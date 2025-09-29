@@ -1,0 +1,82 @@
+/* Force contrast fixes with high specificity */
+.pelican-logo-header {
+  background-color: #7c3aed !important;
+  background: #7c3aed !important;
+}
+
+.pelican-logo-header span {
+  color: #ffffff !important;
+}
+
+.pelican-logo-footer {
+  background-color: #7c3aed !important;
+  background: #7c3aed !important;
+}
+
+.pelican-logo-footer span {
+  color: #ffffff !important;
+}
+
+.signin-button-custom {
+  background-color: #374151 !important;
+  background: #374151 !important;
+  color: #ffffff !important;
+  border: none !important;
+}
+
+.signin-button-custom:hover {
+  background-color: #4b5563 !important;
+  background: #4b5563 !important;
+}
+
+/* Override any component library styles */
+button.signin-button-custom {
+  background-color: #374151 !important;
+  color: #ffffff !important;
+}
+
+a.signin-button-custom {
+  background-color: #374151 !important;
+  color: #ffffff !important;
+}
+
+/* Adding more specific selectors to override inline styles */
+span[style*="backgroundColor: #7c3aed"] {
+  background-color: #7c3aed !important;
+  background: #7c3aed !important;
+  color: #ffffff !important;
+}
+
+span[style*='backgroundColor: "#7c3aed"'] {
+  background-color: #7c3aed !important;
+  background: #7c3aed !important;
+  color: #ffffff !important;
+}
+
+span[style*="backgroundColor: #374151"] {
+  background-color: #374151 !important;
+  background: #374151 !important;
+  color: #ffffff !important;
+}
+
+/* Force purple background on P logo spans */
+span.purple-logo {
+  background-color: #7c3aed !important;
+  color: #ffffff !important;
+}
+
+/* Target spans containing "Sign In" */
+span.signin-text {
+  background-color: #374151 !important;
+  color: #ffffff !important;
+}
+
+/* Removed the universal span override that was causing text display issues */
+/* Removed: body span { color: inherit !important; } */
+
+/* More specific targeting to avoid affecting message content */
+.header-area span[style*="color: #ffffff"],
+.footer-area span[style*="color: #ffffff"],
+.signin-area span[style*="color: #ffffff"] {
+  color: #ffffff !important;
+}

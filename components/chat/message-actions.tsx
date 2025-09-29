@@ -1,0 +1,378 @@
+"use client"
+
+import type React from "react"
+
+import { useState, useRef, useEffect } from "react"
+import { useRouter } from "next/navigation"
+import { Button } from "@/components/ui/button"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { Textarea } from "@/components/ui/textarea"
+import {
+  Copy,
+  RotateCcw,
+  Square,
+  ThumbsUp,
+  ThumbsDown,
+  Share,
+  MoreHorizontal,
+  Check,
+  GitBranch,
+  Edit3,
+  Trash2,
+  Star,
+  Loader2,
+  X,
+  Save,
+} from "lucide-react"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
+import { useToast } from "@/hooks/use-toast"
+import { useConversations } from "@/hooks/use-conversations"
+import type { Message } from "@/lib/chat-utils"
+import { cn } from "@/lib/utils"
+
+interface MessageActionsProps {
+  message: Message
+  onStop?: () => void
+  onRegenerate?: () => void
+  onReaction?: (messageId: string, reaction: "like" | "dislike") => void
+  onEdit?: (id: string, newContent: string) => void
+  onDelete?: (id: string) => void
+  onPin?: (id: string) => void
+  isRegenerating?: boolean
+  canDelete?: boolean
+}
+
+export function MessageActions({
+  message,
+  onStop,
+  onRegenerate,
+  onReaction,
+  onEdit,
+  onDelete,
+  onPin,
+  isRegenerating = false,
+  canDelete = true,
+}: MessageActionsProps) {
+  const [copied, setCopied] = useState(false)
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+  const [isEditing, setIsEditing] = useState(false)
+  const [editContent, setEditContent] = useState(message.content)
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const { toast } = useToast()
+  const router = useRouter()
+  const { createConversation } = useConversations()
+
+  const handlePin = () => {
+    onPin?.(message.id)
+  }
+
+  const handleDelete = () => {
+    onDelete?.(message.id)
+    setShowDeleteDialog(false)
+    toast({
+      title: "Message deleted",
+      description: "Your message has been deleted successfully.",
+      variant: "destructive",
+    })
+  }
+
+  useEffect(() => {
+    if (isEditing && textareaRef.current) {
+      textareaRef.current.focus()
+      textareaRef.current.select()
+      textareaRef.current.style.height = "auto"
+      textareaRef.current.style.height = textareaRef.current.scrollHeight + "px"
+    }
+  }, [isEditing])
+
+  const handleCopy = async () => {
+    try {
+      const markdownContent = `**${message.role === "user" ? "You" : "Pelican AI"}:** ${message.content}`
+      await navigator.clipboard.writeText(markdownContent)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+      toast({
+        title: "Copied to clipboard",
+        description: "Message content has been copied with formatting.",
+      })
+    } catch (error) {
+      toast({
+        title: "Failed to copy",
+        description: "Could not copy message to clipboard.",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const handleShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: "Pelican AI Chat",
+          text: message.content,
+        })
+      } catch (error) {
+        // User cancelled or error occurred
+      }
+    } else {
+      handleCopy()
+    }
+  }
+
+  const handleReaction = (reaction: "like" | "dislike") => {
+    onReaction?.(message.id, reaction)
+    toast({
+      title: reaction === "like" ? "Feedback sent" : "Feedback sent",
+      description: `Thank you for your ${reaction === "like" ? "positive" : "constructive"} feedback!`,
+    })
+  }
+
+  const handleBranchChat = async () => {
+    try {
+      const conversation = await createConversation("Branched Chat")
+      if (conversation) {
+        router.push(`/chat?conversation=${conversation.id}&branch=${message.id}`)
+        toast({
+          title: "New chat created",
+          description: "Started a new conversation from this message.",
+        })
+      }
+    } catch (error) {
+      toast({
+        title: "Failed to branch chat",
+        description: "Could not create a new conversation.",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const handleEdit = () => {
+    if (message.role === "user" && onEdit) {
+      setIsEditing(true)
+      setEditContent(message.content)
+    }
+  }
+
+  const handleSaveEdit = () => {
+    if (editContent.trim() !== "" && onEdit) {
+      onEdit(message.id, editContent.trim())
+      setIsEditing(false)
+      toast({
+        title: "Message updated",
+        description: "Your message has been edited successfully.",
+      })
+    }
+  }
+
+  const handleCancelEdit = () => {
+    setIsEditing(false)
+    setEditContent(message.content)
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Escape") {
+      handleCancelEdit()
+    } else if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+      e.preventDefault()
+      handleSaveEdit()
+    }
+  }
+
+  if (isEditing && message.role === "user") {
+    return (
+      <div className="w-full max-w-md ml-auto">
+        <Textarea
+          ref={textareaRef}
+          value={editContent}
+          onChange={(e) => setEditContent(e.target.value)}
+          onKeyDown={handleKeyDown}
+          className="min-h-[60px] resize-none"
+          placeholder="Edit your message..."
+        />
+        <div className="flex justify-end gap-2 mt-2">
+          <Button variant="outline" size="sm" onClick={handleCancelEdit}>
+            <X className="w-3 h-3 mr-1" />
+            Cancel
+          </Button>
+          <Button size="sm" onClick={handleSaveEdit} disabled={!editContent.trim()}>
+            <Save className="w-3 h-3 mr-1" />
+            Save
+          </Button>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <TooltipProvider>
+      <div className="flex items-center gap-1 min-h-[28px]">
+        {message.isStreaming && onStop && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="sm" onClick={onStop} className="h-7 w-7 p-0">
+                <Square className="w-3 h-3" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Stop generation</TooltipContent>
+          </Tooltip>
+        )}
+
+        {/* Always show copy button, just disable it during streaming */}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleCopy}
+              className="h-7 w-7 p-0"
+              disabled={message.isStreaming}
+            >
+              {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Copy message</TooltipContent>
+        </Tooltip>
+
+        {onPin && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handlePin}
+                    className="h-7 w-7 p-0"
+                    disabled={message.isStreaming}
+                  >
+                    <Star className={cn("w-3 h-3", message.isPinned && "fill-current text-yellow-500")} />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>{message.isPinned ? "Unpin message" : "Pin message"}</TooltipContent>
+              </Tooltip>
+            )}
+
+        {message.role === "user" && onEdit && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleEdit}
+                    className="h-7 w-7 p-0"
+                    disabled={message.isStreaming}
+                  >
+                    <Edit3 className="w-3 h-3" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Edit message</TooltipContent>
+              </Tooltip>
+            )}
+
+        {message.role === "assistant" && onRegenerate && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={onRegenerate}
+                    disabled={isRegenerating || message.isStreaming}
+                    className="h-7 w-7 p-0"
+                  >
+                    {isRegenerating ? <Loader2 className="w-3 h-3 animate-spin" /> : <RotateCcw className="w-3 h-3" />}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>{isRegenerating ? "Regenerating..." : "Regenerate response"}</TooltipContent>
+              </Tooltip>
+            )}
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 w-7 p-0"
+                  disabled={message.isStreaming}
+                >
+                  <MoreHorizontal className="w-3 h-3" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                {message.role === "assistant" && (
+                  <>
+                    <DropdownMenuItem onClick={() => handleReaction("like")}>
+                      <ThumbsUp className="w-4 h-4 mr-2" />
+                      Good response
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleReaction("dislike")}>
+                      <ThumbsDown className="w-4 h-4 mr-2" />
+                      Poor response
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                  </>
+                )}
+
+                {message.role === "assistant" && (
+                  <DropdownMenuItem onClick={handleBranchChat}>
+                    <GitBranch className="w-4 h-4 mr-2" />
+                    Branch into new chat
+                  </DropdownMenuItem>
+                )}
+
+                <DropdownMenuItem onClick={handleShare}>
+                  <Share className="w-4 h-4 mr-2" />
+                  Share
+                </DropdownMenuItem>
+
+                {canDelete && onDelete && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      onClick={() => setShowDeleteDialog(true)}
+                      className="text-destructive focus:text-destructive"
+                    >
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      Delete message
+                    </DropdownMenuItem>
+                  </>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+      </div>
+
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete message</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this message? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </TooltipProvider>
+  )
+}

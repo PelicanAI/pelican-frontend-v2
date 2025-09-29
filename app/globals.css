@@ -1,0 +1,774 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "./contrast-fixes.css";
+
+:root {
+  /* Updated color scheme to match PelicanAI purple gradient branding */
+  --background: oklch(0.98 0.005 280); /* Light background with purple tint */
+  --foreground: oklch(0.15 0.01 280); /* Dark text */
+  --card: oklch(1 0 0); /* Pure white cards */
+  --card-foreground: oklch(0.15 0 0); /* Dark text on cards */
+  --popover: oklch(0.99 0.002 280); /* Slightly tinted white for AI responses */
+  --popover-foreground: oklch(0.15 0 0); /* Dark text on AI responses */
+  --primary: oklch(0.55 0.2 290); /* PelicanAI purple primary */
+  --primary-foreground: oklch(1 0 0); /* White text on primary */
+  --secondary: oklch(0.65 0.15 300); /* Lighter purple for accents */
+  --secondary-foreground: oklch(1 0 0); /* White text on secondary */
+  --muted: oklch(0.96 0.005 280); /* Light muted background */
+  --muted-foreground: oklch(0.45 0.01 280); /* Muted text */
+  --accent: oklch(0.6 0.18 295); /* Purple accent for highlights */
+  --accent-foreground: oklch(1 0 0); /* White text on accent */
+  --destructive: oklch(0.55 0.15 25); /* Orange for warnings */
+  --destructive-foreground: oklch(1 0 0); /* White text on destructive */
+  --border: oklch(0.9 0.005 280); /* Light borders */
+  --input: oklch(1 0 0); /* White input backgrounds */
+  --ring: oklch(0.55 0.2 290 / 0.3); /* Purple focus ring */
+  --chart-1: oklch(0.55 0.2 290); /* Primary purple for charts */
+  --chart-2: oklch(0.65 0.15 300); /* Secondary purple */
+  --chart-3: oklch(0.55 0.15 25); /* Orange for warnings */
+  --chart-4: oklch(0.4 0.01 280); /* Dark slate */
+  --chart-5: oklch(0.5 0.2 270); /* Deep purple accent */
+  --radius: 0.5rem; /* Professional radius */
+  --sidebar: oklch(1 0 0);
+  --sidebar-foreground: oklch(0.15 0.01 280);
+  --sidebar-primary: oklch(0.55 0.2 290);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.65 0.15 300);
+  --sidebar-accent-foreground: oklch(1 0 0);
+  --sidebar-border: oklch(0.9 0.005 280);
+  --sidebar-ring: oklch(0.55 0.2 290 / 0.3);
+  --font-inter: "Inter", sans-serif; /* Define Inter font */
+}
+
+/* Fixed dark mode selector to work properly with next-themes */
+.dark {
+  /* Improved dark theme with layered surfaces and better contrast */
+  /* Bases */
+  --background: oklch(0.09 0.01 280); /* page bg */
+  --foreground: oklch(0.96 0.004 300); /* main text */
+  --muted: oklch(0.15 0.01 280);
+  --muted-foreground: oklch(0.73 0.005 300);
+
+  /* Layered surfaces (for depth) */
+  --surface-1: oklch(0.11 0.01 280); /* sidebar / chrome */
+  --surface-2: oklch(0.13 0.01 280); /* cards/bubbles */
+  --surface-3: oklch(0.16 0.01 280); /* popovers/menus */
+
+  /* Borders & focus */
+  --border: oklch(0.3 0.01 280); /* more visible borders */
+  --ring: oklch(0.7 0.16 290);
+
+  /* Brand */
+  --primary: oklch(0.7 0.2 290); /* Pelican purple */
+  --primary-foreground: oklch(0.1 0.01 280);
+  --accent: oklch(0.76 0.18 295);
+  --accent-foreground: oklch(0.08 0.01 280);
+  --secondary: oklch(0.25 0.01 280);
+  --secondary-foreground: oklch(0.95 0.005 300);
+  --destructive: oklch(0.6 0.15 25);
+  --destructive-foreground: oklch(0.08 0.01 280);
+  --input: oklch(0.15 0.01 280);
+  --chart-1: oklch(0.7 0.2 290);
+  --chart-2: oklch(0.8 0.15 300);
+  --chart-3: oklch(0.6 0.15 25);
+  --chart-4: oklch(0.7 0.01 280);
+  --chart-5: oklch(0.75 0.2 270);
+
+  /* Components that map to your design tokens */
+  --card: var(--surface-2);
+  --card-foreground: oklch(0.95 0.005 300);
+  --popover: var(--surface-3);
+  --popover-foreground: oklch(0.95 0.005 300);
+  --sidebar: var(--surface-1);
+  --sidebar-foreground: oklch(0.95 0.005 300);
+  --sidebar-primary: oklch(0.7 0.2 290);
+  --sidebar-primary-foreground: oklch(0.1 0.01 280);
+  --sidebar-accent: oklch(0.25 0.01 280);
+  --sidebar-accent-foreground: oklch(0.95 0.005 300);
+  --sidebar-border: oklch(0.3 0.01 280);
+  --sidebar-ring: oklch(0.7 0.16 290);
+}
+
+/* Added smooth theme transitions with reduced-motion safety */
+@media (prefers-reduced-motion: no-preference) {
+  :root,
+  .dark {
+    transition: background-color 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+  }
+}
+
+/* Adding Pro Dark theme overrides for refined dark mode */
+.dark.pro-dark {
+  --foreground: oklch(0.98 0.004 300);
+  --surface-2: oklch(0.12 0.01 280);
+  --border: oklch(0.36 0.01 280);
+}
+
+@theme inline {
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-geist-mono);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    /* adding premium typography rendering optimizations */
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Global focus ring styles for better accessibility */
+  .focus-outline {
+    outline: none;
+  }
+
+  .focus-outline:focus-visible {
+    box-shadow: 0 0 0 2px var(--ring), 0 0 0 4px var(--background);
+  }
+}
+
+@layer utilities {
+  .signin-button-custom,
+  .signin-button-custom:link,
+  .signin-button-custom:visited,
+  a.signin-button-custom,
+  button.signin-button-custom {
+    background-color: #374151 !important;
+    background: #374151 !important;
+    color: #ffffff !important;
+    border-color: #374151 !important;
+  }
+
+  .signin-button-custom:hover,
+  .signin-button-custom:focus,
+  a.signin-button-custom:hover,
+  a.signin-button-custom:focus,
+  button.signin-button-custom:hover,
+  button.signin-button-custom:focus {
+    background-color: #4b5563 !important;
+    background: #4b5563 !important;
+    color: #ffffff !important;
+    border-color: #4b5563 !important;
+  }
+
+  /* Glow animation utilities */
+  .glow-button {
+    position: relative;
+    overflow: hidden;
+    transition: all 700ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .glow-button::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    opacity: 0;
+    transition: all 500ms cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  .glow-button:hover {
+    transform: scale(1.05);
+  }
+
+  .glow-button:hover::before {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+
+  /* Primary button glow (purple theme) */
+  .glow-primary::before {
+    background: radial-gradient(
+      circle,
+      rgba(139, 92, 246, 0.15) 0%,
+      rgba(124, 58, 237, 0.08) 50%,
+      rgba(109, 40, 217, 0) 100%
+    );
+  }
+
+  /* Secondary button glow (blue theme) */
+  .glow-secondary::before {
+    background: radial-gradient(
+      circle,
+      rgba(59, 130, 246, 0.15) 0%,
+      rgba(37, 99, 235, 0.08) 50%,
+      rgba(29, 78, 216, 0) 100%
+    );
+  }
+
+  /* Success button glow (green theme) */
+  .glow-success::before {
+    background: radial-gradient(
+      circle,
+      rgba(34, 197, 94, 0.15) 0%,
+      rgba(22, 163, 74, 0.08) 50%,
+      rgba(21, 128, 61, 0) 100%
+    );
+  }
+
+  /* Danger button glow (red theme) */
+  .glow-danger::before {
+    background: radial-gradient(
+      circle,
+      rgba(239, 68, 68, 0.15) 0%,
+      rgba(220, 38, 38, 0.08) 50%,
+      rgba(185, 28, 28, 0) 100%
+    );
+  }
+
+  /* Ghost button glow (neutral theme) */
+  .glow-ghost::before {
+    background: radial-gradient(
+      circle,
+      rgba(156, 163, 175, 0.1) 0%,
+      rgba(107, 114, 128, 0.05) 50%,
+      rgba(75, 85, 99, 0) 100%
+    );
+    transition: opacity 300ms cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  /* Conversation row glow */
+  .glow-conversation {
+    position: relative;
+    overflow: hidden;
+    transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .glow-conversation::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    opacity: 0;
+    background: radial-gradient(
+      circle,
+      rgba(139, 92, 246, 0.08) 0%,
+      rgba(124, 58, 237, 0.04) 50%,
+      rgba(109, 40, 217, 0) 100%
+    );
+    transition: opacity 300ms cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  .glow-conversation:hover::before {
+    opacity: 1;
+  }
+
+  /* Send button special glow */
+  .glow-send {
+    position: relative;
+    overflow: hidden;
+    transition: all 400ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .glow-send::before {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    border-radius: inherit;
+    opacity: 0;
+    background: radial-gradient(
+      circle,
+      rgba(139, 92, 246, 0.2) 0%,
+      rgba(124, 58, 237, 0.1) 50%,
+      rgba(109, 40, 217, 0) 100%
+    );
+    transition: all 400ms cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  .glow-send:hover {
+    transform: scale(1.08);
+  }
+
+  .glow-send:hover::before {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+
+  .glow-send:active {
+    transform: scale(0.98);
+  }
+
+  /* Adding text overflow and word-breaking utilities */
+  .message-content {
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    hyphens: auto;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .code-block {
+    overflow-x: auto;
+    max-width: 100%;
+    white-space: pre;
+    position: relative;
+  }
+
+  .code-block-fade {
+    position: relative;
+  }
+
+  .code-block-fade::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 20px;
+    height: 100%;
+    background: linear-gradient(to left, currentColor 0%, transparent 100%);
+    opacity: 0.1;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+  }
+
+  .code-block-fade:hover::after {
+    opacity: 0.2;
+  }
+
+  /* Text wrapping utilities */
+  .break-words-anywhere {
+    word-break: break-word;
+    overflow-wrap: anywhere;
+  }
+
+  .break-all-safe {
+    word-break: break-all;
+    overflow-wrap: break-word;
+  }
+
+  .text-wrap-balance {
+    text-wrap: balance;
+  }
+
+  .text-wrap-pretty {
+    text-wrap: pretty;
+  }
+
+  /* Long URL handling */
+  .url-break {
+    word-break: break-all;
+    overflow-wrap: anywhere;
+    hyphens: none;
+  }
+
+  /* Container max-width utilities for messages */
+  .message-container-user {
+    max-width: min(70%, 600px);
+  }
+
+  .message-container-assistant {
+    max-width: 100%;
+  }
+
+  /* Premium typography utilities for message components */
+  .premium-text {
+    font-weight: 450;
+    line-height: 1.6;
+    letter-spacing: 0.01em;
+    text-rendering: optimizeLegibility;
+  }
+
+  .premium-text-bold {
+    font-weight: 600;
+  }
+
+  .premium-text-medium {
+    font-weight: 500;
+  }
+
+  /* Enhanced selection styles with purple theme */
+  ::selection {
+    background-color: rgba(139, 92, 246, 0.2);
+    color: inherit;
+  }
+
+  .dark ::selection {
+    background-color: rgba(139, 92, 246, 0.3);
+    color: inherit;
+  }
+
+  /* Message-specific selection styles */
+  .message-user ::selection {
+    background-color: rgba(255, 255, 255, 0.3);
+    color: inherit;
+  }
+
+  .message-assistant ::selection {
+    background-color: rgba(139, 92, 246, 0.2);
+    color: inherit;
+  }
+
+  .dark .message-assistant ::selection {
+    background-color: rgba(139, 92, 246, 0.3);
+    color: inherit;
+  }
+
+  /* Enhanced link styles with purple theme and hover animations */
+  .premium-link {
+    color: rgb(139, 92, 246);
+    font-weight: 500;
+    text-decoration: none;
+    position: relative;
+    transition: color 0.2s ease;
+  }
+
+  .premium-link:hover {
+    color: rgb(124, 58, 237);
+  }
+
+  .premium-link::after {
+    content: "";
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background-color: currentColor;
+    transition: width 0.3s ease;
+  }
+
+  .premium-link:hover::after {
+    width: 100%;
+  }
+
+  /* Enhanced markdown styling for message content */
+  .markdown-content h1,
+  .markdown-content h2,
+  .markdown-content h3,
+  .markdown-content h4,
+  .markdown-content h5,
+  .markdown-content h6 {
+    font-weight: 600;
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+    line-height: 1.3;
+  }
+
+  .markdown-content h1 {
+    font-size: 1.5em;
+  }
+  .markdown-content h2 {
+    font-size: 1.3em;
+  }
+  .markdown-content h3 {
+    font-size: 1.1em;
+  }
+
+  .markdown-content ul,
+  .markdown-content ol {
+    margin: 0.5em 0;
+    padding-left: 1.5em;
+  }
+
+  .markdown-content li {
+    margin: 0.25em 0;
+  }
+
+  .markdown-content strong {
+    font-weight: 600;
+  }
+
+  .markdown-content em {
+    font-style: italic;
+  }
+
+  .markdown-content code {
+    background-color: rgba(139, 92, 246, 0.1);
+    padding: 0.125em 0.25em;
+    border-radius: 0.25em;
+    font-size: 0.9em;
+    font-family: var(--font-mono);
+  }
+
+  .dark .markdown-content code {
+    background-color: rgba(139, 92, 246, 0.2);
+  }
+
+  /* Adding comprehensive micro-animation and transition utilities */
+
+  /* Standard transition timings for consistent animations */
+  .transition-instant {
+    transition-duration: 50ms;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .transition-fast {
+    transition-duration: 150ms;
+    transition-timing-function: ease;
+  }
+
+  .transition-smooth {
+    transition-duration: 200ms;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .transition-message {
+    transition-duration: 300ms;
+    transition-timing-function: ease-out;
+  }
+
+  /* Message appearance animations */
+  .message-slide-up {
+    animation: messageSlideUp 300ms ease-out;
+  }
+
+  @keyframes messageSlideUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Shake animation for error states */
+  .shake-error {
+    animation: shakeError 500ms ease-in-out;
+  }
+
+  /* Adding animate-shake utility class for Tailwind compatibility */
+  .animate-shake {
+    animation: shakeError 500ms ease-in-out;
+  }
+
+  @keyframes shakeError {
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+    10%,
+    30%,
+    50%,
+    70%,
+    90% {
+      transform: translateX(-2px);
+    }
+    20%,
+    40%,
+    60%,
+    80% {
+      transform: translateX(2px);
+    }
+  }
+
+  /* Typing indicator bounce animation */
+  .typing-dot-bounce {
+    animation: typingDotBounce 0.6s infinite ease-in-out;
+  }
+
+  .typing-dot-bounce:nth-child(1) {
+    animation-delay: 0ms;
+  }
+  .typing-dot-bounce:nth-child(2) {
+    animation-delay: 150ms;
+  }
+  .typing-dot-bounce:nth-child(3) {
+    animation-delay: 300ms;
+  }
+
+  @keyframes typingDotBounce {
+    0%,
+    80%,
+    100% {
+      transform: scale(1) translateY(0);
+      opacity: 0.5;
+    }
+    40% {
+      transform: scale(1.1) translateY(-8px);
+      opacity: 1;
+    }
+  }
+
+  /* Shimmer effect for skeleton loading */
+  .shimmer {
+    background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.1) 50%, transparent 100%);
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite linear;
+  }
+
+  .dark .shimmer {
+    background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.05) 50%, transparent 100%);
+    background-size: 200% 100%;
+  }
+
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+
+  /* Pulse animation for loading states */
+  .pulse-loading {
+    animation: pulseLoading 2s infinite ease-in-out;
+  }
+
+  @keyframes pulseLoading {
+    0%,
+    100% {
+      opacity: 0.3;
+      transform: scale(0.98);
+    }
+    50% {
+      opacity: 0.6;
+      transform: scale(1);
+    }
+  }
+
+  /* Smooth scroll behavior */
+  .smooth-scroll {
+    scroll-behavior: smooth;
+  }
+
+  /* Respect reduced motion preferences */
+  @media (prefers-reduced-motion: reduce) {
+    .message-slide-up,
+    .shake-error,
+    .typing-dot-bounce,
+    .shimmer,
+    .pulse-loading {
+      animation: none;
+    }
+
+    .transition-instant,
+    .transition-fast,
+    .transition-smooth,
+    .transition-message {
+      transition: none;
+    }
+
+    .smooth-scroll {
+      scroll-behavior: auto;
+    }
+
+    /* Disable all transforms and animations for reduced motion */
+    * {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  /* Hover state optimizations */
+  .hover-lift {
+    transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-1px);
+  }
+
+  .hover-scale {
+    transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .hover-scale:hover {
+    transform: scale(1.02);
+  }
+
+  /* Focus states for better accessibility */
+  .focus-ring-purple {
+    outline: none;
+    transition: box-shadow 150ms ease;
+  }
+
+  .focus-ring-purple:focus-visible {
+    box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.5), 0 0 0 4px rgba(139, 92, 246, 0.1);
+  }
+
+  /* Button press feedback */
+  .press-feedback {
+    transition: transform 100ms ease;
+  }
+
+  .press-feedback:active {
+    transform: scale(0.98);
+  }
+
+  /* Stagger animation delays for lists */
+  .stagger-1 {
+    animation-delay: 50ms;
+  }
+  .stagger-2 {
+    animation-delay: 100ms;
+  }
+  .stagger-3 {
+    animation-delay: 150ms;
+  }
+  .stagger-4 {
+    animation-delay: 200ms;
+  }
+  .stagger-5 {
+    animation-delay: 250ms;
+  }
+
+  /* Adding safe area inset utilities for mobile devices */
+  .pb-safe-area-inset-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+
+  .pt-safe-area-inset-top {
+    padding-top: env(safe-area-inset-top, 0);
+  }
+
+  .pl-safe-area-inset-left {
+    padding-left: env(safe-area-inset-left, 0);
+  }
+
+  .pr-safe-area-inset-right {
+    padding-right: env(safe-area-inset-right, 0);
+  }
+}

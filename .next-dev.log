@@ -1,0 +1,22 @@
+
+> my-v0-project@0.1.0 dev
+> next dev --port 3000
+
+  ▲ Next.js 14.2.16
+  - Local:        http://localhost:3000
+  - Environments: .env.local
+
+ ✓ Starting...
+ ✓ Ready in 1203ms
+ ✓ Compiled /middleware in 339ms (145 modules)
+ ✓ Compiled /api/health in 236ms (149 modules)
+ GET /api/health 200 in 762ms
+<w> [webpack.cache.PackFileCacheStrategy] Serializing big strings (114kiB) impacts deserialization performance (consider using Buffer instead and decode when needed)
+ ○ Compiling /chat ...
+ ✓ Compiled /chat in 3.3s (2069 modules)
+ GET /chat 200 in 3514ms
+ ○ Compiling /_not-found ...
+ ✓ Compiled /_not-found in 554ms (2169 modules)
+ GET /user-avatar.png 404 in 559ms
+ GET /api/conversations/guest-1759165082742-5vc4lg9mv 401 in 905ms
+ GET /api/conversations/guest-1759165932011-bkjnhoe4c 401 in 11ms

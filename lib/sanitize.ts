@@ -1,0 +1,131 @@
+/**
+ * Sanitizes user input to prevent XSS attacks
+ * Removes potentially dangerous HTML/script content while preserving formatting
+ */
+
+const DANGEROUS_PATTERNS = [
+  /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
+  /<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi,
+  /javascript:/gi,
+  /on\w+\s*=/gi,
+  /<embed\b[^>]*>/gi,
+  /<object\b[^>]*>/gi,
+  /data:text\/html/gi,
+  /<link\b[^>]*>/gi,
+  /<meta\b[^>]*>/gi,
+]
+
+const HTML_ENTITIES: Record<string, string> = {
+  "&": "&amp;",
+  "<": "&lt;",
+  ">": "&gt;",
+  '"': "&quot;",
+  "'": "&#x27;",
+  "/": "&#x2F;",
+}
+
+/**
+ * Escapes HTML special characters
+ */
+export function escapeHtml(text: string): string {
+  return text.replace(/[&<>"'/]/g, (char) => HTML_ENTITIES[char] || char)
+}
+
+/**
+ * Sanitizes user message content
+ * - Removes dangerous patterns
+ * - Escapes HTML entities
+ * - Trims whitespace
+ * - Limits length to prevent abuse
+ */
+export function sanitizeMessage(message: string, maxLength: number = 10000): string {
+  if (!message || typeof message !== "string") {
+    return ""
+  }
+
+  let sanitized = message.trim()
+
+  for (const pattern of DANGEROUS_PATTERNS) {
+    sanitized = sanitized.replace(pattern, "")
+  }
+
+  sanitized = escapeHtml(sanitized)
+
+  if (sanitized.length > maxLength) {
+    sanitized = sanitized.slice(0, maxLength)
+  }
+
+  return sanitized
+}
+
+/**
+ * Sanitizes filename for uploads
+ * - Removes path traversal attempts
+ * - Removes dangerous characters
+ * - Limits length
+ */
+export function sanitizeFilename(filename: string, maxLength: number = 255): string {
+  if (!filename || typeof filename !== "string") {
+    return "unnamed_file"
+  }
+
+  let sanitized = filename
+    .replace(/\.\./g, "")
+    .replace(/[\/\\]/g, "")
+    .replace(/[\x00-\x1f\x80-\x9f]/g, "")
+    .replace(/[<>:"|?*]/g, "")
+    .trim()
+
+  if (sanitized.length === 0) {
+    return "unnamed_file"
+  }
+
+  if (sanitized.length > maxLength) {
+    const ext = sanitized.split(".").pop() || ""
+    const name = sanitized.slice(0, maxLength - ext.length - 1)
+    sanitized = `${name}.${ext}`
+  }
+
+  return sanitized
+}
+
+/**
+ * Validates and sanitizes URL
+ * Only allows http/https protocols
+ */
+export function sanitizeUrl(url: string): string | null {
+  if (!url || typeof url !== "string") {
+    return null
+  }
+
+  try {
+    const parsed = new URL(url)
+
+    if (!["http:", "https:"].includes(parsed.protocol)) {
+      return null
+    }
+
+    return parsed.toString()
+  } catch {
+    return null
+  }
+}
+
+/**
+ * Sanitizes conversation title
+ */
+export function sanitizeTitle(title: string, maxLength: number = 200): string {
+  if (!title || typeof title !== "string") {
+    return "Untitled"
+  }
+
+  let sanitized = title.trim().replace(/[\n\r\t]/g, " ").replace(/\s+/g, " ")
+
+  sanitized = escapeHtml(sanitized)
+
+  if (sanitized.length > maxLength) {
+    sanitized = sanitized.slice(0, maxLength) + "..."
+  }
+
+  return sanitized || "Untitled"
+}
