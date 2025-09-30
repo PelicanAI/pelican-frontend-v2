@@ -477,3 +477,113 @@ Require stack:
  ✓ Compiled /_error in 254ms (2270 modules)
  GET /_next/static/css/app/layout.css?v=1759206109795 500 in 434ms
  ✓ Compiled in 688ms (2279 modules)
+ ✓ Compiled in 671ms (2279 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, lstat '/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/vendor-chunks/aria-hidden.js'
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving './vendor-chunks/aria-hidden' in /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server for build dependencies doesn't lead to expected result '/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/vendor-chunks/aria-hidden.js', but to 'Error: Can't resolve './vendor-chunks/aria-hidden' in '/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server'' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ./vendor-chunks/aria-hidden (expected /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/vendor-chunks/aria-hidden.js)
+<w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/webpack-runtime.js
+<w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/webpack-runtime.js
+<w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/app/api/health/route.js
+<w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/app/api/health/route.js
+<w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/require.js
+<w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/require.js
+<w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/load-components.js
+<w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/load-components.js
+<w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/utils.js
+<w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/utils.js
+<w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js
+<w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js
+<w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/compiled/webpack/bundle5.js
+<w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/compiled/webpack/bundle5.js
+<w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/compiled/webpack/webpack.js
+<w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/compiled/webpack/webpack.js
+<w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/webpack/plugins/define-env-plugin.js
+<w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/webpack/plugins/define-env-plugin.js
+<w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/swc/index.js
+<w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/swc/index.js
+<w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/webpack/loaders/next-swc-loader.js
+<w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/webpack/loaders/next-swc-loader.js
+<w>  at resolve commonjs /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/webpack/loaders/next-swc-loader.js
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving './vendor-chunks/cookie' in /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server for build dependencies doesn't lead to expected result '/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/vendor-chunks/cookie.js', but to 'Error: Can't resolve './vendor-chunks/cookie' in '/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server'' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ./vendor-chunks/cookie (expected /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/vendor-chunks/cookie.js)
+<w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/webpack-runtime.js
+<w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/webpack-runtime.js
+<w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/app/api/health/route.js
+<w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/app/api/health/route.js
+<w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/require.js
+<w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/require.js
+<w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/load-components.js
+<w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/load-components.js
+<w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/utils.js
+<w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/utils.js
+<w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js
+<w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js
+<w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/compiled/webpack/bundle5.js
+<w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/compiled/webpack/bundle5.js
+<w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/compiled/webpack/webpack.js
+<w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/compiled/webpack/webpack.js
+<w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/webpack/plugins/define-env-plugin.js
+<w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/webpack/plugins/define-env-plugin.js
+<w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/swc/index.js
+<w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/swc/index.js
+<w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/webpack/loaders/next-swc-loader.js
+<w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/webpack/loaders/next-swc-loader.js
+<w>  at resolve commonjs /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/webpack/loaders/next-swc-loader.js
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving './vendor-chunks/get-nonce' in /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server for build dependencies doesn't lead to expected result '/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/vendor-chunks/get-nonce.js', but to 'Error: Can't resolve './vendor-chunks/get-nonce' in '/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server'' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ./vendor-chunks/get-nonce (expected /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/vendor-chunks/get-nonce.js)
+<w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/webpack-runtime.js
+<w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/webpack-runtime.js
+<w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/app/api/health/route.js
+<w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/app/api/health/route.js
+<w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/require.js
+<w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/require.js
+<w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/load-components.js
+<w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/load-components.js
+<w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/utils.js
+<w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/utils.js
+<w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js
+<w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js
+<w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/compiled/webpack/bundle5.js
+<w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/compiled/webpack/bundle5.js
+<w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/compiled/webpack/webpack.js
+<w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/compiled/webpack/webpack.js
+<w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/webpack/plugins/define-env-plugin.js
+<w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/webpack/plugins/define-env-plugin.js
+<w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/swc/index.js
+<w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/swc/index.js
+<w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/webpack/loaders/next-swc-loader.js
+<w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/webpack/loaders/next-swc-loader.js
+<w>  at resolve commonjs /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/webpack/loaders/next-swc-loader.js
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving './vendor-chunks/webidl-conversions' in /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server for build dependencies doesn't lead to expected result '/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/vendor-chunks/webidl-conversions.js', but to 'Error: Can't resolve './vendor-chunks/webidl-conversions' in '/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server'' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ./vendor-chunks/webidl-conversions (expected /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/vendor-chunks/webidl-conversions.js)
+<w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/webpack-runtime.js
+<w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/webpack-runtime.js
+<w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/app/api/health/route.js
+<w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/app/api/health/route.js
+<w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/require.js
+<w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/require.js
+<w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/load-components.js
+<w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/load-components.js
+<w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/utils.js
+<w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/utils.js
+<w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js
+<w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js
+<w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/compiled/webpack/bundle5.js
+<w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/compiled/webpack/bundle5.js
+<w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/compiled/webpack/webpack.js
+<w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/compiled/webpack/webpack.js
+<w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/webpack/plugins/define-env-plugin.js
+<w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/webpack/plugins/define-env-plugin.js
+<w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/swc/index.js
+<w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/swc/index.js
+<w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/webpack/loaders/next-swc-loader.js
+<w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/webpack/loaders/next-swc-loader.js
+<w>  at resolve commonjs /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/webpack/loaders/next-swc-loader.js
