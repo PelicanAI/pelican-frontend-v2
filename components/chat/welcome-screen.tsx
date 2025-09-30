@@ -11,20 +11,24 @@ interface WelcomeScreenProps {
 export function WelcomeScreen({ onQuickStart }: WelcomeScreenProps) {
   const suggestions = [
     {
-      title: "Analyze a stock",
-      subtitle: '"What\'s your take on NVDA?"',
+      title: "Technical Analysis",
+      subtitle: "Analyze $SPY with technical indicators",
+      icon: "📊",
     },
     {
-      title: "Trading strategy",
-      subtitle: '"Help me with risk management"',
+      title: "Options Scanner",
+      subtitle: "Find options plays expiring this week",
+      icon: "🎯",
     },
     {
-      title: "Market overview",
-      subtitle: '"What\'s moving the market?"',
+      title: "High IV Stocks",
+      subtitle: "Show me high IV rank stocks",
+      icon: "⚡",
     },
     {
-      title: "Options play",
-      subtitle: '"Find me a bullish strategy"',
+      title: "Market Sentiment",
+      subtitle: "What's the market sentiment today?",
+      icon: "🌡️",
     },
   ]
 
@@ -56,12 +60,19 @@ export function WelcomeScreen({ onQuickStart }: WelcomeScreenProps) {
             {suggestions.map((suggestion, index) => (
               <Card
                 key={index}
-                className="p-4 cursor-pointer transition-colors group text-left border border-white/5 hover:bg-muted/50 bg-[var(--surface-2)]"
-                onClick={() => onQuickStart(suggestion.subtitle.replace(/"/g, ""))}
+                className="min-h-[72px] p-4 cursor-pointer transition-all duration-200 group text-left border border-white/5 hover:bg-muted/50 bg-[var(--surface-2)] hover:scale-[1.02] hover:shadow-lg rounded-xl"
+                onClick={() => onQuickStart(suggestion.subtitle)}
               >
-                <div className="space-y-1">
-                  <h3 className="font-medium text-sm text-card-foreground">{suggestion.title}</h3>
-                  <p className="text-xs text-muted-foreground">{suggestion.subtitle}</p>
+                <div className="flex items-start gap-3">
+                  <div className="text-2xl flex-shrink-0 group-hover:scale-110 transition-transform">
+                    {suggestion.icon}
+                  </div>
+                  <div className="space-y-1.5 flex-1">
+                    <h3 className="font-semibold text-sm text-card-foreground group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors leading-snug">
+                      {suggestion.title}
+                    </h3>
+                    <p className="text-xs text-muted-foreground leading-relaxed">{suggestion.subtitle}</p>
+                  </div>
                 </div>
               </Card>
             ))}

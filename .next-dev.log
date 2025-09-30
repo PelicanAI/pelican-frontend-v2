@@ -20,3 +20,387 @@
  GET /user-avatar.png 404 in 559ms
  GET /api/conversations/guest-1759165082742-5vc4lg9mv 401 in 905ms
  GET /api/conversations/guest-1759165932011-bkjnhoe4c 401 in 11ms
+ ✓ Compiled in 1272ms (2051 modules)
+ ✓ Compiled in 412ms (2051 modules)
+ ✓ Compiled in 325ms (1031 modules)
+ ✓ Compiled in 837ms (2051 modules)
+ ✓ Compiled in 274ms (2051 modules)
+ ✓ Compiled /api/conversations/[id] in 385ms (2155 modules)
+ GET /api/conversations/guest-1759165932011-bkjnhoe4c 401 in 596ms
+ GET /user-avatar.png 404 in 679ms
+ ✓ Compiled in 614ms (2181 modules)
+ ✓ Compiled in 344ms (1039 modules)
+ ✓ Compiled in 379ms (2181 modules)
+ ✓ Compiled in 385ms (2181 modules)
+ ✓ Compiled in 393ms (1037 modules)
+ ✓ Compiled in 404ms (1037 modules)
+ ✓ Compiled in 812ms (2063 modules)
+ ✓ Compiled in 566ms (2065 modules)
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ GET /chat?conversation=guest-1759165932011-bkjnhoe4c&_r=1759183478204 200 in 181ms
+ ✓ Compiled /api/conversations/[id] in 135ms (1142 modules)
+ GET /api/conversations/guest-1759165932011-bkjnhoe4c 401 in 237ms
+ ✓ Compiled in 690ms (2180 modules)
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ GET /chat?conversation=guest-1759165932011-bkjnhoe4c&_r=1759183478204 200 in 168ms
+ GET /api/conversations/guest-1759165932011-bkjnhoe4c 401 in 42ms
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ✓ Compiled in 997ms (2180 modules)
+ GET /chat?conversation=guest-1759165932011-bkjnhoe4c&_r=1759183478204 200 in 378ms
+ GET /api/conversations/guest-1759165932011-bkjnhoe4c 401 in 90ms
+ ✓ Compiled in 971ms (2186 modules)
+ GET /chat?conversation=guest-1759165932011-bkjnhoe4c&_r=1759183478204 200 in 64ms
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ GET /api/conversations/guest-1759165932011-bkjnhoe4c 401 in 9ms
+ ○ Compiling /_not-found ...
+ ✓ Compiled /_not-found in 987ms (2175 modules)
+ GET /user-avatar.png 404 in 1046ms
+ ✓ Compiled in 536ms (2189 modules)
+ ✓ Compiled in 703ms (2065 modules)
+ ✓ Compiled in 934ms (2063 modules)
+ ✓ Compiled in 344ms (2063 modules)
+ ✓ Compiled in 427ms (2063 modules)
+ ✓ Compiled in 513ms (2063 modules)
+ ✓ Compiled in 749ms (2063 modules)
+ ✓ Compiled in 433ms (2061 modules)
+ ✓ Compiled in 528ms (2063 modules)
+ ✓ Compiled /_not-found in 273ms (2052 modules)
+ GET /user-avatar.png 404 in 362ms
+ ✓ Compiled in 579ms (2063 modules)
+ ✓ Compiled in 386ms (2063 modules)
+ ✓ Compiled in 903ms (2063 modules)
+ ✓ Compiled in 381ms (2063 modules)
+ ✓ Compiled in 599ms (2061 modules)
+ ✓ Compiled in 449ms (2061 modules)
+ ✓ Compiled in 490ms (2055 modules)
+ ✓ Compiled in 510ms (2055 modules)
+ ✓ Compiled in 528ms (2055 modules)
+ ✓ Compiled /_not-found in 369ms (2044 modules)
+ GET /_next/static/css/app/layout.css?v=1759198134452 404 in 448ms
+ ⨯ ./components/chat/chat-input.tsx
+Error: 
+  [31mx[0m Unexpected token `div`. Expected jsx identifier
+     ,-[[36;1;4m/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/components/chat/chat-input.tsx[0m:239:1]
+ [2m239[0m |     const showCharCount = characterCount >= LIMITS.CHAT_MAX_TOKENS * UI.CHAR_COUNT_THRESHOLD
+ [2m240[0m | 
+ [2m241[0m |     return (
+ [2m242[0m |       <div className="w-full">
+     : [31;1m       ^^^[0m
+ [2m243[0m |         <AnimatePresence>
+ [2m244[0m |           {isAIResponding && (
+ [2m245[0m |             <motion.div
+     `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./components/chat/chat-input.tsx
+./app/chat/page.tsx
+ ⨯ ./components/chat/chat-input.tsx
+Error: 
+  [31mx[0m Unexpected token `div`. Expected jsx identifier
+     ,-[[36;1;4m/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/components/chat/chat-input.tsx[0m:239:1]
+ [2m239[0m |     const showCharCount = characterCount >= LIMITS.CHAT_MAX_TOKENS * UI.CHAR_COUNT_THRESHOLD
+ [2m240[0m | 
+ [2m241[0m |     return (
+ [2m242[0m |       <div className="w-full">
+     : [31;1m       ^^^[0m
+ [2m243[0m |         <AnimatePresence>
+ [2m244[0m |           {isAIResponding && (
+ [2m245[0m |             <motion.div
+     `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./components/chat/chat-input.tsx
+./app/chat/page.tsx
+ ⨯ ./components/chat/chat-input.tsx
+Error: 
+  [31mx[0m Unexpected token `div`. Expected jsx identifier
+     ,-[[36;1;4m/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/components/chat/chat-input.tsx[0m:239:1]
+ [2m239[0m |     const showCharCount = characterCount >= LIMITS.CHAT_MAX_TOKENS * UI.CHAR_COUNT_THRESHOLD
+ [2m240[0m | 
+ [2m241[0m |     return (
+ [2m242[0m |       <div className="w-full">
+     : [31;1m       ^^^[0m
+ [2m243[0m |         <AnimatePresence>
+ [2m244[0m |           {isAIResponding && (
+ [2m245[0m |             <motion.div
+     `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./components/chat/chat-input.tsx
+./app/chat/page.tsx
+ ⨯ ./components/chat/chat-input.tsx
+Error: 
+  [31mx[0m Unexpected token `div`. Expected jsx identifier
+     ,-[[36;1;4m/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/components/chat/chat-input.tsx[0m:227:1]
+ [2m227[0m |     const showCharCount = characterCount >= LIMITS.CHAT_MAX_TOKENS * UI.CHAR_COUNT_THRESHOLD
+ [2m228[0m | 
+ [2m229[0m |     return (
+ [2m230[0m |       <div className="w-full">
+     : [31;1m       ^^^[0m
+ [2m231[0m |         <AnimatePresence>
+ [2m232[0m |           {isAIResponding && (
+ [2m233[0m |             <motion.div
+     `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./components/chat/chat-input.tsx
+./app/chat/page.tsx
+ ✓ Compiled in 900ms (2056 modules)
+ ✓ Compiled /_not-found in 122ms (2044 modules)
+ ⨯ Error: Cannot find module './787.js'
+Require stack:
+- /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/webpack-runtime.js
+- /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/app/_not-found/page.js
+- /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/require.js
+- /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/load-components.js
+- /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/utils.js
+- /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/dev/hot-middleware.js
+- /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/dev/hot-reloader-webpack.js
+- /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/lib/router-server.js
+- /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/lib/start-server.js
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1369:15)
+    at /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/require-hook.js:55:36
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1025:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1030:22)
+    at Module._load (node:internal/modules/cjs/loader:1179:37)
+    at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1449:12)
+    at mod.require (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/require-hook.js:65:28)
+    at require (node:internal/modules/helpers:135:16)
+    at __webpack_require__.f.require (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/webpack-runtime.js:203:28)
+    at /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/webpack-runtime.js:111:40
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/webpack-runtime.js:162:22)
+    at /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/app/_not-found/page.js:1:9958
+    at Object.<anonymous> (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/app/_not-found/page.js:1:10003)
+    at Module._compile (node:internal/modules/cjs/loader:1692:14)
+    at Object..js (node:internal/modules/cjs/loader:1824:10)
+    at Module.load (node:internal/modules/cjs/loader:1427:32)
+    at Module._load (node:internal/modules/cjs/loader:1250:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1449:12)
+    at mod.require (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/require-hook.js:65:28)
+    at require (node:internal/modules/helpers:135:16)
+    at requirePage (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/require.js:109:84)
+    at /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/load-components.js:98:84
+    at async loadComponentsImpl (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/load-components.js:98:26)
+    at async DevServer.findPageComponentsImpl (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/next-server.js:709:36)
+    at async DevServer.findPageComponents (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/dev/next-dev-server.js:577:20)
+    at async DevServer.renderErrorToResponseImpl (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/base-server.js:2074:30)
+    at async pipe.req.req (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/base-server.js:2040:30)
+    at async DevServer.pipeImpl (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/base-server.js:921:25)
+    at async /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/dev/next-dev-server.js:339:20
+    at async Span.traceAsyncFn (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/trace/trace.js:154:20)
+    at async DevServer.handleRequest (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/dev/next-dev-server.js:336:24)
+    at async invokeRender (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/lib/router-server.js:173:21)
+    at async handleRequest (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/lib/router-server.js:365:24)
+    at async requestHandlerImpl (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/lib/router-server.js:374:13)
+    at async Server.requestListener (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/lib/start-server.js:141:13) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    '/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/webpack-runtime.js',
+    '/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/app/_not-found/page.js',
+    '/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/require.js',
+    '/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/load-components.js',
+    '/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/utils.js',
+    '/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/dev/hot-middleware.js',
+    '/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/dev/hot-reloader-webpack.js',
+    '/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js',
+    '/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/lib/router-server.js',
+    '/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/lib/start-server.js'
+  ]
+}
+ ✓ Compiled /_error in 493ms (2270 modules)
+ GET /_next/static/css/app/layout.css?v=1759198198955 500 in 1193ms
+ GET /_next/static/css/app/layout.css?v=1759198200192 404 in 54ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, lstat '/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/vendor-chunks/aria-hidden.js'
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving './vendor-chunks/aria-hidden' in /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server for build dependencies doesn't lead to expected result '/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/vendor-chunks/aria-hidden.js', but to 'Error: Can't resolve './vendor-chunks/aria-hidden' in '/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server'' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ./vendor-chunks/aria-hidden (expected /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/vendor-chunks/aria-hidden.js)
+<w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/webpack-runtime.js
+<w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/webpack-runtime.js
+<w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/app/_not-found/page.js
+<w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/app/_not-found/page.js
+<w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/require.js
+<w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/require.js
+<w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/load-components.js
+<w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/load-components.js
+<w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/utils.js
+<w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/utils.js
+<w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/handle-externals.js
+<w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/handle-externals.js
+<w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/webpack/loaders/next-swc-loader.js
+<w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/webpack/loaders/next-swc-loader.js
+<w>  at resolve commonjs /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/webpack/loaders/next-swc-loader.js
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving './vendor-chunks/get-nonce' in /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server for build dependencies doesn't lead to expected result '/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/vendor-chunks/get-nonce.js', but to 'Error: Can't resolve './vendor-chunks/get-nonce' in '/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server'' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ./vendor-chunks/get-nonce (expected /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/vendor-chunks/get-nonce.js)
+<w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/webpack-runtime.js
+<w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/webpack-runtime.js
+<w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/app/_not-found/page.js
+<w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/app/_not-found/page.js
+<w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/require.js
+<w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/require.js
+<w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/load-components.js
+<w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/load-components.js
+<w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/utils.js
+<w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/utils.js
+<w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/handle-externals.js
+<w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/handle-externals.js
+<w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/webpack/loaders/next-swc-loader.js
+<w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/webpack/loaders/next-swc-loader.js
+<w>  at resolve commonjs /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/webpack/loaders/next-swc-loader.js
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving './vendor-chunks/tslib' in /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server for build dependencies doesn't lead to expected result '/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/vendor-chunks/tslib.js', but to 'Error: Can't resolve './vendor-chunks/tslib' in '/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server'' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ./vendor-chunks/tslib (expected /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/vendor-chunks/tslib.js)
+<w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/webpack-runtime.js
+<w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/webpack-runtime.js
+<w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/app/_not-found/page.js
+<w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/app/_not-found/page.js
+<w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/require.js
+<w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/require.js
+<w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/load-components.js
+<w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/load-components.js
+<w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/utils.js
+<w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/utils.js
+<w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/handle-externals.js
+<w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/handle-externals.js
+<w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/webpack/loaders/next-swc-loader.js
+<w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/webpack/loaders/next-swc-loader.js
+<w>  at resolve commonjs /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/webpack/loaders/next-swc-loader.js
+ ✓ Compiled in 541ms (2279 modules)
+ ✓ Compiled /_not-found in 119ms (2268 modules)
+ ⨯ Error: Cannot find module './787.js'
+Require stack:
+- /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/webpack-runtime.js
+- /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/app/_not-found/page.js
+- /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/require.js
+- /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/load-components.js
+- /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/utils.js
+- /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/dev/hot-middleware.js
+- /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/dev/hot-reloader-webpack.js
+- /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/lib/router-server.js
+- /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/lib/start-server.js
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1369:15)
+    at /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/require-hook.js:55:36
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1025:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1030:22)
+    at Module._load (node:internal/modules/cjs/loader:1179:37)
+    at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1449:12)
+    at mod.require (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/require-hook.js:65:28)
+    at require (node:internal/modules/helpers:135:16)
+    at __webpack_require__.f.require (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/webpack-runtime.js:203:28)
+    at /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/webpack-runtime.js:111:40
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/webpack-runtime.js:162:22)
+    at /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/app/_not-found/page.js:1:9958
+    at Object.<anonymous> (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/app/_not-found/page.js:1:10003)
+    at Module._compile (node:internal/modules/cjs/loader:1692:14)
+    at Object..js (node:internal/modules/cjs/loader:1824:10)
+    at Module.load (node:internal/modules/cjs/loader:1427:32)
+    at Module._load (node:internal/modules/cjs/loader:1250:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1449:12)
+    at mod.require (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/require-hook.js:65:28)
+    at require (node:internal/modules/helpers:135:16)
+    at requirePage (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/require.js:109:84)
+    at /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/load-components.js:98:84
+    at async loadComponentsImpl (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/load-components.js:98:26)
+    at async DevServer.findPageComponentsImpl (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/next-server.js:709:36)
+    at async DevServer.findPageComponents (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/dev/next-dev-server.js:577:20)
+    at async DevServer.renderErrorToResponseImpl (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/base-server.js:2074:30)
+    at async pipe.req.req (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/base-server.js:2040:30)
+    at async DevServer.pipeImpl (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/base-server.js:921:25)
+    at async /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/dev/next-dev-server.js:339:20
+    at async Span.traceAsyncFn (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/trace/trace.js:154:20)
+    at async DevServer.handleRequest (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/dev/next-dev-server.js:336:24)
+    at async invokeRender (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/lib/router-server.js:173:21)
+    at async handleRequest (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/lib/router-server.js:365:24)
+    at async requestHandlerImpl (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/lib/router-server.js:374:13)
+    at async Server.requestListener (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/lib/start-server.js:141:13) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    '/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/webpack-runtime.js',
+    '/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/app/_not-found/page.js',
+    '/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/require.js',
+    '/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/load-components.js',
+    '/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/utils.js',
+    '/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/dev/hot-middleware.js',
+    '/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/dev/hot-reloader-webpack.js',
+    '/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js',
+    '/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/lib/router-server.js',
+    '/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/lib/start-server.js'
+  ]
+}
+ ✓ Compiled /_error in 113ms (2270 modules)
+ GET /_next/static/css/app/layout.css?v=1759198330793 500 in 250ms
+ ✓ Compiled in 445ms (2284 modules)
+ ✓ Compiled in 236ms (2284 modules)
+ ⨯ ./components/chat/chat-input.tsx
+Error: 
+  [31mx[0m Unexpected token `div`. Expected jsx identifier
+     ,-[[36;1;4m/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/components/chat/chat-input.tsx[0m:240:1]
+ [2m240[0m |     const showCharCount = characterCount >= LIMITS.CHAT_MAX_TOKENS * UI.CHAR_COUNT_THRESHOLD
+ [2m241[0m | 
+ [2m242[0m |     return (
+ [2m243[0m |       <div className="w-full">
+     : [31;1m       ^^^[0m
+ [2m244[0m |         <AnimatePresence>
+ [2m245[0m |           {isAIResponding && (
+ [2m246[0m |             <motion.div
+     `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./components/chat/chat-input.tsx
+./app/chat/page.tsx
+ ⨯ ./components/chat/chat-input.tsx
+Error: 
+  [31mx[0m Unexpected token `div`. Expected jsx identifier
+     ,-[[36;1;4m/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/components/chat/chat-input.tsx[0m:240:1]
+ [2m240[0m |     const showCharCount = characterCount >= LIMITS.CHAT_MAX_TOKENS * UI.CHAR_COUNT_THRESHOLD
+ [2m241[0m | 
+ [2m242[0m |     return (
+ [2m243[0m |       <div className="w-full">
+     : [31;1m       ^^^[0m
+ [2m244[0m |         <AnimatePresence>
+ [2m245[0m |           {isAIResponding && (
+ [2m246[0m |             <motion.div
+     `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./components/chat/chat-input.tsx
+./app/chat/page.tsx
+ ✓ Compiled in 561ms (2279 modules)
+ ✓ Compiled in 818ms (2279 modules)
+ ✓ Compiled /_not-found in 210ms (2268 modules)
+ GET /_next/static/css/app/layout.css?v=1759204210705 404 in 363ms
+ ✓ Compiled in 421ms (2282 modules)
+ GET /_next/static/css/app/layout.css?v=1759204259431 404 in 66ms
+ ✓ Compiled in 576ms (2279 modules)

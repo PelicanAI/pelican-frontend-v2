@@ -7,6 +7,8 @@ import { Card } from "@/components/ui/card"
 import { Send, Paperclip, Square, Search, MapPin, Globe, Calendar, Mic } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { AttachmentChip } from "./attachment-chip"
+import { InputSuggestions } from "./input-suggestions"
+import { useInputSuggestions } from "@/hooks/use-input-suggestions"
 import { motion, AnimatePresence } from "framer-motion"
 import { LIMITS, UI } from "@/lib/constants"
 
@@ -92,42 +94,44 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
     },
     ref,
   ) => {
-    const [message, setMessage] = useState("")
     const [showThinkingNote, setShowThinkingNote] = useState(false)
     const [isDragOver, setIsDragOver] = useState(false)
     const [isFocused, setIsFocused] = useState(false)
     const [isHovered, setIsHovered] = useState(false)
-    const [suggestion, setSuggestion] = useState("")
-    const [showSuggestion, setShowSuggestion] = useState(false)
-    const [userPatterns, setUserPatterns] = useState<string[]>([])
 
     const textareaRef = useRef<HTMLTextAreaElement>(null)
     const fileInputRef = useRef<HTMLInputElement>(null)
     const containerRef = useRef<HTMLDivElement>(null)
+
+    // Input suggestions hook
+    const {
+      input: message,
+      updateInput,
+      suggestions,
+      visible: suggestionsVisible,
+      selectedIndex,
+      handleKeyDown: handleSuggestionsKeyDown,
+      acceptSuggestion,
+      saveRecentSearch,
+      clearSuggestions,
+      handleSuggestionHover,
+    } = useInputSuggestions({
+      onAccept: (text) => {
+        setMessage(text)
+        textareaRef.current?.focus()
+      },
+    })
+
+    // Wrapper for setMessage to update suggestions
+    const setMessage = (value: string) => {
+      updateInput(value)
+    }
 
     useImperativeHandle(ref, () => ({
       focus: () => {
         textareaRef.current?.focus()
       },
     }))
-
-    useEffect(() => {
-      if (message.length > 2 && !isAIResponding) {
-        const allSuggestions = [...COMMON_SUGGESTIONS, ...userPatterns]
-        const matchingSuggestion = allSuggestions.find(
-          (s) => s.toLowerCase().startsWith(message.toLowerCase()) && s.length > message.length,
-        )
-
-        if (matchingSuggestion) {
-          setSuggestion(matchingSuggestion.slice(message.length))
-          setShowSuggestion(true)
-        } else {
-          setShowSuggestion(false)
-        }
-      } else {
-        setShowSuggestion(false)
-      }
-    }, [message, isAIResponding, userPatterns])
 
     const adjustTextareaHeight = () => {
       const textarea = textareaRef.current
@@ -142,22 +146,18 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
       adjustTextareaHeight()
     }, [message])
 
+
     const handleSubmit = () => {
       if (message.trim() && !disabled && !isAIResponding && canSend && !disabledSend) {
-        if (message.length > UI.MESSAGE_MIN_LENGTH_FOR_PATTERN) {
-          const words = message.split(" ")
-          if (words.length >= 3) {
-            const pattern = words.slice(0, 3).join(" ")
-            if (!userPatterns.includes(pattern)) {
-              setUserPatterns((prev) => [...prev.slice(-(UI.USER_PATTERN_LIMIT - 1)), pattern])
-            }
-          }
-        }
+        const trimmedMessage = message.trim()
 
-        onSendMessage(message.trim())
+        // Save to recent searches
+        saveRecentSearch(trimmedMessage)
+
+        onSendMessage(trimmedMessage)
         setMessage("")
         setShowThinkingNote(false)
-        setShowSuggestion(false)
+        clearSuggestions()
       }
     }
 
@@ -166,15 +166,14 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
         onQueueMessage(message.trim())
         setMessage("")
         setShowThinkingNote(false)
-        setShowSuggestion(false)
+        clearSuggestions()
       }
     }
 
     const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
-      if (e.key === "Tab" && showSuggestion) {
-        e.preventDefault()
-        setMessage(message + suggestion)
-        setShowSuggestion(false)
+      // First, let suggestions handle the event
+      const handled = handleSuggestionsKeyDown(e)
+      if (handled) {
         return
       }
 
@@ -282,65 +281,114 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
             )}
           </AnimatePresence>
 
-          <motion.div
-            animate={{
-              scale: isHovered ? 1.01 : 1,
-              y: isFocused ? -2 : 0,
-            }}
-            transition={{
-              type: "spring",
-              stiffness: 400,
-              damping: 25,
-            }}
-          >
-          <Card
-            onClick={(e) => {
-              // Focus textarea when clicking anywhere on the card
-              // except if clicking on a button or other interactive element
-              const target = e.target as HTMLElement;
-              if (!target.closest('button') && !target.closest('input')) {
-                textareaRef.current?.focus();
-              }
-            }}
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
+          <div
             className={cn(
-              "relative transition-all duration-300 ease-out cursor-text",
-              "bg-white dark:bg-gray-900 border-2 rounded-xl",
-              "transform-gpu",
-              isHovered && !isFocused && [
-                "border-purple-300 dark:border-purple-700",
-                "shadow-lg shadow-purple-100 dark:shadow-purple-900/20",
-                "bg-gradient-to-r from-white via-purple-50/10 to-white",
-                "dark:from-gray-900 dark:via-purple-900/10 dark:to-gray-900",
-              ],
+              "relative flex items-center gap-2 p-2",
+              "bg-white dark:bg-gray-900",
+              "rounded-full",
+              "border border-gray-200 dark:border-gray-700",
+              "transition-all duration-200",
+              "shadow-sm",
               isFocused && [
-                "border-purple-500 dark:border-purple-500",
-                "shadow-xl shadow-purple-200 dark:shadow-purple-800/30",
-                "bg-gradient-to-r from-white via-purple-50/20 to-white",
-                "dark:from-gray-900 dark:via-purple-900/20 dark:to-gray-900",
-              ],
-              !isHovered && !isFocused && [
-                "border-gray-200 dark:border-gray-700",
-                "shadow-sm hover:shadow-md",
+                "border-purple-500/50",
+                "shadow-[0_0_0_3px_rgba(168,85,247,0.1)]",
               ],
             )}
           >
-            {pendingDraft && (
-              <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-2 px-3 pt-2">
-                <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-full text-sm text-amber-700 dark:text-amber-300">
-                  <div className="w-2 h-2 bg-amber-500 rounded-full animate-pulse" />
-                  Queued: "{pendingDraft.slice(0, 30)}
-                  {pendingDraft.length > 30 ? "..." : ""}"
-                </div>
-              </motion.div>
+            {/* Paperclip button */}
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => fileInputRef.current?.click()}
+              disabled={disabled}
+              className={cn(
+                "flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center",
+                "transition-all duration-200",
+                "hover:bg-gray-100 dark:hover:bg-gray-800",
+                disabled && "opacity-50 cursor-not-allowed",
+              )}
+              title="Attach file"
+            >
+              <Paperclip className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+            </motion.button>
+
+            {/* Textarea */}
+            <textarea
+              ref={textareaRef}
+              value={message}
+              onChange={handleInputChange}
+              onKeyDown={handleKeyDown}
+              onFocus={() => setIsFocused(true)}
+              onBlur={() => {
+                setIsFocused(false)
+                setTimeout(() => clearSuggestions(), 200)
+              }}
+              placeholder="Message Pelican..."
+              disabled={disabled}
+              className={cn(
+                "flex-1 bg-transparent outline-none resize-none",
+                "text-[15px] leading-[1.5] font-[Inter,system-ui,sans-serif]",
+                "placeholder:text-gray-400 dark:placeholder:text-gray-500 placeholder:opacity-50",
+                "text-gray-900 dark:text-gray-100",
+                "py-2 px-2",
+                "min-h-[32px] max-h-[168px] overflow-y-auto",
+                "scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent",
+              )}
+              rows={1}
+            />
+
+            {/* Character count indicator (3500+) */}
+            {characterCount >= 3500 && (
+              <div
+                className="flex-shrink-0 w-2 h-2 rounded-full bg-amber-500"
+                title={`${characterCount} characters`}
+              />
             )}
 
+            {/* Send button */}
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={isAIResponding && onStopResponse ? onStopResponse : handleSubmit}
+              disabled={!isAIResponding && isSendDisabled}
+              className={cn(
+                "flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center",
+                "transition-all duration-200",
+                isAIResponding
+                  ? "bg-red-500 hover:bg-red-600 text-white"
+                  : isSendDisabled
+                    ? "bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed"
+                    : "bg-gradient-to-br from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white shadow-md",
+              )}
+            >
+              <motion.div
+                key={isAIResponding ? "stop" : "send"}
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.15 }}
+              >
+                {isAIResponding ? <Square className="h-4 w-4" /> : <Send className="h-4 w-4" />}
+              </motion.div>
+            </motion.button>
+
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*,.pdf,.txt,.csv,.xlsx,.xls"
+              onChange={handleFileSelect}
+              multiple
+              className="hidden"
+            />
+          </div>
+
+          {/* Attachments preview below input */}
+          <AnimatePresence mode="wait">
             {(attachments.length > 0 || pendingAttachments.length > 0) && (
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
-                className="mb-2 px-3"
+                exit={{ opacity: 0, height: 0 }}
+                className="mt-2"
               >
                 <div className="flex flex-wrap gap-2">
                   {attachments.map((attachment, index) => (
@@ -368,231 +416,23 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
                 </div>
               </motion.div>
             )}
-
-            <div className="relative">
-              <div className="flex items-end">
-                <div className="absolute left-2 bottom-1 z-10 flex items-center gap-0">
-                  <motion.div
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="w-8 h-8 hover:bg-purple-100 dark:hover:bg-purple-900/20 transition-all duration-200"
-                    >
-                      <Search className="h-4 w-4 text-gray-500 hover:text-purple-600 dark:hover:text-purple-400" />
-                    </Button>
-                  </motion.div>
-                  <motion.div
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => fileInputRef.current?.click()}
-                      disabled={disabled}
-                      className="w-8 h-8 hover:bg-purple-100 dark:hover:bg-purple-900/20 transition-all duration-200"
-                    >
-                      <Paperclip className="h-4 w-4 text-gray-500 hover:text-purple-600 dark:hover:text-purple-400" />
-                    </Button>
-                  </motion.div>
-                  <motion.div
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="w-8 h-8 hover:bg-purple-100 dark:hover:bg-purple-900/20 transition-all duration-200"
-                    >
-                      <MapPin className="h-4 w-4 text-gray-500 hover:text-purple-600 dark:hover:text-purple-400" />
-                    </Button>
-                  </motion.div>
-                </div>
-
-                <div className="relative flex-1">
-                  <textarea
-                    ref={textareaRef}
-                    value={message}
-                    onChange={handleInputChange}
-                    onKeyDown={handleKeyDown}
-                    onFocus={() => setIsFocused(true)}
-                    onBlur={() => setIsFocused(false)}
-                    placeholder={placeholder}
-                    disabled={disabled}
-                    className={cn(
-                      "w-full resize-none border-0 bg-transparent outline-none",
-                      "transition-all duration-180 ease-out",
-                      "text-[15px] leading-[1.5] font-[Inter,system-ui,sans-serif]",
-                      "min-h-[32px] max-h-[200px] overflow-y-auto",
-                      "py-2 pl-32 pr-40",
-                      "placeholder:text-gray-400 dark:placeholder:text-gray-500",
-                      "text-gray-900 dark:text-gray-100",
-                      "scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent",
-                    )}
-                    rows={1}
-                    style={{
-                      height: "32px",
-                      fieldSizing: "content" as any,
-                    }}
-                  />
-
-                  {showSuggestion && (
-                    <div
-                      className="absolute inset-0 pointer-events-none py-[5px] pl-32 pr-40 text-[15px] leading-[1.5] font-[Inter,system-ui,sans-serif]"
-                      style={{ height: textareaRef.current?.style.height }}
-                    >
-                      <span className="invisible">{message}</span>
-                      <span className="text-gray-400 dark:text-gray-500">{suggestion}</span>
-                    </div>
-                  )}
-                </div>
-
-                <div className="absolute right-2 bottom-1 flex items-center gap-0">
-                  <motion.div
-                    whileHover={{ scale: 1.1, rotate: 15 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="w-8 h-8 hover:bg-purple-100 dark:hover:bg-purple-900/20 transition-all duration-200"
-                    >
-                      <Globe className="h-4 w-4 text-gray-500 hover:text-purple-600 dark:hover:text-purple-400" />
-                    </Button>
-                  </motion.div>
-                  <motion.div
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="w-8 h-8 hover:bg-purple-100 dark:hover:bg-purple-900/20 transition-all duration-200"
-                    >
-                      <Calendar className="h-4 w-4 text-gray-500 hover:text-purple-600 dark:hover:text-purple-400" />
-                    </Button>
-                  </motion.div>
-                  <motion.div
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.95 }}
-                    animate={{ scale: isHovered ? [1, 1.05, 1] : 1 }}
-                    transition={{ repeat: isHovered ? Infinity : 0, duration: 2 }}
-                  >
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="w-8 h-8 hover:bg-purple-100 dark:hover:bg-purple-900/20 transition-all duration-200"
-                    >
-                      <Mic className="h-4 w-4 text-gray-500 hover:text-purple-600 dark:hover:text-purple-400" />
-                    </Button>
-                  </motion.div>
-
-                  <Button
-                    onClick={isAIResponding && onStopResponse ? onStopResponse : handleSubmit}
-                    disabled={!isAIResponding && isSendDisabled}
-                    size="icon"
-                    className={cn(
-                      "w-8 h-8 ml-2 transition-all duration-200",
-                      "active:scale-95",
-                      isAIResponding
-                        ? "bg-red-500 hover:bg-red-600 text-white"
-                        : isSendDisabled
-                          ? "bg-gray-300 dark:bg-gray-600 text-gray-500 cursor-not-allowed"
-                          : "bg-teal-600 hover:bg-teal-700 text-white shadow-lg hover:shadow-teal-500/25 hover:scale-105",
-                    )}
-                  >
-                    <motion.div
-                      key={isAIResponding ? "stop" : "send"}
-                      initial={{ scale: 0.8, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      transition={{ duration: 0.15 }}
-                    >
-                      {isAIResponding ? <Square className="h-4 w-4" /> : <Send className="h-4 w-4" />}
-                    </motion.div>
-                  </Button>
-                </div>
-              </div>
-
-              <div className="hidden">
-                <AnimatePresence>
-                  {isFocused && !isAIResponding && (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      className="text-xs text-gray-500 dark:text-gray-400"
-                    >
-                      <span className="hidden md:inline">Press ⌘Enter to send</span>
-                      <span className="md:hidden">Tap to send</span>
-                      {showSuggestion && <span className="ml-2 text-blue-500">• Tab to accept suggestion</span>}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-
-                <AnimatePresence>
-                  {showCharCount && (
-                    <motion.div
-                      initial={{ opacity: 0, x: 10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: 10 }}
-                      className={cn(
-                        "text-xs font-medium",
-                        characterCount >= LIMITS.CHAT_MAX_TOKENS * UI.CHAR_COUNT_DANGER_THRESHOLD
-                          ? "text-red-500"
-                          : characterCount >= LIMITS.CHAT_MAX_TOKENS * UI.CHAR_COUNT_WARNING_THRESHOLD
-                            ? "text-yellow-500"
-                            : "text-gray-500 dark:text-gray-400",
-                      )}
-                    >
-                      {characterCount.toLocaleString()}/{LIMITS.CHAT_MAX_TOKENS.toLocaleString()}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            </div>
-
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*,.pdf,.txt,.csv,.xlsx,.xls"
-              onChange={handleFileSelect}
-              multiple
-              className="hidden"
-            />
-          </Card>
-          </motion.div>
-
-          <AnimatePresence>
-            {!isAIResponding && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 10 }}
-                className="flex flex-wrap gap-2 mt-1 justify-center"
-              >
-                {SUGGESTION_PILLS.map((pill, index) => (
-                  <motion.button
-                    key={pill.text}
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: index * 0.05 }}
-                    onClick={() => handleSuggestionClick(pill.text)}
-                    className={cn(
-                      "inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium",
-                      "border transition-all duration-200 hover:scale-105 active:scale-95",
-                      pill.color,
-                    )}
-                  >
-                    <span>{pill.icon}</span>
-                    {pill.text}
-                  </motion.button>
-                ))}
-              </motion.div>
-            )}
           </AnimatePresence>
+
+          {/* Draft indicator */}
+          {pendingDraft && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mt-2"
+            >
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-full text-sm text-amber-700 dark:text-amber-300">
+                <div className="w-2 h-2 bg-amber-500 rounded-full animate-pulse" />
+                Queued: "{pendingDraft.slice(0, 30)}
+                {pendingDraft.length > 30 ? "..." : ""}"
+              </div>
+            </motion.div>
+          )}
+
         </div>
       </div>
     )

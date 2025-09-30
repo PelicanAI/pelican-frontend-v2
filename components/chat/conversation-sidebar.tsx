@@ -232,11 +232,13 @@ export function ConversationSidebar({
           tabIndex={0}
           data-conversation-id={conversation.id}
           className={cn(
-            "group relative cursor-pointer transition-all duration-150 ease-out",
-            "h-[72px] px-4 py-3 flex items-center",
-            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50",
-            isActive && ["border-l-[3px] border-l-purple-500", "bg-purple-500/10", "scale-[1.01]"],
-            !isActive && "hover:bg-white/5 border-l-[3px] border-l-transparent",
+            "group relative cursor-pointer transition-all duration-150 ease-out rounded-lg mx-2",
+            "min-h-[64px] px-3 py-2.5 flex items-center gap-3",
+            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-sidebar",
+            isActive && [
+              "bg-purple-500/10 border border-purple-500/20",
+            ],
+            !isActive && "hover:bg-sidebar-accent/50 border border-transparent",
             conversation.archived && "opacity-60",
             isNavigatingToThis && "opacity-50 cursor-wait",
           )}
@@ -272,9 +274,9 @@ export function ConversationSidebar({
                 autoFocus
               />
             ) : (
-              <div className="space-y-1">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-medium text-sm truncate text-sidebar-foreground leading-tight font-weight-500">
+              <div className="space-y-1.5">
+                <div className="flex items-center gap-2">
+                  <h3 className="font-medium text-sm truncate text-sidebar-foreground leading-snug">
                     {searchQuery ? (
                       <span
                         dangerouslySetInnerHTML={{
@@ -288,55 +290,48 @@ export function ConversationSidebar({
                       conversation.title || 'New conversation'
                     )}
                   </h3>
-                  {conversation.archived && <Archive className="h-3 w-3 text-muted-foreground ml-2 flex-shrink-0" />}
+                  {conversation.archived && <Archive className="h-3 w-3 text-muted-foreground flex-shrink-0" />}
                 </div>
-                <div
-                  className="text-xs text-sidebar-foreground/70 truncate leading-tight"
-                  title={getExactDateTime(conversation.updated_at)}
-                >
-                  {preview || formatRelativeTime(conversation.updated_at)}
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <span className="truncate" title={preview}>
+                    {preview || "No messages yet"}
+                  </span>
+                  <span className="text-[10px] flex-shrink-0" title={getExactDateTime(conversation.updated_at)}>
+                    {formatRelativeTime(conversation.updated_at)}
+                  </span>
                 </div>
               </div>
             )}
           </div>
           <motion.div
-            className="flex items-center gap-1 ml-3"
-            initial={{ opacity: 0, x: 10 }}
-            animate={{ opacity: showActions ? 1 : 0, x: showActions ? 0 : 10 }}
+            className="flex items-center gap-0.5 flex-shrink-0"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: showActions || isActive ? 1 : 0, scale: showActions || isActive ? 1 : 0.9 }}
             transition={{ duration: 0.15 }}
           >
             <Button
               variant="ghost"
-              size="sm"
+              size="icon"
               onClick={(e) => {
                 e.stopPropagation()
                 startEditing(conversation)
               }}
-              className="h-7 w-7 p-0 hover:bg-white/10"
+              className="h-7 w-7 hover:bg-sidebar-accent/70"
+              title="Edit conversation"
             >
-              <Edit3 className="h-3 w-3" />
+              <Edit3 className="h-3.5 w-3.5" />
             </Button>
             <Button
               variant="ghost"
-              size="sm"
-              onClick={(e) => {
-                e.stopPropagation()
-                handleArchiveConversation(conversation.id, !conversation.archived)
-              }}
-              className="h-7 w-7 p-0 hover:bg-white/10"
-            >
-              {conversation.archived ? <ArchiveRestore className="h-3 w-3" /> : <Archive className="h-3 w-3" />}
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
+              size="icon"
               onClick={(e) => {
                 e.stopPropagation()
                 handleDeleteConversation(conversation.id)
               }}
-              className="h-7 w-7 p-0 hover:bg-red-500/20 text-red-400"
+              className="h-7 w-7 hover:bg-red-500/20 text-red-400 hover:text-red-300"
+              title="Delete conversation"
             >
-              <Trash2 className="h-3 w-3" />
+              <Trash2 className="h-3.5 w-3.5" />
             </Button>
           </motion.div>
         </div>
@@ -359,18 +354,20 @@ export function ConversationSidebar({
       animate={!isMobileSheet ? { width: 320 } : undefined}
       transition={{ duration: 0.2, ease: "easeInOut" }}
     >
-      <div className="p-4 border-b border-sidebar-border/30">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <ThemeToggle />
-            <Image src="/pelican-logo.png" alt="PelicanAI" width={32} height={32} className="w-8 h-8 object-contain" />
-            <span className="font-bold text-lg bg-gradient-to-r from-purple-400 to-purple-600 bg-clip-text text-transparent">
+      {/* Header - 16px padding */}
+      <div className="px-4 py-4 border-b border-sidebar-border/30">
+        {/* Logo section - 8px gap between items */}
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-2">
+            <Image src="/pelican-logo.png" alt="PelicanAI" width={28} height={28} className="w-7 h-7 object-contain" />
+            <span className="font-bold text-base bg-gradient-to-r from-purple-400 to-purple-600 bg-clip-text text-transparent">
               PelicanAI
             </span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
+            <ThemeToggle />
             {onToggleCollapse && !isMobileSheet && (
-              <Button variant="ghost" size="sm" onClick={onToggleCollapse} className="glow-button glow-ghost group">
+              <Button variant="ghost" size="icon" onClick={onToggleCollapse} className="h-8 w-8 hover:bg-sidebar-accent/50">
                 <motion.div whileHover={{ rotate: 180 }} transition={{ duration: 0.2 }}>
                   <X className="h-4 w-4 text-sidebar-foreground" />
                 </motion.div>
@@ -378,86 +375,63 @@ export function ConversationSidebar({
             )}
           </div>
         </div>
-        <div className="space-y-3">
-          <Button
-            variant="outline"
-            asChild
-            className="w-full bg-transparent border-sidebar-border/50 text-sidebar-foreground hover:bg-sidebar-accent/50 glow-button glow-secondary transition-all duration-200"
-            size="sm"
-          >
-            <Link href="/marketing">
-              <Home className="w-4 h-4 mr-2" />
-              Home
-            </Link>
-          </Button>
-          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+
+        {/* Action buttons - 8px gap */}
+        <div className="space-y-2">
+          <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
             <Button
               onClick={onNewConversation}
-              className="w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white shadow-lg hover:shadow-purple-500/25 transition-all duration-200 relative overflow-hidden group"
-              size="sm"
+              className="w-full h-10 px-4 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white text-sm font-medium shadow-lg hover:shadow-purple-500/25 transition-all duration-200 relative overflow-hidden group"
             >
               <motion.div
                 className="absolute inset-0 bg-white/20 rounded-full scale-0 group-active:scale-100"
                 transition={{ duration: 0.2 }}
               />
-              <motion.div whileHover={{ rotate: 90 }} transition={{ duration: 0.2 }}>
-                <Plus className="w-4 h-4 mr-2" />
-              </motion.div>
+              <Plus className="w-4 h-4 mr-2" />
               New chat
             </Button>
           </motion.div>
         </div>
       </div>
-      <div className="p-4 border-b border-sidebar-border/30">
-        <div className="relative mb-3">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+      {/* Search section - 16px padding */}
+      <div className="px-4 py-3 border-b border-sidebar-border/30">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
           <Input
-            placeholder="Search chats..."
+            placeholder="Search conversations..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 bg-sidebar/50 border-sidebar-border/50 text-sidebar-foreground placeholder:text-muted-foreground focus:border-purple-500/50 transition-colors duration-200"
+            className="h-10 pl-10 pr-3 bg-sidebar/50 border-sidebar-border/50 text-sidebar-foreground text-sm placeholder:text-muted-foreground focus:border-purple-500/50 transition-colors duration-200 rounded-lg"
           />
         </div>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setShowArchived(!showArchived)}
-          className={cn(
-            "w-full justify-start glow-button glow-ghost transition-all duration-200",
-            showArchived
-              ? "bg-sidebar-accent/50 text-sidebar-accent-foreground"
-              : "text-muted-foreground hover:text-sidebar-foreground",
-          )}
-        >
-          {showArchived ? <ArchiveRestore className="w-4 h-4 mr-2" /> : <Archive className="w-4 h-4 mr-2" />}
-          {showArchived ? "Show Active" : "Show Archived"}
-        </Button>
       </div>
+      {/* Conversations list - proper spacing */}
       <ScrollArea className="flex-1 min-h-0 scrollbar-thin scrollbar-thumb-white/10 hover:scrollbar-thumb-white/15">
-        <div className="p-2">
+        <div className="py-2">
           {isLoading ? (
-            <div className="text-center py-8">
+            <div className="flex items-center justify-center py-12">
               <motion.div
-                className="animate-spin rounded-full h-6 w-6 border-b-2 border-purple-500 mx-auto"
+                className="animate-spin rounded-full h-6 w-6 border-b-2 border-purple-500"
                 animate={{ rotate: 360 }}
                 transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
               />
             </div>
           ) : Object.values(groupedConversations).every((group) => group.length === 0) ? (
-            <div className="text-center py-8 text-muted-foreground">
-              <MessageSquare className="h-8 w-8 mx-auto mb-2 opacity-50" />
-              <p className="text-sm">{showArchived ? "No archived conversations" : "No conversations yet"}</p>
+            <div className="flex flex-col items-center justify-center py-12 px-6 text-center text-muted-foreground">
+              <MessageSquare className="h-10 w-10 mb-3 opacity-30" />
+              <p className="text-sm font-medium">{showArchived ? "No archived conversations" : "No conversations yet"}</p>
+              <p className="text-xs mt-1 opacity-70">Start a new chat to begin</p>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-6">
               {groupedConversations.today.length > 0 && (
                 <div>
-                  <div className="sticky top-0 bg-sidebar/95 backdrop-blur-sm z-10">
-                    <h4 className="text-[10px] font-semibold text-gray-500 dark:text-gray-600 mb-1 px-3 py-1.5 uppercase tracking-wider">
+                  <div className="sticky top-0 bg-sidebar/95 backdrop-blur-sm z-10 px-4 py-2">
+                    <h4 className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
                       Today
                     </h4>
                   </div>
-                  <div>
+                  <div className="space-y-1">
                     {groupedConversations.today.map((conversation, index) => (
                       <ConversationItem key={conversation.id} conversation={conversation} index={index} />
                     ))}
@@ -466,12 +440,12 @@ export function ConversationSidebar({
               )}
               {groupedConversations.yesterday.length > 0 && (
                 <div>
-                  <div className="sticky top-0 bg-sidebar/95 backdrop-blur-sm z-10">
-                    <h4 className="text-[10px] font-semibold text-gray-500 dark:text-gray-600 mb-1 px-3 py-1.5 uppercase tracking-wider">
+                  <div className="sticky top-0 bg-sidebar/95 backdrop-blur-sm z-10 px-4 py-2">
+                    <h4 className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
                       Yesterday
                     </h4>
                   </div>
-                  <div>
+                  <div className="space-y-1">
                     {groupedConversations.yesterday.map((conversation, index) => (
                       <ConversationItem key={conversation.id} conversation={conversation} index={index} />
                     ))}
@@ -480,12 +454,12 @@ export function ConversationSidebar({
               )}
               {groupedConversations.previous7Days.length > 0 && (
                 <div>
-                  <div className="sticky top-0 bg-sidebar/95 backdrop-blur-sm z-10">
-                    <h4 className="text-[10px] font-semibold text-gray-500 dark:text-gray-600 mb-1 px-3 py-1.5 uppercase tracking-wider">
+                  <div className="sticky top-0 bg-sidebar/95 backdrop-blur-sm z-10 px-4 py-2">
+                    <h4 className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
                       Previous 7 Days
                     </h4>
                   </div>
-                  <div>
+                  <div className="space-y-1">
                     {groupedConversations.previous7Days.map((conversation, index) => (
                       <ConversationItem key={conversation.id} conversation={conversation} index={index} />
                     ))}
@@ -494,12 +468,12 @@ export function ConversationSidebar({
               )}
               {groupedConversations.earlier.length > 0 && (
                 <div>
-                  <div className="sticky top-0 bg-sidebar/95 backdrop-blur-sm z-10">
-                    <h4 className="text-[10px] font-semibold text-gray-500 dark:text-gray-600 mb-1 px-3 py-1.5 uppercase tracking-wider">
+                  <div className="sticky top-0 bg-sidebar/95 backdrop-blur-sm z-10 px-4 py-2">
+                    <h4 className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
                       Earlier
                     </h4>
                   </div>
-                  <div>
+                  <div className="space-y-1">
                     {groupedConversations.earlier.map((conversation, index) => (
                       <ConversationItem key={conversation.id} conversation={conversation} index={index} />
                     ))}
@@ -510,34 +484,36 @@ export function ConversationSidebar({
           )}
         </div>
       </ScrollArea>
-      <div className="p-3 border-t border-sidebar-border/30">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Avatar className="w-7 h-7">
-              <AvatarImage src="/user-avatar.png" />
-              <AvatarFallback className="bg-purple-500/20 text-purple-300 text-xs">
-                <User className="w-3.5 h-3.5" />
-              </AvatarFallback>
-            </Avatar>
-            <span className="text-xs text-sidebar-foreground/70">Account</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-7 px-2 text-xs relative"
-            >
-              <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-              Upgrade
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-7 px-2 text-xs"
-            >
-              Install
-            </Button>
-          </div>
+      {/* Footer - 12px padding */}
+      <div className="px-3 py-3 border-t border-sidebar-border/30">
+        <div className="flex items-center gap-3">
+          <Button
+            variant="ghost"
+            size="sm"
+            asChild
+            className="flex-1 justify-start h-10 px-3 hover:bg-sidebar-accent/50 group"
+          >
+            <Link href="/profile" className="flex items-center gap-3">
+              <Avatar className="w-8 h-8 ring-2 ring-sidebar-border/50 group-hover:ring-purple-500/30 transition-all">
+                <AvatarImage src="/user-avatar.png" />
+                <AvatarFallback className="bg-purple-500/20 text-purple-300">
+                  <User className="w-4 h-4" />
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex-1 text-left min-w-0">
+                <p className="text-sm font-medium text-sidebar-foreground truncate">Account</p>
+                <p className="text-[10px] text-muted-foreground">View profile</p>
+              </div>
+            </Link>
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-10 w-10 hover:bg-sidebar-accent/50"
+            title="Settings"
+          >
+            <Settings className="h-4 w-4" />
+          </Button>
         </div>
       </div>
     </motion.div>

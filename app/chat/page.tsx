@@ -5,7 +5,9 @@ import { useRouter, usePathname, useSearchParams } from "next/navigation"
 import { ConversationSidebar } from "@/components/chat/conversation-sidebar"
 import { ChatContainer } from "@/components/chat/chat-container"
 import { ChatInput, type ChatInputRef } from "@/components/chat/chat-input"
+import { TradingContextPanel } from "@/components/chat/trading-context-panel"
 import { useChat } from "@/hooks/use-chat"
+// import { useMarketData } from "@/hooks/use-market-data"
 import { useConversations } from "@/hooks/use-conversations"
 import { useMessageHandler } from "@/hooks/use-message-handler"
 import { useFileUpload } from "@/hooks/use-file-upload"
@@ -31,6 +33,14 @@ export default function ChatPage() {
   const [isOnline, setIsOnline] = useState(true)
   const [guestMode, setGuestMode] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const [tradingPanelCollapsed, setTradingPanelCollapsed] = useState(false)
+
+  // TODO: Uncomment when ready to add real market data
+  // const { indices, vix, vixChange, sectors, watchlist, isLoading: isLoadingMarketData, refresh: refreshMarketData } = useMarketData({
+  //   refreshInterval: 60000, // Refresh every 60 seconds
+  //   autoRefresh: true,
+  //   watchlistSymbols: ['AAPL', 'TSLA', 'NVDA', 'SPY'] // User's custom watchlist
+  // })
 
   // Initialize after mount
   useEffect(() => {
@@ -245,7 +255,7 @@ export default function ChatPage() {
         </SheetContent>
       </Sheet>
 
-      <div className="flex-1 flex flex-col h-full">
+      <div className="flex-1 flex flex-col h-full min-w-0">
         <div className="md:hidden border-b p-4 flex items-center justify-between bg-background border-border">
           <Sheet open={mobileSheetOpen} onOpenChange={setMobileSheetOpen}>
             <SheetTrigger asChild>
@@ -276,8 +286,8 @@ export default function ChatPage() {
             </div>
           </div>
 
-          <div className="bg-background border-t border-border">
-            <div className="max-w-3xl mx-auto w-full px-3 py-1">
+          <div className="bg-background border-t border-border pb-4">
+            <div className="max-w-3xl mx-auto w-full px-3 py-3">
               <ChatInput
                 ref={chatInputRef}
                 onSendMessage={messageHandler.handleSendMessage}
@@ -304,6 +314,20 @@ export default function ChatPage() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Trading Context Panel - Desktop only */}
+      <div className="hidden xl:block w-80 h-full overflow-y-auto">
+        <TradingContextPanel
+          collapsed={tradingPanelCollapsed}
+          // Future: Pass real data props here
+          // indices={marketIndices}
+          // vix={vixData}
+          // sectors={sectorData}
+          // watchlist={userWatchlist}
+          // isLoading={isLoadingMarketData}
+          // onRefresh={refreshMarketData}
+        />
       </div>
 
       <SettingsModal open={settingsOpen} onOpenChange={setSettingsOpen} />
