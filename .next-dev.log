@@ -587,3 +587,145 @@ Require stack:
 <w>  at file dependencies /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/webpack/loaders/next-swc-loader.js
 <w>  at file /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/webpack/loaders/next-swc-loader.js
 <w>  at resolve commonjs /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/webpack/loaders/next-swc-loader.js
+ GET /chat?conversation=guest-1759165932011-bkjnhoe4c&_r=1759183478204 200 in 291ms
+ ○ Compiling /_not-found ...
+ ✓ Compiled /_not-found in 509ms (2268 modules)
+ ⨯ Error: Cannot find module './787.js'
+Require stack:
+- /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/webpack-runtime.js
+- /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/app/_not-found/page.js
+- /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/require.js
+- /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/load-components.js
+- /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/utils.js
+- /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/dev/hot-middleware.js
+- /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/dev/hot-reloader-webpack.js
+- /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/lib/router-server.js
+- /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/lib/start-server.js
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1369:15)
+    at /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/require-hook.js:55:36
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1025:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1030:22)
+    at Module._load (node:internal/modules/cjs/loader:1179:37)
+    at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1449:12)
+    at mod.require (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/require-hook.js:65:28)
+    at require (node:internal/modules/helpers:135:16)
+    at __webpack_require__.f.require (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/webpack-runtime.js:203:28)
+    at /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/webpack-runtime.js:111:40
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/webpack-runtime.js:162:22)
+    at /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/app/_not-found/page.js:1:9958
+    at Object.<anonymous> (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/app/_not-found/page.js:1:10003)
+    at Module._compile (node:internal/modules/cjs/loader:1692:14)
+    at Object..js (node:internal/modules/cjs/loader:1824:10)
+    at Module.load (node:internal/modules/cjs/loader:1427:32)
+    at Module._load (node:internal/modules/cjs/loader:1250:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1449:12)
+    at mod.require (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/require-hook.js:65:28)
+    at require (node:internal/modules/helpers:135:16)
+    at requirePage (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/require.js:109:84)
+    at /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/load-components.js:98:84
+    at async loadComponentsImpl (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/load-components.js:98:26)
+    at async DevServer.findPageComponentsImpl (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/next-server.js:709:36)
+    at async DevServer.findPageComponents (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/dev/next-dev-server.js:577:20)
+    at async DevServer.renderErrorToResponseImpl (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/base-server.js:2074:30)
+    at async pipe.req.req (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/base-server.js:2040:30)
+    at async DevServer.pipeImpl (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/base-server.js:921:25)
+    at async /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/dev/next-dev-server.js:339:20
+    at async Span.traceAsyncFn (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/trace/trace.js:154:20)
+    at async DevServer.handleRequest (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/dev/next-dev-server.js:336:24)
+    at async invokeRender (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/lib/router-server.js:173:21)
+    at async handleRequest (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/lib/router-server.js:365:24)
+    at async requestHandlerImpl (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/lib/router-server.js:374:13)
+    at async Server.requestListener (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/lib/start-server.js:141:13) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    '/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/webpack-runtime.js',
+    '/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/app/_not-found/page.js',
+    '/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/require.js',
+    '/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/load-components.js',
+    '/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/utils.js',
+    '/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/dev/hot-middleware.js',
+    '/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/dev/hot-reloader-webpack.js',
+    '/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js',
+    '/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/lib/router-server.js',
+    '/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/lib/start-server.js'
+  ]
+}
+ ⨯ Error: Cannot find module './787.js'
+Require stack:
+- /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/webpack-runtime.js
+- /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/app/_not-found/page.js
+- /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/require.js
+- /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/load-components.js
+- /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/utils.js
+- /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/dev/hot-middleware.js
+- /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/dev/hot-reloader-webpack.js
+- /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/lib/router-server.js
+- /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/lib/start-server.js
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1369:15)
+    at /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/require-hook.js:55:36
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1025:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1030:22)
+    at Module._load (node:internal/modules/cjs/loader:1179:37)
+    at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1449:12)
+    at mod.require (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/require-hook.js:65:28)
+    at require (node:internal/modules/helpers:135:16)
+    at __webpack_require__.f.require (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/webpack-runtime.js:203:28)
+    at /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/webpack-runtime.js:111:40
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/webpack-runtime.js:162:22)
+    at /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/app/_not-found/page.js:1:9958
+    at Object.<anonymous> (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/app/_not-found/page.js:1:10003)
+    at Module._compile (node:internal/modules/cjs/loader:1692:14)
+    at Object..js (node:internal/modules/cjs/loader:1824:10)
+    at Module.load (node:internal/modules/cjs/loader:1427:32)
+    at Module._load (node:internal/modules/cjs/loader:1250:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1449:12)
+    at mod.require (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/require-hook.js:65:28)
+    at require (node:internal/modules/helpers:135:16)
+    at requirePage (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/require.js:109:84)
+    at /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/load-components.js:98:84
+    at async loadComponentsImpl (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/load-components.js:98:26)
+    at async DevServer.findPageComponentsImpl (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/next-server.js:709:36)
+    at async DevServer.findPageComponents (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/dev/next-dev-server.js:577:20)
+    at async DevServer.renderErrorToResponseImpl (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/base-server.js:2074:30)
+    at async pipe.req.req (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/base-server.js:2040:30)
+    at async DevServer.pipeImpl (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/base-server.js:921:25)
+    at async /Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/dev/next-dev-server.js:339:20
+    at async Span.traceAsyncFn (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/trace/trace.js:154:20)
+    at async DevServer.handleRequest (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/dev/next-dev-server.js:336:24)
+    at async invokeRender (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/lib/router-server.js:173:21)
+    at async handleRequest (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/lib/router-server.js:365:24)
+    at async requestHandlerImpl (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/lib/router-server.js:374:13)
+    at async Server.requestListener (/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/lib/start-server.js:141:13) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    '/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/webpack-runtime.js',
+    '/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/.next/server/app/_not-found/page.js',
+    '/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/require.js',
+    '/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/load-components.js',
+    '/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/build/utils.js',
+    '/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/dev/hot-middleware.js',
+    '/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/dev/hot-reloader-webpack.js',
+    '/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js',
+    '/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/lib/router-server.js',
+    '/Users/jackmarshall/Desktop/pelican-chat/pelican-ai-chat/node_modules/next/dist/server/lib/start-server.js'
+  ]
+}
+ ✓ Compiled /_error in 174ms (2270 modules)
+ GET /_next/static/chunks/main-app.js?v=1759206914518 500 in 711ms
+ GET /_next/static/chunks/app-pages-internals.js 500 in 710ms
