@@ -283,12 +283,13 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
 
           <div
             className={cn(
-              "relative flex items-center gap-2 p-2",
+              "relative flex items-center gap-2 px-3 py-2",
               "bg-white dark:bg-gray-900",
               "rounded-full",
               "border border-gray-200 dark:border-gray-700",
               "transition-all duration-200",
               "shadow-sm",
+              "min-h-[52px]",
               isFocused && [
                 "border-purple-500/50",
                 "shadow-[0_0_0_3px_rgba(168,85,247,0.1)]",
@@ -302,7 +303,7 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
               onClick={() => fileInputRef.current?.click()}
               disabled={disabled}
               className={cn(
-                "flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center",
+                "flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center",
                 "transition-all duration-200",
                 "hover:bg-gray-100 dark:hover:bg-gray-800",
                 disabled && "opacity-50 cursor-not-allowed",
@@ -328,10 +329,10 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
               className={cn(
                 "flex-1 bg-transparent outline-none resize-none",
                 "text-[15px] leading-[1.5] font-[Inter,system-ui,sans-serif]",
-                "placeholder:text-gray-400 dark:placeholder:text-gray-500 placeholder:opacity-50",
+                "placeholder:text-gray-400 dark:placeholder:text-gray-500",
                 "text-gray-900 dark:text-gray-100",
                 "py-2 px-2",
-                "min-h-[32px] max-h-[168px] overflow-y-auto",
+                "h-[36px] max-h-[168px] overflow-y-auto",
                 "scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent",
               )}
               rows={1}
@@ -352,7 +353,7 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
               onClick={isAIResponding && onStopResponse ? onStopResponse : handleSubmit}
               disabled={!isAIResponding && isSendDisabled}
               className={cn(
-                "flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center",
+                "flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center",
                 "transition-all duration-200",
                 isAIResponding
                   ? "bg-red-500 hover:bg-red-600 text-white"

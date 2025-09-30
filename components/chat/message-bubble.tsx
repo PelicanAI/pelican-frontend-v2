@@ -248,7 +248,7 @@ export function MessageBubble({
             isHovered ? "ring-2 ring-purple-500/40" : "ring-2 ring-transparent",
           )}
         >
-          <AvatarImage src="/pelican-logo-full.png" alt="Pelican AI" />
+          <AvatarImage src="/ai-avatar.jpg" alt="Pelican AI" className="object-cover" />
           <AvatarFallback className="bg-purple-600 text-white text-xs font-medium">P</AvatarFallback>
         </Avatar>
       </motion.div>
