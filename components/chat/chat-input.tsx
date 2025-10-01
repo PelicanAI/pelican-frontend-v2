@@ -272,8 +272,8 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
               "shadow-md hover:shadow-lg",
               "min-h-[56px]",
               isFocused && [
-                "border-purple-500/60",
-                "shadow-[0_0_0_4px_rgba(168,85,247,0.12)]",
+                "border-teal-500/60",
+                "shadow-[0_0_0_4px_rgba(20,184,166,0.12)]",
               ],
             )}
           >
@@ -340,7 +340,7 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
                   ? "bg-red-500 hover:bg-red-600 text-white"
                   : isSendDisabled
                     ? "bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed"
-                    : "bg-gradient-to-br from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white shadow-md",
+                    : "bg-gradient-to-br from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white shadow-md",
               )}
             >
               <motion.div

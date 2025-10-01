@@ -141,9 +141,9 @@ export function MessageBubble({
       >
         <div className="flex flex-col items-end max-w-[min(70%,600px)]">
           <motion.div className="relative group">
-            <div className="bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-2xl rounded-br-md px-4 py-3 shadow-md inline-block text-[15px] leading-relaxed text-rendering-optimizeLegibility">
+            <div className="bg-gradient-to-r from-teal-500 to-teal-600 text-white rounded-2xl rounded-br-md px-4 py-3 shadow-md inline-block text-[15px] leading-relaxed text-rendering-optimizeLegibility">
               {renderAttachments(message.attachments)}
-              <div className="break-words overflow-wrap-anywhere hyphens-auto selection:bg-purple-300 selection:text-purple-900">
+              <div className="break-words overflow-wrap-anywhere hyphens-auto selection:bg-teal-200 selection:text-teal-900">
                 {message.content}
               </div>
             </div>
@@ -245,11 +245,11 @@ export function MessageBubble({
         <Avatar
           className={cn(
             "h-8 w-8 transition-all duration-200",
-            isHovered ? "ring-2 ring-purple-500/40" : "ring-2 ring-transparent",
+            isHovered ? "ring-2 ring-teal-500/40" : "ring-2 ring-transparent",
           )}
         >
           <AvatarImage src="/ai-avatar.jpg" alt="Pelican AI" className="object-cover" />
-          <AvatarFallback className="bg-purple-600 text-white text-xs font-medium">P</AvatarFallback>
+          <AvatarFallback className="bg-teal-600 text-white text-xs font-medium">P</AvatarFallback>
         </Avatar>
       </motion.div>
 
@@ -259,8 +259,8 @@ export function MessageBubble({
             className={cn(
               "rounded-2xl rounded-bl-md px-4 py-3 border overflow-hidden backdrop-blur-[8px] text-[15px] leading-relaxed text-rendering-optimizeLegibility shadow-sm",
               isDarkMode
-                ? "bg-[rgba(30,30,30,0.7)] border-[rgba(255,255,255,0.1)] text-white selection:bg-purple-600/30"
-                : "bg-white/90 border-gray-200/80 text-gray-900 selection:bg-purple-200/60",
+                ? "bg-[rgba(30,30,30,0.7)] border-[rgba(255,255,255,0.1)] text-white selection:bg-teal-600/30"
+                : "bg-white/90 border-gray-200/80 text-gray-900 selection:bg-teal-200/60",
             )}
           >
             {renderAttachments(message.attachments)}
@@ -433,12 +433,12 @@ function MessageContent({
                     href={part}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-purple-600 relative inline-block break-all font-[500]"
+                    className="text-teal-600 relative inline-block break-all font-[500]"
                   >
                     <span className="relative">
                       {part}
                       <motion.span
-                        className="absolute bottom-0 left-0 w-0 h-0.5 bg-purple-600"
+                        className="absolute bottom-0 left-0 w-0 h-0.5 bg-teal-600"
                       />
                     </span>
                   </motion.a>

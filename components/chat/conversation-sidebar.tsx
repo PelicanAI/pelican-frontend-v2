@@ -234,9 +234,9 @@ export function ConversationSidebar({
           className={cn(
             "group relative cursor-pointer transition-all duration-150 ease-out rounded-lg mx-2",
             "min-h-[64px] px-3 py-2.5 flex items-center gap-3",
-            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-sidebar",
+            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-sidebar",
             isActive && [
-              "bg-purple-500/10 border border-purple-500/20",
+              "bg-teal-500/10 border border-teal-500/20",
             ],
             !isActive && "hover:bg-sidebar-accent/50 border border-transparent",
             conversation.archived && "opacity-60",
@@ -360,7 +360,7 @@ export function ConversationSidebar({
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
             <Image src="/pelican-logo.png" alt="PelicanAI" width={28} height={28} className="w-7 h-7 object-contain" />
-            <span className="font-bold text-base bg-gradient-to-r from-purple-400 to-purple-600 bg-clip-text text-transparent">
+            <span className="font-bold text-base bg-gradient-to-r from-teal-500 to-teal-600 bg-clip-text text-transparent">
               PelicanAI
             </span>
           </div>
@@ -381,7 +381,7 @@ export function ConversationSidebar({
           <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
             <Button
               onClick={onNewConversation}
-              className="w-full h-10 px-4 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white text-sm font-medium shadow-lg hover:shadow-purple-500/25 transition-all duration-200 relative overflow-hidden group"
+              className="w-full h-10 px-4 bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white text-sm font-medium shadow-lg hover:shadow-teal-500/25 transition-all duration-200 relative overflow-hidden group"
             >
               <motion.div
                 className="absolute inset-0 bg-white/20 rounded-full scale-0 group-active:scale-100"
