@@ -32,6 +32,10 @@ function generateGuestUUID(): string {
 }
 
 export async function POST(req: NextRequest) {
+  let user: any = null
+  let effectiveUserId: string | null = null
+  let activeConversationId: string | null = null
+  
   try {
     const signal = req.signal // Extract AbortController signal from request
 
@@ -48,9 +52,7 @@ export async function POST(req: NextRequest) {
 
     const supabase = await createClient()
 
-    let user = null
-    let effectiveUserId = null
-    let activeConversationId = conversationId
+    activeConversationId = conversationId || null
 
     if (!guestMode) {
       const {
