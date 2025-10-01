@@ -3,40 +3,40 @@
 @import "./contrast-fixes.css";
 
 :root {
-  /* Updated color scheme to match PelicanAI purple gradient branding */
-  --background: oklch(0.98 0.005 280); /* Light background with purple tint */
-  --foreground: oklch(0.15 0.01 280); /* Dark text */
+  /* Modern Fintech Teal/Cyan color scheme - professional and trustworthy */
+  --background: oklch(0.98 0.005 200); /* Light background with subtle cyan tint */
+  --foreground: oklch(0.15 0.01 200); /* Dark text */
   --card: oklch(1 0 0); /* Pure white cards */
   --card-foreground: oklch(0.15 0 0); /* Dark text on cards */
-  --popover: oklch(0.99 0.002 280); /* Slightly tinted white for AI responses */
+  --popover: oklch(0.99 0.002 200); /* Slightly tinted white for AI responses */
   --popover-foreground: oklch(0.15 0 0); /* Dark text on AI responses */
-  --primary: oklch(0.55 0.2 290); /* PelicanAI purple primary */
+  --primary: oklch(0.58 0.15 195); /* Teal/Cyan primary - modern fintech */
   --primary-foreground: oklch(1 0 0); /* White text on primary */
-  --secondary: oklch(0.65 0.15 300); /* Lighter purple for accents */
+  --secondary: oklch(0.68 0.12 200); /* Lighter cyan for accents */
   --secondary-foreground: oklch(1 0 0); /* White text on secondary */
-  --muted: oklch(0.96 0.005 280); /* Light muted background */
-  --muted-foreground: oklch(0.45 0.01 280); /* Muted text */
-  --accent: oklch(0.6 0.18 295); /* Purple accent for highlights */
+  --muted: oklch(0.96 0.005 200); /* Light muted background */
+  --muted-foreground: oklch(0.45 0.01 200); /* Muted text */
+  --accent: oklch(0.62 0.16 190); /* Vibrant teal accent for highlights */
   --accent-foreground: oklch(1 0 0); /* White text on accent */
   --destructive: oklch(0.55 0.15 25); /* Orange for warnings */
   --destructive-foreground: oklch(1 0 0); /* White text on destructive */
-  --border: oklch(0.9 0.005 280); /* Light borders */
+  --border: oklch(0.9 0.005 200); /* Light borders */
   --input: oklch(1 0 0); /* White input backgrounds */
-  --ring: oklch(0.55 0.2 290 / 0.3); /* Purple focus ring */
-  --chart-1: oklch(0.55 0.2 290); /* Primary purple for charts */
-  --chart-2: oklch(0.65 0.15 300); /* Secondary purple */
+  --ring: oklch(0.58 0.15 195 / 0.3); /* Teal focus ring */
+  --chart-1: oklch(0.58 0.15 195); /* Primary teal for charts */
+  --chart-2: oklch(0.68 0.12 200); /* Secondary cyan */
   --chart-3: oklch(0.55 0.15 25); /* Orange for warnings */
-  --chart-4: oklch(0.4 0.01 280); /* Dark slate */
-  --chart-5: oklch(0.5 0.2 270); /* Deep purple accent */
+  --chart-4: oklch(0.4 0.01 200); /* Dark slate */
+  --chart-5: oklch(0.62 0.16 185); /* Deep teal accent */
   --radius: 0.5rem; /* Professional radius */
   --sidebar: oklch(1 0 0);
-  --sidebar-foreground: oklch(0.15 0.01 280);
-  --sidebar-primary: oklch(0.55 0.2 290);
+  --sidebar-foreground: oklch(0.15 0.01 200);
+  --sidebar-primary: oklch(0.58 0.15 195);
   --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: oklch(0.65 0.15 300);
+  --sidebar-accent: oklch(0.68 0.12 200);
   --sidebar-accent-foreground: oklch(1 0 0);
-  --sidebar-border: oklch(0.9 0.005 280);
-  --sidebar-ring: oklch(0.55 0.2 290 / 0.3);
+  --sidebar-border: oklch(0.9 0.005 200);
+  --sidebar-ring: oklch(0.58 0.15 195 / 0.3);
   --font-inter: "Inter", sans-serif; /* Define Inter font */
 }
 
@@ -44,49 +44,49 @@
 .dark {
   /* Improved dark theme with layered surfaces and better contrast */
   /* Bases */
-  --background: oklch(0.09 0.01 280); /* page bg */
-  --foreground: oklch(0.96 0.004 300); /* main text */
-  --muted: oklch(0.15 0.01 280);
-  --muted-foreground: oklch(0.73 0.005 300);
+  --background: oklch(0.09 0.01 200); /* page bg with subtle cyan tint */
+  --foreground: oklch(0.96 0.004 200); /* main text */
+  --muted: oklch(0.15 0.01 200);
+  --muted-foreground: oklch(0.73 0.005 200);
 
   /* Layered surfaces (for depth) */
-  --surface-1: oklch(0.11 0.01 280); /* sidebar / chrome */
-  --surface-2: oklch(0.13 0.01 280); /* cards/bubbles */
-  --surface-3: oklch(0.16 0.01 280); /* popovers/menus */
+  --surface-1: oklch(0.11 0.01 200); /* sidebar / chrome */
+  --surface-2: oklch(0.13 0.01 200); /* cards/bubbles */
+  --surface-3: oklch(0.16 0.01 200); /* popovers/menus */
 
   /* Borders & focus */
-  --border: oklch(0.3 0.01 280); /* more visible borders */
-  --ring: oklch(0.7 0.16 290);
+  --border: oklch(0.3 0.01 200); /* more visible borders */
+  --ring: oklch(0.68 0.15 195);
 
-  /* Brand */
-  --primary: oklch(0.7 0.2 290); /* Pelican purple */
-  --primary-foreground: oklch(0.1 0.01 280);
-  --accent: oklch(0.76 0.18 295);
-  --accent-foreground: oklch(0.08 0.01 280);
-  --secondary: oklch(0.25 0.01 280);
-  --secondary-foreground: oklch(0.95 0.005 300);
+  /* Brand - Teal/Cyan */
+  --primary: oklch(0.68 0.15 195); /* Modern teal */
+  --primary-foreground: oklch(0.1 0.01 200);
+  --accent: oklch(0.72 0.16 190);
+  --accent-foreground: oklch(0.08 0.01 200);
+  --secondary: oklch(0.25 0.01 200);
+  --secondary-foreground: oklch(0.95 0.005 200);
   --destructive: oklch(0.6 0.15 25);
-  --destructive-foreground: oklch(0.08 0.01 280);
-  --input: oklch(0.15 0.01 280);
-  --chart-1: oklch(0.7 0.2 290);
-  --chart-2: oklch(0.8 0.15 300);
+  --destructive-foreground: oklch(0.08 0.01 200);
+  --input: oklch(0.15 0.01 200);
+  --chart-1: oklch(0.68 0.15 195);
+  --chart-2: oklch(0.75 0.12 200);
   --chart-3: oklch(0.6 0.15 25);
-  --chart-4: oklch(0.7 0.01 280);
-  --chart-5: oklch(0.75 0.2 270);
+  --chart-4: oklch(0.7 0.01 200);
+  --chart-5: oklch(0.72 0.16 185);
 
   /* Components that map to your design tokens */
   --card: var(--surface-2);
-  --card-foreground: oklch(0.95 0.005 300);
+  --card-foreground: oklch(0.95 0.005 200);
   --popover: var(--surface-3);
-  --popover-foreground: oklch(0.95 0.005 300);
+  --popover-foreground: oklch(0.95 0.005 200);
   --sidebar: var(--surface-1);
-  --sidebar-foreground: oklch(0.95 0.005 300);
-  --sidebar-primary: oklch(0.7 0.2 290);
-  --sidebar-primary-foreground: oklch(0.1 0.01 280);
-  --sidebar-accent: oklch(0.25 0.01 280);
-  --sidebar-accent-foreground: oklch(0.95 0.005 300);
-  --sidebar-border: oklch(0.3 0.01 280);
-  --sidebar-ring: oklch(0.7 0.16 290);
+  --sidebar-foreground: oklch(0.95 0.005 200);
+  --sidebar-primary: oklch(0.68 0.15 195);
+  --sidebar-primary-foreground: oklch(0.1 0.01 200);
+  --sidebar-accent: oklch(0.25 0.01 200);
+  --sidebar-accent-foreground: oklch(0.95 0.005 200);
+  --sidebar-border: oklch(0.3 0.01 200);
+  --sidebar-ring: oklch(0.68 0.15 195);
 }
 
 /* Added smooth theme transitions with reduced-motion safety */
@@ -218,13 +218,13 @@
     transform: scale(1.2);
   }
 
-  /* Primary button glow (purple theme) */
+  /* Primary button glow (teal/cyan theme) */
   .glow-primary::before {
     background: radial-gradient(
       circle,
-      rgba(139, 92, 246, 0.15) 0%,
-      rgba(124, 58, 237, 0.08) 50%,
-      rgba(109, 40, 217, 0) 100%
+      rgba(20, 184, 166, 0.15) 0%,
+      rgba(13, 148, 136, 0.08) 50%,
+      rgba(15, 118, 110, 0) 100%
     );
   }
 
@@ -286,9 +286,9 @@
     opacity: 0;
     background: radial-gradient(
       circle,
-      rgba(139, 92, 246, 0.08) 0%,
-      rgba(124, 58, 237, 0.04) 50%,
-      rgba(109, 40, 217, 0) 100%
+      rgba(20, 184, 166, 0.08) 0%,
+      rgba(13, 148, 136, 0.04) 50%,
+      rgba(15, 118, 110, 0) 100%
     );
     transition: opacity 300ms cubic-bezier(0.4, 0, 0.2, 1);
     pointer-events: none;
@@ -314,9 +314,9 @@
     opacity: 0;
     background: radial-gradient(
       circle,
-      rgba(139, 92, 246, 0.2) 0%,
-      rgba(124, 58, 237, 0.1) 50%,
-      rgba(109, 40, 217, 0) 100%
+      rgba(20, 184, 166, 0.2) 0%,
+      rgba(13, 148, 136, 0.1) 50%,
+      rgba(15, 118, 110, 0) 100%
     );
     transition: all 400ms cubic-bezier(0.4, 0, 0.2, 1);
     pointer-events: none;
@@ -424,14 +424,14 @@
     font-weight: 500;
   }
 
-  /* Enhanced selection styles with purple theme */
+  /* Enhanced selection styles with teal theme */
   ::selection {
-    background-color: rgba(139, 92, 246, 0.2);
+    background-color: rgba(20, 184, 166, 0.2);
     color: inherit;
   }
 
   .dark ::selection {
-    background-color: rgba(139, 92, 246, 0.3);
+    background-color: rgba(20, 184, 166, 0.3);
     color: inherit;
   }
 
@@ -442,18 +442,18 @@
   }
 
   .message-assistant ::selection {
-    background-color: rgba(139, 92, 246, 0.2);
+    background-color: rgba(20, 184, 166, 0.2);
     color: inherit;
   }
 
   .dark .message-assistant ::selection {
-    background-color: rgba(139, 92, 246, 0.3);
+    background-color: rgba(20, 184, 166, 0.3);
     color: inherit;
   }
 
-  /* Enhanced link styles with purple theme and hover animations */
+  /* Enhanced link styles with teal theme and hover animations */
   .premium-link {
-    color: rgb(139, 92, 246);
+    color: rgb(20, 184, 166);
     font-weight: 500;
     text-decoration: none;
     position: relative;
@@ -461,7 +461,7 @@
   }
 
   .premium-link:hover {
-    color: rgb(124, 58, 237);
+    color: rgb(13, 148, 136);
   }
 
   .premium-link::after {
@@ -521,7 +521,7 @@
   }
 
   .markdown-content code {
-    background-color: rgba(139, 92, 246, 0.1);
+    background-color: rgba(20, 184, 166, 0.1);
     padding: 0.125em 0.25em;
     border-radius: 0.25em;
     font-size: 0.9em;
@@ -529,7 +529,7 @@
   }
 
   .dark .markdown-content code {
-    background-color: rgba(139, 92, 246, 0.2);
+    background-color: rgba(20, 184, 166, 0.2);
   }
 
   /* Adding comprehensive micro-animation and transition utilities */
@@ -720,13 +720,23 @@
   }
 
   /* Focus states for better accessibility */
+  .focus-ring-teal {
+    outline: none;
+    transition: box-shadow 150ms ease;
+  }
+
+  .focus-ring-teal:focus-visible {
+    box-shadow: 0 0 0 2px rgba(20, 184, 166, 0.5), 0 0 0 4px rgba(20, 184, 166, 0.1);
+  }
+  
+  /* Legacy class name support */
   .focus-ring-purple {
     outline: none;
     transition: box-shadow 150ms ease;
   }
 
   .focus-ring-purple:focus-visible {
-    box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.5), 0 0 0 4px rgba(139, 92, 246, 0.1);
+    box-shadow: 0 0 0 2px rgba(20, 184, 166, 0.5), 0 0 0 4px rgba(20, 184, 166, 0.1);
   }
 
   /* Button press feedback */
