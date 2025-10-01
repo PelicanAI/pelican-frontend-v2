@@ -358,12 +358,16 @@ export function ConversationSidebar({
       <div className="px-4 py-4 border-b border-sidebar-border/30">
         {/* Logo section - 8px gap between items */}
         <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-2">
-            <Image src="/pelican-logo.png" alt="PelicanAI" width={28} height={28} className="w-7 h-7 object-contain" />
+          <Link 
+            href="/marketing" 
+            className="flex items-center gap-2 group transition-all duration-200 hover:opacity-80"
+            title="Go to home page"
+          >
+            <Image src="/pelican-logo.png" alt="PelicanAI" width={28} height={28} className="w-7 h-7 object-contain group-hover:scale-110 transition-transform duration-200" />
             <span className="font-bold text-base bg-gradient-to-r from-teal-500 to-teal-600 bg-clip-text text-transparent">
               PelicanAI
             </span>
-          </div>
+          </Link>
           <div className="flex items-center gap-1">
             <ThemeToggle />
             {onToggleCollapse && !isMobileSheet && (
