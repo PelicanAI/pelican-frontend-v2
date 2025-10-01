@@ -283,16 +283,16 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
 
           <div
             className={cn(
-              "relative flex items-center gap-2 px-3 py-2",
+              "relative flex items-center gap-2 px-4 py-2",
               "bg-white dark:bg-gray-900",
               "rounded-full",
               "border border-gray-200 dark:border-gray-700",
               "transition-all duration-200",
-              "shadow-sm",
-              "min-h-[52px]",
+              "shadow-md hover:shadow-lg",
+              "min-h-[56px]",
               isFocused && [
-                "border-purple-500/50",
-                "shadow-[0_0_0_3px_rgba(168,85,247,0.1)]",
+                "border-purple-500/60",
+                "shadow-[0_0_0_4px_rgba(168,85,247,0.12)]",
               ],
             )}
           >
@@ -328,11 +328,11 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
               disabled={disabled}
               className={cn(
                 "flex-1 bg-transparent outline-none resize-none",
-                "text-[15px] leading-[1.5] font-[Inter,system-ui,sans-serif]",
+                "text-[15px] leading-relaxed font-[Inter,system-ui,sans-serif]",
                 "placeholder:text-gray-400 dark:placeholder:text-gray-500",
                 "text-gray-900 dark:text-gray-100",
                 "py-2 px-2",
-                "h-[36px] max-h-[168px] overflow-y-auto",
+                "h-[40px] max-h-[168px] overflow-y-auto",
                 "scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent",
               )}
               rows={1}

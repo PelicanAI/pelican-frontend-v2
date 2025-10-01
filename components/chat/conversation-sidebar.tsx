@@ -417,10 +417,10 @@ export function ConversationSidebar({
               />
             </div>
           ) : Object.values(groupedConversations).every((group) => group.length === 0) ? (
-            <div className="flex flex-col items-center justify-center py-12 px-6 text-center text-muted-foreground">
-              <MessageSquare className="h-10 w-10 mb-3 opacity-30" />
-              <p className="text-sm font-medium">{showArchived ? "No archived conversations" : "No conversations yet"}</p>
-              <p className="text-xs mt-1 opacity-70">Start a new chat to begin</p>
+            <div className="flex flex-col items-center justify-center py-8 px-6 text-center">
+              <MessageSquare className="h-8 w-8 mb-2 text-muted-foreground/20" />
+              <p className="text-xs font-medium text-muted-foreground/60">{showArchived ? "No archived conversations" : "No conversations yet"}</p>
+              <p className="text-xs mt-1 text-muted-foreground/40">Click "New chat" to start</p>
             </div>
           ) : (
             <div className="space-y-6">

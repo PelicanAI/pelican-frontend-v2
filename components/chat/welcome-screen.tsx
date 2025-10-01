@@ -49,8 +49,8 @@ export function WelcomeScreen({ onQuickStart }: WelcomeScreenProps) {
             </div>
 
             <div className="space-y-3">
-              <h1 className="text-3xl font-semibold text-balance text-foreground">How can I help you trade today?</h1>
-              <p className="text-balance text-muted-foreground">
+              <h1 className="text-4xl font-semibold text-balance text-foreground tracking-tight">How can I help you trade today?</h1>
+              <p className="text-base text-balance text-muted-foreground leading-relaxed">
                 Ask me about market analysis, trading strategies, or get real-time insights
               </p>
             </div>
@@ -68,10 +68,10 @@ export function WelcomeScreen({ onQuickStart }: WelcomeScreenProps) {
                     {suggestion.icon}
                   </div>
                   <div className="space-y-1.5 flex-1">
-                    <h3 className="font-semibold text-sm text-card-foreground group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors leading-snug">
+                    <h3 className="font-semibold text-[15px] text-card-foreground group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors leading-snug">
                       {suggestion.title}
                     </h3>
-                    <p className="text-xs text-muted-foreground leading-relaxed">{suggestion.subtitle}</p>
+                    <p className="text-sm text-muted-foreground leading-relaxed">{suggestion.subtitle}</p>
                   </div>
                 </div>
               </Card>

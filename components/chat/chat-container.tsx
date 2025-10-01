@@ -276,7 +276,7 @@ export function ChatContainer({
         onScrollToBottom={() => scrollToBottom("smooth")}
       >
         <div
-          className="w-full px-4 sm:px-6 py-4 space-y-4"
+          className="w-full px-4 sm:px-6 py-6 space-y-6"
           aria-live="polite"
           aria-label="Chat messages"
         >
@@ -373,7 +373,7 @@ export function ChatContainer({
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
                     <span className="font-medium">Pelican AI</span>
                   </div>
-                  <div className="px-4 py-3 max-w-[85%] bg-[var(--surface-2)] border border-white/5 rounded-lg">
+                  <div className="px-4 py-3 max-w-[85%] bg-white/90 dark:bg-[var(--surface-2)] border border-gray-200/80 dark:border-white/5 rounded-2xl rounded-bl-md shadow-sm">
                     <div className="flex items-center gap-3 text-sm text-muted-foreground">
                       <EnhancedTypingDots variant="processing" />
                     </div>

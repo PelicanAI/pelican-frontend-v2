@@ -141,7 +141,7 @@ export function MessageBubble({
       >
         <div className="flex flex-col items-end max-w-[min(70%,600px)]">
           <motion.div className="relative group">
-            <div className="bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-2xl rounded-br-md px-3 py-2 shadow-sm inline-block text-[14px] leading-[1.5] text-rendering-optimizeLegibility">
+            <div className="bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-2xl rounded-br-md px-4 py-3 shadow-md inline-block text-[15px] leading-relaxed text-rendering-optimizeLegibility">
               {renderAttachments(message.attachments)}
               <div className="break-words overflow-wrap-anywhere hyphens-auto selection:bg-purple-300 selection:text-purple-900">
                 {message.content}
@@ -257,10 +257,10 @@ export function MessageBubble({
         <motion.div className="relative">
           <div
             className={cn(
-              "rounded-2xl rounded-bl-md px-3 py-2 border overflow-hidden backdrop-blur-[8px] text-[14px] leading-[1.5] text-rendering-optimizeLegibility",
+              "rounded-2xl rounded-bl-md px-4 py-3 border overflow-hidden backdrop-blur-[8px] text-[15px] leading-relaxed text-rendering-optimizeLegibility shadow-sm",
               isDarkMode
-                ? "bg-[rgba(30,30,30,0.5)] border-[rgba(255,255,255,0.08)] text-white selection:bg-purple-600/30"
-                : "bg-[rgba(247,247,247,0.8)] border-[rgba(0,0,0,0.08)] text-black selection:bg-purple-200/60",
+                ? "bg-[rgba(30,30,30,0.7)] border-[rgba(255,255,255,0.1)] text-white selection:bg-purple-600/30"
+                : "bg-white/90 border-gray-200/80 text-gray-900 selection:bg-purple-200/60",
             )}
           >
             {renderAttachments(message.attachments)}
@@ -381,7 +381,7 @@ function MessageContent({
 
   return (
     <motion.div
-      className="leading-[1.6] tracking-[0.01em] font-[450] break-words overflow-wrap-anywhere hyphens-auto max-w-full text-rendering-optimizeLegibility"
+      className="leading-relaxed tracking-normal font-normal break-words overflow-wrap-anywhere hyphens-auto max-w-full text-rendering-optimizeLegibility"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
