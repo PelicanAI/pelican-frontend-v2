@@ -240,25 +240,7 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
 
     return (
       <div className="w-full">
-        <AnimatePresence>
-          {isAIResponding && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 10 }}
-              className="mb-2 flex justify-center"
-            >
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-full text-sm text-blue-700 dark:text-blue-300">
-                <motion.div
-                  animate={{ scale: [1, 1.2, 1] }}
-                  transition={{ duration: 1.5, repeat: Number.POSITIVE_INFINITY }}
-                  className="w-2 h-2 bg-blue-500 rounded-full"
-                />
-                Pelican is thinking...
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {/* Removed duplicate "Pelican is thinking..." indicator - shown in chat area instead */}
 
         <div
           ref={containerRef}

@@ -30,32 +30,33 @@ export function StreamingMessage({
   isDarkMode = false,
 }: StreamingMessageProps) {
   const [displayedContent, setDisplayedContent] = useState(message.role === "user" ? message.content : "")
-  const [isTyping, setIsTyping] = useState(false)
+  const [isRevealing, setIsRevealing] = useState(false)
   const [showTypingIndicator, setShowTypingIndicator] = useState(false)
 
   useEffect(() => {
     if (message.role === "user") {
       setDisplayedContent(message.content)
-      setIsTyping(false)
+      setIsRevealing(false)
       setShowTypingIndicator(false)
       return
     }
 
+    // For backend streaming (if available in future)
     if (message.isStreaming && message.content !== displayedContent) {
       if (!displayedContent && message.content) {
         setShowTypingIndicator(true)
         const indicatorTimeout = setTimeout(() => {
           setShowTypingIndicator(false)
-          setIsTyping(true)
+          setIsRevealing(true)
         }, 500)
 
         return () => clearTimeout(indicatorTimeout)
       }
 
       if (!showTypingIndicator) {
-        setIsTyping(true)
+        setIsRevealing(true)
 
-        // Enhanced typing effect with variable speed
+        // Character-by-character for real streaming
         const content = message.content
         let currentIndex = displayedContent.length
 
@@ -65,7 +66,7 @@ export function StreamingMessage({
               setDisplayedContent(content.slice(0, currentIndex + 1))
               currentIndex++
             } else {
-              setIsTyping(false)
+              setIsRevealing(false)
               clearInterval(typeInterval)
             }
           },
@@ -74,16 +75,27 @@ export function StreamingMessage({
 
         return () => clearInterval(typeInterval)
       }
-    } else if (!message.isStreaming) {
+    } 
+    // For non-streaming: Show content immediately (no animation for now)
+    else if (!message.isStreaming && message.content) {
       setDisplayedContent(message.content)
-      setIsTyping(false)
+      setIsRevealing(false)
       setShowTypingIndicator(false)
     }
-  }, [message.content, message.isStreaming, displayedContent, message.role, showTypingIndicator])
+  }, [message.content, message.isStreaming, displayedContent, message.role, showTypingIndicator, isRevealing])
 
   const displayMessage = {
     ...message,
     content: displayedContent,
+  }
+
+  // Allow user to click to instantly reveal full message
+  const handleClick = () => {
+    if (isRevealing && message.role === "assistant") {
+      setDisplayedContent(message.content)
+      setIsRevealing(false)
+      setShowTypingIndicator(false)
+    }
   }
 
   return (
@@ -95,14 +107,17 @@ export function StreamingMessage({
         duration: 0.3,
         ease: "easeOut",
       }}
+      onClick={handleClick}
+      style={{ cursor: isRevealing ? 'pointer' : 'default' }}
+      title={isRevealing ? 'Click to show full message' : ''}
     >
       <MessageBubble
         message={displayMessage}
-        isStreaming={message.isStreaming || isTyping}
+        isStreaming={message.isStreaming || isRevealing}
         showSkeleton={showTypingIndicator}
         isDarkMode={isDarkMode}
         onStop={message.isStreaming ? onStop : undefined}
-        onRegenerate={!message.isStreaming && message.role === "assistant" ? onRegenerate : undefined}
+        onRegenerate={!message.isStreaming && !isRevealing && message.role === "assistant" ? onRegenerate : undefined}
         onReaction={onReaction}
         onEdit={onEdit}
         onDelete={onDelete}

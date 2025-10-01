@@ -386,6 +386,7 @@ function MessageContent({
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
     >
+      <span className="inline">
       {content.split("\n").map((line, index) => {
         if (line.includes("```")) {
           return (
@@ -462,6 +463,15 @@ function MessageContent({
           />
         )
       })}
+      </span>
+      {/* Blinking cursor during text reveal */}
+      {isStreaming && (
+        <motion.span
+          className="inline-block w-[2px] h-[1.2em] ml-0.5 bg-current opacity-70"
+          animate={{ opacity: [0.7, 0, 0.7] }}
+          transition={{ duration: 0.8, repeat: Infinity, ease: "easeInOut" }}
+        />
+      )}
     </motion.div>
   )
 }
