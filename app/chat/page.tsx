@@ -46,7 +46,6 @@ export default function ChatPage() {
   useEffect(() => {
     setMounted(true)
     const stored = localStorage.getItem('pelican_guest_mode')
-    console.log('Guest mode from storage:', stored)
     if (stored === 'true') {
       setGuestMode(true)
     }
@@ -198,15 +197,11 @@ export default function ChatPage() {
     return null
   }
 
-  console.log('Render state:', { user, guestMode, authLoading, mounted })
-
   // If in guest mode, skip auth entirely
   if (guestMode) {
     // Guest mode - show chat interface directly
-    console.log('Guest mode active, showing chat')
   } else if (authLoading) {
     // Only show loading for non-guest users waiting for auth
-    console.log('Waiting for auth...')
     return (
       <div className="flex items-center justify-center h-screen bg-background">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>

@@ -64,7 +64,7 @@ export async function POST(req: NextRequest) {
       effectiveUserId = user.id
     } else {
       effectiveUserId = guestUserId || generateGuestUUID()
-      console.log("[v0] Guest mode with user ID:", effectiveUserId)
+      logger.info("Guest mode active", { userId: effectiveUserId })
     }
 
     if (!activeConversationId && isFirstMessage && effectiveUserId && !guestMode) {
@@ -81,16 +81,16 @@ export async function POST(req: NextRequest) {
         .single()
 
       if (createError) {
-        console.error("[v0] Failed to create conversation:", createError)
+        logger.error("Failed to create conversation", createError, { userId: effectiveUserId })
         // Fallback to temporary ID if database creation fails
         activeConversationId = `temp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
       } else {
         activeConversationId = newConversation.id
-        console.log("[v0] Created new conversation:", activeConversationId)
+        logger.info("Created new conversation", { conversationId: activeConversationId, userId: effectiveUserId })
       }
     } else if (!activeConversationId && guestMode) {
       activeConversationId = `guest-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
-      console.log("[v0] Created guest conversation:", activeConversationId)
+      logger.info("Created guest conversation", { conversationId: activeConversationId })
     }
 
     const apiKey = process.env.PEL_API_KEY
@@ -149,9 +149,12 @@ export async function POST(req: NextRequest) {
       stream: true,
     }
 
-    console.log(`[v0] Calling Pelican API for user ${effectiveUserId || "anonymous"} with message:`, userMessage)
-    console.log(`[v0] Conversation context length:`, conversationContext.length)
-    console.log(`[v0] Active conversation ID:`, activeConversationId)
+    logger.info("Calling Pelican API", {
+      userId: effectiveUserId || "anonymous",
+      messageLength: userMessage.length,
+      contextLength: conversationContext.length,
+      conversationId: activeConversationId,
+    })
 
     const response = await streamWithRetry(endpoint, {
       method: "POST",
@@ -169,9 +172,12 @@ export async function POST(req: NextRequest) {
     })
 
     if (!response.ok) {
-      console.log(`[v0] Pelican API failed with status:`, response.status)
       const errorText = await response.text()
-      console.log(`[v0] Error response:`, errorText)
+      logger.error("Pelican API request failed", new Error(errorText), {
+        status: response.status,
+        userId: effectiveUserId,
+        conversationId: activeConversationId,
+      })
       throw new Error(`API request failed with status ${response.status}`)
     }
 
@@ -193,7 +199,7 @@ export async function POST(req: NextRequest) {
           try {
             while (true) {
               if (signal?.aborted) {
-                console.log("[v0] Request aborted, stopping stream")
+                logger.info("Request aborted, stopping stream", { conversationId: activeConversationId })
                 reader.cancel()
                 controller.close()
                 return
@@ -243,16 +249,19 @@ export async function POST(req: NextRequest) {
               ) {
                 await saveMessagesToDatabase(supabase, activeConversationId, userMessage, fullResponse, effectiveUserId)
               } else {
-                console.log("[v0] Guest/temporary conversation - not saved to database")
+                logger.info("Guest/temporary conversation - not saved to database", { conversationId: activeConversationId })
               }
             }
           } catch (error) {
             if (error instanceof Error && error.name === "AbortError") {
-              console.log("[v0] Stream aborted by user")
+              logger.info("Stream aborted by user", { conversationId: activeConversationId })
               controller.close()
               return
             }
-            console.error("[v0] Streaming error:", error)
+            logger.error("Streaming error occurred", error instanceof Error ? error : new Error(String(error)), {
+              conversationId: activeConversationId,
+              userId: effectiveUserId,
+            })
             controller.error(error)
           } finally {
             controller.close()
@@ -269,7 +278,11 @@ export async function POST(req: NextRequest) {
       })
     } else {
       const data = await response.json()
-      console.log(`[v0] Received response:`, data)
+      logger.info("Received non-streaming response", {
+        conversationId: activeConversationId,
+        userId: effectiveUserId,
+        responseLength: (data.text || data.reply || "").length,
+      })
 
       const reply = data.text || data.reply || "No response received"
 
@@ -282,7 +295,7 @@ export async function POST(req: NextRequest) {
       ) {
         await saveMessagesToDatabase(supabase, activeConversationId, userMessage, reply, effectiveUserId)
       } else {
-        console.log("[v0] Guest/temporary conversation - not saved to database")
+        logger.info("Guest/temporary conversation - not saved to database", { conversationId: activeConversationId })
       }
 
       return NextResponse.json({
@@ -344,15 +357,15 @@ async function saveMessagesToDatabase(
   ])
 
   if (insertError) {
-    console.error("[v0] Failed to save messages:", insertError)
-    console.error("[v0] Insert error details:", {
+    logger.error("Failed to save messages to database", insertError, {
+      conversationId,
+      userId,
       code: insertError.code,
-      message: insertError.message,
       details: insertError.details,
       hint: insertError.hint,
     })
   } else {
-    console.log("[v0] Messages saved to conversation:", conversationId)
+    logger.info("Messages saved to conversation", { conversationId, userId })
 
     const { count: messageCount, error: countError } = await supabase
       .from("messages")
@@ -360,7 +373,7 @@ async function saveMessagesToDatabase(
       .eq("conversation_id", conversationId)
 
     if (countError) {
-      console.error("[v0] Failed to count messages:", countError)
+      logger.error("Failed to count messages", countError, { conversationId })
     }
 
     const { error: updateError } = await supabase
@@ -374,10 +387,8 @@ async function saveMessagesToDatabase(
       .eq("user_id", userId)
 
     if (updateError) {
-      console.error("[v0] Failed to update conversation metadata:", updateError)
-      console.error("[v0] Update error details:", {
+      logger.error("Failed to update conversation metadata", updateError, {
         code: updateError.code,
-        message: updateError.message,
         conversationId,
         userId,
       })
