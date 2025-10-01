@@ -18,6 +18,7 @@ interface SendMessageOptions {
   guestMode?: boolean
   attachments?: Array<{ type: string; name: string; url: string }>
   fileIds?: string[]
+  skipUserMessage?: boolean // For regenerate - don't add duplicate user message
 }
 
 export function useChat({ conversationId, onError, onFinish, onConversationCreated }: UseChatOptions = {}) {
@@ -141,7 +142,11 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
       if (options.attachments) {
         userMessage.attachments = options.attachments
       }
-      setMessages((prev) => [...prev, userMessage])
+      
+      // Only add user message if not regenerating (skipUserMessage flag)
+      if (!options.skipUserMessage) {
+        setMessages((prev) => [...prev, userMessage])
+      }
       setIsLoading(true)
 
       const assistantMessage = createAssistantMessage()
@@ -161,7 +166,8 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            messages: [...messagesRef.current, userMessage],
+            // If regenerating, user message is already in messagesRef, don't add it again
+            messages: options.skipUserMessage ? messagesRef.current : [...messagesRef.current, userMessage],
             conversationId: currentConversationId,
             guestMode: options.guestMode || false,
             guestUserId: options.guestMode ? guestUserId : undefined,
@@ -400,13 +406,22 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
     setMessages((currentMessages) => {
       if (currentMessages.length < 2) return currentMessages
 
-      const lastUserMessage = [...currentMessages].reverse().find((msg) => msg.role === "user")
-      if (!lastUserMessage) return currentMessages
+      // Find the last assistant message
+      const lastAssistantIndex = [...currentMessages].reverse().findIndex((msg) => msg.role === "assistant")
+      if (lastAssistantIndex === -1) return currentMessages
 
-      const lastUserIndex = currentMessages.findIndex((msg) => msg.id === lastUserMessage.id)
-      const newMessages = currentMessages.slice(0, lastUserIndex + 1)
+      // Calculate actual index (since we reversed)
+      const actualIndex = currentMessages.length - 1 - lastAssistantIndex
 
-      setTimeout(() => sendMessage(lastUserMessage.content, { guestMode: isGuestMode }), 0)
+      // Find the user message that prompted this assistant response
+      const userMessage = [...currentMessages.slice(0, actualIndex)].reverse().find((msg) => msg.role === "user")
+      if (!userMessage) return currentMessages
+
+      // Remove only the assistant message, keep the user message
+      const newMessages = currentMessages.slice(0, actualIndex)
+
+      // Regenerate with skipUserMessage flag to avoid duplicating the user's question
+      setTimeout(() => sendMessage(userMessage.content, { guestMode: isGuestMode, skipUserMessage: true }), 0)
 
       return newMessages
     })
