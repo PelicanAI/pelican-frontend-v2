@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
     }
     if (!userId) {
       const forwarded = request.headers.get("x-forwarded-for")
-      const ip = forwarded ? forwarded.split(",")[0].trim() : "unknown"
+      const ip = forwarded ? forwarded.split(",")[0]?.trim() || "unknown" : "unknown"
       guestId = `guest_${ip}`
     }
 
