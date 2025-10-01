@@ -6,6 +6,7 @@ import useSWR, { mutate } from "swr"
 import { useConversations } from "./use-conversations"
 import { useRequestManager } from "./use-request-manager"
 import { STORAGE_KEYS, API_ENDPOINTS, LIMITS } from "@/lib/constants"
+import { logger } from "@/lib/logger"
 
 interface UseChatOptions {
   conversationId?: string | null
@@ -330,10 +331,15 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
         }
         mutate(API_ENDPOINTS.CONVERSATIONS)
       } catch (error) {
-        console.error("[v0] Chat error:", error)
+        logger.error("Chat error", error instanceof Error ? error : new Error(String(error)), {
+          conversationId: currentConversationId,
+          messageLength: content.length,
+          isGuestMode: options.guestMode,
+          skipUserMessage: options.skipUserMessage,
+        })
 
         if (error instanceof Error && error.name === "AbortError") {
-          console.log("[v0] Request was cancelled by user")
+          logger.info("Request cancelled by user")
           setMessages((prev) =>
             prev.map((msg) =>
               msg.id === assistantMessage.id ? { ...msg, content: "Response cancelled", isStreaming: false } : msg,
@@ -351,7 +357,8 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
           )
         } else {
           const retryAction = () => {
-            sendMessage(content, options)
+            // Preserve skipUserMessage flag for retry to avoid duplicates
+            sendMessage(content, { ...options, skipUserMessage: true })
           }
           addSystemMessage("Connection issue. Retry?", retryAction)
         }
