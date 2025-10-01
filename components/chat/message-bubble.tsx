@@ -141,9 +141,14 @@ export function MessageBubble({
       >
         <div className="flex flex-col items-end max-w-[min(70%,600px)]">
           <motion.div className="relative group">
-            <div className="bg-gradient-to-r from-teal-500 to-teal-600 text-white rounded-2xl rounded-br-md px-4 py-3 shadow-md inline-block text-[15px] leading-relaxed text-rendering-optimizeLegibility">
+            <div className={cn(
+              "text-white rounded-2xl rounded-br-md px-4 py-3 shadow-md inline-block text-[15px] leading-relaxed text-rendering-optimizeLegibility",
+              isDarkMode 
+                ? "bg-slate-700 dark:bg-slate-700" 
+                : "bg-gradient-to-r from-teal-500 to-teal-600"
+            )}>
               {renderAttachments(message.attachments)}
-              <div className="break-words overflow-wrap-anywhere hyphens-auto selection:bg-teal-200 selection:text-teal-900">
+              <div className="break-words overflow-wrap-anywhere hyphens-auto selection:bg-white/20">
                 {message.content}
               </div>
             </div>
@@ -259,7 +264,7 @@ export function MessageBubble({
             className={cn(
               "rounded-2xl rounded-bl-md px-4 py-3 border overflow-hidden backdrop-blur-[8px] text-[15px] leading-relaxed text-rendering-optimizeLegibility shadow-sm",
               isDarkMode
-                ? "bg-[rgba(30,30,30,0.7)] border-[rgba(255,255,255,0.1)] text-white selection:bg-teal-600/30"
+                ? "bg-slate-800/90 border-slate-700/50 text-gray-100 selection:bg-teal-600/30"
                 : "bg-white/90 border-gray-200/80 text-gray-900 selection:bg-teal-200/60",
             )}
           >
