@@ -279,11 +279,11 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
 
           if (localAbortController.signal.aborted) {
             setMessages((prev) =>
-              prev.map((msg) =>
-                msg.id === assistantMessage.id
-                  ? { ...msg, content: streamingContent || "Response cancelled", isStreaming: false }
-                  : msg,
-              ),
+              streamingContent
+                ? prev.map((msg) =>
+                    msg.id === assistantMessage.id ? { ...msg, content: streamingContent, isStreaming: false } : msg,
+                  )
+                : prev.filter((msg) => msg.id !== assistantMessage.id), // Remove if no content
             )
           }
         } else {
@@ -340,14 +340,12 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
 
         if (error instanceof Error && error.name === "AbortError") {
           logger.info("Request cancelled by user")
-          setMessages((prev) =>
-            prev.map((msg) =>
-              msg.id === assistantMessage.id ? { ...msg, content: "Response cancelled", isStreaming: false } : msg,
-            ),
-          )
+          // Remove the cancelled assistant message (like ChatGPT/Claude)
+          setMessages((prev) => prev.filter((msg) => msg.id !== assistantMessage.id))
           return
         }
 
+        // Remove failed assistant message for other errors too
         setMessages((prev) => prev.filter((msg) => msg.id !== assistantMessage.id))
 
         if (error instanceof Error && error.message.includes("Rate limited")) {
@@ -388,15 +386,21 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
 
   const stopGeneration = useCallback(() => {
     if (abortControllerRef.current) {
-      console.log("[v0] Stopping generation - aborting local controller")
+      logger.info("Stopping generation - aborting controller")
       abortControllerRef.current.abort()
     }
     cancelAllRequests()
     setIsLoading(false)
     setMessages((prev) =>
-      prev.map((msg) =>
-        msg.isStreaming ? { ...msg, content: msg.content || "Response stopped", isStreaming: false } : msg,
-      ),
+      prev
+        .map((msg) =>
+          msg.isStreaming
+            ? msg.content
+              ? { ...msg, isStreaming: false } // Keep partial content if any was generated
+              : null // Remove message if no content yet
+            : msg,
+        )
+        .filter((msg): msg is Message => msg !== null),
     )
   }, [cancelAllRequests])
 
