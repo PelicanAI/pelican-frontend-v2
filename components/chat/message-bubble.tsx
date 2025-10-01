@@ -263,9 +263,8 @@ export function MessageBubble({
           <div
             className={cn(
               "rounded-2xl rounded-bl-md px-4 py-3 border overflow-hidden backdrop-blur-[8px] text-[15px] leading-relaxed text-rendering-optimizeLegibility shadow-sm",
-              isDarkMode
-                ? "bg-slate-800/90 border-slate-700/50 text-gray-100 selection:bg-teal-600/30"
-                : "bg-white/90 border-gray-200/80 text-gray-900 selection:bg-teal-200/60",
+              "bg-white/90 border-gray-200/80 text-gray-900 selection:bg-teal-200/60",
+              "dark:bg-slate-800 dark:border-slate-700/50 dark:text-gray-100 dark:selection:bg-teal-600/30",
             )}
           >
             {renderAttachments(message.attachments)}
@@ -402,7 +401,8 @@ function MessageContent({
               transition={{ duration: 0.3, delay: index * 0.05 }}
               className={cn(
                 "relative group my-2 rounded-lg border overflow-hidden font-mono",
-                isDarkMode ? "bg-black/40 border-white/10" : "bg-gray-100 border-gray-200",
+                "bg-gray-100 border-gray-200",
+                "dark:bg-slate-900 dark:border-slate-700",
               )}
             >
               <div className="relative">
