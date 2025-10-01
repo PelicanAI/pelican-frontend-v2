@@ -112,6 +112,7 @@ export function useConversationRouter({
   }
 
   const handleNewConversation = async () => {
+    // Archive current conversation if it has messages
     if (messages.length > 0 && currentConversationId) {
 
       if (guestMode && currentConversationId.startsWith("guest-")) {
@@ -136,9 +137,16 @@ export function useConversationRouter({
       }
     }
 
+    // Clear current state
     setCurrentConversationId(null)
     clearMessages()
-    router.push(ROUTES.CHAT)
+    
+    // Create new conversation and navigate to it directly
+    const newConversation = await createConversation("New Chat")
+    
+    startTransition(() => {
+      router.push(`${ROUTES.CHAT}?conversation=${encodeURIComponent(newConversation.id)}`, { scroll: false })
+    })
   }
 
   return {
