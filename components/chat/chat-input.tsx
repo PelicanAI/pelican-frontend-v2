@@ -7,31 +7,32 @@ import { Card } from "@/components/ui/card"
 import { Send, Paperclip, Square, Search, MapPin, Globe, Calendar, Mic } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { AttachmentChip } from "./attachment-chip"
-import { InputSuggestions } from "./input-suggestions"
-import { useInputSuggestions } from "@/hooks/use-input-suggestions"
+// import { InputSuggestions } from "./input-suggestions"
+// import { useInputSuggestions } from "@/hooks/use-input-suggestions"
 import { motion, AnimatePresence } from "framer-motion"
 import { LIMITS, UI } from "@/lib/constants"
 
-const COMMON_SUGGESTIONS = [
-  "Write a professional email about",
-  "Create a marketing strategy for",
-  "Explain the concept of",
-  "Generate a bullish trading strategy for",
-  "Analyze the market trends in",
-  "Help me understand",
-  "Create a business plan for",
-  "Write code to",
-  "Summarize the key points of",
-  "Compare and contrast",
-]
+// Auto-suggestion feature - DISABLED FOR NOW, will re-enable later
+// const COMMON_SUGGESTIONS = [
+//   "Write a professional email about",
+//   "Create a marketing strategy for",
+//   "Explain the concept of",
+//   "Generate a bullish trading strategy for",
+//   "Analyze the market trends in",
+//   "Help me understand",
+//   "Create a business plan for",
+//   "Write code to",
+//   "Summarize the key points of",
+//   "Compare and contrast",
+// ]
 
-const SUGGESTION_PILLS = [
-  { icon: "📊", text: "Compare", color: "bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200" },
-  { icon: "🔧", text: "Troubleshoot", color: "bg-green-50 hover:bg-green-100 text-green-700 border-green-200" },
-  { icon: "📚", text: "Learn", color: "bg-purple-50 hover:bg-purple-100 text-purple-700 border-purple-200" },
-  { icon: "💡", text: "Strategy", color: "bg-orange-50 hover:bg-orange-100 text-orange-700 border-orange-200" },
-  { icon: "❤️", text: "Health", color: "bg-red-50 hover:bg-red-100 text-red-700 border-red-200" },
-]
+// const SUGGESTION_PILLS = [
+//   { icon: "📊", text: "Compare", color: "bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200" },
+//   { icon: "🔧", text: "Troubleshoot", color: "bg-green-50 hover:bg-green-100 text-green-700 border-green-200" },
+//   { icon: "📚", text: "Learn", color: "bg-purple-50 hover:bg-purple-100 text-purple-700 border-purple-200" },
+//   { icon: "💡", text: "Strategy", color: "bg-orange-50 hover:bg-orange-100 text-orange-700 border-orange-200" },
+//   { icon: "❤️", text: "Health", color: "bg-red-50 hover:bg-red-100 text-red-700 border-red-200" },
+// ]
 
 interface Attachment {
   name: string
@@ -103,29 +104,27 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
     const fileInputRef = useRef<HTMLInputElement>(null)
     const containerRef = useRef<HTMLDivElement>(null)
 
-    // Input suggestions hook
-    const {
-      input: message,
-      updateInput,
-      suggestions,
-      visible: suggestionsVisible,
-      selectedIndex,
-      handleKeyDown: handleSuggestionsKeyDown,
-      acceptSuggestion,
-      saveRecentSearch,
-      clearSuggestions,
-      handleSuggestionHover,
-    } = useInputSuggestions({
-      onAccept: (text) => {
-        setMessage(text)
-        textareaRef.current?.focus()
-      },
-    })
+    // Simple message state (auto-suggestions disabled for now)
+    const [message, setMessage] = useState("")
 
-    // Wrapper for setMessage to update suggestions
-    const setMessage = (value: string) => {
-      updateInput(value)
-    }
+    // Input suggestions hook - DISABLED FOR NOW, will re-enable later
+    // const {
+    //   input: message,
+    //   updateInput,
+    //   suggestions,
+    //   visible: suggestionsVisible,
+    //   selectedIndex,
+    //   handleKeyDown: handleSuggestionsKeyDown,
+    //   acceptSuggestion,
+    //   saveRecentSearch,
+    //   clearSuggestions,
+    //   handleSuggestionHover,
+    // } = useInputSuggestions({
+    //   onAccept: (text) => {
+    //     setMessage(text)
+    //     textareaRef.current?.focus()
+    //   },
+    // })
 
     useImperativeHandle(ref, () => ({
       focus: () => {
@@ -151,13 +150,13 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
       if (message.trim() && !disabled && !isAIResponding && canSend && !disabledSend) {
         const trimmedMessage = message.trim()
 
-        // Save to recent searches
-        saveRecentSearch(trimmedMessage)
+        // Save to recent searches - DISABLED
+        // saveRecentSearch(trimmedMessage)
 
         onSendMessage(trimmedMessage)
         setMessage("")
         setShowThinkingNote(false)
-        clearSuggestions()
+        // clearSuggestions() - DISABLED
       }
     }
 
@@ -166,16 +165,16 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
         onQueueMessage(message.trim())
         setMessage("")
         setShowThinkingNote(false)
-        clearSuggestions()
+        // clearSuggestions() - DISABLED
       }
     }
 
     const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
-      // First, let suggestions handle the event
-      const handled = handleSuggestionsKeyDown(e)
-      if (handled) {
-        return
-      }
+      // Suggestions handling - DISABLED FOR NOW
+      // const handled = handleSuggestionsKeyDown(e)
+      // if (handled) {
+      //   return
+      // }
 
       if (e.key === "Enter" && !e.shiftKey) {
         e.preventDefault()
@@ -322,7 +321,7 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
               onFocus={() => setIsFocused(true)}
               onBlur={() => {
                 setIsFocused(false)
-                setTimeout(() => clearSuggestions(), 200)
+                // setTimeout(() => clearSuggestions(), 200) - DISABLED
               }}
               placeholder="Message Pelican..."
               disabled={disabled}
@@ -434,14 +433,14 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
             </motion.div>
           )}
 
-          {/* Input Suggestions */}
-          <InputSuggestions
+          {/* Input Suggestions - DISABLED FOR NOW, will re-enable later */}
+          {/* <InputSuggestions
             suggestions={suggestions}
             selectedIndex={selectedIndex}
             onSelect={acceptSuggestion}
             onHover={handleSuggestionHover}
             visible={suggestionsVisible && isFocused}
-          />
+          /> */}
 
         </div>
       </div>
