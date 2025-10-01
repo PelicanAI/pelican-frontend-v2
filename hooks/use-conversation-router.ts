@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, startTransition } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useConversations } from "./use-conversations"
 import { STORAGE_KEYS, ROUTES, LIMITS } from "@/lib/constants"
+import { logger } from "@/lib/logger"
 
 interface UseConversationRouterOptions {
   user: any
@@ -32,6 +33,7 @@ export function useConversationRouter({
 
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(null)
   const bootstrappedRef = useRef(false)
+  const isCreatingNewRef = useRef(false)
 
   useEffect(() => {
     const cid = searchParams.get("conversation")
@@ -112,41 +114,76 @@ export function useConversationRouter({
   }
 
   const handleNewConversation = async () => {
-    // Archive current conversation if it has messages
-    if (messages.length > 0 && currentConversationId) {
-
-      if (guestMode && currentConversationId.startsWith("guest-")) {
-        await updateConversation(currentConversationId, {
-          title: messages[0]?.content?.slice(0, LIMITS.TITLE_PREVIEW_LENGTH) + "..." || "Untitled Chat",
-          archived: true,
-        })
-      } else if (!guestMode) {
-        try {
-          await fetch(`/api/conversations/${currentConversationId}`, {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              title: messages[0]?.content?.slice(0, LIMITS.TITLE_PREVIEW_LENGTH) + "..." || "Untitled Chat",
-              archived: true,
-              updated_at: new Date().toISOString(),
-            }),
-          })
-        } catch (error) {
-          console.error("[v0] Failed to update conversation before new chat:", error)
-        }
-      }
+    console.log("🔵 [New Chat] Button clicked")
+    
+    // Prevent multiple clicks from creating multiple conversations
+    if (isCreatingNewRef.current) {
+      console.log("🔵 [New Chat] Already creating, ignoring click")
+      return
     }
+    
+    isCreatingNewRef.current = true
+    
+    try {
+      // Stop any ongoing generation first
+      if (chatLoading) {
+        console.log("🔵 [New Chat] Stopping ongoing generation")
+        stopGeneration()
+      }
 
-    // Clear current state
-    setCurrentConversationId(null)
-    clearMessages()
-    
-    // Create new conversation and navigate to it directly
-    const newConversation = await createConversation("New Chat")
-    
-    startTransition(() => {
-      router.push(`${ROUTES.CHAT}?conversation=${encodeURIComponent(newConversation.id)}`, { scroll: false })
-    })
+      console.log("🔵 [New Chat] Creating new conversation...")
+      // Create new conversation FIRST (before any state changes)
+      const newConversation = await createConversation("New Chat")
+      console.log("🔵 [New Chat] Created:", newConversation.id)
+
+      // Store the old conversation ID for archiving AFTER navigation
+      const oldConversationId = currentConversationId
+      const oldMessages = [...messages]
+      
+      // Navigate immediately to new conversation
+      const newUrl = `${ROUTES.CHAT}?conversation=${encodeURIComponent(newConversation.id)}&_r=${Date.now()}`
+      console.log("🔵 [New Chat] Navigating to:", newUrl)
+      
+      startTransition(() => {
+        router.push(newUrl, { scroll: false })
+      })
+      
+      console.log("🔵 [New Chat] Navigation initiated")
+      
+      // Archive old conversation AFTER navigation (if it had messages)
+      // Use setTimeout to ensure this happens after the navigation starts
+      setTimeout(() => {
+        if (oldMessages.length > 0 && oldConversationId) {
+          if (guestMode && oldConversationId.startsWith("guest-")) {
+            updateConversation(oldConversationId, {
+              title: oldMessages[0]?.content?.slice(0, LIMITS.TITLE_PREVIEW_LENGTH) + "..." || "Untitled Chat",
+              archived: true,
+            }).catch(error => logger.error("Failed to archive guest conversation", error instanceof Error ? error : new Error(String(error)), { conversationId: oldConversationId }))
+          } else if (!guestMode) {
+            fetch(`/api/conversations/${oldConversationId}`, {
+              method: "PATCH",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                title: oldMessages[0]?.content?.slice(0, LIMITS.TITLE_PREVIEW_LENGTH) + "..." || "Untitled Chat",
+                archived: true,
+                updated_at: new Date().toISOString(),
+              }),
+            }).catch(error => logger.error("Failed to archive conversation", error instanceof Error ? error : new Error(String(error)), { conversationId: oldConversationId }))
+          }
+        }
+
+        // Clear draft for old conversation
+        if (clearDraftForConversation && oldConversationId) {
+          clearDraftForConversation(oldConversationId)
+        }
+      }, 100)
+      
+    } finally {
+      // Reset the flag after a short delay to allow the navigation to complete
+      setTimeout(() => {
+        isCreatingNewRef.current = false
+      }, 500)
+    }
   }
 
   return {

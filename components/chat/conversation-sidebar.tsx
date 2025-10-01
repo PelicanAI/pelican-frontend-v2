@@ -405,7 +405,7 @@ export function ConversationSidebar({
             placeholder="Search conversations..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="h-10 pl-10 pr-3 bg-sidebar/50 border-sidebar-border/50 text-sidebar-foreground text-sm placeholder:text-muted-foreground focus:border-purple-500/50 transition-colors duration-200 rounded-lg"
+            className="h-10 pl-10 pr-3 bg-sidebar/50 border-sidebar-border/50 text-sidebar-foreground text-sm placeholder:text-muted-foreground focus:border-teal-500/50 transition-colors duration-200 rounded-lg"
           />
         </div>
       </div>

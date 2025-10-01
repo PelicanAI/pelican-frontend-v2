@@ -300,8 +300,15 @@ export function ChatContainer({
             </div>
           </div>
 
+          {/* Loading skeleton when switching conversations */}
+          {isLoadingHistory && messages.length === 0 && (
+            <div className="space-y-6">
+              <ConversationHistorySkeleton />
+            </div>
+          )}
+
           <AnimatePresence mode="popLayout">
-            {messages.map((message, index) =>
+            {!isLoadingHistory && messages.map((message, index) =>
               message.role === "system" ? (
                 <motion.div
                   key={message.id}

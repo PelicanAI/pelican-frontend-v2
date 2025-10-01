@@ -64,6 +64,8 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
     setCurrentConversationId(conversationId || null)
     setConversationNotFound(false)
     if (conversationId !== loadedConversationRef.current) {
+      // Clear messages immediately when switching conversations to prevent showing old messages
+      setMessages([])
       loadedConversationRef.current = null
     }
   }, [conversationId])
@@ -348,17 +350,36 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
         // Remove failed assistant message for other errors too
         setMessages((prev) => prev.filter((msg) => msg.id !== assistantMessage.id))
 
+        // Provide specific error messages based on error type
         if (error instanceof Error && error.message.includes("Rate limited")) {
           const queueStatus = getQueueStatus()
           addSystemMessage(
             `High demand detected. ${queueStatus.queued > 0 ? `Position in queue: ${queueStatus.queued}` : "Your message will be processed shortly."}`,
           )
-        } else {
+        } else if (error instanceof Error && error.message.includes("timeout")) {
           const retryAction = () => {
-            // Preserve skipUserMessage flag for retry to avoid duplicates
             sendMessage(content, { ...options, skipUserMessage: true })
           }
-          addSystemMessage("Connection issue. Retry?", retryAction)
+          addSystemMessage("Request timed out. The server took too long to respond. Please try again.", retryAction)
+        } else if (error instanceof Error && error.message.includes("401")) {
+          addSystemMessage("Authentication error. Please sign in again to continue.")
+        } else if (error instanceof Error && error.message.includes("403")) {
+          addSystemMessage("Access denied. You don't have permission to perform this action.")
+        } else if (error instanceof Error && error.message.includes("500")) {
+          const retryAction = () => {
+            sendMessage(content, { ...options, skipUserMessage: true })
+          }
+          addSystemMessage("Server error. Our servers are experiencing issues. Please try again in a moment.", retryAction)
+        } else if (error instanceof Error && error.name === "TypeError") {
+          const retryAction = () => {
+            sendMessage(content, { ...options, skipUserMessage: true })
+          }
+          addSystemMessage("Network error. Please check your internet connection and try again.", retryAction)
+        } else {
+          const retryAction = () => {
+            sendMessage(content, { ...options, skipUserMessage: true })
+          }
+          addSystemMessage("Something went wrong. Please try again.", retryAction)
         }
 
         onError?.(error instanceof Error ? error : new Error("Unknown error"))

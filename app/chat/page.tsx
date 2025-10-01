@@ -31,6 +31,7 @@ export default function ChatPage() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [mobileSheetOpen, setMobileSheetOpen] = useState(false)
   const [isOnline, setIsOnline] = useState(true)
+  const [showOfflineBanner, setShowOfflineBanner] = useState(false)
   const [guestMode, setGuestMode] = useState(false)
   const [mounted, setMounted] = useState(false)
   const [tradingPanelCollapsed, setTradingPanelCollapsed] = useState(false)
@@ -42,12 +43,30 @@ export default function ChatPage() {
   //   watchlistSymbols: ['AAPL', 'TSLA', 'NVDA', 'SPY'] // User's custom watchlist
   // })
 
-  // Initialize after mount
+  // Initialize after mount and monitor network status
   useEffect(() => {
     setMounted(true)
     const stored = localStorage.getItem('pelican_guest_mode')
     if (stored === 'true') {
       setGuestMode(true)
+    }
+
+    // Monitor online/offline status
+    const handleOnline = () => {
+      setIsOnline(true)
+      setShowOfflineBanner(false)
+    }
+    const handleOffline = () => {
+      setIsOnline(false)
+      setShowOfflineBanner(true)
+    }
+
+    window.addEventListener('online', handleOnline)
+    window.addEventListener('offline', handleOffline)
+
+    return () => {
+      window.removeEventListener('online', handleOnline)
+      window.removeEventListener('offline', handleOffline)
     }
   }, [])
   const [settingsOpen, setSettingsOpen] = useState(false)
@@ -67,11 +86,12 @@ export default function ChatPage() {
   } = useChat({
     conversationId: conversationIdFromUrl,
     onError: (error) => {
-      setIsOnline(false)
-      setTimeout(() => setIsOnline(true), 5000)
+      // Show offline banner for network errors
+      setShowOfflineBanner(true)
     },
     onFinish: async (message) => {
-      setIsOnline(true)
+      // Message sent successfully, hide offline banner if it was showing
+      setShowOfflineBanner(false)
       messageHandler.handleMessageFinish()
     },
     onConversationCreated: (conversationId: string) => {
@@ -153,9 +173,9 @@ export default function ChatPage() {
           <div className="space-y-3">
             <Button
               asChild
-              className="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 signin-button-custom glow-button glow-primary"
+              className="w-full bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 glow-button glow-primary"
             >
-              <Link href="/auth/login" className="signin-button-custom">
+              <Link href="/auth/login">
                 Sign In
               </Link>
             </Button>
@@ -204,13 +224,25 @@ export default function ChatPage() {
     // Only show loading for non-guest users waiting for auth
     return (
       <div className="flex items-center justify-center h-screen bg-background">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600"></div>
       </div>
     )
   }
 
   return (
     <div className="flex h-screen bg-background overflow-hidden">
+      {/* Offline indicator */}
+      {showOfflineBanner && (
+        <div className="fixed top-0 left-0 right-0 z-50 bg-amber-500 dark:bg-amber-600 text-white px-4 py-2 text-center text-sm font-medium shadow-lg">
+          <div className="flex items-center justify-center gap-2">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636a9 9 0 010 12.728m0 0l-2.829-2.829m2.829 2.829L21 21M15.536 8.464a5 5 0 010 7.072m0 0l-2.829-2.829m-4.243 2.829a4.978 4.978 0 01-1.414-2.83m-1.414 5.658a9 9 0 01-2.167-9.238m7.824 2.167a1 1 0 111.414 1.414m-1.414-1.414L3 3m8.293 8.293l1.414 1.414" />
+            </svg>
+            <span>No internet connection. Your messages won't send until you're back online.</span>
+          </div>
+        </div>
+      )}
+
       <div className="hidden md:block">
         <ConversationSidebar
           currentConversationId={conversationRouter.currentConversationId || undefined}
@@ -229,9 +261,12 @@ export default function ChatPage() {
             mobileSheetOpen ? "pointer-events-auto" : "pointer-events-none",
           )}
           onOpenAutoFocus={(e) => {
-            const searchInput = e.currentTarget.querySelector('input[placeholder*="Search"]') as HTMLInputElement
-            if (searchInput) {
-              searchInput.focus()
+            const target = e.currentTarget as HTMLElement | null
+            if (target) {
+              const searchInput = target.querySelector('input[placeholder*="Search"]') as HTMLInputElement | null
+              if (searchInput) {
+                searchInput.focus()
+              }
             }
           }}
           onCloseAutoFocus={() => {
@@ -272,6 +307,7 @@ export default function ChatPage() {
               <ChatContainer
                 messages={messages}
                 isLoading={chatLoading}
+                isLoadingHistory={false}
                 onStopGeneration={handleStopGeneration}
                 onRegenerateMessage={regenerateLastMessage}
                 onQuickStart={handleQuickStart}
@@ -295,14 +331,17 @@ export default function ChatPage() {
                 onTypingDuringResponse={messageHandler.handleTypingDuringResponse}
                 isAIResponding={chatLoading}
                 pendingDraft={messageHandler.pendingDraft}
-                onForceQueue={messageHandler.handleForceQueue}
-                isQueuing={messageHandler.isQueueingMessage}
                 attachments={fileUpload.pendingAttachments.map((pa) => ({
                   name: pa.file.name,
                   type: pa.file.type,
                   url: "",
                 }))}
-                onRemoveAttachment={fileUpload.handleRemovePendingAttachment}
+                onRemoveAttachment={(index: number) => {
+                  const attachment = fileUpload.pendingAttachments[index]
+                  if (attachment) {
+                    fileUpload.handleRemovePendingAttachment(attachment.id)
+                  }
+                }}
                 pendingAttachments={fileUpload.pendingAttachments}
                 onRetryAttachment={fileUpload.handleRetryUpload}
               />
