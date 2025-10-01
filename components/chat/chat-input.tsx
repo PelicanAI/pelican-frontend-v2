@@ -434,6 +434,15 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
             </motion.div>
           )}
 
+          {/* Input Suggestions */}
+          <InputSuggestions
+            suggestions={suggestions}
+            selectedIndex={selectedIndex}
+            onSelect={acceptSuggestion}
+            onHover={handleSuggestionHover}
+            visible={suggestionsVisible && isFocused}
+          />
+
         </div>
       </div>
     )

@@ -307,7 +307,7 @@ export async function POST(req: NextRequest) {
 
     const friendlyError = getUserFriendlyError(error)
     logger.error("Chat API error", error instanceof Error ? error : new Error(String(error)), {
-      conversationId,
+      conversationId: activeConversationId,
       userId: effectiveUserId,
     })
 

@@ -2,6 +2,7 @@ interface RetryOptions {
   maxRetries?: number
   baseDelay?: number
   maxDelay?: number
+  timeout?: number
   shouldRetry?: (error: Error, attempt: number) => boolean
 }
 
@@ -9,8 +10,10 @@ const DEFAULT_OPTIONS: Required<RetryOptions> = {
   maxRetries: 3,
   baseDelay: 1000,
   maxDelay: 10000,
+  timeout: 30000, // 30 second default timeout to prevent hanging connections
   shouldRetry: (error: Error) => {
     if (error.name === "AbortError") return false
+    if (error.message.includes("timeout")) return true // Retry on timeout
     if (error.message.includes("401") || error.message.includes("403")) return false
     return true
   },
@@ -20,6 +23,10 @@ function calculateDelay(attempt: number, baseDelay: number, maxDelay: number): n
   const exponentialDelay = baseDelay * Math.pow(2, attempt)
   const jitter = Math.random() * 0.3 * exponentialDelay
   return Math.min(exponentialDelay + jitter, maxDelay)
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
 export async function fetchWithRetry(
@@ -33,33 +40,71 @@ export async function fetchWithRetry(
 
   for (let attempt = 0; attempt <= config.maxRetries; attempt++) {
     try {
-      const response = await fetch(url, fetchOptions)
+      // Create timeout controller for this specific request
+      const timeoutController = new AbortController()
+      const timeoutId = setTimeout(() => timeoutController.abort(), config.timeout)
 
-      if (response.ok || response.status === 400 || response.status === 404) {
+      // Merge abort signals if one already exists
+      const existingSignal = fetchOptions.signal
+      let combinedSignal = timeoutController.signal
+
+      if (existingSignal) {
+        // Create a combined abort controller
+        const combinedController = new AbortController()
+        const abortBoth = () => combinedController.abort()
+        
+        existingSignal.addEventListener('abort', abortBoth)
+        timeoutController.signal.addEventListener('abort', abortBoth)
+        combinedSignal = combinedController.signal
+      }
+
+      try {
+        const response = await fetch(url, {
+          ...fetchOptions,
+          signal: combinedSignal,
+        })
+        
+        clearTimeout(timeoutId)
+        
+        // Handle different response statuses
+        if (response.ok || response.status === 400 || response.status === 404) {
+          return response
+        }
+
+        // Handle rate limiting
+        if (response.status === 429) {
+          const retryAfter = response.headers.get("Retry-After")
+          const delay = retryAfter ? parseInt(retryAfter) * 1000 : calculateDelay(attempt, config.baseDelay, config.maxDelay)
+
+          if (attempt < config.maxRetries) {
+            await sleep(delay)
+            continue
+          }
+        }
+
+        // Handle server errors
+        if (response.status >= 500 && response.status < 600) {
+          lastError = new Error(`Server error: ${response.status}`)
+
+          if (attempt < config.maxRetries) {
+            const delay = calculateDelay(attempt, config.baseDelay, config.maxDelay)
+            await sleep(delay)
+            continue
+          }
+        }
+
         return response
-      }
-
-      if (response.status === 429) {
-        const retryAfter = response.headers.get("Retry-After")
-        const delay = retryAfter ? parseInt(retryAfter) * 1000 : calculateDelay(attempt, config.baseDelay, config.maxDelay)
-
-        if (attempt < config.maxRetries) {
-          await sleep(delay)
-          continue
+      } catch (fetchError) {
+        clearTimeout(timeoutId)
+        
+        // Check if it was a timeout
+        if (fetchError instanceof Error && fetchError.name === 'AbortError') {
+          if (timeoutController.signal.aborted) {
+            throw new Error(`Request timeout after ${config.timeout}ms`)
+          }
         }
+        throw fetchError
       }
-
-      if (response.status >= 500 && response.status < 600) {
-        lastError = new Error(`Server error: ${response.status}`)
-
-        if (attempt < config.maxRetries) {
-          const delay = calculateDelay(attempt, config.baseDelay, config.maxDelay)
-          await sleep(delay)
-          continue
-        }
-      }
-
-      return response
     } catch (error) {
       lastError = error instanceof Error ? error : new Error(String(error))
 
@@ -75,10 +120,6 @@ export async function fetchWithRetry(
   throw lastError || new Error("Request failed after retries")
 }
 
-function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms))
-}
-
 export async function streamWithRetry(
   url: string,
   options: RequestInit & { retryOptions?: RetryOptions } = {},
@@ -88,6 +129,7 @@ export async function streamWithRetry(
     retryOptions: {
       maxRetries: 2,
       baseDelay: 500,
+      timeout: 60000, // 60 seconds for streaming requests
       ...options.retryOptions,
     },
   })

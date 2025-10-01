@@ -495,7 +495,7 @@ export function ConversationSidebar({
           >
             <Link href="/profile" className="flex items-center gap-3">
               <Avatar className="w-8 h-8 ring-2 ring-sidebar-border/50 group-hover:ring-purple-500/30 transition-all">
-                <AvatarImage src="/user-avatar.png" />
+                <AvatarImage src="/placeholder-user.jpg" />
                 <AvatarFallback className="bg-purple-500/20 text-purple-300">
                   <User className="w-4 h-4" />
                 </AvatarFallback>
