@@ -101,21 +101,43 @@ export function useSmartScroll(options: SmartScrollOptions = {}) {
   // Scroll to show user message at top when they send a message
   const scrollToUserMessage = useCallback(() => {
     const container = containerRef.current
-    if (!container) return
-
-    // Find the last message element (the user's new message)
-    const messages = container.querySelectorAll('[role="article"]')
-    if (messages.length === 0) return
-
-    const lastUserMessage = messages[messages.length - 1]
-    if (lastUserMessage) {
-      // Scroll to show the user message near the top of the viewport
-      // This will show: user message + thinking indicator below it
-      lastUserMessage.scrollIntoView({ 
-        behavior: 'smooth', 
-        block: 'start' // Position at top of viewport
-      })
+    if (!container) {
+      console.log('[Scroll] No container found')
+      return
     }
+
+    console.log('[Scroll] Attempting to scroll to new user message')
+
+    // Use requestAnimationFrame to ensure DOM is updated
+    requestAnimationFrame(() => {
+      const allMessages = Array.from(container.querySelectorAll('[role="article"]'))
+      console.log('[Scroll] Messages in DOM:', allMessages.length)
+      
+      if (allMessages.length === 0) {
+        console.log('[Scroll] No messages found yet')
+        return
+      }
+
+      // Get the last message (the newly sent user message)
+      const lastMessage = allMessages[allMessages.length - 1]
+      
+      console.log('[Scroll] Last message element:', {
+        offsetTop: (lastMessage as HTMLElement).offsetTop,
+        scrollHeight: container.scrollHeight,
+        clientHeight: container.clientHeight
+      })
+
+      // Calculate position to show user message near top with some padding
+      const targetScrollTop = (lastMessage as HTMLElement).offsetTop - 100 // 100px from top
+      
+      console.log('[Scroll] Scrolling to position:', targetScrollTop)
+      
+      // Smooth scroll to the calculated position
+      container.scrollTo({
+        top: targetScrollTop,
+        behavior: 'smooth'
+      })
+    })
   }, [])
 
   // Claude/ChatGPT style auto-scroll: handles all scenarios
@@ -136,11 +158,13 @@ export function useSmartScroll(options: SmartScrollOptions = {}) {
 
       // SCENARIO 1: When user sends a message
       if (isUserMessage) {
+        console.log('[Scroll] User message detected, triggering scroll')
         // Always scroll to show the user message at top of viewport
         // This mimics Claude's behavior: you see your message + thinking indicator
         setTimeout(() => {
+          console.log('[Scroll] Executing scrollToUserMessage after delay')
           scrollToUserMessage()
-        }, 100) // Small delay to ensure message is rendered
+        }, 200) // Delay to ensure message is fully rendered in DOM
         
         // Reset auto-scroll state
         shouldAutoScrollRef.current = true
