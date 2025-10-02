@@ -108,6 +108,22 @@ export function useSmartScroll(options: SmartScrollOptions = {}) {
 
     console.log('[Scroll Debug] ✅ Container found, attempting scroll')
     console.log('[Scroll Debug] Message ID to scroll to:', messageId)
+    
+    // DEBUG: Check if container is actually scrollable
+    console.log('[Scroll Debug] 🔍 Container analysis:')
+    console.log('  - scrollHeight:', container.scrollHeight)
+    console.log('  - clientHeight:', container.clientHeight)
+    console.log('  - scrollTop:', container.scrollTop)
+    console.log('  - Scrollable height:', container.scrollHeight - container.clientHeight)
+    console.log('  - Is scrollable?:', container.scrollHeight > container.clientHeight)
+    console.log('  - Overflow-Y:', window.getComputedStyle(container).overflowY)
+    
+    // Check if window is the actual scroll container
+    console.log('[Scroll Debug] 🔍 Window analysis:')
+    console.log('  - Body scrollHeight:', document.body.scrollHeight)
+    console.log('  - Window innerHeight:', window.innerHeight)
+    console.log('  - Window scrollY:', window.scrollY)
+    console.log('  - Window scrollable?:', document.body.scrollHeight > window.innerHeight)
 
     // Multiple attempts with increasing delays to handle React rendering
     const attemptScroll = (attemptNumber: number) => {
@@ -161,17 +177,44 @@ export function useSmartScroll(options: SmartScrollOptions = {}) {
         console.log('[Scroll Debug] Calculated relativeTop:', relativeTop)
         console.log('[Scroll Debug] 📍 Final scroll position:', targetScrollTop)
         
-        // Perform the scroll
-        container.scrollTo({
-          top: targetScrollTop,
-          behavior: 'smooth'
-        })
+        // Check if container is actually scrollable
+        const containerIsScrollable = container.scrollHeight > container.clientHeight
+        const windowIsScrollable = document.body.scrollHeight > window.innerHeight
+        
+        console.log('[Scroll Debug] 🎯 Choosing scroll target:')
+        console.log('  - Container scrollable?', containerIsScrollable)
+        console.log('  - Window scrollable?', windowIsScrollable)
+        
+        // Perform the scroll on the correct element
+        if (containerIsScrollable) {
+          console.log('[Scroll Debug] 📜 Scrolling CONTAINER to:', targetScrollTop)
+          container.scrollTo({
+            top: targetScrollTop,
+            behavior: 'smooth'
+          })
+        } else if (windowIsScrollable) {
+          console.log('[Scroll Debug] 📜 Container not scrollable, using WINDOW scroll')
+          // Calculate position relative to window instead
+          const windowScrollTop = messageRect.top + window.scrollY - 100
+          console.log('[Scroll Debug] 📜 Scrolling WINDOW to:', windowScrollTop)
+          window.scrollTo({
+            top: windowScrollTop,
+            behavior: 'smooth'
+          })
+        } else {
+          console.log('[Scroll Debug] ⚠️ Neither container nor window is scrollable!')
+        }
         
         // Verify scroll happened
         setTimeout(() => {
-          console.log('[Scroll Debug] ✅ After scroll - container.scrollTop:', container.scrollTop)
-          console.log('[Scroll Debug] Target was:', targetScrollTop)
-          console.log('[Scroll Debug] Difference:', Math.abs(container.scrollTop - targetScrollTop))
+          if (containerIsScrollable) {
+            console.log('[Scroll Debug] ✅ After scroll - container.scrollTop:', container.scrollTop)
+            console.log('[Scroll Debug] Target was:', targetScrollTop)
+            console.log('[Scroll Debug] Difference:', Math.abs(container.scrollTop - targetScrollTop))
+          } else if (windowIsScrollable) {
+            console.log('[Scroll Debug] ✅ After scroll - window.scrollY:', window.scrollY)
+            console.log('[Scroll Debug] Target was:', messageRect.top + window.scrollY - 100)
+          }
         }, 600)
         
         return true // Success
