@@ -84,7 +84,7 @@ export function isAcceptedFileType(file: File): boolean {
 
   // Fallback to extension check
   const acceptedExtensions = Object.values(ACCEPTED_FILE_TYPES).flat()
-  return acceptedExtensions.includes(`.${fileExtension}`)
+  return acceptedExtensions.includes(`.${fileExtension}` as typeof acceptedExtensions[number])
 }
 
 export function getFileTypeCategory(file: File): "image" | "spreadsheet" | "document" {

@@ -149,7 +149,9 @@ export function useConversations() {
       )
       .subscribe()
 
-    return () => subscription.unsubscribe()
+    return () => {
+      subscription.unsubscribe()
+    }
   }, [user])
 
   const loadConversations = async (userId: string) => {

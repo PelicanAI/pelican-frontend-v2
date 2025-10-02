@@ -219,7 +219,7 @@ export function TradingTemplates({ onTemplateSelect, className }: TradingTemplat
       if (!acc[template.category]) {
         acc[template.category] = []
       }
-      acc[template.category].push(template)
+      acc[template.category]!.push(template)
       return acc
     },
     {} as Record<string, TradingTemplate[]>,

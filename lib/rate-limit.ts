@@ -79,6 +79,6 @@ export function getClientIdentifier(request: Request): string {
 
   // Fallback to IP address for guests
   const forwarded = request.headers.get("x-forwarded-for")
-  const ip = forwarded ? forwarded.split(",")[0].trim() : "unknown"
+  const ip = forwarded ? forwarded.split(",")[0]?.trim() ?? "unknown" : "unknown"
   return `guest:${ip}`
 }

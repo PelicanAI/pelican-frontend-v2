@@ -71,7 +71,7 @@ export function useInputSuggestions({ onAccept }: UseInputSuggestionsOptions = {
 
       // Check for ticker autocomplete ($ followed by letters)
       const tickerMatch = trimmed.match(/\$([A-Za-z]+)$/)
-      if (tickerMatch) {
+      if (tickerMatch && tickerMatch[1]) {
         const query = tickerMatch[1].toUpperCase()
         const matchingTickers = TICKERS.filter((ticker) => ticker.startsWith(query))
 

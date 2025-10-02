@@ -104,9 +104,11 @@ const PremiumTextarea = React.forwardRef<HTMLTextAreaElement, PremiumTextareaPro
         onChange={handleChange}
         onFocus={handleFocus}
         onBlur={handleBlur}
-        style={{
-          fieldSizing: "content" as any,
-        }}
+        style={
+          {
+            fieldSizing: "content",
+          } as React.CSSProperties
+        }
         {...props}
       />
     )

@@ -120,7 +120,7 @@ export function ConversationMemoryTest() {
             .eq("id", testConversation.id)
             .single()
 
-          if (updatedConversation?.message_count > 0) {
+          if (updatedConversation && updatedConversation.message_count > 0) {
             updateTestResult(
               "Real-time Updates",
               "success",
