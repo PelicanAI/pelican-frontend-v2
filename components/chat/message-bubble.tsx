@@ -296,8 +296,8 @@ function MessageContent({
               transition={{ duration: 0.3, delay: index * 0.05 }}
               className={cn(
                 "relative group my-2 rounded-lg border overflow-hidden font-mono",
-                "bg-gray-100 border-gray-200",
-                "dark:bg-slate-900 dark:border-slate-700",
+                "bg-white border-gray-200",
+                "dark:bg-gray-950 dark:border-gray-800",
               )}
             >
               <div className="relative">
