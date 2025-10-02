@@ -212,19 +212,44 @@ export function ChatContainer({
     // Detect if a NEW message was added (not just an update to existing message)
     const messageWasAdded = messages.length > prevMessagesLengthRef.current
     const lastMessageChanged = currentLastMessageId !== prevLastMessageIdRef.current
+    const messagesAdded = messages.length - prevMessagesLengthRef.current
     
-    // Check if the NEW message is from the user
-    const isUserMessage = messageWasAdded && lastMessage?.role === 'user'
+    // BUG FIX: When user sends, TWO messages are added simultaneously:
+    // 1. User message
+    // 2. Assistant placeholder (for "thinking" state)
+    // So we need to find the most recent USER message, not just check the last message
+    
+    let userMessageToScrollTo: Message | undefined = undefined
+    let isUserMessage = false
+    
+    if (messageWasAdded) {
+      // Find the most recent user message (could be last or second-to-last)
+      const recentUserMessage = [...messages].reverse().find(m => m.role === 'user')
+      
+      // Check if this user message is NEW (wasn't in the previous state)
+      if (recentUserMessage) {
+        const wasInPreviousState = messages.slice(0, prevMessagesLengthRef.current)
+          .some(m => m.id === recentUserMessage.id)
+        
+        if (!wasInPreviousState) {
+          userMessageToScrollTo = recentUserMessage
+          isUserMessage = true
+        }
+      }
+    }
 
     console.log('[Chat Container] 🔍 Message change detected:', {
       messageCount: messages.length,
       prevCount: prevMessagesLengthRef.current,
+      messagesAdded,
       messageWasAdded,
       lastMessageChanged,
       lastMessageRole: lastMessage?.role,
       lastMessageId: lastMessage?.id,
       isStreaming,
-      isUserMessage: isUserMessage ? '✅ YES - USER SENT MESSAGE' : '❌ No'
+      userMessageFound: userMessageToScrollTo ? '✅ YES - USER SENT MESSAGE' : '❌ No',
+      userMessageId: userMessageToScrollTo?.id,
+      userMessagePosition: userMessageToScrollTo ? messages.findIndex(m => m.id === userMessageToScrollTo?.id) + 1 : 'N/A'
     })
 
     // Check if user is near bottom to show new messages pill
@@ -236,10 +261,16 @@ export function ChatContainer({
       setShowNewMessagesPill(false)
     }
 
-    // CRITICAL: Only trigger scroll if this is a NEW user message being added
+    // CRITICAL: Trigger scroll if we found a NEW user message
     if (messageWasAdded) {
-      console.log('[Chat Container] 📨 New message added, triggering handleNewMessage')
-      handleNewMessage(isStreaming, isUserMessage, lastMessage?.id)
+      if (isUserMessage && userMessageToScrollTo) {
+        console.log('[Chat Container] 📨 NEW USER MESSAGE detected, triggering scroll!')
+        console.log('[Chat Container] User message ID:', userMessageToScrollTo.id)
+        handleNewMessage(false, true, userMessageToScrollTo.id)
+      } else {
+        console.log('[Chat Container] 📨 New message(s) added, but not from user')
+        handleNewMessage(isStreaming, false, lastMessage?.id)
+      }
     } else {
       console.log('[Chat Container] 🔄 Message updated (streaming), checking streaming state')
       // Still need to handle streaming updates
