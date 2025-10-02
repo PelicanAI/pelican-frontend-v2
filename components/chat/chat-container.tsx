@@ -380,14 +380,12 @@ export function ChatContainer({
                     transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
                   />
                 </div>
-                <div className="flex flex-col gap-2 min-w-0 flex-1">
+                <div className="flex flex-col gap-2">
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
                     <span className="font-medium">Pelican AI</span>
                   </div>
-                  <div className="px-4 py-3 max-w-[85%] bg-white/90 dark:bg-[var(--surface-2)] border border-gray-200/80 dark:border-white/5 rounded-2xl rounded-bl-md shadow-sm">
-                    <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                      <EnhancedTypingDots variant="processing" />
-                    </div>
+                  <div className="px-4 py-3 w-fit bg-white/90 dark:bg-[var(--surface-2)] border border-gray-200/80 dark:border-white/5 rounded-2xl rounded-bl-md shadow-sm">
+                    <EnhancedTypingDots variant="processing" />
                   </div>
                 </div>
               </motion.div>
