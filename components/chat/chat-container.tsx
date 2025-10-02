@@ -2,7 +2,7 @@
 
 import type React from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { useEffect, useState, useCallback } from "react"
+import { useEffect, useState, useCallback, useRef } from "react"
 import { StreamingMessage } from "./streaming-message"
 import { WelcomeScreen } from "./welcome-screen"
 import { ScrollContainer } from "./scroll-container"
@@ -52,6 +52,10 @@ export function ChatContainer({
   const [dragCounter, setDragCounter] = useState(0)
   const [newMessageCount, setNewMessageCount] = useState(0)
   const [showNewMessagesPill, setShowNewMessagesPill] = useState(false)
+  
+  // Track previous messages to detect when user sends
+  const prevMessagesLengthRef = useRef(messages.length)
+  const prevLastMessageIdRef = useRef<string | undefined>(messages[messages.length - 1]?.id)
 
   const {
     containerRef,
@@ -195,18 +199,32 @@ export function ChatContainer({
   }, [scrollToBottom, resetScrollAwayState])
 
   useEffect(() => {
-    if (messages.length === 0) return
+    if (messages.length === 0) {
+      prevMessagesLengthRef.current = 0
+      prevLastMessageIdRef.current = undefined
+      return
+    }
 
     const lastMessage = messages[messages.length - 1]
     const isStreaming = lastMessage?.isStreaming || false
-    const isUserMessage = lastMessage?.role === 'user'
+    const currentLastMessageId = lastMessage?.id
+    
+    // Detect if a NEW message was added (not just an update to existing message)
+    const messageWasAdded = messages.length > prevMessagesLengthRef.current
+    const lastMessageChanged = currentLastMessageId !== prevLastMessageIdRef.current
+    
+    // Check if the NEW message is from the user
+    const isUserMessage = messageWasAdded && lastMessage?.role === 'user'
 
-    console.log('[Chat Container] Message change detected:', {
+    console.log('[Chat Container] 🔍 Message change detected:', {
       messageCount: messages.length,
+      prevCount: prevMessagesLengthRef.current,
+      messageWasAdded,
+      lastMessageChanged,
       lastMessageRole: lastMessage?.role,
       lastMessageId: lastMessage?.id,
       isStreaming,
-      isUserMessage
+      isUserMessage: isUserMessage ? '✅ YES - USER SENT MESSAGE' : '❌ No'
     })
 
     // Check if user is near bottom to show new messages pill
@@ -218,12 +236,25 @@ export function ChatContainer({
       setShowNewMessagesPill(false)
     }
 
-    // Pass isUserMessage flag and message ID to implement ChatGPT-like scroll behavior
-    handleNewMessage(isStreaming, isUserMessage, lastMessage?.id)
+    // CRITICAL: Only trigger scroll if this is a NEW user message being added
+    if (messageWasAdded) {
+      console.log('[Chat Container] 📨 New message added, triggering handleNewMessage')
+      handleNewMessage(isStreaming, isUserMessage, lastMessage?.id)
+    } else {
+      console.log('[Chat Container] 🔄 Message updated (streaming), checking streaming state')
+      // Still need to handle streaming updates
+      if (isStreaming) {
+        handleNewMessage(isStreaming, false, lastMessage?.id)
+      }
+    }
 
     if (!isStreaming && state.isStreaming) {
       handleStreamingEnd()
     }
+
+    // Update refs for next comparison
+    prevMessagesLengthRef.current = messages.length
+    prevLastMessageIdRef.current = currentLastMessageId
   }, [messages, handleNewMessage, handleStreamingEnd, state.isStreaming, state.isNearBottom])
 
   if (isLoadingHistory) {
