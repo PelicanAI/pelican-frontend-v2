@@ -278,12 +278,12 @@ export function ChatContainer({
         onScrollToBottom={() => scrollToBottom("smooth")}
       >
         <div
-          className="w-full px-4 sm:px-6 py-6 space-y-6"
+          className="w-full px-4 sm:px-6 pb-6 space-y-6"
           aria-live="polite"
           aria-label="Chat messages"
         >
-          {/* Conversation Header */}
-          <div className="flex items-center justify-between pb-2 border-b border-gray-200 dark:border-gray-800">
+          {/* Conversation Header - Sticky */}
+          <div className="sticky top-0 z-10 flex items-center justify-between pb-2 pt-6 border-b border-gray-200 dark:border-gray-800 bg-background backdrop-blur-sm bg-opacity-95 -mx-4 sm:-mx-6 px-4 sm:px-6">
             <div className="flex items-center gap-3">
               <div className="flex flex-col">
                 <h2 className="text-sm font-medium text-gray-900 dark:text-gray-100">
