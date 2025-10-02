@@ -92,7 +92,7 @@ export function useSmartScroll(options: SmartScrollOptions = {}) {
     lastScrollTopRef.current = currentScrollTop
   }, [checkIfNearBottom, debounceMs])
 
-  // Auto-scroll logic for new messages
+  // Auto-scroll logic for new messages - DISABLED: User controls scroll position at all times
   const handleNewMessage = useCallback(
     (isStreaming = false) => {
       isStreamingRef.current = isStreaming
@@ -110,26 +110,20 @@ export function useSmartScroll(options: SmartScrollOptions = {}) {
         userHasScrolledRef.current = false
       }
 
-      // Check if user is near bottom
-      const isNearBottom = checkIfNearBottom()
-
-      // Auto-scroll conditions:
-      // 1. User is near bottom OR
-      // 2. User has NOT manually scrolled up
-      const shouldAutoScroll = isNearBottom || !userHasScrolledRef.current
-
-      if (shouldAutoScroll) {
-        // Use immediate scroll for streaming to feel responsive
-        const behavior = isStreaming ? "instant" : scrollBehavior
-        scrollToBottom(behavior)
-      }
+      // REMOVED: Auto-scroll functionality - user controls scroll position
+      // const isNearBottom = checkIfNearBottom()
+      // const shouldAutoScroll = isNearBottom || !userHasScrolledRef.current
+      // if (shouldAutoScroll) {
+      //   const behavior = isStreaming ? "instant" : scrollBehavior
+      //   scrollToBottom(behavior)
+      // }
 
       // Reset new messages flag
       setTimeout(() => {
         setState((prev) => ({ ...prev, hasNewMessages: false }))
       }, 1000)
     },
-    [checkIfNearBottom, scrollBehavior, scrollToBottom],
+    [],
   )
 
   // Reset scroll-away state when streaming ends
@@ -144,27 +138,25 @@ export function useSmartScroll(options: SmartScrollOptions = {}) {
     userHasScrolledRef.current = false
   }, [])
 
-  // Handle streaming updates - called during message streaming
+  // Handle streaming updates - DISABLED: User controls scroll position at all times
   const handleStreamingUpdate = useCallback(() => {
-    // Check if user is near bottom
-    const isNearBottom = checkIfNearBottom()
+    // REMOVED: Auto-scroll during streaming - user controls scroll position
+    // const isNearBottom = checkIfNearBottom()
+    // const shouldAutoScroll = isNearBottom || !userHasScrolledRef.current
+    // if (shouldAutoScroll) {
+    //   scrollToBottom("instant")
+    // }
+  }, [])
 
-    // Only auto-scroll if user is near bottom OR hasn't manually scrolled up
-    const shouldAutoScroll = isNearBottom || !userHasScrolledRef.current
-
-    if (shouldAutoScroll) {
-      scrollToBottom("instant")
-    }
-  }, [checkIfNearBottom, scrollToBottom])
-
-  // Handle long messages - scroll to top of new message
+  // Handle long messages - DISABLED: User controls scroll position at all times
   const handleLongMessage = useCallback(
     (messageElement: HTMLElement) => {
-      if (checkIfNearBottom()) {
-        messageElement.scrollIntoView({ behavior: scrollBehavior, block: "start" })
-      }
+      // REMOVED: Auto-scroll for long messages - user controls scroll position
+      // if (checkIfNearBottom()) {
+      //   messageElement.scrollIntoView({ behavior: scrollBehavior, block: "start" })
+      // }
     },
-    [checkIfNearBottom, scrollBehavior],
+    [],
   )
 
   // Setup scroll listener
