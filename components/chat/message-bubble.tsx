@@ -146,7 +146,7 @@ export function MessageBubble({
           <div className="flex gap-6 items-start justify-end">
             {/* Message bubble */}
             <div className="max-w-[700px]">
-              <div className="bg-gradient-to-r from-teal-500 to-teal-600 text-white rounded-2xl px-4 py-3 shadow-md">
+              <div className="bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-2xl px-4 py-3 shadow-lg shadow-purple-500/20">
                 {renderAttachments(message.attachments)}
                 <div className="text-base leading-relaxed break-words">
                   {message.content}
@@ -172,7 +172,7 @@ export function MessageBubble({
             <div className="flex-shrink-0">
               <Avatar className="h-8 w-8">
                 <AvatarImage src="/placeholder-user.jpg" alt="You" />
-                <AvatarFallback className="bg-gradient-to-r from-teal-500 to-teal-600 text-white text-sm font-medium">
+                        <AvatarFallback className="bg-gradient-to-r from-purple-600 to-purple-700 text-white text-sm font-medium">
                   You
                 </AvatarFallback>
               </Avatar>
@@ -201,7 +201,7 @@ export function MessageBubble({
           <div className="flex-shrink-0">
             <Avatar className="h-8 w-8">
               <AvatarImage src="/ai-avatar.jpg" alt="Pelican AI" className="object-cover" />
-              <AvatarFallback className="bg-teal-600 text-white text-sm font-medium">P</AvatarFallback>
+              <AvatarFallback className="bg-gradient-to-br from-purple-600 to-purple-700 text-white text-sm font-medium">P</AvatarFallback>
             </Avatar>
           </div>
           

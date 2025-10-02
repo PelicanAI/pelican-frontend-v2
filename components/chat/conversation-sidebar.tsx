@@ -237,7 +237,7 @@ export function ConversationSidebar({
             "min-h-[64px] px-3 py-2.5 flex items-center gap-3",
             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-sidebar",
             isActive && [
-              "bg-teal-500/10 border border-teal-500/20",
+              "bg-purple-500/10 border border-purple-500/20",
             ],
             !isActive && "hover:bg-sidebar-accent/50 border border-transparent",
             conversation.archived && "opacity-60",
@@ -365,7 +365,7 @@ export function ConversationSidebar({
             title="Go to home page"
           >
             <Image src="/pelican-logo.png" alt="PelicanAI" width={28} height={28} className="w-7 h-7 object-contain group-hover:scale-110 transition-transform duration-200" />
-            <span className="font-bold text-base bg-gradient-to-r from-teal-500 to-teal-600 bg-clip-text text-transparent">
+            <span className="font-bold text-base bg-gradient-to-r from-purple-600 to-purple-700 bg-clip-text text-transparent">
               PelicanAI
             </span>
           </Link>
@@ -390,7 +390,7 @@ export function ConversationSidebar({
           <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
             <Button
               onClick={onNewConversation}
-              className="w-full h-10 px-4 bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white text-sm font-medium shadow-lg hover:shadow-teal-500/25 transition-all duration-200 relative overflow-hidden group"
+              className="w-full h-10 px-4 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white text-sm font-medium shadow-lg hover:shadow-purple-500/30 transition-all duration-200 relative overflow-hidden group"
             >
               <motion.div
                 className="absolute inset-0 bg-white/20 rounded-full scale-0 group-active:scale-100"
@@ -410,7 +410,7 @@ export function ConversationSidebar({
             placeholder="Search conversations..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="h-10 pl-10 pr-3 bg-sidebar/50 border-sidebar-border/50 text-sidebar-foreground text-sm placeholder:text-muted-foreground focus:border-teal-500/50 transition-colors duration-200 rounded-lg"
+            className="h-10 pl-10 pr-3 bg-sidebar/50 border-sidebar-border/50 text-sidebar-foreground text-sm placeholder:text-muted-foreground focus:border-purple-500/50 transition-colors duration-200 rounded-lg"
           />
         </div>
       </div>

@@ -197,7 +197,7 @@ export default function ChatPage() {
           <div className="space-y-3">
             <Button
               asChild
-              className="w-full bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 glow-button glow-primary"
+              className="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 glow-button glow-primary"
             >
               <Link href="/auth/login">
                 Sign In
@@ -248,7 +248,7 @@ export default function ChatPage() {
     // Only show loading for non-guest users waiting for auth
     return (
       <div className="flex items-center justify-center h-screen bg-background">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
       </div>
     )
   }
