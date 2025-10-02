@@ -30,10 +30,8 @@ export function useSmartScroll(options: SmartScrollOptions = {}) {
   const bottomRef = useRef<HTMLDivElement>(null)
   const scrollTimeoutRef = useRef<NodeJS.Timeout>()
   const lastScrollTopRef = useRef(0)
-  const userHasScrolledRef = useRef(false)
   const isStreamingRef = useRef(false)
-  const wasAtBottomOnSendRef = useRef(true) // Track if user was at bottom when they sent message
-  const hasScrolledForAIResponseRef = useRef(false) // Track if we've already scrolled for current AI response
+  const shouldAutoScrollRef = useRef(true) // Track if auto-scroll is enabled (disabled when user scrolls up)
   const [lastNewMessageAt, setLastNewMessageAt] = useState<number>(0)
 
   const [state, setState] = useState<SmartScrollState>({
@@ -81,9 +79,15 @@ export function useSmartScroll(options: SmartScrollOptions = {}) {
     // Update user scrolling state
     setState((prev) => ({ ...prev, isUserScrolling: true, isNearBottom }))
 
-    // Track if user manually scrolled up
-    if (isScrollingUp && !isNearBottom) {
-      userHasScrolledRef.current = true
+    // SCENARIO 4: User manually scrolls
+    // If user scrolls UP during streaming: disable auto-scroll immediately
+    if (isScrollingUp && isStreamingRef.current && !isNearBottom) {
+      shouldAutoScrollRef.current = false
+    }
+    
+    // If user scrolls back to bottom: re-enable auto-scroll
+    if (isNearBottom) {
+      shouldAutoScrollRef.current = true
     }
 
     // Reset user scrolling state after debounce period
@@ -94,7 +98,7 @@ export function useSmartScroll(options: SmartScrollOptions = {}) {
     lastScrollTopRef.current = currentScrollTop
   }, [checkIfNearBottom, debounceMs])
 
-  // Smart auto-scroll like ChatGPT: Only scroll when user sends message if they're at bottom
+  // Claude/ChatGPT style auto-scroll: handles all scenarios
   const handleNewMessage = useCallback(
     (isStreaming = false, isUserMessage = false) => {
       isStreamingRef.current = isStreaming
@@ -107,31 +111,32 @@ export function useSmartScroll(options: SmartScrollOptions = {}) {
         isStreaming,
       }))
 
-      // Check if user is near bottom (within 150px as specified)
+      // Check if user is near bottom (within 150px)
       const isNearBottom = checkIfNearBottom()
 
-      // When user sends a message, capture their scroll position and reset AI scroll flag
-      if (isUserMessage) {
-        wasAtBottomOnSendRef.current = isNearBottom
-        hasScrolledForAIResponseRef.current = false // Reset for new conversation turn
+      // SCENARIO 1 & 5: When user sends a message OR when new conversation starts
+      if (isUserMessage || (!isStreaming && !isUserMessage)) {
+        // Reset auto-scroll state for new message
+        shouldAutoScrollRef.current = isNearBottom
         
-        // Only scroll if user was already at bottom when they sent the message
-        if (wasAtBottomOnSendRef.current) {
+        // If user is at bottom: scroll to show their message
+        if (isNearBottom) {
           scrollToBottom("smooth")
         }
-        // If user was scrolled up reading old messages, DON'T scroll - keep them at reading position
+        // If user is scrolled up: DON'T move, keep at reading position
       }
       
-      // When AI starts responding, scroll ONCE to show the start of response
-      // But don't continue scrolling as message streams in
-      if (isStreaming && wasAtBottomOnSendRef.current && !hasScrolledForAIResponseRef.current) {
-        // Scroll once to show the start of AI response
-        scrollToBottom("smooth")
-        hasScrolledForAIResponseRef.current = true // Mark that we've scrolled for this response
+      // SCENARIO 2 & 3: AI responding - continuously check and scroll if appropriate
+      if (isStreaming) {
+        // Before EVERY scroll attempt: check if we should auto-scroll
+        // This is checked on every streaming update
+        if (shouldAutoScrollRef.current && isNearBottom) {
+          // User is at bottom and hasn't scrolled up: keep showing new text
+          scrollToBottom("auto") // Use 'auto' for instant, smooth streaming
+        }
+        // If user scrolled up during streaming: shouldAutoScrollRef.current is false (set by handleScroll)
+        // So we won't scroll anymore until they scroll back to bottom
       }
-      
-      // When AI finishes (not streaming), don't auto-scroll
-      // User can manually scroll down when ready
 
       // Reset new messages flag
       setTimeout(() => {
@@ -141,17 +146,16 @@ export function useSmartScroll(options: SmartScrollOptions = {}) {
     [checkIfNearBottom, scrollToBottom],
   )
 
-  // Reset scroll-away state when streaming ends
+  // Reset scroll state when streaming ends
   const handleStreamingEnd = useCallback(() => {
     isStreamingRef.current = false
-    userHasScrolledRef.current = false
-    hasScrolledForAIResponseRef.current = false // Reset for next response
+    // Keep shouldAutoScrollRef as is - will be reset on next user message
     setState((prev) => ({ ...prev, isStreaming: false }))
   }, [])
 
-  // Manually reset scroll-away state (useful for user-initiated scroll to bottom)
+  // Manually reset scroll state (useful for user-initiated scroll to bottom)
   const resetScrollAwayState = useCallback(() => {
-    userHasScrolledRef.current = false
+    shouldAutoScrollRef.current = true
   }, [])
 
   // Handle streaming updates - DISABLED: User controls scroll position at all times
