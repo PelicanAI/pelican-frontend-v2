@@ -154,7 +154,7 @@ export function QuickActions({ onActionSelect, className }: QuickActionsProps) {
       if (!acc[action.category]) {
         acc[action.category] = []
       }
-      acc[action.category].push(action)
+      acc[action.category]!.push(action)
       return acc
     },
     {} as Record<string, QuickAction[]>,
