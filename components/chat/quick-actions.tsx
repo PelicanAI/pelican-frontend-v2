@@ -151,10 +151,14 @@ export function QuickActions({ onActionSelect, className }: QuickActionsProps) {
 
   const groupedActions = quickActions.reduce(
     (acc, action) => {
-      if (!acc[action.category]) {
-        acc[action.category] = []
+      const category = action.category
+      if (!acc[category]) {
+        acc[category] = []
       }
-      acc[action.category]!.push(action)
+      const categoryArray = acc[category]
+      if (categoryArray) {
+        categoryArray.push(action)
+      }
       return acc
     },
     {} as Record<string, QuickAction[]>,
