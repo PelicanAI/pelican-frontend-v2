@@ -100,142 +100,33 @@ export function useSmartScroll(options: SmartScrollOptions = {}) {
 
   // Scroll to show user message at top when they send a message
   const scrollToUserMessage = useCallback((messageId?: string) => {
-    const container = containerRef.current
-    if (!container) {
-      console.log('[Scroll Debug] ❌ No container found')
+    if (!messageId) {
+      console.log('[Scroll] ❌ No message ID provided')
       return
     }
 
-    console.log('[Scroll Debug] ✅ Container found, attempting scroll')
-    console.log('[Scroll Debug] Message ID to scroll to:', messageId)
+    console.log('[Scroll] 🎯 Scrolling to message:', messageId)
     
-    // DEBUG: Check if container is actually scrollable
-    console.log('[Scroll Debug] 🔍 Container analysis:')
-    console.log('  - scrollHeight:', container.scrollHeight)
-    console.log('  - clientHeight:', container.clientHeight)
-    console.log('  - scrollTop:', container.scrollTop)
-    console.log('  - Scrollable height:', container.scrollHeight - container.clientHeight)
-    console.log('  - Is scrollable?:', container.scrollHeight > container.clientHeight)
-    console.log('  - Overflow-Y:', window.getComputedStyle(container).overflowY)
-    
-    // Check if window is the actual scroll container
-    console.log('[Scroll Debug] 🔍 Window analysis:')
-    console.log('  - Body scrollHeight:', document.body.scrollHeight)
-    console.log('  - Window innerHeight:', window.innerHeight)
-    console.log('  - Window scrollY:', window.scrollY)
-    console.log('  - Window scrollable?:', document.body.scrollHeight > window.innerHeight)
-
-    // Multiple attempts with increasing delays to handle React rendering
-    const attemptScroll = (attemptNumber: number) => {
-      console.log(`[Scroll Debug] Attempt ${attemptNumber}...`)
+    // Simple, reliable approach: let scrollIntoView handle everything
+    setTimeout(() => {
+      const messageElement = document.querySelector(`[data-message-id="${messageId}"]`)
       
-      let targetMessage: Element | null = null
-      
-      // Try to find by message ID if provided
-      if (messageId) {
-        targetMessage = container.querySelector(`[data-message-id="${messageId}"]`)
-        console.log('[Scroll Debug] Looking for message ID:', messageId, targetMessage ? '✅ Found' : '❌ Not found')
-      }
-      
-      // Fallback: find last user message
-      if (!targetMessage) {
-        const userMessages = container.querySelectorAll('[data-message-role="user"]')
-        if (userMessages.length > 0) {
-          targetMessage = userMessages[userMessages.length - 1] || null
-          console.log('[Scroll Debug] Using last user message (fallback), total user messages:', userMessages.length)
-        }
-      }
-      
-      // Last resort: find any last message
-      if (!targetMessage) {
-        const allMessages = container.querySelectorAll('[role="article"]')
-        if (allMessages.length > 0) {
-          targetMessage = allMessages[allMessages.length - 1] || null
-          console.log('[Scroll Debug] Using last message (last resort), total messages:', allMessages.length)
-        }
-      }
-
-      if (targetMessage) {
-        const messageElement = targetMessage as HTMLElement
-        console.log('[Scroll Debug] 🎯 Found target message!')
-        console.log('[Scroll Debug] Container scrollHeight:', container.scrollHeight)
-        console.log('[Scroll Debug] Container clientHeight:', container.clientHeight)
-        console.log('[Scroll Debug] Container scrollTop (current):', container.scrollTop)
-        console.log('[Scroll Debug] Message offsetTop (relative to offsetParent):', messageElement.offsetTop)
+      if (messageElement) {
+        console.log('[Scroll] ✅ Found message element, scrolling...')
+        messageElement.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'start',
+          inline: 'nearest'
+        })
         
-        // FIX: Calculate position relative to scroll container, not offsetParent
-        // offsetTop is relative to offsetParent which may not be the scroll container
-        const containerRect = container.getBoundingClientRect()
-        const messageRect = messageElement.getBoundingClientRect()
-        
-        // Calculate actual position within scrollable content
-        const relativeTop = messageRect.top - containerRect.top + container.scrollTop
-        const targetScrollTop = Math.max(0, relativeTop - 100) // 100px padding from top
-        
-        console.log('[Scroll Debug] Container rect top:', containerRect.top)
-        console.log('[Scroll Debug] Message rect top:', messageRect.top)
-        console.log('[Scroll Debug] Calculated relativeTop:', relativeTop)
-        console.log('[Scroll Debug] 📍 Final scroll position:', targetScrollTop)
-        
-        // Check if container is actually scrollable
-        const containerIsScrollable = container.scrollHeight > container.clientHeight
-        const windowIsScrollable = document.body.scrollHeight > window.innerHeight
-        
-        console.log('[Scroll Debug] 🎯 Choosing scroll target:')
-        console.log('  - Container scrollable?', containerIsScrollable)
-        console.log('  - Window scrollable?', windowIsScrollable)
-        
-        // Perform the scroll on the correct element
-        if (containerIsScrollable) {
-          console.log('[Scroll Debug] 📜 Scrolling CONTAINER to:', targetScrollTop)
-          container.scrollTo({
-            top: targetScrollTop,
-            behavior: 'smooth'
-          })
-        } else if (windowIsScrollable) {
-          console.log('[Scroll Debug] 📜 Container not scrollable, using WINDOW scroll')
-          // Calculate position relative to window instead
-          const windowScrollTop = messageRect.top + window.scrollY - 100
-          console.log('[Scroll Debug] 📜 Scrolling WINDOW to:', windowScrollTop)
-          window.scrollTo({
-            top: windowScrollTop,
-            behavior: 'smooth'
-          })
-        } else {
-          console.log('[Scroll Debug] ⚠️ Neither container nor window is scrollable!')
-        }
-        
-        // Verify scroll happened
+        // Verify after scroll
         setTimeout(() => {
-          if (containerIsScrollable) {
-            console.log('[Scroll Debug] ✅ After scroll - container.scrollTop:', container.scrollTop)
-            console.log('[Scroll Debug] Target was:', targetScrollTop)
-            console.log('[Scroll Debug] Difference:', Math.abs(container.scrollTop - targetScrollTop))
-          } else if (windowIsScrollable) {
-            console.log('[Scroll Debug] ✅ After scroll - window.scrollY:', window.scrollY)
-            console.log('[Scroll Debug] Target was:', messageRect.top + window.scrollY - 100)
-          }
-        }, 600)
-        
-        return true // Success
+          console.log('[Scroll] ✅ Scroll complete')
+        }, 500)
       } else {
-        console.log(`[Scroll Debug] ⚠️ Attempt ${attemptNumber} - No message found, will retry...`)
-        return false // Failed
+        console.log('[Scroll] ❌ Message element not found in DOM')
       }
-    }
-
-    // Try immediately
-    if (!attemptScroll(1)) {
-      // Try again after 100ms
-      setTimeout(() => {
-        if (!attemptScroll(2)) {
-          // Final try after 300ms
-          setTimeout(() => {
-            attemptScroll(3)
-          }, 200)
-        }
-      }, 100)
-    }
+    }, 100)
   }, [])
 
   // Claude/ChatGPT style auto-scroll: handles all scenarios
