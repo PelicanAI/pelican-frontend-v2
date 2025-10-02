@@ -98,6 +98,26 @@ export function useSmartScroll(options: SmartScrollOptions = {}) {
     lastScrollTopRef.current = currentScrollTop
   }, [checkIfNearBottom, debounceMs])
 
+  // Scroll to show user message at top when they send a message
+  const scrollToUserMessage = useCallback(() => {
+    const container = containerRef.current
+    if (!container) return
+
+    // Find the last message element (the user's new message)
+    const messages = container.querySelectorAll('[role="article"]')
+    if (messages.length === 0) return
+
+    const lastUserMessage = messages[messages.length - 1]
+    if (lastUserMessage) {
+      // Scroll to show the user message near the top of the viewport
+      // This will show: user message + thinking indicator below it
+      lastUserMessage.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'start' // Position at top of viewport
+      })
+    }
+  }, [])
+
   // Claude/ChatGPT style auto-scroll: handles all scenarios
   const handleNewMessage = useCallback(
     (isStreaming = false, isUserMessage = false) => {
@@ -114,16 +134,23 @@ export function useSmartScroll(options: SmartScrollOptions = {}) {
       // Check if user is near bottom (within 150px)
       const isNearBottom = checkIfNearBottom()
 
-      // SCENARIO 1 & 5: When user sends a message OR when new conversation starts
-      if (isUserMessage || (!isStreaming && !isUserMessage)) {
-        // Reset auto-scroll state for new message
-        shouldAutoScrollRef.current = isNearBottom
+      // SCENARIO 1: When user sends a message
+      if (isUserMessage) {
+        // Always scroll to show the user message at top of viewport
+        // This mimics Claude's behavior: you see your message + thinking indicator
+        setTimeout(() => {
+          scrollToUserMessage()
+        }, 100) // Small delay to ensure message is rendered
         
-        // If user is at bottom: scroll to show their message
+        // Reset auto-scroll state
+        shouldAutoScrollRef.current = true
+      }
+      // SCENARIO 5: When new conversation starts (non-streaming, non-user message)
+      else if (!isStreaming && !isUserMessage) {
+        shouldAutoScrollRef.current = isNearBottom
         if (isNearBottom) {
           scrollToBottom("smooth")
         }
-        // If user is scrolled up: DON'T move, keep at reading position
       }
       
       // SCENARIO 2 & 3: AI responding - continuously check and scroll if appropriate
@@ -143,7 +170,7 @@ export function useSmartScroll(options: SmartScrollOptions = {}) {
         setState((prev) => ({ ...prev, hasNewMessages: false }))
       }, 1000)
     },
-    [checkIfNearBottom, scrollToBottom],
+    [checkIfNearBottom, scrollToBottom, scrollToUserMessage],
   )
 
   // Reset scroll state when streaming ends

@@ -35,6 +35,7 @@ interface TradingContextPanelProps {
   isLoading?: boolean
   onRefresh?: () => void
   collapsed?: boolean
+  onToggleCollapse?: () => void
 }
 
 export function TradingContextPanel({
@@ -46,6 +47,7 @@ export function TradingContextPanel({
   isLoading = false,
   onRefresh,
   collapsed = false,
+  onToggleCollapse,
 }: TradingContextPanelProps) {
   const [isCollapsed, setIsCollapsed] = useState(collapsed)
 
@@ -98,15 +100,29 @@ export function TradingContextPanel({
     <Card className="border-l-0 rounded-l-none bg-[var(--surface-1)]/40 backdrop-blur border-white/5 overflow-hidden">
       <div className="p-4 border-b border-white/5 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Activity className="h-4 w-4 text-purple-500" />
+          <Activity className="h-4 w-4 text-teal-500" />
           <h3 className="font-semibold text-sm text-foreground">Market Overview</h3>
         </div>
-        <button
-          onClick={() => setIsCollapsed(!isCollapsed)}
-          className="text-muted-foreground hover:text-foreground transition-colors p-1 hover:bg-muted/50 rounded"
-        >
-          {isCollapsed ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-        </button>
+        <div className="flex items-center gap-1">
+          <button
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            className="text-muted-foreground hover:text-foreground transition-colors p-1 hover:bg-muted/50 rounded"
+            title={isCollapsed ? "Expand sections" : "Collapse sections"}
+          >
+            {isCollapsed ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+          </button>
+          {onToggleCollapse && (
+            <button
+              onClick={onToggleCollapse}
+              className="text-muted-foreground hover:text-foreground transition-colors p-1 hover:bg-muted/50 rounded"
+              title="Hide Market Overview"
+            >
+              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          )}
+        </div>
       </div>
 
       <AnimatePresence>

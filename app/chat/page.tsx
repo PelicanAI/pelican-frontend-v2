@@ -39,13 +39,25 @@ export default function ChatPage() {
   const [showOfflineBanner, setShowOfflineBanner] = useState(false)
   const [guestMode, setGuestMode] = useState(false)
   const [mounted, setMounted] = useState(false)
-  const [tradingPanelCollapsed, setTradingPanelCollapsed] = useState(false)
+  const [tradingPanelCollapsed, setTradingPanelCollapsed] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('pelican_trading_panel_collapsed') === 'true'
+    }
+    return false
+  })
 
   // Handle sidebar toggle with persistence
   const handleSidebarToggle = () => {
     const newCollapsed = !sidebarCollapsed
     setSidebarCollapsed(newCollapsed)
     localStorage.setItem('pelican_sidebar_collapsed', newCollapsed.toString())
+  }
+
+  // Handle trading panel toggle with persistence
+  const handleTradingPanelToggle = () => {
+    const newCollapsed = !tradingPanelCollapsed
+    setTradingPanelCollapsed(newCollapsed)
+    localStorage.setItem('pelican_trading_panel_collapsed', newCollapsed.toString())
   }
 
   // TODO: Uncomment when ready to add real market data
@@ -385,18 +397,39 @@ export default function ChatPage() {
       </div>
 
       {/* Trading Context Panel - Desktop only */}
-      <div className="hidden xl:block w-80 h-full overflow-y-auto">
-        <TradingContextPanel
-          collapsed={tradingPanelCollapsed}
-          // Future: Pass real data props here
-          // indices={marketIndices}
-          // vix={vixData}
-          // sectors={sectorData}
-          // watchlist={userWatchlist}
-          // isLoading={isLoadingMarketData}
-          // onRefresh={refreshMarketData}
-        />
-      </div>
+      {!tradingPanelCollapsed && (
+        <div className="hidden xl:block w-80 h-full overflow-y-auto transition-all duration-300">
+          <TradingContextPanel
+            collapsed={tradingPanelCollapsed}
+            onToggleCollapse={handleTradingPanelToggle}
+            // Future: Pass real data props here
+            // indices={marketIndices}
+            // vix={vixData}
+            // sectors={sectorData}
+            // watchlist={userWatchlist}
+            // isLoading={isLoadingMarketData}
+            // onRefresh={refreshMarketData}
+          />
+        </div>
+      )}
+
+      {/* Show expand button when trading panel is collapsed */}
+      {tradingPanelCollapsed && (
+        <div className="hidden xl:flex items-start p-2 bg-background border-l border-border">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleTradingPanelToggle}
+            className="h-8 px-2"
+            title="Show Market Overview"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            <span className="ml-1 text-xs">Market</span>
+          </Button>
+        </div>
+      )}
 
       <SettingsModal open={settingsOpen} onOpenChange={setSettingsOpen} />
     </div>

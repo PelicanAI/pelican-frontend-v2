@@ -280,7 +280,7 @@ export function ChatContainer({
         onScrollToBottom={() => scrollToBottom("smooth")}
       >
         <div
-          className="w-full px-4 sm:px-6 pb-6 space-y-6"
+          className="w-full pb-6"
           aria-live="polite"
           aria-label="Chat messages"
         >
@@ -367,25 +367,25 @@ export function ChatContainer({
                 transition={{
                   duration: 0.4,
                   ease: [0.4, 0, 0.2, 1],
-                  delay: 0.5, // 500ms delay before showing typing indicator
+                  delay: 0.5,
                 }}
-                className="flex gap-3 w-full"
+                className="w-full py-4"
               >
-                <div className="h-8 w-8 shrink-0 mt-1 bg-transparent rounded-full flex items-center justify-center">
-                  <motion.img
-                    src="/pelican-logo.png"
-                    alt="PelicanAI"
-                    className="w-6 h-6 object-contain"
-                    animate={{ rotate: [0, 5, -5, 0] }}
-                    transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
-                  />
-                </div>
-                <div className="flex flex-col gap-2">
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <span className="font-medium">Pelican AI</span>
-                  </div>
-                  <div className="px-4 py-3 w-fit bg-white/90 dark:bg-[var(--surface-2)] border border-gray-200/80 dark:border-white/5 rounded-2xl rounded-bl-md shadow-sm">
-                    <EnhancedTypingDots variant="processing" />
+                {/* Thinking indicator - clean, no background */}
+                <div className="max-w-3xl mx-auto px-8">
+                  <div className="flex gap-6 items-start">
+                    <div className="flex-shrink-0">
+                      <motion.img
+                        src="/pelican-logo.png"
+                        alt="PelicanAI"
+                        className="w-8 h-8 object-contain rounded-full"
+                        animate={{ rotate: [0, 5, -5, 0] }}
+                        transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0 max-w-[700px]">
+                      <EnhancedTypingDots variant="processing" />
+                    </div>
                   </div>
                 </div>
               </motion.div>

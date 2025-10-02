@@ -133,98 +133,48 @@ export function MessageBubble({
     return (
       <motion.div
         {...animationVariant}
-        className="flex justify-end w-full mb-4"
+        className="w-full py-4"
         role="article"
         aria-label="Your message"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
       >
-        <div className="flex flex-col items-end max-w-[min(85%,800px)]">
-          <motion.div className="relative group">
-            <div className={cn(
-              "text-white rounded-2xl rounded-br-md px-4 py-3 shadow-md inline-block text-[15px] leading-relaxed text-rendering-optimizeLegibility",
-              isDarkMode 
-                ? "bg-slate-700 dark:bg-slate-700" 
-                : "bg-gradient-to-r from-teal-500 to-teal-600"
-            )}>
-              {renderAttachments(message.attachments)}
-              <div className="break-words overflow-wrap-anywhere hyphens-auto selection:bg-white/20">
-                {message.content}
+        {/* User message with bubble - right-aligned */}
+        <div className="max-w-3xl mx-auto px-8">
+          <div className="flex gap-6 items-start justify-end">
+            {/* Message bubble */}
+            <div className="max-w-[700px]">
+              <div className="bg-gradient-to-r from-teal-500 to-teal-600 text-white rounded-2xl px-4 py-3 shadow-md">
+                {renderAttachments(message.attachments)}
+                <div className="text-base leading-relaxed break-words">
+                  {message.content}
+                </div>
+              </div>
+              
+              {/* Action buttons - always visible */}
+              <div className="flex items-center gap-2 mt-2 justify-end">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleQuickCopy}
+                  className="h-7 px-2 text-xs text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
+                  title="Copy message"
+                >
+                  {copied ? <Check className="h-3 w-3 mr-1" /> : <Copy className="h-3 w-3 mr-1" />}
+                  {copied ? "Copied" : "Copy"}
+                </Button>
               </div>
             </div>
-
-            {/* Quick copy button */}
-            <AnimatePresence>
-              {isHovered && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.8 }}
-                  transition={{ duration: 0.15 }}
-                  className="absolute -left-10 top-2"
-                >
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleQuickCopy}
-                    className="h-7 w-7 p-0 bg-background/95 backdrop-blur-sm border shadow-sm"
-                    aria-label="Copy message"
-                  >
-                    <AnimatePresence mode="wait">
-                      {copied ? (
-                        <motion.div
-                          key="check"
-                          initial={{ scale: 0 }}
-                          animate={{ scale: 1 }}
-                          exit={{ scale: 0 }}
-                          transition={{ duration: 0.15 }}
-                        >
-                          <Check className="h-3 w-3 text-green-600" />
-                        </motion.div>
-                      ) : (
-                        <motion.div
-                          key="copy"
-                          initial={{ scale: 0 }}
-                          animate={{ scale: 1 }}
-                          exit={{ scale: 0 }}
-                          transition={{ duration: 0.15 }}
-                        >
-                          <Copy className="h-3 w-3" />
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </Button>
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            {/* Timestamp on hover */}
-            <AnimatePresence>
-              {isHovered && (
-                <motion.div
-                  initial={{ opacity: 0, y: -5 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -5 }}
-                  transition={{ duration: 0.2 }}
-                  className="absolute -top-6 right-0 text-xs text-muted-foreground"
-                >
-                  <RelativeTimestamp date={message.timestamp} updateInterval={60000} showTooltip={true} />
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </motion.div>
-
-          {/* Action buttons */}
-          <div className="mt-1">
-            <MessageActions
-              message={message}
-              onStop={onStop}
-              onRegenerate={onRegenerate}
-              onReaction={onReaction}
-              onEdit={onEdit}
-              onDelete={onDelete}
-              onPin={onPin}
-              isRegenerating={false}
-              canDelete={true}
-            />
+            
+            {/* User avatar */}
+            <div className="flex-shrink-0">
+              <Avatar className="h-8 w-8">
+                <AvatarImage src="/placeholder-user.jpg" alt="You" />
+                <AvatarFallback className="bg-gradient-to-r from-teal-500 to-teal-600 text-white text-sm font-medium">
+                  You
+                </AvatarFallback>
+              </Avatar>
+            </div>
           </div>
         </div>
       </motion.div>
@@ -234,114 +184,63 @@ export function MessageBubble({
   return (
     <motion.div
       {...animationVariant}
-      className="flex gap-2 w-full mb-4"
+      className="w-full py-4"
       role="article"
       aria-label="Assistant message"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
-      <motion.div className="flex-shrink-0">
-        <Avatar
-          className={cn(
-            "h-8 w-8 transition-all duration-200",
-            isHovered ? "ring-2 ring-teal-500/40" : "ring-2 ring-transparent",
-          )}
-        >
-          <AvatarImage src="/ai-avatar.jpg" alt="Pelican AI" className="object-cover" />
-          <AvatarFallback className="bg-teal-600 text-white text-xs font-medium">P</AvatarFallback>
-        </Avatar>
-      </motion.div>
-
-      <div className="ml-2 max-w-[75%]">
-        <motion.div className="relative">
-          <div
-            className={cn(
-              "rounded-2xl rounded-bl-md px-4 py-3 border overflow-hidden backdrop-blur-[8px] text-[15px] leading-relaxed text-rendering-optimizeLegibility shadow-sm w-fit",
-              "bg-white/90 border-gray-200/80 text-gray-900 selection:bg-teal-200/60",
-              "dark:bg-slate-800 dark:border-slate-700/50 dark:text-gray-100 dark:selection:bg-teal-600/30",
-            )}
-          >
-            {renderAttachments(message.attachments)}
-            <MessageContent
-              content={message.content}
-              isStreaming={isStreaming}
-              showSkeleton={showSkeleton}
-              isDarkMode={isDarkMode}
-            />
+      {/* AI message - clean, no bubble, no background */}
+      <div className="max-w-3xl mx-auto px-8">
+        <div className="flex gap-6 items-start">
+          {/* AI avatar */}
+          <div className="flex-shrink-0">
+            <Avatar className="h-8 w-8">
+              <AvatarImage src="/ai-avatar.jpg" alt="Pelican AI" className="object-cover" />
+              <AvatarFallback className="bg-teal-600 text-white text-sm font-medium">P</AvatarFallback>
+            </Avatar>
           </div>
-
-          {/* Quick copy button */}
-          <AnimatePresence>
-            {isHovered && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                transition={{ duration: 0.15 }}
-                className="absolute -right-10 top-2"
+          
+          {/* Message content - plain text, no bubble */}
+          <div className="flex-1 min-w-0 max-w-[700px]">
+            {renderAttachments(message.attachments)}
+            <div className="text-base leading-relaxed text-gray-900 dark:text-gray-100">
+              <MessageContent
+                content={message.content}
+                isStreaming={isStreaming}
+                showSkeleton={showSkeleton}
+                isDarkMode={isDarkMode}
+              />
+            </div>
+            
+            {/* Action buttons - always visible */}
+            <div className="flex items-center gap-2 mt-3 pt-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleQuickCopy}
+                className="h-7 px-2 text-xs text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
+                title="Copy message"
               >
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleQuickCopy}
-                  className="h-7 w-7 p-0 bg-background/95 backdrop-blur-sm border shadow-sm hover:bg-background"
-                  aria-label="Copy message"
-                >
-                  <AnimatePresence mode="wait">
-                    {copied ? (
-                      <motion.div
-                        key="check"
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        exit={{ scale: 0 }}
-                        transition={{ duration: 0.15 }}
-                      >
-                        <Check className="h-3 w-3 text-green-600" />
-                      </motion.div>
-                    ) : (
-                      <motion.div
-                        key="copy"
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        exit={{ scale: 0 }}
-                        transition={{ duration: 0.15 }}
-                      >
-                        <Copy className="h-3 w-3" />
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </Button>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Timestamp on hover */}
-          <AnimatePresence>
-            {isHovered && (
-              <motion.div
-                initial={{ opacity: 0, y: -5 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -5 }}
-                transition={{ duration: 0.2 }}
-                className="absolute -top-6 left-0 text-xs text-muted-foreground"
-              >
-                <RelativeTimestamp date={message.timestamp} updateInterval={60000} showTooltip={true} />
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </motion.div>
-
-        {/* Action buttons */}
-        <div className="mt-1">
-          <MessageActions
-            message={message}
-            onStop={onStop}
-            onRegenerate={onRegenerate}
-            onReaction={onReaction}
-            onEdit={onEdit}
-            onDelete={onDelete}
-            onPin={onPin}
-            isRegenerating={false}
-            canDelete={true}
-          />
+                {copied ? <Check className="h-3 w-3 mr-1" /> : <Copy className="h-3 w-3 mr-1" />}
+                {copied ? "Copied" : "Copy"}
+              </Button>
+              
+              {onRegenerate && (
+                <MessageActions
+                  message={message}
+                  onStop={onStop}
+                  onRegenerate={onRegenerate}
+                  onReaction={onReaction}
+                  onEdit={onEdit}
+                  onDelete={onDelete}
+                  onPin={onPin}
+                  isRegenerating={false}
+                  canDelete={true}
+                />
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </motion.div>
