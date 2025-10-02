@@ -119,10 +119,21 @@ export function useSmartScroll(options: SmartScrollOptions = {}) {
           inline: 'nearest'
         })
         
-        // Verify after scroll
+        // Add offset to position message with proper spacing from top
         setTimeout(() => {
+          const container = containerRef.current
+          if (container && container.scrollHeight > container.clientHeight) {
+            // Container is scrollable - scroll container
+            container.scrollBy({ top: -100, behavior: 'smooth' })
+            console.log('[Scroll] 📏 Adjusted scroll position by -100px (container)')
+          } else {
+            // Window is scrollable - scroll window
+            window.scrollBy({ top: -100, behavior: 'smooth' })
+            console.log('[Scroll] 📏 Adjusted scroll position by -100px (window)')
+          }
+          
           console.log('[Scroll] ✅ Scroll complete')
-        }, 500)
+        }, 200)
       } else {
         console.log('[Scroll] ❌ Message element not found in DOM')
       }
