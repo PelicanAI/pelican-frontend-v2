@@ -28,9 +28,6 @@ export default function LoginPage() {
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
-        options: {
-          emailRedirectTo: process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL || `${window.location.origin}/chat`,
-        },
       })
       if (error) throw error
       router.push("/chat")
@@ -46,14 +43,14 @@ export default function LoginPage() {
       <div className="w-full max-w-sm">
         <div className="flex flex-col gap-6">
           <div className="flex justify-start">
-            <Button variant="ghost" asChild className="text-muted-foreground hover:text-purple-600">
+            <Button variant="ghost" asChild className="text-muted-foreground hover:text-teal-600">
               <Link href="/" className="flex items-center gap-2">
                 ← Back to Home
               </Link>
             </Button>
           </div>
           <div className="flex flex-col items-center gap-2">
-            <div className="w-12 h-12 bg-gradient-to-br from-purple-600 to-purple-700 rounded-xl flex items-center justify-center p-2">
+            <div className="w-12 h-12 bg-gradient-to-br from-teal-600 to-teal-700 rounded-xl flex items-center justify-center p-2">
               <Image
                 src="/pelican-logo.png"
                 alt="Pelican AI"
@@ -97,7 +94,7 @@ export default function LoginPage() {
                   {error && <p className="text-sm text-red-500">{error}</p>}
                   <Button
                     type="submit"
-                    className="w-full bg-gradient-to-r from-purple-600 to-purple-700"
+                    className="w-full bg-gradient-to-r from-teal-600 to-teal-700"
                     disabled={isLoading}
                   >
                     {isLoading ? "Signing in..." : "Sign in"}
@@ -105,7 +102,7 @@ export default function LoginPage() {
                 </div>
                 <div className="mt-4 text-center text-sm">
                   Don&apos;t have an account?{" "}
-                  <Link href="/auth/signup" className="underline underline-offset-4 text-purple-600">
+                  <Link href="/auth/signup" className="underline underline-offset-4 text-teal-600">
                     Sign up
                   </Link>
                 </div>
