@@ -187,7 +187,7 @@ export default function ChatPage() {
 
   if (!user && !guestMode) {
     return (
-      <div className="flex items-center justify-center min-h-screen p-6 bg-background">
+      <div className="flex items-center justify-center min-h-screen p-6 bg-white">
         <div className="text-center space-y-6 max-w-md">
           <div className="space-y-2">
             <h2 className="text-3xl font-bold text-foreground">Welcome to Pelican AI</h2>
@@ -247,14 +247,14 @@ export default function ChatPage() {
   } else if (authLoading) {
     // Only show loading for non-guest users waiting for auth
     return (
-      <div className="flex items-center justify-center h-screen bg-background">
+      <div className="flex items-center justify-center h-screen bg-white">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
       </div>
     )
   }
 
   return (
-    <div className="flex h-screen bg-background overflow-hidden">
+    <div className="flex h-screen bg-white overflow-hidden">
       {/* Offline indicator */}
       {showOfflineBanner && (
         <div className="fixed top-0 left-0 right-0 z-50 bg-amber-500 dark:bg-amber-600 text-white px-4 py-2 text-center text-sm font-medium shadow-lg">
@@ -312,7 +312,7 @@ export default function ChatPage() {
       </Sheet>
 
       <div className="flex-1 flex flex-col h-full min-w-0">
-        <div className="md:hidden border-b p-4 flex items-center justify-between bg-background border-border">
+        <div className="md:hidden border-b p-4 flex items-center justify-between bg-white border-border">
           <Sheet open={mobileSheetOpen} onOpenChange={setMobileSheetOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="sm" className="glow-button glow-ghost">
@@ -329,7 +329,7 @@ export default function ChatPage() {
 
         {/* Desktop sidebar toggle button - only show when sidebar is collapsed */}
         {sidebarCollapsed && (
-          <div className="hidden md:flex items-center justify-between p-4 border-b border-border bg-background">
+          <div className="hidden md:flex items-center justify-between p-4 border-b border-border bg-white">
             <Button
               variant="ghost"
               size="sm"
@@ -363,7 +363,7 @@ export default function ChatPage() {
             </div>
           </div>
 
-          <div className="bg-background border-t border-border pb-4">
+          <div className="bg-white border-t border-border pb-4">
             <div className="max-w-5xl mx-auto w-full px-3 py-3">
               <ChatInput
                 ref={chatInputRef}
@@ -415,7 +415,7 @@ export default function ChatPage() {
 
       {/* Show expand button when trading panel is collapsed */}
       {tradingPanelCollapsed && (
-        <div className="hidden xl:flex items-start p-2 bg-background border-l border-border">
+        <div className="hidden xl:flex items-start p-2 bg-white border-l border-border">
           <Button
             variant="ghost"
             size="sm"
