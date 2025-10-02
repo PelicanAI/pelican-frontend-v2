@@ -17,6 +17,10 @@ yarn-error.log*
 .pnpm-debug.log*
 .next-dev.log
 
+# lockfiles for unused package managers
+pnpm-lock.yaml
+yarn.lock
+
 # env files
 .env*
 
