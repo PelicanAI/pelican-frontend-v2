@@ -532,8 +532,10 @@ export const PremiumChatInput = forwardRef<PremiumChatInputRef, PremiumChatInput
                       rows={1}
                       style={{
                         height: `${UI.TEXTAREA_MIN_HEIGHT}px`,
-                        fieldSizing: "content" as any,
-                      }}
+                        WebkitFieldSizing: "content",
+                        // @ts-ignore - fieldSizing is experimental CSS property not in TS types yet
+                        fieldSizing: "content",
+                      } as React.CSSProperties}
                     />
 
                     <AnimatePresence>
