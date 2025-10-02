@@ -28,13 +28,25 @@ export default function ChatPage() {
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('pelican_sidebar_collapsed') === 'true'
+    }
+    return false
+  })
   const [mobileSheetOpen, setMobileSheetOpen] = useState(false)
   const [isOnline, setIsOnline] = useState(true)
   const [showOfflineBanner, setShowOfflineBanner] = useState(false)
   const [guestMode, setGuestMode] = useState(false)
   const [mounted, setMounted] = useState(false)
   const [tradingPanelCollapsed, setTradingPanelCollapsed] = useState(false)
+
+  // Handle sidebar toggle with persistence
+  const handleSidebarToggle = () => {
+    const newCollapsed = !sidebarCollapsed
+    setSidebarCollapsed(newCollapsed)
+    localStorage.setItem('pelican_sidebar_collapsed', newCollapsed.toString())
+  }
 
   // TODO: Uncomment when ready to add real market data
   // const { indices, vix, vixChange, sectors, watchlist, isLoading: isLoadingMarketData, refresh: refreshMarketData } = useMarketData({
@@ -243,15 +255,17 @@ export default function ChatPage() {
         </div>
       )}
 
-      <div className="hidden md:block">
-        <ConversationSidebar
-          currentConversationId={conversationRouter.currentConversationId || undefined}
-          onConversationSelect={handleConversationSelect}
-          onNewConversation={handleNewConversation}
-          isCollapsed={sidebarCollapsed}
-          onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
-        />
-      </div>
+      {!sidebarCollapsed && (
+        <div className="hidden md:block">
+          <ConversationSidebar
+            currentConversationId={conversationRouter.currentConversationId || undefined}
+            onConversationSelect={handleConversationSelect}
+            onNewConversation={handleNewConversation}
+            isCollapsed={sidebarCollapsed}
+            onToggleCollapse={handleSidebarToggle}
+          />
+        </div>
+      )}
 
       <Sheet open={mobileSheetOpen} onOpenChange={setMobileSheetOpen}>
         <SheetContent
@@ -300,6 +314,26 @@ export default function ChatPage() {
           </div>
           <ThemeToggle />
         </div>
+
+        {/* Desktop sidebar toggle button - only show when sidebar is collapsed */}
+        {sidebarCollapsed && (
+          <div className="hidden md:flex items-center justify-between p-4 border-b border-border bg-background">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleSidebarToggle}
+              className="glow-button glow-ghost"
+            >
+              <Menu className="h-4 w-4 text-foreground mr-2" />
+              <span className="text-sm font-medium">Show Sidebar</span>
+            </Button>
+            <div className="flex items-center gap-2">
+              <img src="/pelican-logo.png" alt="PelicanAI" className="w-6 h-6 object-contain" />
+              <span className="font-semibold text-foreground">Pelican AI</span>
+            </div>
+            <ThemeToggle />
+          </div>
+        )}
 
         <div className="flex-1 flex flex-col overflow-hidden">
           <div className="flex-1 overflow-y-auto">

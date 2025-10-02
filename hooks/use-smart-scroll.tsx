@@ -30,7 +30,7 @@ export function useSmartScroll(options: SmartScrollOptions = {}) {
   const bottomRef = useRef<HTMLDivElement>(null)
   const scrollTimeoutRef = useRef<NodeJS.Timeout>()
   const lastScrollTopRef = useRef(0)
-  const userScrolledAwayRef = useRef(false)
+  const userHasScrolledRef = useRef(false)
   const isStreamingRef = useRef(false)
   const [lastNewMessageAt, setLastNewMessageAt] = useState<number>(0)
 
@@ -51,8 +51,8 @@ export function useSmartScroll(options: SmartScrollOptions = {}) {
 
     const { scrollTop, scrollHeight, clientHeight } = container
     const distanceFromBottom = scrollHeight - scrollTop - clientHeight
-    return distanceFromBottom <= threshold
-  }, [threshold])
+    return distanceFromBottom < 150 // Exact threshold as requested
+  }, [])
 
   const scrollToBottom = useCallback(
     (behavior: ScrollBehavior = scrollBehavior) => {
@@ -79,9 +79,9 @@ export function useSmartScroll(options: SmartScrollOptions = {}) {
     // Update user scrolling state
     setState((prev) => ({ ...prev, isUserScrolling: true, isNearBottom }))
 
-    // If user scrolled up significantly while streaming, mark as scrolled away
-    if (isScrollingUp && isStreamingRef.current && !isNearBottom) {
-      userScrolledAwayRef.current = true
+    // Track if user manually scrolled up
+    if (isScrollingUp && !isNearBottom) {
+      userHasScrolledRef.current = true
     }
 
     // Reset user scrolling state after debounce period
@@ -105,13 +105,18 @@ export function useSmartScroll(options: SmartScrollOptions = {}) {
         isStreaming,
       }))
 
+      // Reset userHasScrolled when a new message starts
+      if (!isStreaming) {
+        userHasScrolledRef.current = false
+      }
+
+      // Check if user is near bottom
+      const isNearBottom = checkIfNearBottom()
+
       // Auto-scroll conditions:
-      // 1. User is near bottom (within threshold)
-      // 2. It's the start of a new conversation (first few messages)
-      // 3. For streaming: ONLY auto-scroll if user is near bottom
-      const shouldAutoScroll =
-        checkIfNearBottom() ||
-        (containerRef.current && containerRef.current.scrollHeight <= containerRef.current.clientHeight * 2)
+      // 1. User is near bottom OR
+      // 2. User has NOT manually scrolled up
+      const shouldAutoScroll = isNearBottom || !userHasScrolledRef.current
 
       if (shouldAutoScroll) {
         // Use immediate scroll for streaming to feel responsive
@@ -130,14 +135,27 @@ export function useSmartScroll(options: SmartScrollOptions = {}) {
   // Reset scroll-away state when streaming ends
   const handleStreamingEnd = useCallback(() => {
     isStreamingRef.current = false
-    userScrolledAwayRef.current = false
+    userHasScrolledRef.current = false
     setState((prev) => ({ ...prev, isStreaming: false }))
   }, [])
 
   // Manually reset scroll-away state (useful for user-initiated scroll to bottom)
   const resetScrollAwayState = useCallback(() => {
-    userScrolledAwayRef.current = false
+    userHasScrolledRef.current = false
   }, [])
+
+  // Handle streaming updates - called during message streaming
+  const handleStreamingUpdate = useCallback(() => {
+    // Check if user is near bottom
+    const isNearBottom = checkIfNearBottom()
+
+    // Only auto-scroll if user is near bottom OR hasn't manually scrolled up
+    const shouldAutoScroll = isNearBottom || !userHasScrolledRef.current
+
+    if (shouldAutoScroll) {
+      scrollToBottom("instant")
+    }
+  }, [checkIfNearBottom, scrollToBottom])
 
   // Handle long messages - scroll to top of new message
   const handleLongMessage = useCallback(
@@ -178,6 +196,7 @@ export function useSmartScroll(options: SmartScrollOptions = {}) {
     state,
     scrollToBottom,
     handleNewMessage,
+    handleStreamingUpdate,
     handleStreamingEnd,
     handleLongMessage,
     checkIfNearBottom,

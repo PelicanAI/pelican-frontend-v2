@@ -19,6 +19,7 @@ import {
   Settings,
   Crown,
   User,
+  PanelLeftClose,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useConversations } from "@/hooks/use-conversations"
@@ -177,7 +178,7 @@ export function ConversationSidebar({
       } else if (e.key === "Enter" && currentIndex >= 0) {
         e.preventDefault()
         const currentItem = items[currentIndex]
-        const conversationId = currentItem.getAttribute("data-conversation-id")
+        const conversationId = currentItem?.getAttribute("data-conversation-id")
         if (conversationId) onConversationSelect(conversationId)
       }
     }
@@ -216,7 +217,7 @@ export function ConversationSidebar({
     const isNavigatingToThis = isNavigating && navigatingToId === conversation.id
     const isActive = currentConversationId === conversation.id
     const lastMessage = conversation.messages?.[conversation.messages.length - 1]
-    const preview = lastMessage?.content?.slice(0, 50) + (lastMessage?.content?.length > 50 ? "..." : "") || ""
+    const preview = lastMessage?.content?.slice(0, 50) + ((lastMessage?.content?.length ?? 0) > 50 ? "..." : "") || ""
     const [showActions, setShowActions] = useState(false)
 
     return (
@@ -371,10 +372,14 @@ export function ConversationSidebar({
           <div className="flex items-center gap-1">
             <ThemeToggle />
             {onToggleCollapse && !isMobileSheet && (
-              <Button variant="ghost" size="icon" onClick={onToggleCollapse} className="h-8 w-8 hover:bg-sidebar-accent/50">
-                <motion.div whileHover={{ rotate: 180 }} transition={{ duration: 0.2 }}>
-                  <X className="h-4 w-4 text-sidebar-foreground" />
-                </motion.div>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={onToggleCollapse} 
+                className="h-8 w-8 hover:bg-sidebar-accent/50"
+                title="Collapse sidebar"
+              >
+                <PanelLeftClose className="h-4 w-4 text-sidebar-foreground" />
               </Button>
             )}
           </div>
