@@ -250,11 +250,11 @@ export function MessageBubble({
         </Avatar>
       </motion.div>
 
-      <div className="flex-1 min-w-0 max-w-full ml-2">
+      <div className="ml-2 max-w-[75%]">
         <motion.div className="relative">
           <div
             className={cn(
-              "rounded-2xl rounded-bl-md px-4 py-3 border overflow-hidden backdrop-blur-[8px] text-[15px] leading-relaxed text-rendering-optimizeLegibility shadow-sm",
+              "rounded-2xl rounded-bl-md px-4 py-3 border overflow-hidden backdrop-blur-[8px] text-[15px] leading-relaxed text-rendering-optimizeLegibility shadow-sm w-fit",
               "bg-white/90 border-gray-200/80 text-gray-900 selection:bg-teal-200/60",
               "dark:bg-slate-800 dark:border-slate-700/50 dark:text-gray-100 dark:selection:bg-teal-600/30",
             )}
