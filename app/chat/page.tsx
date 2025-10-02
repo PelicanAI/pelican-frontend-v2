@@ -303,7 +303,7 @@ export default function ChatPage() {
 
         <div className="flex-1 flex flex-col overflow-hidden">
           <div className="flex-1 overflow-y-auto">
-            <div className="max-w-3xl mx-auto w-full">
+            <div className="max-w-5xl mx-auto w-full">
               <ChatContainer
                 messages={messages}
                 isLoading={chatLoading}
@@ -318,7 +318,7 @@ export default function ChatPage() {
           </div>
 
           <div className="bg-background border-t border-border pb-4">
-            <div className="max-w-3xl mx-auto w-full px-3 py-3">
+            <div className="max-w-5xl mx-auto w-full px-3 py-3">
               <ChatInput
                 ref={chatInputRef}
                 onSendMessage={messageHandler.handleSendMessage}

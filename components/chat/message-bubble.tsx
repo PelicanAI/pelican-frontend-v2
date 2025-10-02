@@ -139,7 +139,7 @@ export function MessageBubble({
         role="article"
         aria-label="Your message"
       >
-        <div className="flex flex-col items-end max-w-[min(70%,600px)]">
+        <div className="flex flex-col items-end max-w-[min(85%,800px)]">
           <motion.div className="relative group">
             <div className={cn(
               "text-white rounded-2xl rounded-br-md px-4 py-3 shadow-md inline-block text-[15px] leading-relaxed text-rendering-optimizeLegibility",
