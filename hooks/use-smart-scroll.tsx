@@ -144,11 +144,22 @@ export function useSmartScroll(options: SmartScrollOptions = {}) {
         console.log('[Scroll Debug] 🎯 Found target message!')
         console.log('[Scroll Debug] Container scrollHeight:', container.scrollHeight)
         console.log('[Scroll Debug] Container clientHeight:', container.clientHeight)
-        console.log('[Scroll Debug] Message offsetTop:', messageElement.offsetTop)
+        console.log('[Scroll Debug] Container scrollTop (current):', container.scrollTop)
+        console.log('[Scroll Debug] Message offsetTop (relative to offsetParent):', messageElement.offsetTop)
         
-        // Calculate scroll position: message top - 100px padding
-        const targetScrollTop = messageElement.offsetTop - 100
-        console.log('[Scroll Debug] 📍 Scrolling to position:', targetScrollTop)
+        // FIX: Calculate position relative to scroll container, not offsetParent
+        // offsetTop is relative to offsetParent which may not be the scroll container
+        const containerRect = container.getBoundingClientRect()
+        const messageRect = messageElement.getBoundingClientRect()
+        
+        // Calculate actual position within scrollable content
+        const relativeTop = messageRect.top - containerRect.top + container.scrollTop
+        const targetScrollTop = Math.max(0, relativeTop - 100) // 100px padding from top
+        
+        console.log('[Scroll Debug] Container rect top:', containerRect.top)
+        console.log('[Scroll Debug] Message rect top:', messageRect.top)
+        console.log('[Scroll Debug] Calculated relativeTop:', relativeTop)
+        console.log('[Scroll Debug] 📍 Final scroll position:', targetScrollTop)
         
         // Perform the scroll
         container.scrollTo({
@@ -158,8 +169,10 @@ export function useSmartScroll(options: SmartScrollOptions = {}) {
         
         // Verify scroll happened
         setTimeout(() => {
-          console.log('[Scroll Debug] After scroll - container.scrollTop:', container.scrollTop)
-        }, 500)
+          console.log('[Scroll Debug] ✅ After scroll - container.scrollTop:', container.scrollTop)
+          console.log('[Scroll Debug] Target was:', targetScrollTop)
+          console.log('[Scroll Debug] Difference:', Math.abs(container.scrollTop - targetScrollTop))
+        }, 600)
         
         return true // Success
       } else {
