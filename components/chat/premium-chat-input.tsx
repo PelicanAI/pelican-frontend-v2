@@ -344,7 +344,7 @@ export const PremiumChatInput = forwardRef<PremiumChatInputRef, PremiumChatInput
               "backdrop-blur-xl border-t border-white/10",
               "shadow-[0_-2px_24px_rgba(0,0,0,0.15)]",
               "transition-all duration-200",
-              isDarkMode ? "bg-gray-900/80" : "bg-white/80",
+              isDarkMode ? "bg-gray-950/80" : "bg-white/80",
             )}
           >
             <div
@@ -450,7 +450,7 @@ export const PremiumChatInput = forwardRef<PremiumChatInputRef, PremiumChatInput
                     inputState === "error" && "border-red-500/50 animate-shake",
                     inputState === "rate-limited" && "border-orange-500/50",
                     inputState === "default" && !isFocused && "border-transparent",
-                    isDarkMode ? "bg-white/5" : "bg-gray-50/50",
+                    isDarkMode ? "bg-white/5" : "bg-white/50",
                   )}
                 >
                   <div className="flex items-center absolute left-4 top-1/2 -translate-y-1/2 gap-1 z-10">

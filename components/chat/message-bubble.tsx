@@ -338,7 +338,7 @@ function MessageContent({
                     <span className="relative">
                       {part}
                       <motion.span
-                        className="absolute bottom-0 left-0 w-0 h-0.5 bg-teal-600"
+                        className="absolute bottom-0 left-0 w-0 h-0.5 bg-purple-600"
                       />
                     </span>
                   </motion.a>

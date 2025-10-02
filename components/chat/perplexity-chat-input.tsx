@@ -182,7 +182,7 @@ export function PerplexityChatInput({
             disabled={disabled}
             className={cn(
               "flex items-center gap-2 px-4 py-2 rounded-full",
-              "bg-gray-100 hover:bg-gray-200 text-gray-700",
+              "bg-white hover:bg-gray-50 text-gray-700",
               "border border-gray-200 hover:border-gray-300",
               "transition-all duration-200 text-sm font-medium",
               "disabled:opacity-50 disabled:cursor-not-allowed",
