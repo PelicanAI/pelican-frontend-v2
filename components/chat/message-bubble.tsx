@@ -14,6 +14,7 @@ import { useState, useCallback } from "react"
 import { Copy, Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/hooks/use-toast"
+import { getMessageAnimationVariant } from "@/lib/animation-config"
 
 interface MessageBubbleProps {
   message: Message
@@ -125,16 +126,13 @@ export function MessageBubble({
     )
   }
 
+  // Get animation variant based on message role
+  const animationVariant = getMessageAnimationVariant(message.role)
+
   if (isUser) {
     return (
       <motion.div
-        initial={{ opacity: 0, y: 10, scale: 0.98 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{
-          duration: 0.3,
-          ease: [0.4, 0, 0.2, 1],
-          scale: { duration: 0.2 },
-        }}
+        {...animationVariant}
         className="flex justify-end w-full mb-4"
         role="article"
         aria-label="Your message"
@@ -235,13 +233,7 @@ export function MessageBubble({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 10, scale: 0.98 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{
-        duration: 0.3,
-        ease: [0.4, 0, 0.2, 1],
-        scale: { duration: 0.2 },
-      }}
+      {...animationVariant}
       className="flex gap-2 w-full mb-4"
       role="article"
       aria-label="Assistant message"

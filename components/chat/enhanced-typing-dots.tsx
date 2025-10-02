@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion"
 import { cn } from "@/lib/utils"
+import { ANIMATION_CONFIG, messageVariants } from "@/lib/animation-config"
 
 interface EnhancedTypingDotsProps {
   className?: string
@@ -23,7 +24,15 @@ export function EnhancedTypingDots({ className, size = "md", variant = "default"
   }
 
   return (
-    <div className={cn("flex items-center gap-3", className)} aria-label={messages[variant]} role="status">
+    <motion.div 
+      initial={messageVariants.thinkingIndicator.initial}
+      animate={messageVariants.thinkingIndicator.animate}
+      exit={messageVariants.thinkingIndicator.exit}
+      transition={messageVariants.thinkingIndicator.transition}
+      className={cn("flex items-center gap-3", className)} 
+      aria-label={messages[variant]} 
+      role="status"
+    >
       <div className="flex items-center gap-1">
         {[0, 1, 2].map((index) => (
           <motion.div
@@ -35,8 +44,8 @@ export function EnhancedTypingDots({ className, size = "md", variant = "default"
             }}
             transition={{
               duration: 0.6,
-              repeat: Number.POSITIVE_INFINITY,
-              delay: index * 0.15, // 150ms delay between dots
+              repeat: Infinity,
+              delay: index * 0.15,
               ease: [0.4, 0, 0.2, 1],
             }}
           />
@@ -50,19 +59,22 @@ export function EnhancedTypingDots({ className, size = "md", variant = "default"
           scale: [0.98, 1, 0.98],
         }}
         transition={{
-          duration: 2,
-          repeat: Number.POSITIVE_INFINITY,
-          ease: "easeInOut",
+          duration: ANIMATION_CONFIG.typingIndicator.duration,
+          repeat: Infinity,
+          ease: ANIMATION_CONFIG.typingIndicator.ease,
         }}
       >
         <motion.span
           className="text-sm text-muted-foreground font-medium"
           animate={{ opacity: [0.5, 1, 0.5] }}
-          transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
+          transition={{ 
+            duration: ANIMATION_CONFIG.typingIndicator.duration, 
+            repeat: Infinity 
+          }}
         >
           {messages[variant]}...
         </motion.span>
       </motion.div>
-    </div>
+    </motion.div>
   )
 }
