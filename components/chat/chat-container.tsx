@@ -199,6 +199,7 @@ export function ChatContainer({
 
     const lastMessage = messages[messages.length - 1]
     const isStreaming = lastMessage?.isStreaming || false
+    const isUserMessage = lastMessage?.role === 'user'
 
     // Check if user is near bottom to show new messages pill
     if (!state.isNearBottom && !isStreaming) {
@@ -209,7 +210,8 @@ export function ChatContainer({
       setShowNewMessagesPill(false)
     }
 
-    handleNewMessage(isStreaming)
+    // Pass isUserMessage flag to implement ChatGPT-like scroll behavior
+    handleNewMessage(isStreaming, isUserMessage)
 
     if (!isStreaming && state.isStreaming) {
       handleStreamingEnd()
