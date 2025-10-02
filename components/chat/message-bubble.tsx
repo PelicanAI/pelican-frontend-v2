@@ -136,6 +136,8 @@ export function MessageBubble({
         className="w-full py-4"
         role="article"
         aria-label="Your message"
+        data-message-id={message.id}
+        data-message-role="user"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
@@ -187,6 +189,8 @@ export function MessageBubble({
       className="w-full py-4"
       role="article"
       aria-label="Assistant message"
+      data-message-id={message.id}
+      data-message-role="assistant"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >

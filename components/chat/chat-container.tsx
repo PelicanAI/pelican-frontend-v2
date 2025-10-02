@@ -201,6 +201,14 @@ export function ChatContainer({
     const isStreaming = lastMessage?.isStreaming || false
     const isUserMessage = lastMessage?.role === 'user'
 
+    console.log('[Chat Container] Message change detected:', {
+      messageCount: messages.length,
+      lastMessageRole: lastMessage?.role,
+      lastMessageId: lastMessage?.id,
+      isStreaming,
+      isUserMessage
+    })
+
     // Check if user is near bottom to show new messages pill
     if (!state.isNearBottom && !isStreaming) {
       setNewMessageCount((prev) => prev + 1)
@@ -210,8 +218,8 @@ export function ChatContainer({
       setShowNewMessagesPill(false)
     }
 
-    // Pass isUserMessage flag to implement ChatGPT-like scroll behavior
-    handleNewMessage(isStreaming, isUserMessage)
+    // Pass isUserMessage flag and message ID to implement ChatGPT-like scroll behavior
+    handleNewMessage(isStreaming, isUserMessage, lastMessage?.id)
 
     if (!isStreaming && state.isStreaming) {
       handleStreamingEnd()

@@ -99,50 +99,92 @@ export function useSmartScroll(options: SmartScrollOptions = {}) {
   }, [checkIfNearBottom, debounceMs])
 
   // Scroll to show user message at top when they send a message
-  const scrollToUserMessage = useCallback(() => {
+  const scrollToUserMessage = useCallback((messageId?: string) => {
     const container = containerRef.current
     if (!container) {
-      console.log('[Scroll] No container found')
+      console.log('[Scroll Debug] ❌ No container found')
       return
     }
 
-    console.log('[Scroll] Attempting to scroll to new user message')
+    console.log('[Scroll Debug] ✅ Container found, attempting scroll')
+    console.log('[Scroll Debug] Message ID to scroll to:', messageId)
 
-    // Use requestAnimationFrame to ensure DOM is updated
-    requestAnimationFrame(() => {
-      const allMessages = Array.from(container.querySelectorAll('[role="article"]'))
-      console.log('[Scroll] Messages in DOM:', allMessages.length)
+    // Multiple attempts with increasing delays to handle React rendering
+    const attemptScroll = (attemptNumber: number) => {
+      console.log(`[Scroll Debug] Attempt ${attemptNumber}...`)
       
-      if (allMessages.length === 0) {
-        console.log('[Scroll] No messages found yet')
-        return
+      let targetMessage: Element | null = null
+      
+      // Try to find by message ID if provided
+      if (messageId) {
+        targetMessage = container.querySelector(`[data-message-id="${messageId}"]`)
+        console.log('[Scroll Debug] Looking for message ID:', messageId, targetMessage ? '✅ Found' : '❌ Not found')
+      }
+      
+      // Fallback: find last user message
+      if (!targetMessage) {
+        const userMessages = container.querySelectorAll('[data-message-role="user"]')
+        if (userMessages.length > 0) {
+          targetMessage = userMessages[userMessages.length - 1] || null
+          console.log('[Scroll Debug] Using last user message (fallback), total user messages:', userMessages.length)
+        }
+      }
+      
+      // Last resort: find any last message
+      if (!targetMessage) {
+        const allMessages = container.querySelectorAll('[role="article"]')
+        if (allMessages.length > 0) {
+          targetMessage = allMessages[allMessages.length - 1] || null
+          console.log('[Scroll Debug] Using last message (last resort), total messages:', allMessages.length)
+        }
       }
 
-      // Get the last message (the newly sent user message)
-      const lastMessage = allMessages[allMessages.length - 1]
-      
-      console.log('[Scroll] Last message element:', {
-        offsetTop: (lastMessage as HTMLElement).offsetTop,
-        scrollHeight: container.scrollHeight,
-        clientHeight: container.clientHeight
-      })
+      if (targetMessage) {
+        const messageElement = targetMessage as HTMLElement
+        console.log('[Scroll Debug] 🎯 Found target message!')
+        console.log('[Scroll Debug] Container scrollHeight:', container.scrollHeight)
+        console.log('[Scroll Debug] Container clientHeight:', container.clientHeight)
+        console.log('[Scroll Debug] Message offsetTop:', messageElement.offsetTop)
+        
+        // Calculate scroll position: message top - 100px padding
+        const targetScrollTop = messageElement.offsetTop - 100
+        console.log('[Scroll Debug] 📍 Scrolling to position:', targetScrollTop)
+        
+        // Perform the scroll
+        container.scrollTo({
+          top: targetScrollTop,
+          behavior: 'smooth'
+        })
+        
+        // Verify scroll happened
+        setTimeout(() => {
+          console.log('[Scroll Debug] After scroll - container.scrollTop:', container.scrollTop)
+        }, 500)
+        
+        return true // Success
+      } else {
+        console.log(`[Scroll Debug] ⚠️ Attempt ${attemptNumber} - No message found, will retry...`)
+        return false // Failed
+      }
+    }
 
-      // Calculate position to show user message near top with some padding
-      const targetScrollTop = (lastMessage as HTMLElement).offsetTop - 100 // 100px from top
-      
-      console.log('[Scroll] Scrolling to position:', targetScrollTop)
-      
-      // Smooth scroll to the calculated position
-      container.scrollTo({
-        top: targetScrollTop,
-        behavior: 'smooth'
-      })
-    })
+    // Try immediately
+    if (!attemptScroll(1)) {
+      // Try again after 100ms
+      setTimeout(() => {
+        if (!attemptScroll(2)) {
+          // Final try after 300ms
+          setTimeout(() => {
+            attemptScroll(3)
+          }, 200)
+        }
+      }, 100)
+    }
   }, [])
 
   // Claude/ChatGPT style auto-scroll: handles all scenarios
   const handleNewMessage = useCallback(
-    (isStreaming = false, isUserMessage = false) => {
+    (isStreaming = false, isUserMessage = false, messageId?: string) => {
       isStreamingRef.current = isStreaming
 
       setLastNewMessageAt(Date.now())
@@ -158,13 +200,14 @@ export function useSmartScroll(options: SmartScrollOptions = {}) {
 
       // SCENARIO 1: When user sends a message
       if (isUserMessage) {
-        console.log('[Scroll] User message detected, triggering scroll')
+        console.log('[Scroll] ⚡ User message detected! Message ID:', messageId)
+        console.log('[Scroll] Triggering scroll in 50ms...')
         // Always scroll to show the user message at top of viewport
         // This mimics Claude's behavior: you see your message + thinking indicator
         setTimeout(() => {
-          console.log('[Scroll] Executing scrollToUserMessage after delay')
-          scrollToUserMessage()
-        }, 200) // Delay to ensure message is fully rendered in DOM
+          console.log('[Scroll] ⏰ Executing scrollToUserMessage now')
+          scrollToUserMessage(messageId)
+        }, 50) // Very short delay - the scroll function has retry logic built in
         
         // Reset auto-scroll state
         shouldAutoScrollRef.current = true
