@@ -61,6 +61,7 @@ export function ChatContainer({
     handleNewMessage,
     handleStreamingEnd,
     checkIfNearBottom,
+    resetScrollAwayState,
     showJump,
     lastNewMessageAt,
   } = useSmartScroll({
@@ -188,9 +189,10 @@ export function ChatContainer({
 
   const handleJumpToBottom = useCallback(() => {
     scrollToBottom("smooth")
+    resetScrollAwayState() // Reset scroll-away state when user manually scrolls to bottom
     setNewMessageCount(0)
     setShowNewMessagesPill(false)
-  }, [scrollToBottom])
+  }, [scrollToBottom, resetScrollAwayState])
 
   useEffect(() => {
     if (messages.length === 0) return

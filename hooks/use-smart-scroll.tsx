@@ -106,12 +106,11 @@ export function useSmartScroll(options: SmartScrollOptions = {}) {
       }))
 
       // Auto-scroll conditions:
-      // 1. User is near bottom
-      // 2. User hasn't scrolled away during streaming
-      // 3. It's the start of a new conversation (first few messages)
+      // 1. User is near bottom (within threshold)
+      // 2. It's the start of a new conversation (first few messages)
+      // 3. For streaming: ONLY auto-scroll if user is near bottom
       const shouldAutoScroll =
         checkIfNearBottom() ||
-        (!userScrolledAwayRef.current && isStreaming) ||
         (containerRef.current && containerRef.current.scrollHeight <= containerRef.current.clientHeight * 2)
 
       if (shouldAutoScroll) {
@@ -135,6 +134,11 @@ export function useSmartScroll(options: SmartScrollOptions = {}) {
     setState((prev) => ({ ...prev, isStreaming: false }))
   }, [])
 
+  // Manually reset scroll-away state (useful for user-initiated scroll to bottom)
+  const resetScrollAwayState = useCallback(() => {
+    userScrolledAwayRef.current = false
+  }, [])
+
   // Handle long messages - scroll to top of new message
   const handleLongMessage = useCallback(
     (messageElement: HTMLElement) => {
@@ -155,7 +159,7 @@ export function useSmartScroll(options: SmartScrollOptions = {}) {
 
     // Enable momentum scrolling on iOS if requested
     if (enableMomentumScrolling) {
-      container.style.webkitOverflowScrolling = "touch"
+      ;(container.style as any).webkitOverflowScrolling = "touch"
     }
 
     return () => {
@@ -177,6 +181,7 @@ export function useSmartScroll(options: SmartScrollOptions = {}) {
     handleStreamingEnd,
     handleLongMessage,
     checkIfNearBottom,
+    resetScrollAwayState,
     showJump,
     lastNewMessageAt,
   }
