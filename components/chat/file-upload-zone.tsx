@@ -38,7 +38,7 @@ export function FileUploadZone({
         return file.name.toLowerCase().endsWith(type.toLowerCase())
       }
       if (type.includes("*")) {
-        const baseType = type.split("/")[0]
+        const baseType = type.split("/")[0] || ""
         return file.type.startsWith(baseType)
       }
       return file.type === type
