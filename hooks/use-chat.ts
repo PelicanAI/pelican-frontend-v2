@@ -45,11 +45,16 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
     },
   })
 
+  const shouldFetchConversation =
+    !!currentConversationId &&
+    !currentConversationId.startsWith("guest-") &&
+    !currentConversationId.startsWith("temp-")
+
   const {
     data: conversationData,
     error: conversationError,
     mutate: mutateConversation,
-  } = useSWR(currentConversationId ? `/api/conversations/${currentConversationId}` : null, {
+  } = useSWR(shouldFetchConversation ? `/api/conversations/${currentConversationId}` : null, {
     revalidateOnFocus: false,
     revalidateOnReconnect: true,
     onError: (error) => {

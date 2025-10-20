@@ -24,6 +24,10 @@ export function useMessageHandler({
   const [isTypingDuringResponse, setIsTypingDuringResponse] = useState(false)
   const [isQueueingMessage, setIsQueueingMessage] = useState(false)
 
+  const setDraftConversationIdSafe = useCallback((conversationId: string | null) => {
+    setDraftConversationId(conversationId)
+  }, [])
+
   const handleSendMessage = useCallback(
     async (content: string, options?: { forceQueue?: boolean }) => {
       if (chatLoading || options?.forceQueue) {
@@ -100,5 +104,6 @@ export function useMessageHandler({
     isTypingDuringResponse,
     isQueueingMessage,
     draftConversationId,
+    setDraftConversationId: setDraftConversationIdSafe,
   }
 }

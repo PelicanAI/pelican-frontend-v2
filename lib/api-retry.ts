@@ -129,7 +129,7 @@ export async function streamWithRetry(
     retryOptions: {
       maxRetries: 2,
       baseDelay: 500,
-      timeout: 60000, // 60 seconds for streaming requests
+      timeout: 120000, // 120 seconds for streaming requests - allows complex queries with extended thinking
       ...options.retryOptions,
     },
   })

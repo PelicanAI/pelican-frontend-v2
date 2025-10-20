@@ -518,10 +518,13 @@ export function ConversationSidebar({
           <Button
             variant="ghost"
             size="icon"
+            asChild
             className="h-10 w-10 hover:bg-sidebar-accent/50"
             title="Settings"
           >
-            <Settings className="h-4 w-4" />
+            <Link href="/settings">
+              <Settings className="h-4 w-4" />
+            </Link>
           </Button>
         </div>
       </div>

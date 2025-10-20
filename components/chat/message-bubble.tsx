@@ -10,11 +10,103 @@ import { AttachmentChip } from "./attachment-chip"
 import { MessageActions } from "./message-actions"
 import { EnhancedTypingDots } from "./enhanced-typing-dots"
 import { motion, AnimatePresence } from "framer-motion"
-import { useState, useCallback } from "react"
+import { useState, useCallback, useMemo } from "react"
 import { Copy, Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/hooks/use-toast"
 import { getMessageAnimationVariant } from "@/lib/animation-config"
+import { detectDataTable } from '@/lib/data-parsers'
+import { DataTable } from '@/components/chat/data-visualizations/data-table'
+import DOMPurify from "isomorphic-dompurify"
+import { escapeHtml } from "@/lib/sanitize"
+
+type ContentSegment =
+  | { type: "text"; content: string }
+  | { type: "code"; content: string; language?: string }
+
+const LINK_REGEX = /(https?:\/\/[^\s]+)/g
+
+function parseContentSegments(rawContent: string): ContentSegment[] {
+  const lines = rawContent.split("\n")
+  const segments: ContentSegment[] = []
+
+  let isInCodeBlock = false
+  let currentLanguage: string | undefined
+  let codeBuffer: string[] = []
+  let textBuffer: string[] = []
+
+  const flushText = () => {
+    if (textBuffer.length > 0) {
+      const text = textBuffer.join("\n").trimEnd()
+      if (text.length > 0) {
+        segments.push({ type: "text", content: text })
+      }
+      textBuffer = []
+    }
+  }
+
+  const flushCode = () => {
+    const code = codeBuffer.join("\n")
+    segments.push({ type: "code", content: code, language: currentLanguage })
+    codeBuffer = []
+    currentLanguage = undefined
+  }
+
+  for (const line of lines) {
+    const fenceMatch = line.match(/^```(.*)?$/)
+
+    if (fenceMatch) {
+      if (isInCodeBlock) {
+        flushCode()
+        isInCodeBlock = false
+      } else {
+        flushText()
+        isInCodeBlock = true
+        const language = fenceMatch[1]?.trim()
+        currentLanguage = language ? language : undefined
+      }
+      continue
+    }
+
+    if (isInCodeBlock) {
+      codeBuffer.push(line)
+    } else {
+      textBuffer.push(line)
+    }
+  }
+
+  if (isInCodeBlock) {
+    flushCode()
+  }
+
+  if (textBuffer.length > 0) {
+    const text = textBuffer.join("\n").trimEnd()
+    if (text.length > 0) {
+      segments.push({ type: "text", content: text })
+    }
+  }
+
+  return segments
+}
+
+function formatLine(line: string): string {
+  const escaped = escapeHtml(line)
+  const boldFormatted = escaped.replace(/\*\*(.*?)\*\*/g, '<strong class="font-[600]">$1</strong>')
+  const italicFormatted = boldFormatted.replace(/\*(.*?)\*/g, '<em>$1</em>')
+  const linkFormatted = italicFormatted.replace(
+    LINK_REGEX,
+    (match) =>
+      `<a href="${match}" target="_blank" rel="noopener noreferrer" class="text-teal-600 font-[500] break-all">${match}</a>`
+  )
+
+  return DOMPurify.sanitize(linkFormatted, {
+    ALLOWED_TAGS: ["strong", "em", "a", "span", "br"],
+    ALLOWED_ATTR: {
+      a: ["href", "target", "rel", "class"],
+      span: ["class"],
+    },
+  })
+}
 
 interface MessageBubbleProps {
   message: Message
@@ -262,6 +354,10 @@ function MessageContent({
   showSkeleton?: boolean
   isDarkMode?: boolean
 }) {
+  const [showRawText, setShowRawText] = useState(false)
+  const parsedData = useMemo(() => (!isStreaming ? detectDataTable(content) : null), [content, isStreaming])
+  const segments = useMemo(() => parseContentSegments(content), [content])
+
   if (showSkeleton && !content) {
     return (
       <div className="flex items-center gap-2">
@@ -278,6 +374,25 @@ function MessageContent({
     return <div className="text-muted-foreground italic">No content</div>
   }
 
+  if (parsedData && !showRawText) {
+    const isStructured = "columns" in parsedData
+
+    return (
+      <DataTable
+        data={parsedData.data as any}
+        title={parsedData.title}
+        {...(isStructured
+          ? {
+              columns: (parsedData as any).columns,
+              query: (parsedData as any).query,
+              summary: (parsedData as any).summary,
+            }
+          : {})}
+        onToggle={() => setShowRawText(true)}
+      />
+    )
+  }
+
   return (
     <motion.div
       className="leading-relaxed tracking-normal font-normal break-words overflow-wrap-anywhere hyphens-auto max-w-full text-rendering-optimizeLegibility"
@@ -285,86 +400,62 @@ function MessageContent({
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
     >
-      <span className="inline">
-      {content.split("\n").map((line, index) => {
-        if (line.includes("```")) {
-          return (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.3, delay: index * 0.05 }}
-              className={cn(
-                "relative group my-2 rounded-lg border overflow-hidden font-mono",
-                "bg-white border-gray-200",
-                "dark:bg-gray-950 dark:border-gray-800",
-              )}
-            >
-              <div className="relative">
-                <div className="p-3 text-sm overflow-x-auto whitespace-pre max-w-full leading-[1.4]">
-                  <code>{line.replace(/```/g, "")}</code>
-                </div>
-                <div className="absolute top-0 right-0 w-8 h-full bg-gradient-to-l from-current/10 to-transparent pointer-events-none opacity-0" />
-              </div>
-              <motion.button
-                className="absolute top-2 right-2 opacity-0 p-1.5 rounded"
-                whileTap={{ scale: 0.95 }}
+      <div className="space-y-2">
+        {segments.map((segment, index) => {
+          if (segment.type === "code") {
+    const sanitizedCode = DOMPurify.sanitize(segment.content)
+            return (
+              <motion.div
+                key={`code-${index}`}
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.3, delay: index * 0.03 }}
+                className={cn(
+                  "relative group my-3 rounded-lg border overflow-hidden font-mono",
+                  "bg-white border-gray-200",
+                  "dark:bg-gray-950 dark:border-gray-800",
+                )}
               >
-                <Copy className="h-3 w-3" />
-              </motion.button>
-            </motion.div>
-          )
-        }
+                <div className="relative">
+                  <div className="p-3 text-sm overflow-x-auto whitespace-pre max-w-full leading-[1.5]">
+                    <code>{sanitizedCode}</code>
+                  </div>
+                  {segment.language && (
+                    <span className="absolute top-2 right-2 text-[10px] uppercase tracking-wide text-gray-400">
+                      {segment.language}
+                    </span>
+                  )}
+                  <button
+                    type="button"
+                    className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-gray-200"
+                    onClick={() => navigator.clipboard.writeText(segment.content)}
+                    aria-label="Copy code"
+                  >
+                    <Copy className="h-4 w-4" />
+                  </button>
+                </div>
+              </motion.div>
+            )
+          }
 
-        if (line.includes("http")) {
-          const parts = line.split(/(https?:\/\/[^\s]+)/g)
+          const safeLines = segment.content
+            .split("\n")
+            .map((line) => formatLine(line))
+            .join("<br />")
+
           return (
             <motion.div
-              key={index}
-              className="mb-1 break-words overflow-wrap-anywhere"
+              key={`text-${index}`}
+              className="space-y-2"
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.3, delay: index * 0.05 }}
-            >
-              {parts.map((part, partIndex) =>
-                part.match(/https?:\/\/[^\s]+/) ? (
-                  <motion.a
-                    key={partIndex}
-                    href={part}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-teal-600 relative inline-block break-all font-[500]"
-                  >
-                    <span className="relative">
-                      {part}
-                      <motion.span
-                        className="absolute bottom-0 left-0 w-0 h-0.5 bg-purple-600"
-                      />
-                    </span>
-                  </motion.a>
-                ) : (
-                  part
-                ),
-              )}
-            </motion.div>
+              transition={{ duration: 0.3, delay: index * 0.03 }}
+              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(safeLines) }}
+            />
           )
-        }
+        })}
+      </div>
 
-        const processedLine = line.replace(/\*\*(.*?)\*\*/g, '<strong class="font-[600]">$1</strong>')
-
-        return (
-          <motion.div
-            key={index}
-            className="mb-1 break-words overflow-wrap-anywhere"
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.3, delay: index * 0.05 }}
-            dangerouslySetInnerHTML={{ __html: processedLine }}
-          />
-        )
-      })}
-      </span>
-      {/* Blinking cursor during text reveal */}
       {isStreaming && (
         <motion.span
           className="inline-block w-[2px] h-[1.2em] ml-0.5 bg-current opacity-70"

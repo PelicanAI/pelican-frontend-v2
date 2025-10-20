@@ -144,7 +144,7 @@ export default function ChatPage() {
 
   // Update the messageHandler with the current conversation ID
   useEffect(() => {
-    messageHandler.draftConversationId = conversationRouter.currentConversationId
+    messageHandler.setDraftConversationId(conversationRouter.currentConversationId || null)
   }, [conversationRouter.currentConversationId, messageHandler])
 
   // Clear guest mode when user logs in

@@ -96,12 +96,20 @@ export async function POST(req: NextRequest) {
     }
 
     const apiKey = process.env.PEL_API_KEY
+    const apiUrl = process.env.PEL_API_URL
+
     if (!apiKey) {
       logger.error("PEL_API_KEY not configured")
       throw new ExternalAPIError("Pelican", "API key not configured", "AI service is temporarily unavailable. Please try again later.")
     }
 
-    const endpoint = "https://pelican-api.fly.dev/api/pelican_response"
+    if (!apiUrl) {
+      logger.error("PEL_API_URL not configured")
+      throw new ExternalAPIError("Pelican", "API URL not configured", "AI service is temporarily unavailable. Please try again later.")
+    }
+
+    const endpoint = `${apiUrl}/api/pelican_response`
+    logger.info("Using Pelican API endpoint", { endpoint })
 
     const userMessage = sanitizedMessages[sanitizedMessages.length - 1]?.content || ""
 
@@ -162,7 +170,7 @@ export async function POST(req: NextRequest) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
+        "X-API-Key": apiKey,
       },
       body: JSON.stringify(requestBody),
       signal,
