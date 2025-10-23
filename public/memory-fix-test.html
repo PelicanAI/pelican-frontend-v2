@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pelican Memory Fix Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .step {
+            margin: 15px 0;
+            padding: 15px;
+            border-left: 4px solid #007bff;
+            background-color: #f8f9fa;
+        }
+        .success { border-left-color: #28a745; background-color: #d4edda; }
+        .error { border-left-color: #dc3545; background-color: #f8d7da; }
+        .warning { border-left-color: #ffc107; background-color: #fff3cd; }
+        .info { border-left-color: #17a2b8; background-color: #d1ecf1; }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background-color: #0056b3; }
+        button:disabled { background-color: #6c757d; cursor: not-allowed; }
+        .log-output {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+            font-size: 12px;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .code-block {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Pelican Memory Fix Test</h1>
+        <p><strong>Production-Grade Memory Context Fix</strong> - Testing the complete solution</p>
+    </div>
+
+    <div class="container">
+        <h2>📋 Pre-Test Checklist</h2>
+        <div class="step info">
+            <h3>Step 1: Run SQL Migration</h3>
+            <p>Copy and paste this SQL into your Supabase SQL Editor:</p>
+            <div class="code-block">-- Copy entire content from: Pelican-frontend/supabase/fix-memory-context.sql</div>
+            <p><strong>Expected Result:</strong> All messages should have user_id values</p>
+        </div>
+
+        <div class="step info">
+            <h3>Step 2: Verify Server is Running</h3>
+            <p>Server should be running on http://localhost:3000</p>
+            <button onclick="checkServer()">Check Server Status</button>
+            <div id="server-status" class="log-output"></div>
+        </div>
+
+        <div class="step info">
+            <h3>Step 3: Sign In (Not Guest Mode)</h3>
+            <p>Make sure you're signed in as a real user, not using guest mode</p>
+            <button onclick="checkAuth()">Check Authentication</button>
+            <div id="auth-status" class="log-output"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🧪 Memory Test Sequence</h2>
+        
+        <div class="step">
+            <h3>Test 1: Send Initial Message</h3>
+            <p>Send: <code>I bought AAPL at 256.50 with a stop at 250</code></p>
+            <button onclick="sendFirstMessage()">Send First Message</button>
+            <div id="first-message-result" class="log-output"></div>
+        </div>
+
+        <div class="step">
+            <h3>Test 2: Send Follow-up Question</h3>
+            <p>Send: <code>What was my AAPL entry price?</code></p>
+            <button onclick="sendFollowUp()">Send Follow-up</button>
+            <div id="follow-up-result" class="log-output"></div>
+        </div>
+
+        <div class="step">
+            <h3>Test 3: Check Terminal Logs</h3>
+            <p>Look for these patterns in your terminal:</p>
+            <div class="code-block">✅ WORKING:
+[INFO] Retrieved conversation context { messageCount: 2 }
+[INFO] Calling Pelican API { contextLength: 2 }
+
+❌ BROKEN:
+[INFO] Calling Pelican API { contextLength: 0 }</div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🔍 Debug Information</h2>
+        <div id="debug-info" class="log-output">Ready to test...</div>
+        <button onclick="runFullTest()">Run Complete Test</button>
+        <button onclick="clearLogs()">Clear Logs</button>
+    </div>
+
+    <div class="container">
+        <h2>📊 Expected Results</h2>
+        <div class="step success">
+            <h3>✅ Success Indicators</h3>
+            <ul>
+                <li>Terminal shows <code>contextLength: 2</code> (or higher)</li>
+                <li>AI remembers the AAPL entry price ($256.50)</li>
+                <li>AI mentions the stop price ($250)</li>
+                <li>No database errors in logs</li>
+            </ul>
+        </div>
+
+        <div class="step error">
+            <h3>❌ Failure Indicators</h3>
+            <ul>
+                <li>Terminal shows <code>contextLength: 0</code></li>
+                <li>AI asks for entry price instead of remembering it</li>
+                <li>Database errors in logs</li>
+                <li>Authentication errors</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        let conversationId = null;
+        let testResults = [];
+
+        function log(message, elementId = 'debug-info') {
+            const element = document.getElementById(elementId);
+            const timestamp = new Date().toLocaleTimeString();
+            element.textContent += `[${timestamp}] ${message}\n`;
+            element.scrollTop = element.scrollHeight;
+        }
+
+        function clearLogs() {
+            document.getElementById('debug-info').textContent = '';
+            document.getElementById('first-message-result').textContent = '';
+            document.getElementById('follow-up-result').textContent = '';
+            document.getElementById('server-status').textContent = '';
+            document.getElementById('auth-status').textContent = '';
+        }
+
+        async function checkServer() {
+            log('Checking server status...', 'server-status');
+            try {
+                const response = await fetch('/api/health');
+                const data = await response.json();
+                log(`✅ Server is running: ${JSON.stringify(data)}`, 'server-status');
+                return true;
+            } catch (error) {
+                log(`❌ Server error: ${error.message}`, 'server-status');
+                return false;
+            }
+        }
+
+        async function checkAuth() {
+            log('Checking authentication...', 'auth-status');
+            try {
+                const response = await fetch('/api/health');
+                const data = await response.json();
+                log(`✅ API accessible: ${JSON.stringify(data)}`, 'auth-status');
+                log('Note: Full auth check requires actual login', 'auth-status');
+                return true;
+            } catch (error) {
+                log(`❌ Auth check failed: ${error.message}`, 'auth-status');
+                return false;
+            }
+        }
+
+        async function sendFirstMessage() {
+            log('Sending first message...', 'first-message-result');
+            
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        messages: [
+                            {
+                                role: 'user',
+                                content: 'I bought AAPL at 256.50 with a stop at 250'
+                            }
+                        ],
+                        conversationId: null,
+                        guestMode: false,
+                        isFirstMessage: true
+                    })
+                });
+
+                if (response.ok) {
+                    log('✅ First message sent successfully', 'first-message-result');
+                    log('📝 Check terminal logs for:', 'first-message-result');
+                    log('   - [INFO] Created new conversation', 'first-message-result');
+                    log('   - [INFO] Messages saved to conversation', 'first-message-result');
+                    
+                    // Try to extract conversation ID from response
+                    const data = await response.json();
+                    if (data.conversationId) {
+                        conversationId = data.conversationId;
+                        log(`📝 Conversation ID: ${conversationId}`, 'first-message-result');
+                    }
+                } else {
+                    log(`❌ Failed to send message: ${response.status}`, 'first-message-result');
+                }
+            } catch (error) {
+                log(`❌ Error: ${error.message}`, 'first-message-result');
+            }
+        }
+
+        async function sendFollowUp() {
+            log('Sending follow-up message...', 'follow-up-result');
+            
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        messages: [
+                            {
+                                role: 'user',
+                                content: 'I bought AAPL at 256.50 with a stop at 250'
+                            },
+                            {
+                                role: 'assistant',
+                                content: 'I understand you bought AAPL at $256.50 with a stop at $250.'
+                            },
+                            {
+                                role: 'user',
+                                content: 'What was my AAPL entry price?'
+                            }
+                        ],
+                        conversationId: conversationId || 'test-conversation',
+                        guestMode: false,
+                        isFirstMessage: false
+                    })
+                });
+
+                if (response.ok) {
+                    log('✅ Follow-up message sent', 'follow-up-result');
+                    log('📝 Check terminal logs for:', 'follow-up-result');
+                    log('   - [INFO] Retrieved conversation context { messageCount: X }', 'follow-up-result');
+                    log('   - [INFO] Calling Pelican API { contextLength: X }', 'follow-up-result');
+                    log('', 'follow-up-result');
+                    log('🔍 KEY INDICATORS:', 'follow-up-result');
+                    log('❌ BROKEN: contextLength: 0', 'follow-up-result');
+                    log('✅ WORKING: contextLength > 0', 'follow-up-result');
+                } else {
+                    log(`❌ Failed to send follow-up: ${response.status}`, 'follow-up-result');
+                }
+            } catch (error) {
+                log(`❌ Error: ${error.message}`, 'follow-up-result');
+            }
+        }
+
+        async function runFullTest() {
+            log('🚀 Starting complete memory test...');
+            
+            // Check server
+            const serverOk = await checkServer();
+            if (!serverOk) {
+                log('❌ Server not running, aborting test');
+                return;
+            }
+
+            // Check auth
+            await checkAuth();
+
+            // Send first message
+            await sendFirstMessage();
+            
+            // Wait 2 seconds then send follow-up
+            setTimeout(async () => {
+                await sendFollowUp();
+                
+                log('');
+                log('🎯 TEST COMPLETE');
+                log('Check your terminal for the key indicators above');
+                log('If contextLength > 0, memory is working!');
+                log('If contextLength = 0, run the SQL migration');
+            }, 2000);
+        }
+
+        // Initialize
+        log('🔧 Pelican Memory Fix Test Ready');
+        log('1. Run the SQL migration first');
+        log('2. Make sure server is running');
+        log('3. Sign in (not guest mode)');
+        log('4. Click "Run Complete Test"');
+    </script>
+</body>
+</html>

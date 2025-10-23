@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pelican Memory Debug Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .warning { background-color: #fff3cd; border-color: #ffeaa7; }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background-color: #0056b3; }
+        button:disabled { background-color: #6c757d; cursor: not-allowed; }
+        .log-output {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Pelican Memory Debug Test</h1>
+        
+        <div class="test-section">
+            <h3>📋 Test Instructions</h3>
+            <ol>
+                <li><strong>Sign in</strong> to Pelican (don't use guest mode)</li>
+                <li><strong>Open browser console</strong> (F12 → Console tab)</li>
+                <li><strong>Run the test sequence</strong> below</li>
+                <li><strong>Watch the terminal</strong> for log output</li>
+            </ol>
+        </div>
+
+        <div class="test-section">
+            <h3>🧪 Memory Test Sequence</h3>
+            <p>Copy and paste this into your browser console:</p>
+            <div class="log-output">// Test 1: Check authentication
+async function testMemory() {
+  console.log("🔍 Starting Pelican Memory Test");
+  
+  // Test if we're authenticated
+  try {
+    const response = await fetch('/api/health');
+    const data = await response.json();
+    console.log("✅ Server connected:", data);
+  } catch (error) {
+    console.log("❌ Server error:", error);
+    return;
+  }
+  
+  // Test memory sequence
+  console.log("📝 Sending first message...");
+  
+  const firstMessage = await fetch('/api/chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      messages: [{ role: 'user', content: 'Test memory: I own 500 shares of TSLA at $240' }],
+      conversationId: null,
+      guestMode: false,
+      isFirstMessage: true
+    })
+  });
+  
+  if (firstMessage.ok) {
+    console.log("✅ First message sent");
+    console.log("📝 Check terminal logs for:");
+    console.log("   - [INFO] Created new conversation");
+    console.log("   - [INFO] Messages saved to conversation");
+    
+    // Wait 2 seconds then send follow-up
+    setTimeout(async () => {
+      console.log("📝 Sending follow-up message...");
+      
+      const followUp = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: [
+            { role: 'user', content: 'Test memory: I own 500 shares of TSLA at $240' },
+            { role: 'assistant', content: 'I understand you own 500 shares of TSLA at $240.' },
+            { role: 'user', content: 'How many TSLA shares do I own?' }
+          ],
+          conversationId: 'test-conversation-id',
+          guestMode: false,
+          isFirstMessage: false
+        })
+      });
+      
+      if (followUp.ok) {
+        console.log("✅ Follow-up sent");
+        console.log("📝 Check terminal logs for:");
+        console.log("   - [INFO] Retrieved conversation context { messageCount: X }");
+        console.log("   - [INFO] Calling Pelican API { contextLength: X }");
+        console.log("");
+        console.log("🔍 KEY INDICATORS:");
+        console.log("❌ BROKEN: contextLength: 0");
+        console.log("✅ WORKING: contextLength > 0");
+      }
+    }, 2000);
+  }
+}
+
+// Run the test
+testMemory();</div>
+        </div>
+
+        <div class="test-section">
+            <h3>🔍 What to Look For</h3>
+            <div class="status error">
+                <strong>❌ BROKEN (Memory Not Working):</strong><br>
+                <code>[INFO] Calling Pelican API { contextLength: 0 }</code><br>
+                <small>This means no conversation history is being sent to the backend.</small>
+            </div>
+            
+            <div class="status success">
+                <strong>✅ WORKING (Memory Working):</strong><br>
+                <code>[INFO] Calling Pelican API { contextLength: 2 }</code><br>
+                <small>This means conversation history is being sent to the backend.</small>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>🛠️ Common Fixes</h3>
+            <ol>
+                <li><strong>Database Schema:</strong> Run the fix SQL in Supabase</li>
+                <li><strong>Authentication:</strong> Make sure you're signed in (not guest)</li>
+                <li><strong>Backend Flag:</strong> Check PEL_MEMORY_ENABLED=true</li>
+            </ol>
+        </div>
+
+        <div class="test-section">
+            <h3>📊 Debug Status</h3>
+            <div id="status">Ready to test...</div>
+            <button onclick="runQuickTest()">Run Quick Test</button>
+            <div id="output" class="log-output"></div>
+        </div>
+    </div>
+
+    <script>
+        function runQuickTest() {
+            const output = document.getElementById('output');
+            const status = document.getElementById('status');
+            
+            output.textContent = 'Running quick test...\n';
+            status.textContent = 'Testing...';
+            
+            fetch('/api/health')
+                .then(response => response.json())
+                .then(data => {
+                    output.textContent += `✅ Server Status: ${JSON.stringify(data, null, 2)}\n`;
+                    status.textContent = 'Server is running ✅';
+                })
+                .catch(error => {
+                    output.textContent += `❌ Error: ${error.message}\n`;
+                    status.textContent = 'Server error ❌';
+                });
+        }
+    </script>
+</body>
+</html>

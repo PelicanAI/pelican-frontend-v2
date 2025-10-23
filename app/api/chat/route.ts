@@ -5,6 +5,7 @@ import { streamWithRetry } from "@/lib/api-retry"
 import { sanitizeMessage, sanitizeTitle } from "@/lib/sanitize"
 import { logger } from "@/lib/logger"
 import { AuthenticationError, ValidationError, ExternalAPIError, getUserFriendlyError } from "@/lib/errors"
+import { extractTradingMetadata, getTradingSessionId } from "@/lib/trading-metadata"
 
 interface Message {
   role: "user" | "assistant" | "system"
@@ -40,6 +41,9 @@ export async function POST(req: NextRequest) {
     const signal = req.signal // Extract AbortController signal from request
 
     const { messages, conversationId, guestMode, guestUserId, isFirstMessage }: ChatRequest = await req.json()
+    
+    // Debug: Log effectiveUserId at the start
+    console.log("[DEBUG] Starting POST function - effectiveUserId will be determined")
 
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
       throw new ValidationError("Messages array is required and must not be empty", "Please provide a message to send.")
@@ -68,6 +72,9 @@ export async function POST(req: NextRequest) {
       effectiveUserId = guestUserId || generateGuestUUID()
       logger.info("Guest mode active", { userId: effectiveUserId })
     }
+    
+    // Debug: Log effectiveUserId after determination
+    console.log("[DEBUG] effectiveUserId determined:", effectiveUserId)
 
     if (!activeConversationId && isFirstMessage && effectiveUserId && !guestMode) {
       const userMessage = sanitizedMessages[sanitizedMessages.length - 1]?.content || ""
@@ -126,44 +133,140 @@ export async function POST(req: NextRequest) {
       !activeConversationId.startsWith("temp-") &&
       !activeConversationId.startsWith("guest-")
     ) {
-      const { data: conversation } = await supabase
-        .from("conversations")
-        .select(`
-          messages (
-            role,
-            content,
-            created_at
-          )
-        `)
-        .eq("id", activeConversationId)
-        .eq("user_id", effectiveUserId)
-        .single()
+        // Primary query - with user_id for security
+        console.log("[DEBUG] Querying messages with:", { 
+          conversationId: activeConversationId, 
+          userId: effectiveUserId,
+          userIdType: typeof effectiveUserId,
+          userIdLength: effectiveUserId?.length 
+        })
+        
+        let { data: allMessages, error: messagesError } = await supabase
+          .from("messages")
+          .select("role, content, created_at, user_id, conversation_id")
+          .eq("conversation_id", activeConversationId)
+          .eq("user_id", effectiveUserId)
+          .order("created_at", { ascending: false })
+          .limit(LIMITS.MESSAGE_CONTEXT)
+        
+        // Debug: Log detailed results from DB
+        console.log("[DEBUG] Messages from DB:", allMessages?.length || 0)
+        console.log("[DEBUG] Query error:", messagesError)
+        if (allMessages && allMessages.length > 0) {
+          console.log("[DEBUG] Sample message:", {
+            id: allMessages[0].id,
+            userId: allMessages[0].user_id,
+            conversationId: allMessages[0].conversation_id,
+            role: allMessages[0].role
+          })
+        }
 
-      if (conversation?.messages) {
-        conversationContext = conversation.messages
-          .sort((a: any, b: any) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
-          .slice(-LIMITS.MESSAGE_CONTEXT)
-          .map((msg: any) => ({
-            role: msg.role,
-            content: msg.content,
-          }))
+      if (messagesError) {
+        logger.error("Failed to fetch conversation context", messagesError, {
+          conversationId: activeConversationId,
+          userId: effectiveUserId,
+        })
+      }
+
+      // Fallback if no messages found but conversation exists
+      if ((!allMessages || allMessages.length === 0) && activeConversationId) {
+        logger.info("Primary query returned no messages, trying conversation-based query", {
+          conversationId: activeConversationId,
+          userId: effectiveUserId,
+        })
+        
+        // Check if user owns this conversation
+        const { data: conversationCheck } = await supabase
+          .from("conversations")
+          .select("user_id")
+          .eq("id", activeConversationId)
+          .single()
+        
+        // Only proceed if user owns the conversation
+        if (conversationCheck && conversationCheck.user_id === effectiveUserId) {
+          console.log("[DEBUG] User owns conversation, trying fallback query")
+          const { data: fallbackMessages } = await supabase
+            .from("messages")
+            .select("role, content, created_at, user_id, conversation_id")
+            .eq("conversation_id", activeConversationId)
+            .order("created_at", { ascending: false })
+            .limit(LIMITS.MESSAGE_CONTEXT)
+          
+          console.log("[DEBUG] Fallback query results:", fallbackMessages?.length || 0)
+          
+          if (fallbackMessages && fallbackMessages.length > 0) {
+            allMessages = fallbackMessages
+            logger.info("Fallback query retrieved messages", {
+              conversationId: activeConversationId,
+              messageCount: fallbackMessages.length,
+            })
+            console.log("[DEBUG] Fallback sample message:", {
+              userId: fallbackMessages[0].user_id,
+              conversationId: fallbackMessages[0].conversation_id,
+              role: fallbackMessages[0].role
+            })
+          }
+        } else {
+          console.log("[DEBUG] User does not own conversation:", {
+            effectiveUserId,
+            conversationOwner: conversationCheck?.user_id,
+            userIdMatch: conversationCheck?.user_id === effectiveUserId
+          })
+          logger.warn("User does not own conversation, skipping fallback", {
+            conversationId: activeConversationId,
+            userId: effectiveUserId,
+            conversationOwner: conversationCheck?.user_id,
+          })
+        }
+      }
+
+      if (allMessages && allMessages.length > 0) {
+        // Reverse to chronological order (oldest first) for context
+        conversationContext = allMessages.reverse().map((msg: any) => ({
+          role: msg.role,
+          content: msg.content,
+        }))
+        logger.info("Retrieved conversation context", {
+          conversationId: activeConversationId,
+          messageCount: allMessages.length,
+          userId: effectiveUserId,
+        })
+      } else {
+        logger.info("No conversation context found", {
+          conversationId: activeConversationId,
+          userId: effectiveUserId,
+        })
       }
     }
 
+    // Generate trading session ID for memory continuity
+    const sessionId = effectiveUserId ? getTradingSessionId(effectiveUserId) : null
+
     const requestBody = {
       message: userMessage,
+      conversationHistory: conversationContext,
       user_id: effectiveUserId || "anonymous",
+      session_id: sessionId,
       conversation_id: activeConversationId || null,
-      conversation_context: conversationContext,
       timestamp: new Date().toISOString(),
       stream: true,
     }
+    
+    // Debug: Log the full request body being sent to backend
+    console.log("[DEBUG] Sending to backend:", JSON.stringify({ message: userMessage, sessionId, conversationHistory: conversationContext, userId: effectiveUserId }, null, 2))
 
+    // Debug: Log final context length
+    console.log("[DEBUG] FINAL contextLength:", conversationContext.length)
+    console.log("[DEBUG] Context messages:", conversationContext.map(msg => ({ role: msg.role, contentLength: msg.content.length })))
+    
     logger.info("Calling Pelican API", {
       userId: effectiveUserId || "anonymous",
       messageLength: userMessage.length,
       contextLength: conversationContext.length,
       conversationId: activeConversationId,
+      sessionId: sessionId,
+      firstMessage: conversationContext[0]?.content?.substring(0, 50) || "none",
+      lastMessage: conversationContext[conversationContext.length - 1]?.content?.substring(0, 50) || "none",
     })
 
     const response = await streamWithRetry(endpoint, {
@@ -351,20 +454,26 @@ async function saveMessagesToDatabase(
   reply: string,
   userId: string,
 ) {
-  const { error: insertError } = await supabase.from("messages").insert([
+  // Extract trading metadata from user message
+  const userMetadata = extractTradingMetadata(userMessage)
+  const assistantMetadata = extractTradingMetadata(reply)
+
+  const { data: insertData, error: insertError } = await supabase.from("messages").insert([
     {
       conversation_id: conversationId,
       user_id: userId,
       role: "user",
       content: userMessage,
+      metadata: userMetadata,
     },
     {
       conversation_id: conversationId,
       user_id: userId,
       role: "assistant",
       content: reply,
+      metadata: assistantMetadata,
     },
-  ])
+  ]).select()
 
   if (insertError) {
     logger.error("Failed to save messages to database", insertError, {
@@ -376,6 +485,19 @@ async function saveMessagesToDatabase(
     })
   } else {
     logger.info("Messages saved to conversation", { conversationId, userId })
+    
+    // Debug: Verify stored messages
+    if (insertData && insertData.length > 0) {
+      const newMessageId = insertData[0].id
+      const { data: verify } = await supabase.from("messages").select("*").eq("id", newMessageId)
+      console.log("[DEBUG] Verification of stored message:", verify?.[0] ? {
+        id: verify[0].id,
+        conversation_id: verify[0].conversation_id,
+        user_id: verify[0].user_id,
+        role: verify[0].role,
+        hasContent: !!verify[0].content
+      } : "No message found")
+    }
 
     const { count: messageCount, error: countError } = await supabase
       .from("messages")

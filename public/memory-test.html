@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pelican Memory Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        button { background-color: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; margin: 5px; }
+        button:hover { background-color: #0056b3; }
+        .log-output { background-color: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 4px; font-family: monospace; white-space: pre-wrap; max-height: 300px; overflow-y: auto; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Pelican Memory Test</h1>
+        <p><strong>Test the memory fix</strong></p>
+        
+        <div class="container">
+            <h3>📋 Test Instructions</h3>
+            <ol>
+                <li><strong>Sign in</strong> to Pelican (not guest mode)</li>
+                <li><strong>Run the test</strong> below</li>
+                <li><strong>Watch terminal logs</strong> for contextLength</li>
+            </ol>
+        </div>
+
+        <div class="container">
+            <h3>🧪 Memory Test</h3>
+            <button onclick="runMemoryTest()">Run Memory Test</button>
+            <div id="test-result" class="log-output">Ready to test...</div>
+        </div>
+
+        <div class="container">
+            <h3>🔍 What to Look For</h3>
+            <div class="success">
+                <strong>✅ WORKING:</strong><br>
+                <code>[INFO] Calling Pelican API { contextLength: 2 }</code><br>
+                <small>AI remembers your previous messages</small>
+            </div>
+            
+            <div class="error">
+                <strong>❌ BROKEN:</strong><br>
+                <code>[INFO] Calling Pelican API { contextLength: 0 }</code><br>
+                <small>AI doesn't remember anything</small>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function log(message) {
+            const element = document.getElementById('test-result');
+            const timestamp = new Date().toLocaleTimeString();
+            element.textContent += `[${timestamp}] ${message}\n`;
+            element.scrollTop = element.scrollHeight;
+        }
+
+        async function runMemoryTest() {
+            log('🚀 Starting Memory Test...');
+            
+            try {
+                // Test 1: Send first message
+                log('📝 Sending first message: "I bought AAPL at 256.50 with a stop at 250"');
+                
+                const firstResponse = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        messages: [
+                            { role: 'user', content: 'I bought AAPL at 256.50 with a stop at 250' }
+                        ],
+                        conversationId: null,
+                        guestMode: false,
+                        isFirstMessage: true
+                    })
+                });
+
+                if (firstResponse.ok) {
+                    log('✅ First message sent successfully');
+                    log('📝 Check terminal logs for:');
+                    log('   - [INFO] Created new conversation');
+                    log('   - [INFO] Messages saved to conversation');
+                    
+                    // Wait 2 seconds then send follow-up
+                    setTimeout(async () => {
+                        log('📝 Sending follow-up: "What was my AAPL entry price?"');
+                        
+                        const followUpResponse = await fetch('/api/chat', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                messages: [
+                                    { role: 'user', content: 'I bought AAPL at 256.50 with a stop at 250' },
+                                    { role: 'assistant', content: 'I understand you bought AAPL at $256.50 with a stop at $250.' },
+                                    { role: 'user', content: 'What was my AAPL entry price?' }
+                                ],
+                                conversationId: 'test-conversation',
+                                guestMode: false,
+                                isFirstMessage: false
+                            })
+                        });
+
+                        if (followUpResponse.ok) {
+                            log('✅ Follow-up sent');
+                            log('📝 Check terminal logs for:');
+                            log('   - [INFO] Retrieved conversation context { messageCount: X }');
+                            log('   - [INFO] Calling Pelican API { contextLength: X }');
+                            log('');
+                            log('🔍 KEY INDICATORS:');
+                            log('❌ BROKEN: contextLength: 0');
+                            log('✅ WORKING: contextLength > 0');
+                            log('');
+                            log('🎯 If contextLength > 0, memory is working!');
+                            log('🎯 If contextLength = 0, memory is broken!');
+                        } else {
+                            log(`❌ Follow-up failed: ${followUpResponse.status}`);
+                        }
+                    }, 2000);
+                } else {
+                    log(`❌ First message failed: ${firstResponse.status}`);
+                }
+            } catch (error) {
+                log(`❌ Error: ${error.message}`);
+            }
+        }
+
+        // Initialize
+        log('🔧 Pelican Memory Test Ready');
+        log('1. Make sure you are signed in (not guest mode)');
+        log('2. Click "Run Memory Test"');
+        log('3. Watch terminal logs for contextLength');
+    </script>
+</body>
+</html>

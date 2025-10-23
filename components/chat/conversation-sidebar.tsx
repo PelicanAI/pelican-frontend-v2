@@ -20,6 +20,7 @@ import {
   Crown,
   User,
   PanelLeftClose,
+  LogOut,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useConversations } from "@/hooks/use-conversations"
@@ -27,6 +28,8 @@ import Link from "next/link"
 import Image from "next/image"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { motion, stagger, useAnimate } from "framer-motion"
+import { Switch } from "@/components/ui/switch"
+import { Label } from "@/components/ui/label"
 
 interface Conversation {
   id: string
@@ -493,9 +496,34 @@ export function ConversationSidebar({
           )}
         </div>
       </ScrollArea>
+      
+      {/* Guest Mode Toggle */}
+      <div className="px-3 py-2 border-t border-sidebar-border/30">
+        <div className="flex items-center space-x-2">
+          <Switch 
+            id="guest-mode" 
+            checked={typeof window !== 'undefined' && localStorage.getItem('pelican_guest_mode') === 'true'}
+            onCheckedChange={(enabled) => {
+              if (typeof window !== 'undefined') {
+                localStorage.setItem('pelican_guest_mode', enabled.toString())
+                window.location.reload()
+              }
+            }}
+          />
+          <Label htmlFor="guest-mode" className="text-xs text-sidebar-foreground">
+            Guest Mode
+          </Label>
+        </div>
+        <p className="text-[10px] text-muted-foreground mt-1">
+          {typeof window !== 'undefined' && localStorage.getItem('pelican_guest_mode') === 'true'
+            ? "Conversations won't be saved"
+            : "Conversations will be saved"}
+        </p>
+      </div>
+      
       {/* Footer - 12px padding */}
       <div className="px-3 py-3 border-t border-sidebar-border/30">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <Button
             variant="ghost"
             size="sm"
@@ -526,6 +554,17 @@ export function ConversationSidebar({
               <Settings className="h-4 w-4" />
             </Link>
           </Button>
+          <form action="/auth/signout" method="post">
+            <Button
+              variant="ghost"
+              size="icon"
+              type="submit"
+              className="h-10 w-10 hover:bg-sidebar-accent/50"
+              title="Sign Out"
+            >
+              <LogOut className="h-4 w-4" />
+            </Button>
+          </form>
         </div>
       </div>
     </motion.div>

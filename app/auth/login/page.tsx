@@ -106,6 +106,46 @@ export default function LoginPage() {
                     Sign up
                   </Link>
                 </div>
+                {process.env.NODE_ENV === 'development' && (
+                  <div className="mt-6 pt-4 border-t">
+                    <p className="text-xs text-muted-foreground mb-2">Quick Login (Dev Only):</p>
+                    <div className="flex gap-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setEmail('nick@pelicantrading.ai')
+                          setPassword('TempPassword123!')
+                        }}
+                      >
+                        Nick
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setEmail('jack@pelicantrading.ai')
+                          setPassword('TempPassword123!')
+                        }}
+                      >
+                        Jack
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setEmail('ray@pelicantrading.ai')
+                          setPassword('TempPassword123!')
+                        }}
+                      >
+                        Ray
+                      </Button>
+                    </div>
+                  </div>
+                )}
               </form>
             </CardContent>
           </Card>
