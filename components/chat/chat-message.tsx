@@ -20,11 +20,15 @@ export function ChatMessage({ message, onRegenerate, showActions = false }: Chat
   }
 
   return (
-    <div className={cn("group relative px-4 py-6", !isUser && "bg-muted/30")}>
+    <div className={cn("group relative px-4 py-6", !isUser && "bg-muted/10 dark:bg-surface-2/80")}>
       <div className="max-w-3xl mx-auto flex gap-4">
         {/* Avatar */}
         <Avatar className="w-8 h-8 shrink-0">
-          <AvatarFallback className={cn(isUser ? "bg-background border" : "bg-purple-600 text-white")}>
+          <AvatarFallback className={cn(
+            isUser 
+              ? "bg-card border border-border text-foreground" 
+              : "bg-primary text-primary-foreground"
+          )}>
             {isUser ? "You" : "P"}
           </AvatarFallback>
         </Avatar>

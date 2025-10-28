@@ -290,7 +290,7 @@ export function ChatContainer({
 
   if (isLoadingHistory) {
     return (
-      <div className="flex-1 flex flex-col min-h-0 bg-white dark:bg-gray-950 relative">
+      <div className="flex-1 flex flex-col min-h-0 bg-background relative">
         <ConversationHistorySkeleton messageCount={4} />
       </div>
     )
@@ -299,7 +299,7 @@ export function ChatContainer({
   if (messages.length === 0) {
     return (
       <div
-        className="flex-1 flex flex-col min-h-0 bg-white dark:bg-gray-950 relative"
+        className="flex-1 flex flex-col min-h-0 bg-background relative"
         onDragEnter={handleDragEnter}
         onDragLeave={handleDragLeave}
         onDragOver={handleDragOver}
@@ -324,7 +324,7 @@ export function ChatContainer({
 
   return (
     <div
-      className="flex-1 flex flex-col min-h-0 bg-white dark:bg-gray-950 relative"
+      className="flex-1 flex flex-col min-h-0 bg-background relative"
       onDragEnter={handleDragEnter}
       onDragLeave={handleDragLeave}
       onDragOver={handleDragOver}
@@ -355,13 +355,13 @@ export function ChatContainer({
           aria-label="Chat messages"
         >
           {/* Conversation Header - Sticky */}
-          <div className="sticky top-0 z-10 flex items-center justify-between pb-2 pt-6 border-b border-gray-200 dark:border-gray-800 bg-white/95 dark:bg-gray-950/95 backdrop-blur-sm -mx-4 sm:-mx-6 px-4 sm:px-6">
+          <div className="sticky top-0 z-10 flex items-center justify-between pb-2 pt-6 border-b border-border bg-background/95 backdrop-blur-sm -mx-4 sm:-mx-6 px-4 sm:px-6">
             <div className="flex items-center gap-3">
               <div className="flex flex-col">
-                <h2 className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                <h2 className="text-sm font-medium text-foreground">
                   Trading Assistant
                 </h2>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
+                <p className="text-xs text-muted-foreground">
                   {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
                 </p>
               </div>

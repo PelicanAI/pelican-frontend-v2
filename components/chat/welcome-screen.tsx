@@ -39,7 +39,7 @@ export function WelcomeScreen({ onQuickStart }: WelcomeScreenProps) {
         className="pointer-events-none fixed inset-0 -z-10 [background:radial-gradient(600px_400px_at_50%_10%,color-mix(in_oklch,var(--primary)_18%,transparent),transparent)] [@media(prefers-reduced-transparency:reduce)]:hidden"
       />
 
-      <div className="bg-[var(--surface-1)]/40 border border-white/5 backdrop-blur rounded-2xl p-8">
+      <div className="bg-card/40 border border-border backdrop-blur rounded-2xl p-8">
         <div className="max-w-2xl mx-auto text-center space-y-8">
           <div className="space-y-6">
             <div className="flex justify-center">
@@ -60,7 +60,7 @@ export function WelcomeScreen({ onQuickStart }: WelcomeScreenProps) {
             {suggestions.map((suggestion, index) => (
               <Card
                 key={index}
-                className="min-h-[72px] p-4 cursor-pointer transition-all duration-200 group text-left border border-white/5 hover:bg-muted/50 bg-[var(--surface-2)] hover:scale-[1.02] hover:shadow-lg rounded-xl"
+                className="min-h-[72px] p-4 cursor-pointer transition-all duration-200 group text-left hover:bg-accent/10 hover:scale-[1.02] hover:shadow-lg rounded-xl"
                 onClick={() => onQuickStart(suggestion.subtitle)}
               >
                 <div className="flex items-start gap-3">
@@ -68,7 +68,7 @@ export function WelcomeScreen({ onQuickStart }: WelcomeScreenProps) {
                     {suggestion.icon}
                   </div>
                   <div className="space-y-1.5 flex-1">
-                    <h3 className="font-semibold text-[15px] text-card-foreground group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors leading-snug">
+                    <h3 className="font-semibold text-[15px] text-card-foreground group-hover:text-primary transition-colors leading-snug">
                       {suggestion.title}
                     </h3>
                     <p className="text-sm text-muted-foreground leading-relaxed">{suggestion.subtitle}</p>

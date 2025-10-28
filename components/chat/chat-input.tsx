@@ -265,15 +265,16 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
           <div
             className={cn(
               "relative flex items-center gap-2 px-4 py-2",
-              "bg-white dark:bg-gray-900",
+              "bg-card",
               "rounded-full",
-              "border border-gray-200 dark:border-gray-700",
+              "border border-border",
               "transition-all duration-200",
               "shadow-md hover:shadow-lg",
               "min-h-[56px]",
               isFocused && [
-                "border-purple-500/60",
+                "border-primary/60",
                 "shadow-[0_0_0_4px_rgba(168,85,247,0.12)]",
+                "dark:shadow-[0_0_0_4px_rgba(168,85,247,0.08)]",
               ],
             )}
           >
@@ -286,12 +287,12 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
               className={cn(
                 "flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center",
                 "transition-all duration-200",
-                "hover:bg-gray-100 dark:hover:bg-gray-800",
+                "hover:bg-muted",
                 disabled && "opacity-50 cursor-not-allowed",
               )}
               title="Attach file"
             >
-              <Paperclip className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+              <Paperclip className="h-4 w-4 text-muted-foreground" />
             </motion.button>
 
             {/* Textarea */}
@@ -310,11 +311,11 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
               className={cn(
                 "flex-1 bg-transparent outline-none resize-none",
                 "text-[15px] leading-relaxed font-[Inter,system-ui,sans-serif]",
-                "placeholder:text-gray-400 dark:placeholder:text-gray-500",
-                "text-gray-900 dark:text-gray-100",
+                "placeholder:text-muted-foreground",
+                "text-foreground",
                 "py-2 px-2",
                 "h-[40px] max-h-[168px] overflow-y-auto",
-                "scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent",
+                "scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent",
               )}
               rows={1}
             />
@@ -339,8 +340,8 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
                 isAIResponding
                   ? "bg-red-500 hover:bg-red-600 text-white"
                   : isSendDisabled
-                    ? "bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed"
-                    : "bg-gradient-to-br from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white shadow-md shadow-purple-500/20",
+                    ? "bg-muted text-muted-foreground cursor-not-allowed"
+                    : "bg-primary hover:bg-primary/90 text-primary-foreground shadow-md shadow-primary/20",
               )}
             >
               <motion.div
