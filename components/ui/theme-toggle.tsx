@@ -38,8 +38,8 @@ export function ThemeToggle({ onThemeChange }: ThemeToggleProps) {
       onClick={toggleTheme}
       className={`h-8 w-8 border transition-colors ${
         isDark
-          ? "text-gray-700 hover:text-gray-600 hover:bg-gray-800/30 border-gray-700/30"
-          : "text-gray-600 hover:text-gray-900 hover:bg-gray-100 border-gray-300"
+          ? "text-muted-foreground hover:text-foreground hover:bg-muted border-border"
+          : "text-muted-foreground hover:text-foreground hover:bg-muted border-border"
       }`}
       title={`Switch to ${isDark ? "light" : "dark"} mode`}
     >

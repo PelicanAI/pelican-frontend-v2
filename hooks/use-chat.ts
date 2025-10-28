@@ -37,10 +37,10 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
   const { makeRequest, cancelAllRequests, getQueueStatus } = useRequestManager({
     maxRetries: 3,
     onError: (error) => {
-      console.error("[v0] RequestManager error:", error)
+      logger.error("RequestManager error", error instanceof Error ? error : new Error(String(error)))
     },
     onRateLimit: (resetTime) => {
-      console.log("[v0] Rate limited until:", resetTime)
+      logger.info("Rate limited", { resetTime })
       // Could show user notification here
     },
   })
@@ -58,7 +58,7 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
     revalidateOnFocus: false,
     revalidateOnReconnect: true,
     onError: (error) => {
-      console.error("[v0] Conversation fetch error:", error)
+      logger.error("Conversation fetch error", error instanceof Error ? error : new Error(String(error)))
       if (error.status === 404 || error.status === 403) {
         setConversationNotFound(true)
       }
@@ -81,13 +81,16 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
       const exists = guestConversations.some((conv: any) => conv.id === currentConversationId)
 
       if (!exists) {
-        console.log("[v0] Guest conversation not found in localStorage:", currentConversationId)
+        logger.info("Guest conversation not found in localStorage", { conversationId: currentConversationId })
         setConversationNotFound(true)
       } else {
         // Load messages for guest conversation
         const savedMessages = loadGuestConversationMessages(currentConversationId)
         if (savedMessages.length > 0 && loadedConversationRef.current !== currentConversationId) {
-          console.log(`[v0] Loading ${savedMessages.length} saved messages for guest conversation: ${currentConversationId}`)
+          logger.info("Loading saved messages for guest conversation", { 
+            conversationId: currentConversationId,
+            messageCount: savedMessages.length 
+          })
           setMessages(savedMessages)
           loadedConversationRef.current = currentConversationId
         }
@@ -97,13 +100,13 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
 
   useEffect(() => {
     if (conversationError && (conversationError.status === 404 || conversationError.status === 403)) {
-      console.log("[v0] Conversation access denied or not found:", currentConversationId)
+      logger.info("Conversation access denied or not found", { conversationId: currentConversationId })
       setConversationNotFound(true)
       return
     }
 
     if (conversationData?.conversation?.messages && loadedConversationRef.current !== currentConversationId) {
-      console.log(`[v0] Loading messages for conversation: ${currentConversationId}`)
+      logger.info("Loading messages for conversation", { conversationId: currentConversationId })
       const loadedMessages = conversationData.conversation.messages.map((msg: any) => ({
         id: msg.id,
         role: msg.role as "user" | "assistant",
@@ -115,7 +118,7 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
       loadedConversationRef.current = currentConversationId
       setConversationNotFound(false)
     } else if (!currentConversationId && loadedConversationRef.current !== null) {
-      console.log("[v0] Clearing messages for new conversation")
+      logger.info("Clearing messages for new conversation")
       setMessages([])
       loadedConversationRef.current = null
       setConversationNotFound(false)
@@ -164,7 +167,7 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
       abortControllerRef.current = localAbortController
 
       try {
-        console.log("[v0] Sending message to Pelican API:", content)
+        logger.info("Sending message to Pelican API", { messageLength: content.length })
 
         const guestUserId = localStorage.getItem(STORAGE_KEYS.GUEST_USER_ID)
 
@@ -174,12 +177,10 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            // If regenerating, user message is already in messagesRef, don't add it again
-            messages: options.skipUserMessage ? messagesRef.current : [...messagesRef.current, userMessage],
+            message: userMessage.content,  // Only send the new message content
             conversationId: currentConversationId,
             guestMode: options.guestMode || false,
             guestUserId: options.guestMode ? guestUserId : undefined,
-            isFirstMessage: messagesRef.current.length === 0,
             fileIds: options.fileIds,
           }),
         })
@@ -200,21 +201,21 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
           let buffer = ""
           let streamingContent = ""
 
-          while (true) {
-            if (localAbortController.signal.aborted) {
-              console.log("[v0] Stream cancelled by user")
-              reader.cancel()
-              break
-            }
+            while (true) {
+              if (localAbortController.signal.aborted) {
+                logger.info("Stream cancelled by user")
+                reader.cancel()
+                break
+              }
 
-            const { done, value } = await reader.read()
-            if (done) break
+              const { done, value } = await reader.read()
+              if (done) break
 
-            if (localAbortController.signal.aborted) {
-              console.log("[v0] Stream cancelled by user during processing")
-              reader.cancel()
-              return
-            }
+              if (localAbortController.signal.aborted) {
+                logger.info("Stream cancelled during processing")
+                reader.cancel()
+                return
+              }
 
             buffer += decoder.decode(value, { stream: true })
             const lines = buffer.split("\n")
@@ -222,7 +223,7 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
 
             for (const line of lines) {
               if (localAbortController.signal.aborted) {
-                console.log("[v0] Stream cancelled during line processing")
+                logger.info("Stream cancelled during line processing")
                 reader.cancel()
                 return
               }
@@ -247,11 +248,11 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
                     if (parsed.conversationId && !currentConversationId) {
                       setCurrentConversationId(parsed.conversationId)
                       onConversationCreated?.(parsed.conversationId)
-                      console.log("[v0] New conversation created:", parsed.conversationId)
+                      logger.info("New conversation created", { conversationId: parsed.conversationId })
 
                       if (options.guestMode && !user?.id) {
                         const title = content.length > LIMITS.TITLE_PREVIEW_LENGTH ? content.slice(0, LIMITS.TITLE_PREVIEW_LENGTH) + "..." : content
-                        console.log("[v0] Saving guest conversation to localStorage:", parsed.conversationId)
+                        logger.info("Saving guest conversation to localStorage", { conversationId: parsed.conversationId })
                         ensureGuestConversation(parsed.conversationId, title)
                       }
                     }
@@ -269,7 +270,10 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
                         const finalMessages = currentMessages.map((msg) => (msg.id === assistantMessage.id ? finalMessage : msg))
                         const messageCount = finalMessages.length
                         const preview = content.slice(0, 100)
-                        console.log("[v0] Updating guest conversation messages:", conversationIdToUpdate, messageCount)
+                        logger.info("Updating guest conversation messages", { 
+                          conversationId: conversationIdToUpdate, 
+                          messageCount 
+                        })
                         updateGuestConversationMessages(conversationIdToUpdate, messageCount, preview, finalMessages)
                         return finalMessages
                       })
@@ -278,7 +282,7 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
                     onFinish?.(finalMessage)
                   }
                 } catch (parseError) {
-                  console.error("[v0] Failed to parse streaming data:", parseError)
+                  logger.error("Failed to parse streaming data", parseError instanceof Error ? parseError : new Error(String(parseError)))
                 }
               }
             }
@@ -295,7 +299,7 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
           }
         } else {
           const data = await response.json()
-          console.log("[v0] Received API response:", data)
+          logger.info("Received API response", { hasError: !!data.error })
 
           if (data.error) {
             throw new Error(data.error)
@@ -306,11 +310,11 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
           if (data.conversationId && !currentConversationId) {
             setCurrentConversationId(data.conversationId)
             onConversationCreated?.(data.conversationId)
-            console.log("[v0] New conversation created:", data.conversationId)
+            logger.info("New conversation created", { conversationId: data.conversationId })
 
             if (options.guestMode && !user?.id) {
               const title = content.length > 50 ? content.slice(0, 50) + "..." : content
-              console.log("[v0] Saving guest conversation to localStorage:", data.conversationId)
+              logger.info("Saving guest conversation to localStorage", { conversationId: data.conversationId })
               ensureGuestConversation(data.conversationId, title)
             }
           }
@@ -324,7 +328,10 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
               const finalMessages = currentMessages.map((msg) => (msg.id === assistantMessage.id ? finalMessage : msg))
               const messageCount = finalMessages.length
               const preview = content.slice(0, 100)
-              console.log("[v0] Updating guest conversation messages:", conversationIdToUpdate, messageCount)
+              logger.info("Updating guest conversation messages", { 
+                conversationId: conversationIdToUpdate, 
+                messageCount 
+              })
               updateGuestConversationMessages(conversationIdToUpdate, messageCount, preview, finalMessages)
               return finalMessages
             })

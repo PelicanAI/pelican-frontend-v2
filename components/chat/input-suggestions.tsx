@@ -82,10 +82,10 @@ export function InputSuggestions({
         transition={{ duration: 0.15, ease: "easeOut" }}
         className={cn(
           "absolute bottom-full mb-2 left-0 right-0 z-50",
-          "bg-[var(--surface-2)] backdrop-blur-xl",
-          "border border-white/10 rounded-lg shadow-2xl",
+          "bg-card backdrop-blur-xl",
+          "border border-border rounded-lg shadow-2xl",
           "overflow-hidden max-h-64 overflow-y-auto",
-          "scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-transparent",
+          "scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent",
         )}
         style={position}
       >
@@ -98,8 +98,8 @@ export function InputSuggestions({
               transition={{ duration: 0.1, delay: index * 0.02 }}
               className={cn(
                 "flex items-center gap-3 px-3 py-2 cursor-pointer transition-all duration-150",
-                "hover:bg-purple-500/10",
-                selectedIndex === index && "bg-purple-500/20 border-l-2 border-purple-500",
+                "hover:bg-primary/10",
+                selectedIndex === index && "bg-primary/20 border-l-2 border-primary",
               )}
               onClick={() => onSelect(suggestion)}
               onMouseEnter={() => onHover(index)}
@@ -117,7 +117,7 @@ export function InputSuggestions({
                 <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
-                  className="flex-shrink-0 text-[10px] text-purple-400 font-medium px-2 py-0.5 bg-purple-500/20 rounded"
+                  className="flex-shrink-0 text-[10px] text-primary font-medium px-2 py-0.5 bg-primary/20 rounded"
                 >
                   ↵
                 </motion.div>
@@ -127,13 +127,13 @@ export function InputSuggestions({
         </div>
 
         {/* Hint footer */}
-        <div className="border-t border-white/5 px-3 py-1.5 bg-black/20">
+        <div className="border-t border-border px-3 py-1.5 bg-muted/50">
           <p className="text-[10px] text-muted-foreground flex items-center gap-2">
-            <span className="text-purple-400">↑↓</span> Navigate
+            <span className="text-primary">↑↓</span> Navigate
             <span className="mx-1">•</span>
-            <span className="text-purple-400">↵/Tab</span> Select
+            <span className="text-primary">↵/Tab</span> Select
             <span className="mx-1">•</span>
-            <span className="text-purple-400">Esc</span> Close
+            <span className="text-primary">Esc</span> Close
           </p>
         </div>
       </motion.div>

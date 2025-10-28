@@ -26,7 +26,7 @@ export function NewMessagesPill({ show, messageCount, onJumpToBottom }: NewMessa
         >
           <Button
             onClick={onJumpToBottom}
-            className="bg-purple-600 hover:bg-purple-700 text-white shadow-lg border-0 rounded-full px-4 py-2 flex items-center gap-2 text-sm font-medium"
+            className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg border-0 rounded-full px-4 py-2 flex items-center gap-2 text-sm font-medium"
           >
             <motion.div
               animate={{ y: [0, 2, 0] }}

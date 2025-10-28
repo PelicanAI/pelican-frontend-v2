@@ -26,7 +26,7 @@ export function ConversationHistorySkeleton({ messageCount = 4 }: ConversationHi
             {/* Avatar skeleton */}
             <div className="flex-shrink-0">
               <motion.div
-                className="h-9 w-9 bg-purple-600/20 rounded-full"
+                className="h-9 w-9 bg-primary/20 rounded-full"
                 animate={{ opacity: [0.4, 0.8, 0.4] }}
                 transition={{
                   duration: 1.5,
@@ -38,10 +38,10 @@ export function ConversationHistorySkeleton({ messageCount = 4 }: ConversationHi
 
             {/* Message content skeleton with shimmer */}
             <div className="flex-1 min-w-0">
-              <div className="bg-[#f7f7f7] dark:bg-[#1a1a1a] border border-black/10 dark:border-white/10 rounded-2xl rounded-bl-md px-4 py-3 relative overflow-hidden">
+              <div className="bg-card border border-border rounded-2xl rounded-bl-md px-4 py-3 relative overflow-hidden">
                 <div className="space-y-2">
                   <motion.div
-                    className={`h-4 bg-current/20 rounded ${messageLengths[index % messageLengths.length]}`}
+                    className={`h-4 bg-muted rounded ${messageLengths[index % messageLengths.length]}`}
                     animate={{ opacity: [0.3, 0.7, 0.3] }}
                     transition={{
                       duration: 1.2,
@@ -50,7 +50,7 @@ export function ConversationHistorySkeleton({ messageCount = 4 }: ConversationHi
                     }}
                   />
                   <motion.div
-                    className="h-4 bg-current/15 rounded w-32"
+                    className="h-4 bg-muted/60 rounded w-32"
                     animate={{ opacity: [0.2, 0.6, 0.2] }}
                     transition={{
                       duration: 1.2,
@@ -61,7 +61,7 @@ export function ConversationHistorySkeleton({ messageCount = 4 }: ConversationHi
                 </div>
 
                 <motion.div
-                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent"
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-muted/30 to-transparent"
                   animate={{ x: ["-100%", "100%"] }}
                   transition={{
                     duration: 2,

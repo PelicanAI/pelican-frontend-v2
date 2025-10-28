@@ -45,10 +45,10 @@ function getCellClass(value: any, type?: string, isFirstColumn?: boolean): strin
   }
 
   if (isFirstColumn) {
-    return `${base} font-medium text-gray-900 dark:text-gray-100 ${sticky}`.trim()
+    return `${base} font-medium text-foreground ${sticky}`.trim()
   }
 
-  return `${base} text-gray-900 dark:text-gray-100`.trim()
+  return `${base} text-foreground`.trim()
 }
 
 // Helper: Check if data is legacy arrow format
@@ -93,7 +93,7 @@ export function DataTable({ data, columns, title = "Market Data", query, summary
   }, [data])
 
   return (
-    <div className="my-6 rounded-xl border border-purple-200 bg-gradient-to-br from-purple-50/40 via-white to-purple-50/20 p-8 shadow-xl dark:bg-gray-900 dark:border-gray-700 relative overflow-hidden">
+    <div className="my-6 rounded-xl border border-border bg-card p-8 shadow-xl relative overflow-hidden">
 
       {/* LARGE PROMINENT WATERMARK - 30% opacity, no blur */}
       <div className="absolute inset-0 flex items-center justify-center opacity-30 pointer-events-none overflow-hidden">
@@ -111,31 +111,31 @@ export function DataTable({ data, columns, title = "Market Data", query, summary
         {/* Header with logo and branding */}
         <div className="mb-6 flex items-center gap-3">
           <img src="/pelican-logo.png" alt="Pelican" className="h-12 w-12" />
-          <span className="text-2xl font-bold text-gray-900 dark:text-gray-100">Pelican</span>
+          <span className="text-2xl font-bold text-foreground">Pelican</span>
         </div>
 
         {/* User's query (if provided by AI) */}
         {query && (
-          <p className="mb-6 text-lg font-medium text-gray-800 dark:text-gray-200 leading-relaxed">
+          <p className="mb-6 text-lg font-medium text-foreground leading-relaxed">
             {query}
           </p>
         )}
 
         {/* Title (if different from query) */}
         {title && title !== query && (
-          <h3 className="mb-4 text-lg font-semibold text-gray-800 dark:text-gray-200">{title}</h3>
+          <h3 className="mb-4 text-lg font-semibold text-foreground">{title}</h3>
         )}
 
         {/* Table */}
         <div className="overflow-x-auto rounded-lg">
           <table className="w-full border-collapse" aria-label="Market data visualization">
             <thead>
-              <tr className="border-b-2 border-gray-300 dark:border-gray-700">
+              <tr className="border-b-2 border-border">
                 {displayColumns.map((col, i) => (
                   <th
                     key={col.key}
                     className={cn(
-                      "px-4 py-3 text-base font-semibold text-gray-900 dark:text-gray-300",
+                      "px-4 py-3 text-base font-semibold text-foreground",
                       i === 0 && "sticky left-0 bg-transparent",
                       col.align === 'center' ? 'text-center' :
                       col.align === 'right' ? 'text-right' : 'text-left'
@@ -151,8 +151,8 @@ export function DataTable({ data, columns, title = "Market Data", query, summary
                 <tr
                   key={i}
                   className={cn(
-                    "border-b border-gray-200 dark:border-gray-700 transition",
-                    i % 2 === 0 ? "bg-white/40" : "bg-purple-50/20"
+                    "border-b border-border transition",
+                    i % 2 === 0 ? "bg-card" : "bg-muted/20"
                   )}
                 >
                   {displayColumns.map((col, colIndex) => {
@@ -188,7 +188,7 @@ export function DataTable({ data, columns, title = "Market Data", query, summary
 
             {/* Summary row - either from props or calculated for legacy format */}
             {(summary || stats) && (
-              <tfoot className="bg-purple-100/80 dark:bg-purple-900/30 border-t-2 border-purple-300 dark:border-purple-700">
+              <tfoot className="bg-primary/10 border-t-2 border-primary/30">
                 <tr>
                   {summary ? (
                     // Structured format summary
@@ -196,7 +196,7 @@ export function DataTable({ data, columns, title = "Market Data", query, summary
                       <td
                         key={col.key}
                         className={cn(
-                          "px-4 py-4 text-sm font-bold text-gray-900 dark:text-gray-200",
+                          "px-4 py-4 text-sm font-bold text-foreground",
                           i === 0 && "sticky left-0 bg-inherit"
                         )}
                       >
@@ -206,9 +206,9 @@ export function DataTable({ data, columns, title = "Market Data", query, summary
                   ) : stats ? (
                     // Legacy format stats
                     <td colSpan={displayColumns.length} className="px-4 py-4">
-                      <div className="flex gap-6 text-sm font-bold text-gray-900 dark:text-gray-200">
-                        <span>Avg Return: <span className="text-purple-600 dark:text-purple-400">{stats.avgReturn}</span></span>
-                        <span>Positive: <span className="text-purple-600 dark:text-purple-400">{stats.percentPositive}</span></span>
+                      <div className="flex gap-6 text-sm font-bold text-foreground">
+                        <span>Avg Return: <span className="text-primary">{stats.avgReturn}</span></span>
+                        <span>Positive: <span className="text-primary">{stats.percentPositive}</span></span>
                       </div>
                     </td>
                   ) : null}
@@ -222,7 +222,7 @@ export function DataTable({ data, columns, title = "Market Data", query, summary
         {onToggle && (
           <button
             onClick={onToggle}
-            className="mt-4 text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 underline"
+            className="mt-4 text-xs text-muted-foreground hover:text-foreground underline"
           >
             View Raw Text
           </button>

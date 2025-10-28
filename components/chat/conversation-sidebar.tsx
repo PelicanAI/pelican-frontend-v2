@@ -7,6 +7,12 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import {
   Plus,
   Search,
   MessageSquare,
@@ -21,6 +27,8 @@ import {
   User,
   PanelLeftClose,
   LogOut,
+  MoreVertical,
+  MoreHorizontal,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useConversations } from "@/hooks/use-conversations"
@@ -28,8 +36,6 @@ import Link from "next/link"
 import Image from "next/image"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { motion, stagger, useAnimate } from "framer-motion"
-import { Switch } from "@/components/ui/switch"
-import { Label } from "@/components/ui/label"
 
 interface Conversation {
   id: string
@@ -131,7 +137,7 @@ export function ConversationSidebar({
   const [showArchived, setShowArchived] = useState(false)
   const [scope, animate] = useAnimate()
 
-  const { conversations, isLoading, deleteConversation, updateConversation } = useConversations()
+  const { list: conversations, isLoading, deleteConversation, updateConversation } = useConversations()
 
   const filteredConversations = useMemo(() => {
     return conversations.filter((conv) => {
@@ -221,7 +227,6 @@ export function ConversationSidebar({
     const isActive = currentConversationId === conversation.id
     const lastMessage = conversation.messages?.[conversation.messages.length - 1]
     const preview = lastMessage?.content?.slice(0, 50) + ((lastMessage?.content?.length ?? 0) > 50 ? "..." : "") || ""
-    const [showActions, setShowActions] = useState(false)
 
     return (
       <motion.div
@@ -240,7 +245,7 @@ export function ConversationSidebar({
             "min-h-[64px] px-3 py-2.5 flex items-center gap-3",
             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-sidebar",
             isActive && [
-              "bg-purple-500/10 border border-purple-500/20",
+              "bg-primary/10 border border-primary/20",
             ],
             !isActive && "hover:bg-sidebar-accent/50 border border-transparent",
             conversation.archived && "opacity-60",
@@ -257,8 +262,6 @@ export function ConversationSidebar({
               onConversationSelect?.(conversation.id)
             }
           }}
-          onMouseEnter={() => setShowActions(true)}
-          onMouseLeave={() => setShowActions(false)}
         >
           <div className="flex-1 min-w-0">
             {editingId === conversation.id ? (
@@ -274,7 +277,7 @@ export function ConversationSidebar({
                   }
                 }}
                 onClick={(e) => e.stopPropagation()}
-                className="h-6 text-sm bg-transparent border-purple-500/30 focus:border-purple-500"
+                className="h-6 text-sm bg-transparent border-primary/30 focus:border-primary"
                 autoFocus
               />
             ) : (
@@ -286,7 +289,7 @@ export function ConversationSidebar({
                         dangerouslySetInnerHTML={{
                           __html: conversation.title.replace(
                             new RegExp(`(${searchQuery})`, "gi"),
-                            '<mark class="bg-purple-500/20 text-purple-300">$1</mark>',
+                            '<mark class="bg-primary/20 text-primary">$1</mark>',
                           ),
                         }}
                       />
@@ -307,37 +310,39 @@ export function ConversationSidebar({
               </div>
             )}
           </div>
-          <motion.div
-            className="flex items-center gap-0.5 flex-shrink-0"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: showActions || isActive ? 1 : 0, scale: showActions || isActive ? 1 : 0.9 }}
-            transition={{ duration: 0.15 }}
-          >
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={(e) => {
-                e.stopPropagation()
-                startEditing(conversation)
-              }}
-              className="h-7 w-7 hover:bg-sidebar-accent/70"
-              title="Edit conversation"
-            >
-              <Edit3 className="h-3.5 w-3.5" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={(e) => {
-                e.stopPropagation()
-                handleDeleteConversation(conversation.id)
-              }}
-              className="h-7 w-7 hover:bg-red-500/20 text-red-400 hover:text-red-300"
-              title="Delete conversation"
-            >
-              <Trash2 className="h-3.5 w-3.5" />
-            </Button>
-          </motion.div>
+          <div className="flex items-center gap-0.5 flex-shrink-0 opacity-0 group-hover:opacity-100 data-[active=true]:opacity-100 transition-opacity duration-150" data-active={isActive}>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                  }}
+                  className="h-7 w-7 hover:bg-sidebar-accent/70"
+                  title="More actions"
+                >
+                  <MoreVertical className="h-3.5 w-3.5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-40 z-[100]">
+                <DropdownMenuItem onSelect={(e) => {
+                    e.preventDefault()
+                    startEditing(conversation)
+                  }}>
+                  <Edit3 className="h-3.5 w-3.5 mr-2" />
+                  Rename
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={(e) => {
+                    e.preventDefault()
+                    handleDeleteConversation(conversation.id)
+                  }} className="text-red-400 focus:text-red-300 focus:bg-red-500/20">
+                  <Trash2 className="h-3.5 w-3.5 mr-2" />
+                  Delete
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
       </motion.div>
     )
@@ -368,7 +373,7 @@ export function ConversationSidebar({
             title="Go to home page"
           >
             <Image src="/pelican-logo.png" alt="PelicanAI" width={28} height={28} className="w-7 h-7 object-contain group-hover:scale-110 transition-transform duration-200" />
-            <span className="font-bold text-base bg-gradient-to-r from-purple-600 to-purple-700 bg-clip-text text-transparent">
+            <span className="font-bold text-base text-primary">
               PelicanAI
             </span>
           </Link>
@@ -393,10 +398,10 @@ export function ConversationSidebar({
           <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
             <Button
               onClick={onNewConversation}
-              className="w-full h-10 px-4 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white text-sm font-medium shadow-lg hover:shadow-purple-500/30 transition-all duration-200 relative overflow-hidden group"
+              className="w-full h-10 px-4 bg-gradient-to-r from-purple-600 via-violet-600 to-purple-600 hover:from-purple-700 hover:via-violet-700 hover:to-purple-700 text-white text-sm font-medium shadow-lg shadow-purple-900/30 transition-all duration-200 relative overflow-hidden group"
             >
               <motion.div
-                className="absolute inset-0 bg-white/20 rounded-full scale-0 group-active:scale-100"
+                className="absolute inset-0 bg-white/10 rounded-lg scale-0 group-active:scale-100"
                 transition={{ duration: 0.2 }}
               />
               <Plus className="w-4 h-4 mr-2" />
@@ -413,7 +418,7 @@ export function ConversationSidebar({
             placeholder="Search conversations..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="h-10 pl-10 pr-3 bg-sidebar/50 border-sidebar-border/50 text-sidebar-foreground text-sm placeholder:text-muted-foreground focus:border-purple-500/50 transition-colors duration-200 rounded-lg"
+            className="h-10 pl-10 pr-3 bg-sidebar/50 border-sidebar-border/50 text-sidebar-foreground text-sm placeholder:text-muted-foreground focus:border-primary/50 transition-colors duration-200 rounded-lg"
           />
         </div>
       </div>
@@ -423,7 +428,7 @@ export function ConversationSidebar({
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
               <motion.div
-                className="animate-spin rounded-full h-6 w-6 border-b-2 border-purple-500"
+                className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"
                 animate={{ rotate: 360 }}
                 transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
               />
@@ -496,31 +501,7 @@ export function ConversationSidebar({
           )}
         </div>
       </ScrollArea>
-      
-      {/* Guest Mode Toggle */}
-      <div className="px-3 py-2 border-t border-sidebar-border/30">
-        <div className="flex items-center space-x-2">
-          <Switch 
-            id="guest-mode" 
-            checked={typeof window !== 'undefined' && localStorage.getItem('pelican_guest_mode') === 'true'}
-            onCheckedChange={(enabled) => {
-              if (typeof window !== 'undefined') {
-                localStorage.setItem('pelican_guest_mode', enabled.toString())
-                window.location.reload()
-              }
-            }}
-          />
-          <Label htmlFor="guest-mode" className="text-xs text-sidebar-foreground">
-            Guest Mode
-          </Label>
-        </div>
-        <p className="text-[10px] text-muted-foreground mt-1">
-          {typeof window !== 'undefined' && localStorage.getItem('pelican_guest_mode') === 'true'
-            ? "Conversations won't be saved"
-            : "Conversations will be saved"}
-        </p>
-      </div>
-      
+
       {/* Footer - 12px padding */}
       <div className="px-3 py-3 border-t border-sidebar-border/30">
         <div className="flex items-center gap-2">
@@ -531,9 +512,9 @@ export function ConversationSidebar({
             className="flex-1 justify-start h-10 px-3 hover:bg-sidebar-accent/50 group"
           >
             <Link href="/profile" className="flex items-center gap-3">
-              <Avatar className="w-8 h-8 ring-2 ring-sidebar-border/50 group-hover:ring-purple-500/30 transition-all">
+              <Avatar className="w-8 h-8 ring-2 ring-sidebar-border/50 group-hover:ring-primary/30 transition-all">
                 <AvatarImage src="/placeholder-user.jpg" />
-                <AvatarFallback className="bg-purple-500/20 text-purple-300">
+                <AvatarFallback className="bg-primary/20 text-primary">
                   <User className="w-4 h-4" />
                 </AvatarFallback>
               </Avatar>

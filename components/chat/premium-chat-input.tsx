@@ -341,10 +341,10 @@ export const PremiumChatInput = forwardRef<PremiumChatInputRef, PremiumChatInput
         <div className="pb-safe-area-inset-bottom">
           <div
             className={cn(
-              "backdrop-blur-xl border-t border-white/10",
+              "backdrop-blur-xl border-t border-border",
               "shadow-[0_-2px_24px_rgba(0,0,0,0.15)]",
               "transition-all duration-200",
-              isDarkMode ? "bg-gray-950/80" : "bg-white/80",
+              "bg-background/80",
             )}
           >
             <div
@@ -446,11 +446,11 @@ export const PremiumChatInput = forwardRef<PremiumChatInputRef, PremiumChatInput
                     "shadow-sm hover:shadow-md",
                     isFocused &&
                       inputState === "default" &&
-                      "border-purple-500/30 shadow-[0_0_0_3px_rgba(147,51,234,0.1)]",
+                      "border-primary/30 shadow-[0_0_0_3px_rgba(147,51,234,0.1)]",
                     inputState === "error" && "border-red-500/50 animate-shake",
                     inputState === "rate-limited" && "border-orange-500/50",
-                    inputState === "default" && !isFocused && "border-transparent",
-                    isDarkMode ? "bg-white/5" : "bg-white/50",
+                    inputState === "default" && !isFocused && "border-border",
+                    "bg-card",
                   )}
                 >
                   <div className="flex items-center absolute left-4 top-1/2 -translate-y-1/2 gap-1 z-10">
@@ -461,7 +461,7 @@ export const PremiumChatInput = forwardRef<PremiumChatInputRef, PremiumChatInput
                       disabled={disabled}
                       className={cn(
                         "w-8 h-8 transition-all duration-150",
-                        "hover:bg-gray-100 dark:hover:bg-white/10",
+                        "hover:bg-muted",
                         "active:scale-95",
                       )}
                     >
@@ -480,7 +480,7 @@ export const PremiumChatInput = forwardRef<PremiumChatInputRef, PremiumChatInput
                         disabled={disabled}
                         className={cn(
                           "w-8 h-8 transition-all duration-150",
-                          "hover:bg-gray-100 dark:hover:bg-white/10",
+                          "hover:bg-muted",
                           "active:scale-95",
                           isRecording && "bg-red-100 dark:bg-red-900/20",
                         )}
@@ -524,9 +524,7 @@ export const PremiumChatInput = forwardRef<PremiumChatInputRef, PremiumChatInput
                         "py-4",
                         isMobile ? "pl-20 pr-16" : "pl-14 pr-16",
                         "placeholder:opacity-40",
-                        isDarkMode
-                          ? "text-white placeholder:text-white/40"
-                          : "text-gray-900 placeholder:text-gray-500/40",
+                        "text-foreground placeholder:text-muted-foreground",
                         inputState === "rate-limited" && "opacity-50 cursor-not-allowed",
                       )}
                       rows={1}
@@ -555,7 +553,7 @@ export const PremiumChatInput = forwardRef<PremiumChatInputRef, PremiumChatInput
                             )}
                           >
                             <span className="invisible">{message}</span>
-                            <span className={cn("opacity-40", isDarkMode ? "text-white/40" : "text-gray-500/40")}>
+                            <span className={cn("opacity-40", "text-muted-foreground")}>
                               {currentSuggestion.text.slice(message.length)}
                             </span>
                           </div>
@@ -579,8 +577,8 @@ export const PremiumChatInput = forwardRef<PremiumChatInputRef, PremiumChatInput
                         isAIResponding
                           ? "bg-red-500 hover:bg-red-600 text-white animate-pulse"
                           : isSendDisabled || inputState !== "default"
-                            ? "bg-gray-500/30 text-gray-400 cursor-not-allowed opacity-30"
-                            : "bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white shadow-lg",
+                            ? "bg-muted text-muted-foreground cursor-not-allowed opacity-30"
+                            : "bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg",
                       )}
                     >
                       <motion.div
@@ -604,7 +602,7 @@ export const PremiumChatInput = forwardRef<PremiumChatInputRef, PremiumChatInput
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="text-xs text-gray-500 dark:text-gray-400"
+                        className="text-xs text-muted-foreground"
                       >
                         <span className="hidden md:inline">
                           ⌘Enter to send • Tab to accept • / for commands • Esc to clear
@@ -618,7 +616,7 @@ export const PremiumChatInput = forwardRef<PremiumChatInputRef, PremiumChatInput
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="text-xs text-purple-500 dark:text-purple-400 font-medium"
+                        className="text-xs text-primary font-medium"
                       >
                         Press Tab to accept suggestion
                       </motion.div>
@@ -647,7 +645,7 @@ export const PremiumChatInput = forwardRef<PremiumChatInputRef, PremiumChatInput
                             ? "text-red-500 font-semibold"
                             : characterCount >= UI.PREMIUM_CHAR_COUNT_WARNING_THRESHOLD
                               ? "text-yellow-500 font-medium"
-                              : "text-gray-500 dark:text-gray-400",
+                              : "text-muted-foreground",
                         )}
                       >
                         {characterCount.toLocaleString()}/{UI.PREMIUM_MAX_CHARS.toLocaleString()}

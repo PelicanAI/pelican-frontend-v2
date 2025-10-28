@@ -57,8 +57,10 @@ export function useConversationRouter({
         latestId = localStorage.getItem(STORAGE_KEYS.LAST_CONVERSATION)
       }
 
-      const id = latestId || (await createConversation("New Chat")).id
-      router.replace(`${ROUTES.CHAT}?conversation=${encodeURIComponent(id)}`, { scroll: false })
+      const id = latestId || (await createConversation("New Chat"))?.id
+      if (id) {
+        router.replace(`${ROUTES.CHAT}?conversation=${encodeURIComponent(id)}`, { scroll: false })
+      }
     })()
   }, [searchParams, user, guestMode, conversations, createConversation, router])
 
@@ -134,6 +136,12 @@ export function useConversationRouter({
       console.log("🔵 [New Chat] Creating new conversation...")
       // Create new conversation FIRST (before any state changes)
       const newConversation = await createConversation("New Chat")
+      
+      if (!newConversation) {
+        console.error("🔴 [New Chat] Failed to create conversation")
+        return
+      }
+      
       console.log("🔵 [New Chat] Created:", newConversation.id)
 
       // Store the old conversation ID for archiving AFTER navigation

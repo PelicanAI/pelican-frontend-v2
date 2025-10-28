@@ -194,7 +194,7 @@ export function TradingTemplates({ onTemplateSelect, className }: TradingTemplat
   const categories = {
     journal: { name: "Trade Journal", color: "bg-blue-500/10 text-blue-700 dark:text-blue-300" },
     analysis: { name: "Market Analysis", color: "bg-green-500/10 text-green-700 dark:text-green-300" },
-    review: { name: "Performance Review", color: "bg-purple-500/10 text-purple-700 dark:text-purple-300" },
+    review: { name: "Performance Review", color: "bg-primary/10 text-primary" },
   }
 
   const handleTemplateClick = (template: TradingTemplate) => {
@@ -288,7 +288,7 @@ export function TradingTemplates({ onTemplateSelect, className }: TradingTemplat
             {templates.map((template) => (
               <Card
                 key={template.id}
-                className="p-4 cursor-pointer hover:bg-muted/50 transition-colors"
+                className="p-4 cursor-pointer hover:bg-muted transition-colors"
                 onClick={() => handleTemplateClick(template)}
               >
                 <div className="space-y-2">

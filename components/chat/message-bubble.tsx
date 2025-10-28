@@ -233,25 +233,23 @@ export function MessageBubble({
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        {/* User message with bubble - right-aligned */}
+        {/* User message - clean, no bubble, right-aligned */}
         <div className="max-w-3xl mx-auto px-8">
           <div className="flex gap-6 items-start justify-end">
-            {/* Message bubble */}
+            {/* Message content */}
             <div className="max-w-[700px]">
-              <div className="bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-2xl px-4 py-3 shadow-lg shadow-purple-500/20">
+              <div className="text-base leading-relaxed break-words text-foreground">
                 {renderAttachments(message.attachments)}
-                <div className="text-base leading-relaxed break-words">
-                  {message.content}
-                </div>
+                {message.content}
               </div>
-              
+
               {/* Action buttons - always visible */}
               <div className="flex items-center gap-2 mt-2 justify-end">
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={handleQuickCopy}
-                  className="h-7 px-2 text-xs text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
+                  className="h-7 px-2 text-xs text-muted-foreground hover:text-foreground"
                   title="Copy message"
                 >
                   {copied ? <Check className="h-3 w-3 mr-1" /> : <Copy className="h-3 w-3 mr-1" />}
@@ -259,16 +257,8 @@ export function MessageBubble({
                 </Button>
               </div>
             </div>
-            
-            {/* User avatar */}
-            <div className="flex-shrink-0">
-              <Avatar className="h-8 w-8">
-                <AvatarImage src="/placeholder-user.jpg" alt="You" />
-                        <AvatarFallback className="bg-gradient-to-r from-purple-600 to-purple-700 text-white text-sm font-medium">
-                  You
-                </AvatarFallback>
-              </Avatar>
-            </div>
+
+            {/* User avatar - hidden per requirements */}
           </div>
         </div>
       </motion.div>
@@ -291,16 +281,17 @@ export function MessageBubble({
         <div className="flex gap-6 items-start">
           {/* AI avatar */}
           <div className="flex-shrink-0">
-            <Avatar className="h-8 w-8">
-              <AvatarImage src="/ai-avatar.jpg" alt="Pelican AI" className="object-cover" />
-              <AvatarFallback className="bg-gradient-to-br from-purple-600 to-purple-700 text-white text-sm font-medium">P</AvatarFallback>
-            </Avatar>
+            <img
+              src="/pelican-logo.png"
+              alt="Pelican AI"
+              className="w-8 h-8 object-contain"
+            />
           </div>
-          
+
           {/* Message content - plain text, no bubble */}
           <div className="flex-1 min-w-0 max-w-[700px]">
             {renderAttachments(message.attachments)}
-            <div className="text-base leading-relaxed text-gray-900 dark:text-gray-100">
+            <div className="text-base leading-relaxed text-foreground">
               <MessageContent
                 content={message.content}
                 isStreaming={isStreaming}
@@ -308,14 +299,14 @@ export function MessageBubble({
                 isDarkMode={isDarkMode}
               />
             </div>
-            
+
             {/* Action buttons - always visible */}
             <div className="flex items-center gap-2 mt-3 pt-2">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={handleQuickCopy}
-                className="h-7 px-2 text-xs text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
+                className="h-7 px-2 text-xs text-muted-foreground hover:text-foreground"
                 title="Copy message"
               >
                 {copied ? <Check className="h-3 w-3 mr-1" /> : <Copy className="h-3 w-3 mr-1" />}
@@ -412,8 +403,7 @@ function MessageContent({
                 transition={{ duration: 0.3, delay: index * 0.03 }}
                 className={cn(
                   "relative group my-3 rounded-lg border overflow-hidden font-mono",
-                  "bg-white border-gray-200",
-                  "dark:bg-gray-950 dark:border-gray-800",
+                  "bg-muted/30 border-border",
                 )}
               >
                 <div className="relative">

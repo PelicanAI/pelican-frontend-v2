@@ -5,22 +5,17 @@ import { streamWithRetry } from "@/lib/api-retry"
 import { sanitizeMessage, sanitizeTitle } from "@/lib/sanitize"
 import { logger } from "@/lib/logger"
 import { AuthenticationError, ValidationError, ExternalAPIError, getUserFriendlyError } from "@/lib/errors"
-import { extractTradingMetadata, getTradingSessionId } from "@/lib/trading-metadata"
-
-interface Message {
-  role: "user" | "assistant" | "system"
-  content: string
-}
+import { getTradingSessionId } from "@/lib/trading-metadata"
 
 interface ChatRequest {
-  messages: Message[]
+  message: string
   conversationId?: string
   stream?: boolean
   temperature?: number
   max_tokens?: number
   guestMode?: boolean
   guestUserId?: string
-  isFirstMessage?: boolean
+  fileIds?: string[]
 }
 
 function generateGuestUUID(): string {
@@ -40,19 +35,16 @@ export async function POST(req: NextRequest) {
   try {
     const signal = req.signal // Extract AbortController signal from request
 
-    const { messages, conversationId, guestMode, guestUserId, isFirstMessage }: ChatRequest = await req.json()
-    
-    // Debug: Log effectiveUserId at the start
-    console.log("[DEBUG] Starting POST function - effectiveUserId will be determined")
+    const { message, conversationId, guestMode, guestUserId, fileIds }: ChatRequest = await req.json()
 
-    if (!messages || !Array.isArray(messages) || messages.length === 0) {
-      throw new ValidationError("Messages array is required and must not be empty", "Please provide a message to send.")
+    if (!message || message.trim().length === 0) {
+      return new Response(JSON.stringify({ error: "Message cannot be empty" }), {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      })
     }
 
-    const sanitizedMessages = messages.map((msg) => ({
-      ...msg,
-      content: sanitizeMessage(msg.content, LIMITS.CHAT_MAX_TOKENS),
-    }))
+    const userMessage = sanitizeMessage(message, LIMITS.CHAT_MAX_TOKENS)
 
     const supabase = await createClient()
 
@@ -72,12 +64,8 @@ export async function POST(req: NextRequest) {
       effectiveUserId = guestUserId || generateGuestUUID()
       logger.info("Guest mode active", { userId: effectiveUserId })
     }
-    
-    // Debug: Log effectiveUserId after determination
-    console.log("[DEBUG] effectiveUserId determined:", effectiveUserId)
 
-    if (!activeConversationId && isFirstMessage && effectiveUserId && !guestMode) {
-      const userMessage = sanitizedMessages[sanitizedMessages.length - 1]?.content || ""
+    if (!activeConversationId && effectiveUserId && !guestMode) {
       const title = sanitizeTitle(userMessage, LIMITS.TITLE_PREVIEW_LENGTH)
 
       const { data: newConversation, error: createError } = await supabase
@@ -118,155 +106,25 @@ export async function POST(req: NextRequest) {
     const endpoint = `${apiUrl}/api/pelican_response`
     logger.info("Using Pelican API endpoint", { endpoint })
 
-    const userMessage = sanitizedMessages[sanitizedMessages.length - 1]?.content || ""
-
-    if (!userMessage || userMessage.length === 0) {
-      throw new ValidationError("Message content is empty after sanitization", "Your message appears to be empty. Please enter a message.")
-    }
-
-    let conversationContext: Message[] = []
-
-    if (
-      activeConversationId &&
-      effectiveUserId &&
-      !guestMode &&
-      !activeConversationId.startsWith("temp-") &&
-      !activeConversationId.startsWith("guest-")
-    ) {
-        // Primary query - with user_id for security
-        console.log("[DEBUG] Querying messages with:", { 
-          conversationId: activeConversationId, 
-          userId: effectiveUserId,
-          userIdType: typeof effectiveUserId,
-          userIdLength: effectiveUserId?.length 
-        })
-        
-        let { data: allMessages, error: messagesError } = await supabase
-          .from("messages")
-          .select("role, content, created_at, user_id, conversation_id")
-          .eq("conversation_id", activeConversationId)
-          .eq("user_id", effectiveUserId)
-          .order("created_at", { ascending: false })
-          .limit(LIMITS.MESSAGE_CONTEXT)
-        
-        // Debug: Log detailed results from DB
-        console.log("[DEBUG] Messages from DB:", allMessages?.length || 0)
-        console.log("[DEBUG] Query error:", messagesError)
-        if (allMessages && allMessages.length > 0) {
-          console.log("[DEBUG] Sample message:", {
-            id: allMessages[0].id,
-            userId: allMessages[0].user_id,
-            conversationId: allMessages[0].conversation_id,
-            role: allMessages[0].role
-          })
-        }
-
-      if (messagesError) {
-        logger.error("Failed to fetch conversation context", messagesError, {
-          conversationId: activeConversationId,
-          userId: effectiveUserId,
-        })
-      }
-
-      // Fallback if no messages found but conversation exists
-      if ((!allMessages || allMessages.length === 0) && activeConversationId) {
-        logger.info("Primary query returned no messages, trying conversation-based query", {
-          conversationId: activeConversationId,
-          userId: effectiveUserId,
-        })
-        
-        // Check if user owns this conversation
-        const { data: conversationCheck } = await supabase
-          .from("conversations")
-          .select("user_id")
-          .eq("id", activeConversationId)
-          .single()
-        
-        // Only proceed if user owns the conversation
-        if (conversationCheck && conversationCheck.user_id === effectiveUserId) {
-          console.log("[DEBUG] User owns conversation, trying fallback query")
-          const { data: fallbackMessages } = await supabase
-            .from("messages")
-            .select("role, content, created_at, user_id, conversation_id")
-            .eq("conversation_id", activeConversationId)
-            .order("created_at", { ascending: false })
-            .limit(LIMITS.MESSAGE_CONTEXT)
-          
-          console.log("[DEBUG] Fallback query results:", fallbackMessages?.length || 0)
-          
-          if (fallbackMessages && fallbackMessages.length > 0) {
-            allMessages = fallbackMessages
-            logger.info("Fallback query retrieved messages", {
-              conversationId: activeConversationId,
-              messageCount: fallbackMessages.length,
-            })
-            console.log("[DEBUG] Fallback sample message:", {
-              userId: fallbackMessages[0].user_id,
-              conversationId: fallbackMessages[0].conversation_id,
-              role: fallbackMessages[0].role
-            })
-          }
-        } else {
-          console.log("[DEBUG] User does not own conversation:", {
-            effectiveUserId,
-            conversationOwner: conversationCheck?.user_id,
-            userIdMatch: conversationCheck?.user_id === effectiveUserId
-          })
-          logger.warn("User does not own conversation, skipping fallback", {
-            conversationId: activeConversationId,
-            userId: effectiveUserId,
-            conversationOwner: conversationCheck?.user_id,
-          })
-        }
-      }
-
-      if (allMessages && allMessages.length > 0) {
-        // Reverse to chronological order (oldest first) for context
-        conversationContext = allMessages.reverse().map((msg: any) => ({
-          role: msg.role,
-          content: msg.content,
-        }))
-        logger.info("Retrieved conversation context", {
-          conversationId: activeConversationId,
-          messageCount: allMessages.length,
-          userId: effectiveUserId,
-        })
-      } else {
-        logger.info("No conversation context found", {
-          conversationId: activeConversationId,
-          userId: effectiveUserId,
-        })
-      }
-    }
-
     // Generate trading session ID for memory continuity
     const sessionId = effectiveUserId ? getTradingSessionId(effectiveUserId) : null
 
+    // TODO: Backend will fetch conversation context using conversation_id
+    // TODO: Backend will extract and save trading metadata
+    // TODO: Backend will update message metadata in Supabase after processing
+    
     const requestBody = {
       message: userMessage,
-      conversationHistory: conversationContext,
       user_id: effectiveUserId || "anonymous",
-      session_id: sessionId,
       conversation_id: activeConversationId || null,
       timestamp: new Date().toISOString(),
       stream: true,
     }
     
-    // Debug: Log the full request body being sent to backend
-    console.log("[DEBUG] Sending to backend:", JSON.stringify({ message: userMessage, sessionId, conversationHistory: conversationContext, userId: effectiveUserId }, null, 2))
-
-    // Debug: Log final context length
-    console.log("[DEBUG] FINAL contextLength:", conversationContext.length)
-    console.log("[DEBUG] Context messages:", conversationContext.map(msg => ({ role: msg.role, contentLength: msg.content.length })))
-    
-    logger.info("Calling Pelican API", {
-      userId: effectiveUserId || "anonymous",
-      messageLength: userMessage.length,
-      contextLength: conversationContext.length,
+    logger.info("Sending request to backend", {
       conversationId: activeConversationId,
-      sessionId: sessionId,
-      firstMessage: conversationContext[0]?.content?.substring(0, 50) || "none",
-      lastMessage: conversationContext[conversationContext.length - 1]?.content?.substring(0, 50) || "none",
+      userId: effectiveUserId,
+      messageLength: userMessage.length,
     })
 
     const response = await streamWithRetry(endpoint, {
@@ -454,24 +312,21 @@ async function saveMessagesToDatabase(
   reply: string,
   userId: string,
 ) {
-  // Extract trading metadata from user message
-  const userMetadata = extractTradingMetadata(userMessage)
-  const assistantMetadata = extractTradingMetadata(reply)
-
+  // Backend will handle metadata extraction
   const { data: insertData, error: insertError } = await supabase.from("messages").insert([
     {
       conversation_id: conversationId,
       user_id: userId,
       role: "user",
       content: userMessage,
-      metadata: userMetadata,
+      metadata: {},  // Backend will populate this
     },
     {
       conversation_id: conversationId,
       user_id: userId,
       role: "assistant",
       content: reply,
-      metadata: assistantMetadata,
+      metadata: {},  // Backend will populate this
     },
   ]).select()
 
@@ -485,19 +340,6 @@ async function saveMessagesToDatabase(
     })
   } else {
     logger.info("Messages saved to conversation", { conversationId, userId })
-    
-    // Debug: Verify stored messages
-    if (insertData && insertData.length > 0) {
-      const newMessageId = insertData[0].id
-      const { data: verify } = await supabase.from("messages").select("*").eq("id", newMessageId)
-      console.log("[DEBUG] Verification of stored message:", verify?.[0] ? {
-        id: verify[0].id,
-        conversation_id: verify[0].conversation_id,
-        user_id: verify[0].user_id,
-        role: verify[0].role,
-        hasContent: !!verify[0].content
-      } : "No message found")
-    }
 
     const { count: messageCount, error: countError } = await supabase
       .from("messages")

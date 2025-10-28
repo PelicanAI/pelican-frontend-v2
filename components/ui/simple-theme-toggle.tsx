@@ -38,8 +38,8 @@ export function SimpleThemeToggle({ onThemeChange }: SimpleThemeToggleProps) {
       onClick={toggleTheme}
       className={`border transition-colors ${
         isDark
-          ? "text-purple-300 hover:text-white hover:bg-purple-800/30 border-purple-700/30"
-          : "text-gray-600 hover:text-gray-900 hover:bg-gray-100 border-gray-300"
+          ? "text-primary hover:text-foreground hover:bg-primary/10 border-primary/30"
+          : "text-muted-foreground hover:text-foreground hover:bg-muted border-border"
       }`}
     >
       {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}

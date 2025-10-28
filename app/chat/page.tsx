@@ -186,54 +186,9 @@ export default function ChatPage() {
   }
 
   if (!user && !guestMode) {
-    return (
-      <div className="flex items-center justify-center min-h-screen p-6 bg-white">
-        <div className="text-center space-y-6 max-w-md">
-          <div className="space-y-2">
-            <h2 className="text-3xl font-bold text-foreground">Welcome to Pelican AI</h2>
-            <p className="text-lg text-muted-foreground">Your intelligent trading assistant</p>
-          </div>
-
-          <div className="space-y-3">
-            <Button
-              asChild
-              className="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 glow-button glow-primary"
-            >
-              <Link href="/auth/login">
-                Sign In
-              </Link>
-            </Button>
-            <Button asChild variant="secondary" className="w-full glow-button glow-secondary">
-              <Link href="/auth/signup">Create Account</Link>
-            </Button>
-          </div>
-
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t border-border" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">or</span>
-            </div>
-          </div>
-
-          <Button
-            onClick={() => {
-              localStorage.setItem('pelican_guest_mode', 'true')
-              setGuestMode(true)
-            }}
-            variant="outline"
-            className="w-full border-border hover:bg-accent hover:text-accent-foreground"
-          >
-            Try Demo Mode
-          </Button>
-
-          <p className="text-sm text-muted-foreground">
-            Demo mode allows you to try Pelican AI without an account. Conversations won't be saved.
-          </p>
-        </div>
-      </div>
-    )
+    // Redirect to login page if not authenticated
+    router.push('/auth/login')
+    return null
   }
 
   // Don't render anything until mounted (avoids hydration mismatch)
@@ -247,14 +202,21 @@ export default function ChatPage() {
   } else if (authLoading) {
     // Only show loading for non-guest users waiting for auth
     return (
-      <div className="flex items-center justify-center h-screen bg-white">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+      <div className="flex items-center justify-center h-screen bg-background">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     )
   }
 
   return (
-    <div className="flex h-screen bg-white overflow-hidden">
+    <div className="flex h-screen bg-background overflow-hidden relative">
+      {/* Futuristic background effects - only in dark mode */}
+      <div className="absolute inset-0 dark:block hidden pointer-events-none">
+        <div className="absolute inset-0 bg-gradient-to-br from-purple-950/10 via-black to-violet-950/10" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(124,58,237,0.08),transparent_50%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(139,92,246,0.06),transparent_50%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(124,58,237,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(124,58,237,0.02)_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_80%_80%_at_50%_50%,black,transparent)]" />
+      </div>
       {/* Offline indicator */}
       {showOfflineBanner && (
         <div className="fixed top-0 left-0 right-0 z-50 bg-amber-500 dark:bg-amber-600 text-white px-4 py-2 text-center text-sm font-medium shadow-lg">
@@ -312,7 +274,7 @@ export default function ChatPage() {
       </Sheet>
 
       <div className="flex-1 flex flex-col h-full min-w-0">
-        <div className="md:hidden border-b p-4 flex items-center justify-between bg-white border-border">
+        <div className="md:hidden border-b p-4 flex items-center justify-between bg-background border-border">
           <Sheet open={mobileSheetOpen} onOpenChange={setMobileSheetOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="sm" className="glow-button glow-ghost">
@@ -329,7 +291,7 @@ export default function ChatPage() {
 
         {/* Desktop sidebar toggle button - only show when sidebar is collapsed */}
         {sidebarCollapsed && (
-          <div className="hidden md:flex items-center justify-between p-4 border-b border-border bg-white">
+          <div className="hidden md:flex items-center justify-between p-4 border-b border-border bg-background">
             <Button
               variant="ghost"
               size="sm"
@@ -363,7 +325,7 @@ export default function ChatPage() {
             </div>
           </div>
 
-          <div className="bg-white border-t border-border pb-4">
+          <div className="bg-background border-t border-border pb-4">
             <div className="max-w-5xl mx-auto w-full px-3 py-3">
               <ChatInput
                 ref={chatInputRef}
@@ -415,7 +377,7 @@ export default function ChatPage() {
 
       {/* Show expand button when trading panel is collapsed */}
       {tradingPanelCollapsed && (
-        <div className="hidden xl:flex items-start p-2 bg-white border-l border-border">
+        <div className="hidden xl:flex items-start p-2 bg-background border-l border-border">
           <Button
             variant="ghost"
             size="sm"

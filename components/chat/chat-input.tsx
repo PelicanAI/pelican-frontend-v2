@@ -266,7 +266,7 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
             className={cn(
               "relative flex items-center gap-2 px-4 py-2",
               "bg-card",
-              "rounded-full",
+              "rounded-2xl",
               "border border-border",
               "transition-all duration-200",
               "shadow-md hover:shadow-lg",

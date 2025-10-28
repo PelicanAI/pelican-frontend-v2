@@ -144,7 +144,7 @@ interface QuickActionsProps {
 export function QuickActions({ onActionSelect, className }: QuickActionsProps) {
   const categories = {
     analysis: { name: "Market Analysis", color: "bg-blue-500/10 text-blue-700 dark:text-blue-300" },
-    psychology: { name: "Trading Psychology", color: "bg-purple-500/10 text-purple-700 dark:text-purple-300" },
+    psychology: { name: "Trading Psychology", color: "bg-primary/10 text-primary" },
     risk: { name: "Risk Management", color: "bg-orange-500/10 text-orange-700 dark:text-orange-300" },
     education: { name: "Education", color: "bg-green-500/10 text-green-700 dark:text-green-300" },
   }
@@ -183,7 +183,7 @@ export function QuickActions({ onActionSelect, className }: QuickActionsProps) {
             {actions.map((action) => (
               <Card
                 key={action.id}
-                className="p-4 cursor-pointer hover:bg-muted/50 transition-colors group"
+                className="p-4 cursor-pointer hover:bg-muted transition-colors group"
                 onClick={() => onActionSelect(action.prompt)}
               >
                 <div className="flex items-start gap-3">

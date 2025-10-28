@@ -57,31 +57,31 @@ const PremiumTextarea = React.forwardRef<HTMLTextAreaElement, PremiumTextareaPro
           "border-[1.5px] border-solid",
 
           // Background colors
-          isDarkMode ? "bg-white/[0.02]" : "bg-black/[0.02]",
+          "bg-card",
 
           // Border colors - default state
-          !isFocused && !isHovered && "border-white/[0.08]",
+          !isFocused && !isHovered && "border-border",
 
           !isFocused &&
             isHovered && [
-              "border-[rgba(139,92,246,0.3)]",
+              "border-primary/30",
               "shadow-[0_0_0_2px_rgba(139,92,246,0.08),0_0_12px_rgba(139,92,246,0.15)]",
-              isDarkMode ? "bg-[rgba(139,92,246,0.015)]" : "bg-[rgba(139,92,246,0.015)]",
+              "bg-primary/5",
               "transform scale-[1.005]",
             ],
 
           // Focus state
           isFocused && [
-            "border-[rgba(139,92,246,0.4)]",
+            "border-primary/40",
             "shadow-[0_0_0_3px_rgba(139,92,246,0.1)]",
-            isDarkMode ? "bg-[rgba(139,92,246,0.02)]" : "bg-[rgba(139,92,246,0.02)]",
+            "bg-primary/5",
           ],
 
           // Disabled state
-          "disabled:opacity-30 disabled:cursor-not-allowed disabled:border-white/[0.05]",
+          "disabled:opacity-30 disabled:cursor-not-allowed disabled:border-border",
 
           // Text and placeholder colors
-          isDarkMode ? "text-white placeholder:text-white/30" : "text-gray-900 placeholder:text-gray-600/30",
+          "text-foreground placeholder:text-muted-foreground",
 
           // Selection colors
           "selection:bg-purple-500 selection:text-white",
@@ -92,9 +92,9 @@ const PremiumTextarea = React.forwardRef<HTMLTextAreaElement, PremiumTextareaPro
           // Custom scrollbar
           "[&::-webkit-scrollbar]:w-[6px]",
           "[&::-webkit-scrollbar-track]:bg-transparent",
-          "[&::-webkit-scrollbar-thumb]:bg-purple-500/50",
+          "[&::-webkit-scrollbar-thumb]:bg-primary/50",
           "[&::-webkit-scrollbar-thumb]:rounded-full",
-          "[&::-webkit-scrollbar-thumb:hover]:bg-purple-500/70",
+          "[&::-webkit-scrollbar-thumb:hover]:bg-primary/70",
 
           className,
         )}
