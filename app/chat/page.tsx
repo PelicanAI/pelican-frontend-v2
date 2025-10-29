@@ -37,7 +37,6 @@ export default function ChatPage() {
   const [mobileSheetOpen, setMobileSheetOpen] = useState(false)
   const [isOnline, setIsOnline] = useState(true)
   const [showOfflineBanner, setShowOfflineBanner] = useState(false)
-  const [guestMode, setGuestMode] = useState(false)
   const [mounted, setMounted] = useState(false)
   const [tradingPanelCollapsed, setTradingPanelCollapsed] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -70,10 +69,6 @@ export default function ChatPage() {
   // Initialize after mount and monitor network status
   useEffect(() => {
     setMounted(true)
-    const stored = localStorage.getItem('pelican_guest_mode')
-    if (stored === 'true') {
-      setGuestMode(true)
-    }
 
     // Monitor online/offline status
     const handleOnline = () => {
@@ -126,14 +121,12 @@ export default function ChatPage() {
   const messageHandler = useMessageHandler({
     chatLoading,
     currentConversationId: conversationIdFromUrl,
-    guestMode,
     sendMessage,
     chatInputRef,
   })
 
   const conversationRouter = useConversationRouter({
     user,
-    guestMode,
     chatLoading,
     messages,
     stopGeneration,
@@ -147,18 +140,32 @@ export default function ChatPage() {
     messageHandler.setDraftConversationId(conversationRouter.currentConversationId || null)
   }, [conversationRouter.currentConversationId, messageHandler])
 
-  // Clear guest mode when user logs in
+  // Clear any old guest data from localStorage
   useEffect(() => {
-    if (user && guestMode) {
+    if (typeof window !== 'undefined') {
       localStorage.removeItem('pelican_guest_mode')
-      setGuestMode(false)
+      localStorage.removeItem('pelican_guest_user_id')
+      localStorage.removeItem('pelican_guest_conversations')
+      // Remove all guest message keys
+      Object.keys(localStorage).forEach(key => {
+        if (key.startsWith('pelican_guest_messages_')) {
+          localStorage.removeItem(key)
+        }
+      })
     }
-  }, [user, guestMode])
+  }, [])
+
+  // Clear guest conversation IDs from URL when user loads page
+  useEffect(() => {
+    if (conversationIdFromUrl && conversationIdFromUrl.startsWith('guest-')) {
+      // Guest conversation ID in URL - clear it and redirect
+      router.replace('/chat')
+    }
+  }, [conversationIdFromUrl, router])
 
   const fileUpload = useFileUpload({
     sendMessage,
     addSystemMessage,
-    guestMode,
     chatInputRef,
   })
 
@@ -185,8 +192,8 @@ export default function ChatPage() {
     setSettingsOpen(true)
   }
 
-  if (!user && !guestMode) {
-    // Redirect to login page if not authenticated
+  // Require authentication - no guest mode
+  if (!user) {
     router.push('/auth/login')
     return null
   }
@@ -196,11 +203,7 @@ export default function ChatPage() {
     return null
   }
 
-  // If in guest mode, skip auth entirely
-  if (guestMode) {
-    // Guest mode - show chat interface directly
-  } else if (authLoading) {
-    // Only show loading for non-guest users waiting for auth
+  if (authLoading) {
     return (
       <div className="flex items-center justify-center h-screen bg-background">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>

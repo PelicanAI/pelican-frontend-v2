@@ -69,8 +69,8 @@ export default function LoginPage() {
               />
             </div>
 
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-white via-purple-200 to-white bg-clip-text text-transparent">
-              Welcome back to Pelican AI
+            <h1 className="text-4xl font-bold text-center bg-gradient-to-r from-white via-purple-200 to-white bg-clip-text text-transparent">
+              Pelican AI
             </h1>
             <p className="text-gray-400 text-center">Sign in to continue your trading journey</p>
           </div>

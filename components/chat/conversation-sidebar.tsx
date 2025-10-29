@@ -1,41 +1,26 @@
 "use client"
 
-import { useState, useMemo, useEffect } from "react"
+import { useState, useMemo } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import {
   Plus,
   Search,
   MessageSquare,
   Trash2,
   Edit3,
-  X,
-  Home,
-  Archive,
-  ArchiveRestore,
   Settings,
-  Crown,
   User,
-  PanelLeftClose,
   LogOut,
-  MoreVertical,
-  MoreHorizontal,
+  PanelLeftClose,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useConversations } from "@/hooks/use-conversations"
 import Link from "next/link"
 import Image from "next/image"
 import { ThemeToggle } from "@/components/theme-toggle"
-import { motion, stagger, useAnimate } from "framer-motion"
 
 interface Conversation {
   id: string
@@ -43,12 +28,6 @@ interface Conversation {
   created_at: string
   updated_at: string
   archived?: boolean
-  messages?: Array<{
-    id: string
-    role: string
-    content: string
-    created_at: string
-  }>
 }
 
 interface ConversationSidebarProps {
@@ -61,63 +40,6 @@ interface ConversationSidebarProps {
   isMobileSheet?: boolean
   isNavigating?: boolean
   navigatingToId?: string
-}
-
-const groupConversationsByTime = (conversations: Conversation[]) => {
-  const now = new Date()
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
-  const yesterday = new Date(today.getTime() - 24 * 60 * 60 * 1000)
-  const sevenDaysAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000)
-
-  const groups = {
-    today: [] as Conversation[],
-    yesterday: [] as Conversation[],
-    previous7Days: [] as Conversation[],
-    earlier: [] as Conversation[],
-  }
-
-  conversations.forEach((conv) => {
-    const convDate = new Date(conv.updated_at)
-    if (convDate >= today) {
-      groups.today.push(conv)
-    } else if (convDate >= yesterday) {
-      groups.yesterday.push(conv)
-    } else if (convDate >= sevenDaysAgo) {
-      groups.previous7Days.push(conv)
-    } else {
-      groups.earlier.push(conv)
-    }
-  })
-
-  return groups
-}
-
-const formatRelativeTime = (dateString: string) => {
-  const date = new Date(dateString)
-  const now = new Date()
-  const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60))
-  const diffInHours = Math.floor(diffInMinutes / 60)
-  const diffInDays = Math.floor(diffInHours / 24)
-
-  if (diffInMinutes < 1) return "Just now"
-  if (diffInMinutes < 60) return `${diffInMinutes}m ago`
-  if (diffInHours < 24) return `${diffInHours}h ago`
-  if (diffInDays === 1) return "Yesterday"
-  if (diffInDays < 7) return `${diffInDays}d ago`
-
-  return date.toLocaleDateString([], { month: "short", day: "numeric" })
-}
-
-const getExactDateTime = (dateString: string) => {
-  const date = new Date(dateString)
-  return date.toLocaleString([], {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  })
 }
 
 export function ConversationSidebar({
@@ -134,245 +56,178 @@ export function ConversationSidebar({
   const [searchQuery, setSearchQuery] = useState("")
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editTitle, setEditTitle] = useState("")
-  const [showArchived, setShowArchived] = useState(false)
-  const [scope, animate] = useAnimate()
 
   const { list: conversations, isLoading, deleteConversation, updateConversation } = useConversations()
 
   const filteredConversations = useMemo(() => {
     return conversations.filter((conv) => {
       const matchesSearch = conv.title.toLowerCase().includes(searchQuery.toLowerCase())
-      const matchesArchiveFilter = showArchived ? conv.archived : !conv.archived
-      return matchesSearch && matchesArchiveFilter
+      return matchesSearch && !conv.archived
     })
-  }, [conversations, searchQuery, showArchived])
+  }, [conversations, searchQuery])
 
+  // Group conversations by time
   const groupedConversations = useMemo(() => {
-    return groupConversationsByTime(filteredConversations)
+    const now = new Date()
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+    const yesterday = new Date(today.getTime() - 24 * 60 * 60 * 1000)
+    const sevenDaysAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000)
+
+    const groups = {
+      today: [] as Conversation[],
+      yesterday: [] as Conversation[],
+      previous7Days: [] as Conversation[],
+      earlier: [] as Conversation[],
+    }
+
+    filteredConversations.forEach((conv) => {
+      const convDate = new Date(conv.updated_at)
+      if (convDate >= today) {
+        groups.today.push(conv)
+      } else if (convDate >= yesterday) {
+        groups.yesterday.push(conv)
+      } else if (convDate >= sevenDaysAgo) {
+        groups.previous7Days.push(conv)
+      } else {
+        groups.earlier.push(conv)
+      }
+    })
+
+    return groups
   }, [filteredConversations])
 
-  useEffect(() => {
-    if (!isCollapsed && !isMobileSheet && filteredConversations.length > 0) {
-      // Small delay to ensure DOM is ready
-      const timer = setTimeout(() => {
-        const elements = document.querySelectorAll(".conversation-item")
-        if (elements.length > 0) {
-          animate(".conversation-item", { opacity: [0, 1], x: [-20, 0] }, { delay: stagger(0.05), duration: 0.3 })
-        }
-      }, 100)
-
-      return () => clearTimeout(timer)
-    }
-  }, [isCollapsed, animate, isMobileSheet, filteredConversations.length])
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.target instanceof HTMLInputElement) return
-
-      const items = document.querySelectorAll("[data-conversation-id]")
-      const currentIndex = Array.from(items).findIndex(
-        (item) => item.getAttribute("data-conversation-id") === currentConversationId,
-      )
-
-      if (e.key === "ArrowDown") {
-        e.preventDefault()
-        const nextIndex = Math.min(currentIndex + 1, items.length - 1)
-        const nextItem = items[nextIndex] as HTMLElement
-        nextItem?.focus()
-      } else if (e.key === "ArrowUp") {
-        e.preventDefault()
-        const prevIndex = Math.max(currentIndex - 1, 0)
-        const prevItem = items[prevIndex] as HTMLElement
-        prevItem?.focus()
-      } else if (e.key === "Enter" && currentIndex >= 0) {
-        e.preventDefault()
-        const currentItem = items[currentIndex]
-        const conversationId = currentItem?.getAttribute("data-conversation-id")
-        if (conversationId) onConversationSelect(conversationId)
+  const handleDeleteConversation = async (conversationId: string) => {
+    if (window.confirm('Delete this conversation?')) {
+      const success = await deleteConversation(conversationId)
+      if (success && currentConversationId === conversationId) {
+        onNewConversation()
       }
     }
-
-    document.addEventListener("keydown", handleKeyDown)
-    return () => document.removeEventListener("keydown", handleKeyDown)
-  }, [currentConversationId, onConversationSelect])
-
-  const handleDeleteConversation = async (conversationId: string) => {
-    const success = await deleteConversation(conversationId)
-    if (success && currentConversationId === conversationId) {
-      onNewConversation()
-    }
   }
 
-  const handleArchiveConversation = async (conversationId: string, archived: boolean) => {
-    const success = await updateConversation(conversationId, { archived })
-    if (success && currentConversationId === conversationId && archived) {
-      onNewConversation()
-    }
-  }
-
-  const handleEditTitle = async (conversationId: string, newTitle: string) => {
-    const success = await updateConversation(conversationId, { title: newTitle })
-    if (success) {
+  const handleRenameConversation = async (conversationId: string, newTitle: string) => {
+    if (newTitle && newTitle.trim()) {
+      await updateConversation(conversationId, { title: newTitle.trim() })
       setEditingId(null)
+      setEditTitle("")
     }
   }
 
-  const startEditing = (conversation: any) => {
-    setEditingId(conversation.id)
-    setEditTitle(conversation.title || 'New conversation')
-  }
-
-  const ConversationItem = ({ conversation, index }: { conversation: Conversation; index: number }) => {
+  const ConversationItem = ({ conversation }: { conversation: Conversation }) => {
     const isNavigatingToThis = isNavigating && navigatingToId === conversation.id
     const isActive = currentConversationId === conversation.id
-    const lastMessage = conversation.messages?.[conversation.messages.length - 1]
-    const preview = lastMessage?.content?.slice(0, 50) + ((lastMessage?.content?.length ?? 0) > 50 ? "..." : "") || ""
+    const isEditing = editingId === conversation.id
+
+    if (isEditing) {
+      return (
+        <div className="px-3 py-2 mx-2">
+          <Input
+            value={editTitle}
+            onChange={(e) => setEditTitle(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                handleRenameConversation(conversation.id, editTitle)
+              } else if (e.key === 'Escape') {
+                setEditingId(null)
+                setEditTitle("")
+              }
+            }}
+            onBlur={() => {
+              if (editTitle.trim()) {
+                handleRenameConversation(conversation.id, editTitle)
+              } else {
+                setEditingId(null)
+              }
+            }}
+            autoFocus
+            className="h-8 text-sm"
+          />
+        </div>
+      )
+    }
 
     return (
-      <motion.div
-        className="conversation-item"
-        initial={{ opacity: 0, x: -20 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ delay: index * 0.05 }}
-        key={conversation.id}
+      <div
+        role="button"
+        tabIndex={0}
+        data-conversation-id={conversation.id}
+        className={cn(
+          "conversation-item group relative cursor-pointer transition-all rounded-lg mx-2",
+          "min-h-[48px] px-3 py-2 flex items-center gap-2",
+          isActive && "bg-primary/10 border border-primary/20",
+          !isActive && "hover:bg-sidebar-accent/50 border border-transparent",
+          isNavigatingToThis && "opacity-50 cursor-wait",
+        )}
+        onClick={() => {
+          if (isNavigatingToThis) return
+          onConversationSelect?.(conversation.id)
+        }}
       >
-        <div
-          role="button"
-          tabIndex={0}
-          data-conversation-id={conversation.id}
-          className={cn(
-            "group relative cursor-pointer transition-all duration-150 ease-out rounded-lg mx-2",
-            "min-h-[64px] px-3 py-2.5 flex items-center gap-3",
-            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-sidebar",
-            isActive && [
-              "bg-primary/10 border border-primary/20",
-            ],
-            !isActive && "hover:bg-sidebar-accent/50 border border-transparent",
-            conversation.archived && "opacity-60",
-            isNavigatingToThis && "opacity-50 cursor-wait",
-          )}
-          onClick={() => {
-            if (isNavigatingToThis) return
-            onConversationSelect?.(conversation.id)
-          }}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-              e.preventDefault()
-              if (isNavigatingToThis) return
-              onConversationSelect?.(conversation.id)
-            }
-          }}
-        >
-          <div className="flex-1 min-w-0">
-            {editingId === conversation.id ? (
-              <Input
-                value={editTitle}
-                onChange={(e) => setEditTitle(e.target.value)}
-                onBlur={() => handleEditTitle(conversation.id, editTitle)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    handleEditTitle(conversation.id, editTitle)
-                  } else if (e.key === "Escape") {
-                    setEditingId(null)
-                  }
-                }}
-                onClick={(e) => e.stopPropagation()}
-                className="h-6 text-sm bg-transparent border-primary/30 focus:border-primary"
-                autoFocus
-              />
-            ) : (
-              <div className="space-y-1.5">
-                <div className="flex items-center gap-2">
-                  <h3 className="font-medium text-sm truncate text-sidebar-foreground leading-snug">
-                    {searchQuery ? (
-                      <span
-                        dangerouslySetInnerHTML={{
-                          __html: conversation.title.replace(
-                            new RegExp(`(${searchQuery})`, "gi"),
-                            '<mark class="bg-primary/20 text-primary">$1</mark>',
-                          ),
-                        }}
-                      />
-                    ) : (
-                      conversation.title || 'New conversation'
-                    )}
-                  </h3>
-                  {conversation.archived && <Archive className="h-3 w-3 text-muted-foreground flex-shrink-0" />}
-                </div>
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <span className="truncate" title={preview}>
-                    {preview || "No messages yet"}
-                  </span>
-                  <span className="text-[10px] flex-shrink-0" title={getExactDateTime(conversation.updated_at)}>
-                    {formatRelativeTime(conversation.updated_at)}
-                  </span>
-                </div>
-              </div>
-            )}
-          </div>
-          <div className="flex items-center gap-0.5 flex-shrink-0 opacity-0 group-hover:opacity-100 data-[active=true]:opacity-100 transition-opacity duration-150" data-active={isActive}>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                  }}
-                  className="h-7 w-7 hover:bg-sidebar-accent/70"
-                  title="More actions"
-                >
-                  <MoreVertical className="h-3.5 w-3.5" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-40 z-[100]">
-                <DropdownMenuItem onSelect={(e) => {
-                    e.preventDefault()
-                    startEditing(conversation)
-                  }}>
-                  <Edit3 className="h-3.5 w-3.5 mr-2" />
-                  Rename
-                </DropdownMenuItem>
-                <DropdownMenuItem onSelect={(e) => {
-                    e.preventDefault()
-                    handleDeleteConversation(conversation.id)
-                  }} className="text-red-400 focus:text-red-300 focus:bg-red-500/20">
-                  <Trash2 className="h-3.5 w-3.5 mr-2" />
-                  Delete
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+        {/* Main content */}
+        <div className="flex-1 min-w-0">
+          <h3 className="font-medium text-sm truncate text-sidebar-foreground">
+            {conversation.title || 'New conversation'}
+          </h3>
         </div>
-      </motion.div>
+
+        {/* Action buttons - ALWAYS VISIBLE */}
+        <div className="flex items-center gap-1 flex-shrink-0">
+          {/* Rename button */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              setEditingId(conversation.id)
+              setEditTitle(conversation.title || 'New conversation')
+            }}
+            className="p-1.5 rounded hover:bg-sidebar-accent opacity-70 hover:opacity-100 transition-opacity"
+            title="Rename"
+          >
+            <Edit3 className="h-3.5 w-3.5" />
+          </button>
+
+          {/* Delete button - RED */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              handleDeleteConversation(conversation.id)
+            }}
+            className="p-1.5 rounded hover:bg-red-500/20 opacity-70 hover:opacity-100 transition-opacity"
+            title="Delete"
+          >
+            <Trash2 className="h-3.5 w-3.5 text-red-400" />
+          </button>
+        </div>
+      </div>
     )
   }
 
+  if (isCollapsed && !isMobileSheet) {
+    return null
+  }
+
   return (
-    <motion.div
-      ref={scope}
+    <div
       className={cn(
-        "relative z-20 pointer-events-auto",
-        isMobileSheet ? "w-full h-full" : "w-80 h-screen border-r overflow-hidden",
-        "flex flex-col bg-gradient-to-b from-sidebar to-sidebar/95",
-        !isMobileSheet && "border-sidebar-border/50",
+        "relative z-20",
+        isMobileSheet ? "w-full h-full" : "w-80 h-screen border-r",
+        "flex flex-col bg-sidebar",
         className,
       )}
-      style={{ outline: "1px solid transparent" }}
-      initial={!isMobileSheet ? { width: 64 } : undefined}
-      animate={!isMobileSheet ? { width: 320 } : undefined}
-      transition={{ duration: 0.2, ease: "easeInOut" }}
     >
-      {/* Header - 16px padding */}
+      {/* Header */}
       <div className="px-4 py-4 border-b border-sidebar-border/30">
-        {/* Logo section - 8px gap between items */}
         <div className="flex items-center justify-between mb-6">
-          <Link 
-            href="/marketing" 
-            className="flex items-center gap-2 group transition-all duration-200 hover:opacity-80"
-            title="Go to home page"
+          <Link
+            href="/marketing"
+            className="flex items-center gap-2 group transition-opacity hover:opacity-80"
           >
-            <Image src="/pelican-logo.png" alt="PelicanAI" width={28} height={28} className="w-7 h-7 object-contain group-hover:scale-110 transition-transform duration-200" />
+            <Image
+              src="/pelican-logo.png"
+              alt="PelicanAI"
+              width={28}
+              height={28}
+              className="w-7 h-7 object-contain"
+            />
             <span className="font-bold text-base text-primary">
               PelicanAI
             </span>
@@ -380,119 +235,111 @@ export function ConversationSidebar({
           <div className="flex items-center gap-1">
             <ThemeToggle />
             {onToggleCollapse && !isMobileSheet && (
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                onClick={onToggleCollapse} 
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={onToggleCollapse}
                 className="h-8 w-8 hover:bg-sidebar-accent/50"
-                title="Collapse sidebar"
               >
-                <PanelLeftClose className="h-4 w-4 text-sidebar-foreground" />
+                <PanelLeftClose className="h-4 w-4" />
               </Button>
             )}
           </div>
         </div>
 
-        {/* Action buttons - 8px gap */}
-        <div className="space-y-2">
-          <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
-            <Button
-              onClick={onNewConversation}
-              className="w-full h-10 px-4 bg-gradient-to-r from-purple-600 via-violet-600 to-purple-600 hover:from-purple-700 hover:via-violet-700 hover:to-purple-700 text-white text-sm font-medium shadow-lg shadow-purple-900/30 transition-all duration-200 relative overflow-hidden group"
-            >
-              <motion.div
-                className="absolute inset-0 bg-white/10 rounded-lg scale-0 group-active:scale-100"
-                transition={{ duration: 0.2 }}
-              />
-              <Plus className="w-4 h-4 mr-2" />
-              New chat
-            </Button>
-          </motion.div>
-        </div>
+        {/* New Chat Button */}
+        <Button
+          onClick={onNewConversation}
+          className="w-full h-10 bg-gradient-to-r from-purple-600 via-violet-600 to-purple-600 hover:from-purple-700 hover:via-violet-700 hover:to-purple-700 text-white"
+        >
+          <Plus className="w-4 h-4 mr-2" />
+          New chat
+        </Button>
       </div>
-      {/* Search section - 16px padding */}
+
+      {/* Search */}
       <div className="px-4 py-3 border-b border-sidebar-border/30">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
           <Input
             placeholder="Search conversations..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="h-10 pl-10 pr-3 bg-sidebar/50 border-sidebar-border/50 text-sidebar-foreground text-sm placeholder:text-muted-foreground focus:border-primary/50 transition-colors duration-200 rounded-lg"
+            className="h-10 pl-10 pr-3 bg-sidebar/50 border-sidebar-border/50"
           />
         </div>
       </div>
-      {/* Conversations list - proper spacing */}
-      <ScrollArea className="flex-1 min-h-0 scrollbar-thin scrollbar-thumb-white/10 hover:scrollbar-thumb-white/15">
+
+      {/* Conversations List */}
+      <ScrollArea className="flex-1 min-h-0">
         <div className="py-2">
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
-              <motion.div
-                className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"
-                animate={{ rotate: 360 }}
-                transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
-              />
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary" />
             </div>
-          ) : Object.values(groupedConversations).every((group) => group.length === 0) ? (
+          ) : filteredConversations.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-8 px-6 text-center">
               <MessageSquare className="h-8 w-8 mb-2 text-muted-foreground/20" />
-              <p className="text-xs font-medium text-muted-foreground/60">{showArchived ? "No archived conversations" : "No conversations yet"}</p>
-              <p className="text-xs mt-1 text-muted-foreground/40">Click "New chat" to start</p>
+              <p className="text-xs font-medium text-muted-foreground/60">
+                No conversations yet
+              </p>
+              <p className="text-xs mt-1 text-muted-foreground/40">
+                Click "New chat" to start
+              </p>
             </div>
           ) : (
-            <div className="space-y-6">
+            <div className="space-y-4">
+              {/* Today */}
               {groupedConversations.today.length > 0 && (
                 <div>
-                  <div className="sticky top-0 bg-sidebar/95 backdrop-blur-sm z-10 px-4 py-2">
-                    <h4 className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
-                      Today
-                    </h4>
-                  </div>
+                  <h4 className="px-4 py-2 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+                    Today
+                  </h4>
                   <div className="space-y-1">
-                    {groupedConversations.today.map((conversation, index) => (
-                      <ConversationItem key={conversation.id} conversation={conversation} index={index} />
+                    {groupedConversations.today.map((conv) => (
+                      <ConversationItem key={conv.id} conversation={conv} />
                     ))}
                   </div>
                 </div>
               )}
+
+              {/* Yesterday */}
               {groupedConversations.yesterday.length > 0 && (
                 <div>
-                  <div className="sticky top-0 bg-sidebar/95 backdrop-blur-sm z-10 px-4 py-2">
-                    <h4 className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
-                      Yesterday
-                    </h4>
-                  </div>
+                  <h4 className="px-4 py-2 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+                    Yesterday
+                  </h4>
                   <div className="space-y-1">
-                    {groupedConversations.yesterday.map((conversation, index) => (
-                      <ConversationItem key={conversation.id} conversation={conversation} index={index} />
+                    {groupedConversations.yesterday.map((conv) => (
+                      <ConversationItem key={conv.id} conversation={conv} />
                     ))}
                   </div>
                 </div>
               )}
+
+              {/* Previous 7 Days */}
               {groupedConversations.previous7Days.length > 0 && (
                 <div>
-                  <div className="sticky top-0 bg-sidebar/95 backdrop-blur-sm z-10 px-4 py-2">
-                    <h4 className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
-                      Previous 7 Days
-                    </h4>
-                  </div>
+                  <h4 className="px-4 py-2 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+                    Previous 7 Days
+                  </h4>
                   <div className="space-y-1">
-                    {groupedConversations.previous7Days.map((conversation, index) => (
-                      <ConversationItem key={conversation.id} conversation={conversation} index={index} />
+                    {groupedConversations.previous7Days.map((conv) => (
+                      <ConversationItem key={conv.id} conversation={conv} />
                     ))}
                   </div>
                 </div>
               )}
+
+              {/* Earlier */}
               {groupedConversations.earlier.length > 0 && (
                 <div>
-                  <div className="sticky top-0 bg-sidebar/95 backdrop-blur-sm z-10 px-4 py-2">
-                    <h4 className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
-                      Earlier
-                    </h4>
-                  </div>
+                  <h4 className="px-4 py-2 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+                    Earlier
+                  </h4>
                   <div className="space-y-1">
-                    {groupedConversations.earlier.map((conversation, index) => (
-                      <ConversationItem key={conversation.id} conversation={conversation} index={index} />
+                    {groupedConversations.earlier.map((conv) => (
+                      <ConversationItem key={conv.id} conversation={conv} />
                     ))}
                   </div>
                 </div>
@@ -502,17 +349,17 @@ export function ConversationSidebar({
         </div>
       </ScrollArea>
 
-      {/* Footer - 12px padding */}
+      {/* Footer */}
       <div className="px-3 py-3 border-t border-sidebar-border/30">
         <div className="flex items-center gap-2">
           <Button
             variant="ghost"
             size="sm"
             asChild
-            className="flex-1 justify-start h-10 px-3 hover:bg-sidebar-accent/50 group"
+            className="flex-1 justify-start h-10 px-3 hover:bg-sidebar-accent/50"
           >
             <Link href="/profile" className="flex items-center gap-3">
-              <Avatar className="w-8 h-8 ring-2 ring-sidebar-border/50 group-hover:ring-primary/30 transition-all">
+              <Avatar className="w-8 h-8 ring-2 ring-sidebar-border/50">
                 <AvatarImage src="/placeholder-user.jpg" />
                 <AvatarFallback className="bg-primary/20 text-primary">
                   <User className="w-4 h-4" />
@@ -529,7 +376,6 @@ export function ConversationSidebar({
             size="icon"
             asChild
             className="h-10 w-10 hover:bg-sidebar-accent/50"
-            title="Settings"
           >
             <Link href="/settings">
               <Settings className="h-4 w-4" />
@@ -541,13 +387,12 @@ export function ConversationSidebar({
               size="icon"
               type="submit"
               className="h-10 w-10 hover:bg-sidebar-accent/50"
-              title="Sign Out"
             >
               <LogOut className="h-4 w-4" />
             </Button>
           </form>
         </div>
       </div>
-    </motion.div>
+    </div>
   )
 }

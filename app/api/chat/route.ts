@@ -13,29 +13,18 @@ interface ChatRequest {
   stream?: boolean
   temperature?: number
   max_tokens?: number
-  guestMode?: boolean
-  guestUserId?: string
   fileIds?: string[]
-}
-
-function generateGuestUUID(): string {
-  // Generate a valid UUID v4 for guest users
-  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
-    const r = (Math.random() * 16) | 0
-    const v = c == "x" ? r : (r & 0x3) | 0x8
-    return v.toString(16)
-  })
 }
 
 export async function POST(req: NextRequest) {
   let user: any = null
   let effectiveUserId: string | null = null
   let activeConversationId: string | null = null
-  
+
   try {
     const signal = req.signal // Extract AbortController signal from request
 
-    const { message, conversationId, guestMode, guestUserId, fileIds }: ChatRequest = await req.json()
+    const { message, conversationId, fileIds }: ChatRequest = await req.json()
 
     if (!message || message.trim().length === 0) {
       return new Response(JSON.stringify({ error: "Message cannot be empty" }), {
@@ -50,22 +39,18 @@ export async function POST(req: NextRequest) {
 
     activeConversationId = conversationId || null
 
-    if (!guestMode) {
-      const {
-        data: { user: authUser },
-        error: authError,
-      } = await supabase.auth.getUser()
-      if (authError || !authUser) {
-        throw new AuthenticationError()
-      }
-      user = authUser
-      effectiveUserId = user.id
-    } else {
-      effectiveUserId = guestUserId || generateGuestUUID()
-      logger.info("Guest mode active", { userId: effectiveUserId })
+    // Require authentication - no guest mode
+    const {
+      data: { user: authUser },
+      error: authError,
+    } = await supabase.auth.getUser()
+    if (authError || !authUser) {
+      throw new AuthenticationError()
     }
+    user = authUser
+    effectiveUserId = user.id
 
-    if (!activeConversationId && effectiveUserId && !guestMode) {
+    if (!activeConversationId && effectiveUserId) {
       const title = sanitizeTitle(userMessage, LIMITS.TITLE_PREVIEW_LENGTH)
 
       const { data: newConversation, error: createError } = await supabase
@@ -79,15 +64,11 @@ export async function POST(req: NextRequest) {
 
       if (createError) {
         logger.error("Failed to create conversation", createError, { userId: effectiveUserId })
-        // Fallback to temporary ID if database creation fails
-        activeConversationId = `temp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
-      } else {
-        activeConversationId = newConversation.id
-        logger.info("Created new conversation", { conversationId: activeConversationId, userId: effectiveUserId })
+        throw new Error("Failed to create conversation in database")
       }
-    } else if (!activeConversationId && guestMode) {
-      activeConversationId = `guest-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
-      logger.info("Created guest conversation", { conversationId: activeConversationId })
+
+      activeConversationId = newConversation.id
+      logger.info("Created new conversation", { conversationId: activeConversationId, userId: effectiveUserId })
     }
 
     const apiKey = process.env.PEL_API_KEY
@@ -117,6 +98,7 @@ export async function POST(req: NextRequest) {
       message: userMessage,
       user_id: effectiveUserId || "anonymous",
       conversation_id: activeConversationId || null,
+      session_id: activeConversationId || null,  // Backward compatibility - same as conversation_id
       timestamp: new Date().toISOString(),
       stream: true,
     }
@@ -211,16 +193,9 @@ export async function POST(req: NextRequest) {
               controller.enqueue(encoder.encode(`data: ${finalData}\n\n`))
               controller.enqueue(encoder.encode(`data: [DONE]\n\n`))
 
-              if (
-                activeConversationId &&
-                effectiveUserId &&
-                !guestMode &&
-                !activeConversationId.startsWith("temp-") &&
-                !activeConversationId.startsWith("guest-")
-              ) {
+              // Always save to database for authenticated users
+              if (activeConversationId && effectiveUserId) {
                 await saveMessagesToDatabase(supabase, activeConversationId, userMessage, fullResponse, effectiveUserId)
-              } else {
-                logger.info("Guest/temporary conversation - not saved to database", { conversationId: activeConversationId })
               }
             }
           } catch (error) {
@@ -257,16 +232,9 @@ export async function POST(req: NextRequest) {
 
       const reply = data.text || data.reply || "No response received"
 
-      if (
-        activeConversationId &&
-        effectiveUserId &&
-        !guestMode &&
-        !activeConversationId.startsWith("temp-") &&
-        !activeConversationId.startsWith("guest-")
-      ) {
+      // Always save to database for authenticated users
+      if (activeConversationId && effectiveUserId) {
         await saveMessagesToDatabase(supabase, activeConversationId, userMessage, reply, effectiveUserId)
-      } else {
-        logger.info("Guest/temporary conversation - not saved to database", { conversationId: activeConversationId })
       }
 
       return NextResponse.json({

@@ -6,15 +6,13 @@ import type { ChatInputRef } from "@/components/chat/chat-input"
 interface UseMessageHandlerOptions {
   chatLoading: boolean
   currentConversationId: string | null
-  guestMode: boolean
-  sendMessage: (content: string, options?: { guestMode?: boolean; attachments?: any[]; fileIds?: string[] }) => Promise<void>
+  sendMessage: (content: string, options?: { attachments?: any[]; fileIds?: string[] }) => Promise<void>
   chatInputRef: React.RefObject<ChatInputRef>
 }
 
 export function useMessageHandler({
   chatLoading,
   currentConversationId,
-  guestMode,
   sendMessage,
   chatInputRef,
 }: UseMessageHandlerOptions) {
@@ -37,12 +35,12 @@ export function useMessageHandler({
         return
       }
 
-      await sendMessage(content, { guestMode })
+      await sendMessage(content)
       setTimeout(() => {
         chatInputRef.current?.focus()
       }, 100)
     },
-    [chatLoading, currentConversationId, guestMode, sendMessage, chatInputRef],
+    [chatLoading, currentConversationId, sendMessage, chatInputRef],
   )
 
   const handleTypingDuringResponse = useCallback(() => {
@@ -68,11 +66,11 @@ export function useMessageHandler({
       const draftToSend = pendingDraft
       setPendingDraft(null)
       setTimeout(async () => {
-        await sendMessage(draftToSend, { guestMode })
+        await sendMessage(draftToSend)
         chatInputRef.current?.focus()
       }, 100)
     }
-  }, [pendingDraft, guestMode, sendMessage, chatInputRef])
+  }, [pendingDraft, sendMessage, chatInputRef])
 
   const clearDraftForConversation = useCallback(
     (conversationId: string) => {

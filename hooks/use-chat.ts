@@ -16,7 +16,6 @@ interface UseChatOptions {
 }
 
 interface SendMessageOptions {
-  guestMode?: boolean
   attachments?: Array<{ type: string; name: string; url: string }>
   fileIds?: string[]
   skipUserMessage?: boolean // For regenerate - don't add duplicate user message
@@ -26,13 +25,12 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
   const [messages, setMessages] = useState<Message[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(conversationId || null)
-  const [isGuestMode, setIsGuestMode] = useState(false)
   const [conversationNotFound, setConversationNotFound] = useState(false)
   const loadedConversationRef = useRef<string | null>(null)
   const abortControllerRef = useRef<AbortController | null>(null)
   const messagesRef = useRef<Message[]>([])
 
-  const { ensureGuestConversation, updateGuestConversationMessages, loadGuestConversationMessages, user } = useConversations()
+  const { user } = useConversations()
 
   const { makeRequest, cancelAllRequests, getQueueStatus } = useRequestManager({
     maxRetries: 3,
@@ -75,28 +73,7 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
     }
   }, [conversationId])
 
-  useEffect(() => {
-    if (currentConversationId && !user && currentConversationId.startsWith("guest-")) {
-      const guestConversations = JSON.parse(localStorage.getItem("pelican_guest_conversations") || "[]")
-      const exists = guestConversations.some((conv: any) => conv.id === currentConversationId)
-
-      if (!exists) {
-        logger.info("Guest conversation not found in localStorage", { conversationId: currentConversationId })
-        setConversationNotFound(true)
-      } else {
-        // Load messages for guest conversation
-        const savedMessages = loadGuestConversationMessages(currentConversationId)
-        if (savedMessages.length > 0 && loadedConversationRef.current !== currentConversationId) {
-          logger.info("Loading saved messages for guest conversation", { 
-            conversationId: currentConversationId,
-            messageCount: savedMessages.length 
-          })
-          setMessages(savedMessages)
-          loadedConversationRef.current = currentConversationId
-        }
-      }
-    }
-  }, [currentConversationId, user, loadGuestConversationMessages])
+  // No guest mode - removed guest conversation loading
 
   useEffect(() => {
     if (conversationError && (conversationError.status === 404 || conversationError.status === 403)) {
@@ -145,15 +122,11 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
 
       cancelAllRequests()
 
-      if (options.guestMode !== undefined) {
-        setIsGuestMode(options.guestMode)
-      }
-
       const userMessage = createUserMessage(content)
       if (options.attachments) {
         userMessage.attachments = options.attachments
       }
-      
+
       // Only add user message if not regenerating (skipUserMessage flag)
       if (!options.skipUserMessage) {
         setMessages((prev) => [...prev, userMessage])
@@ -169,8 +142,6 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
       try {
         logger.info("Sending message to Pelican API", { messageLength: content.length })
 
-        const guestUserId = localStorage.getItem(STORAGE_KEYS.GUEST_USER_ID)
-
         const response = await makeRequest(API_ENDPOINTS.CHAT, {
           method: "POST",
           headers: {
@@ -179,8 +150,6 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
           body: JSON.stringify({
             message: userMessage.content,  // Only send the new message content
             conversationId: currentConversationId,
-            guestMode: options.guestMode || false,
-            guestUserId: options.guestMode ? guestUserId : undefined,
             fileIds: options.fileIds,
           }),
         })
@@ -249,12 +218,6 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
                       setCurrentConversationId(parsed.conversationId)
                       onConversationCreated?.(parsed.conversationId)
                       logger.info("New conversation created", { conversationId: parsed.conversationId })
-
-                      if (options.guestMode && !user?.id) {
-                        const title = content.length > LIMITS.TITLE_PREVIEW_LENGTH ? content.slice(0, LIMITS.TITLE_PREVIEW_LENGTH) + "..." : content
-                        logger.info("Saving guest conversation to localStorage", { conversationId: parsed.conversationId })
-                        ensureGuestConversation(parsed.conversationId, title)
-                      }
                     }
 
                     const finalMessage = {
@@ -263,21 +226,6 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
                       isStreaming: false,
                     }
                     setMessages((prev) => prev.map((msg) => (msg.id === assistantMessage.id ? finalMessage : msg)))
-
-                    if (options.guestMode && !user?.id && (currentConversationId || parsed.conversationId)) {
-                      const conversationIdToUpdate = currentConversationId || parsed.conversationId
-                      setMessages((currentMessages) => {
-                        const finalMessages = currentMessages.map((msg) => (msg.id === assistantMessage.id ? finalMessage : msg))
-                        const messageCount = finalMessages.length
-                        const preview = content.slice(0, 100)
-                        logger.info("Updating guest conversation messages", { 
-                          conversationId: conversationIdToUpdate, 
-                          messageCount 
-                        })
-                        updateGuestConversationMessages(conversationIdToUpdate, messageCount, preview, finalMessages)
-                        return finalMessages
-                      })
-                    }
 
                     onFinish?.(finalMessage)
                   }
@@ -311,31 +259,10 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
             setCurrentConversationId(data.conversationId)
             onConversationCreated?.(data.conversationId)
             logger.info("New conversation created", { conversationId: data.conversationId })
-
-            if (options.guestMode && !user?.id) {
-              const title = content.length > 50 ? content.slice(0, 50) + "..." : content
-              logger.info("Saving guest conversation to localStorage", { conversationId: data.conversationId })
-              ensureGuestConversation(data.conversationId, title)
-            }
           }
 
           const finalMessage = { ...assistantMessage, content: reply, isStreaming: false }
           setMessages((prev) => prev.map((msg) => (msg.id === assistantMessage.id ? finalMessage : msg)))
-
-          if (options.guestMode && !user?.id && (currentConversationId || data.conversationId)) {
-            const conversationIdToUpdate = currentConversationId || data.conversationId
-            setMessages((currentMessages) => {
-              const finalMessages = currentMessages.map((msg) => (msg.id === assistantMessage.id ? finalMessage : msg))
-              const messageCount = finalMessages.length
-              const preview = content.slice(0, 100)
-              logger.info("Updating guest conversation messages", { 
-                conversationId: conversationIdToUpdate, 
-                messageCount 
-              })
-              updateGuestConversationMessages(conversationIdToUpdate, messageCount, preview, finalMessages)
-              return finalMessages
-            })
-          }
 
           onFinish?.(finalMessage)
         }
@@ -348,7 +275,6 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
         logger.error("Chat error", error instanceof Error ? error : new Error(String(error)), {
           conversationId: currentConversationId,
           messageLength: content.length,
-          isGuestMode: options.guestMode,
           skipUserMessage: options.skipUserMessage,
         })
 
@@ -407,8 +333,6 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
       onError,
       onFinish,
       onConversationCreated,
-      ensureGuestConversation,
-      updateGuestConversationMessages,
       user,
       makeRequest,
       cancelAllRequests,
@@ -465,11 +389,11 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
       const newMessages = currentMessages.slice(0, actualIndex)
 
       // Regenerate with skipUserMessage flag to avoid duplicating the user's question
-      setTimeout(() => sendMessage(userMessage.content, { guestMode: isGuestMode, skipUserMessage: true }), 0)
+      setTimeout(() => sendMessage(userMessage.content, { skipUserMessage: true }), 0)
 
       return newMessages
     })
-  }, [sendMessage, isGuestMode])
+  }, [sendMessage])
 
   return {
     messages,
@@ -480,7 +404,6 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
     removeMessage,
     regenerateLastMessage,
     conversationId: currentConversationId,
-    isGuestMode,
     addSystemMessage,
     removeSystemMessage,
     conversationNotFound,

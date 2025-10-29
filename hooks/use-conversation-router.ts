@@ -8,7 +8,6 @@ import { logger } from "@/lib/logger"
 
 interface UseConversationRouterOptions {
   user: any
-  guestMode: boolean
   chatLoading: boolean
   messages: any[]
   stopGeneration: () => void
@@ -19,7 +18,6 @@ interface UseConversationRouterOptions {
 
 export function useConversationRouter({
   user,
-  guestMode,
   chatLoading,
   messages,
   stopGeneration,
@@ -43,7 +41,7 @@ export function useConversationRouter({
     ;(async () => {
       let latestId: string | null = null
 
-      if (user && !guestMode) {
+      if (user) {
         if (conversations.length > 0) {
           const mostRecent = conversations
             .filter((c) => !c.archived)
@@ -53,8 +51,6 @@ export function useConversationRouter({
             )[0]
           latestId = mostRecent?.id || null
         }
-      } else {
-        latestId = localStorage.getItem(STORAGE_KEYS.LAST_CONVERSATION)
       }
 
       const id = latestId || (await createConversation("New Chat"))?.id
@@ -62,7 +58,7 @@ export function useConversationRouter({
         router.replace(`${ROUTES.CHAT}?conversation=${encodeURIComponent(id)}`, { scroll: false })
       }
     })()
-  }, [searchParams, user, guestMode, conversations, createConversation, router])
+  }, [searchParams, user, conversations, createConversation, router])
 
   useEffect(() => {
     const cid = searchParams.get("conversation")
@@ -71,31 +67,8 @@ export function useConversationRouter({
     }
   }, [searchParams, currentConversationId])
 
-  useEffect(() => {
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === STORAGE_KEYS.LAST_CONVERSATION && e.newValue) {
-        const conversationInUrl = searchParams.get("conversation")
-
-        if (!conversationInUrl && e.newValue !== currentConversationId) {
-          setCurrentConversationId(e.newValue)
-          router.replace(`${ROUTES.CHAT}?conversation=${encodeURIComponent(e.newValue)}`, { scroll: false })
-        }
-      }
-    }
-
-    if (guestMode) {
-      window.addEventListener("storage", handleStorageChange)
-      return () => window.removeEventListener("storage", handleStorageChange)
-    }
-  }, [guestMode, searchParams, currentConversationId, router])
-
-  useEffect(() => {
-    if (currentConversationId) {
-      if (guestMode) {
-        localStorage.setItem(STORAGE_KEYS.LAST_CONVERSATION, currentConversationId)
-      }
-    }
-  }, [currentConversationId, guestMode, user])
+  // Storage change listener removed - no longer needed without guest mode
+  // Last conversation tracking removed - no longer needed without guest mode
 
   const handleConversationSelect = (id: string) => {
     const current = searchParams.get("conversation")
@@ -162,22 +135,15 @@ export function useConversationRouter({
       // Use setTimeout to ensure this happens after the navigation starts
       setTimeout(() => {
         if (oldMessages.length > 0 && oldConversationId) {
-          if (guestMode && oldConversationId.startsWith("guest-")) {
-            updateConversation(oldConversationId, {
+          fetch(`/api/conversations/${oldConversationId}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
               title: oldMessages[0]?.content?.slice(0, LIMITS.TITLE_PREVIEW_LENGTH) + "..." || "Untitled Chat",
               archived: true,
-            }).catch(error => logger.error("Failed to archive guest conversation", error instanceof Error ? error : new Error(String(error)), { conversationId: oldConversationId }))
-          } else if (!guestMode) {
-            fetch(`/api/conversations/${oldConversationId}`, {
-              method: "PATCH",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                title: oldMessages[0]?.content?.slice(0, LIMITS.TITLE_PREVIEW_LENGTH) + "..." || "Untitled Chat",
-                archived: true,
-                updated_at: new Date().toISOString(),
-              }),
-            }).catch(error => logger.error("Failed to archive conversation", error instanceof Error ? error : new Error(String(error)), { conversationId: oldConversationId }))
-          }
+              updated_at: new Date().toISOString(),
+            }),
+          }).catch(error => logger.error("Failed to archive conversation", error instanceof Error ? error : new Error(String(error)), { conversationId: oldConversationId }))
         }
 
         // Clear draft for old conversation

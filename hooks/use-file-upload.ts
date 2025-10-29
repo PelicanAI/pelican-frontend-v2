@@ -14,13 +14,12 @@ interface PendingAttachment {
 }
 
 interface UseFileUploadOptions {
-  sendMessage: (content: string, options?: { guestMode?: boolean; attachments?: any[]; fileIds?: string[] }) => Promise<void>
+  sendMessage: (content: string, options?: { attachments?: any[]; fileIds?: string[] }) => Promise<void>
   addSystemMessage: (content: string, retryAction?: () => void) => string
-  guestMode: boolean
   chatInputRef: React.RefObject<ChatInputRef>
 }
 
-export function useFileUpload({ sendMessage, addSystemMessage, guestMode, chatInputRef }: UseFileUploadOptions) {
+export function useFileUpload({ sendMessage, addSystemMessage, chatInputRef }: UseFileUploadOptions) {
   const [pendingAttachments, setPendingAttachments] = useState<PendingAttachment[]>([])
 
   const handleFileUpload = useCallback(
@@ -90,7 +89,7 @@ export function useFileUpload({ sendMessage, addSystemMessage, guestMode, chatIn
 
         setPendingAttachments((prev) => prev.filter((a) => a.id !== attachmentId))
 
-        await sendMessage("", { guestMode, attachments, fileIds })
+        await sendMessage("", { attachments, fileIds })
 
         setTimeout(() => {
           chatInputRef.current?.focus()
@@ -109,7 +108,7 @@ export function useFileUpload({ sendMessage, addSystemMessage, guestMode, chatIn
         }, 100)
       }
     },
-    [sendMessage, addSystemMessage, guestMode, chatInputRef],
+    [sendMessage, addSystemMessage, chatInputRef],
   )
 
   const handleRetryUpload = useCallback(
@@ -202,7 +201,7 @@ export function useFileUpload({ sendMessage, addSystemMessage, guestMode, chatIn
 
           const fileIds = successfulResults.map((result) => result.id)
 
-          await sendMessage("", { guestMode, attachments, fileIds })
+          await sendMessage("", { attachments, fileIds })
         }
 
         const failedCount = results.filter((result) => result.status === "rejected").length
@@ -220,7 +219,7 @@ export function useFileUpload({ sendMessage, addSystemMessage, guestMode, chatIn
         }, 100)
       }
     },
-    [sendMessage, addSystemMessage, guestMode, chatInputRef],
+    [sendMessage, addSystemMessage, chatInputRef],
   )
 
   return {
