@@ -22,8 +22,8 @@ export interface StructuredDataTable {
   query?: string
   title: string
   columns: Column[]
-  data: Record<string, any>[]
-  summary?: Record<string, any>
+  data: Record<string, unknown>[]
+  summary?: Record<string, unknown>
 }
 
 /**
@@ -55,7 +55,9 @@ export function detectStructuredData(text: string): StructuredDataTable | null {
     }
 
     // Ensure columns have required fields
-    const validColumns = parsed.columns.every((col: any) => col.key && col.label)
+    const validColumns = parsed.columns.every((col: unknown) => {
+      return typeof col === 'object' && col !== null && 'key' in col && 'label' in col
+    })
     if (!validColumns) {
       console.warn('Invalid structured data: columns missing key or label')
       return null

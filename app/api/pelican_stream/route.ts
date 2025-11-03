@@ -6,6 +6,7 @@ import { sanitizeMessage } from "@/lib/sanitize"
 import { logger } from "@/lib/logger"
 import { AuthenticationError, ExternalAPIError, getUserFriendlyError } from "@/lib/errors"
 import { getTradingSessionId } from "@/lib/trading-metadata"
+import type { User } from "@supabase/supabase-js"
 
 interface PelicanStreamRequest {
   message: string
@@ -14,7 +15,7 @@ interface PelicanStreamRequest {
 }
 
 export async function POST(req: NextRequest) {
-  let user: any = null
+  let user: User | null = null
   let effectiveUserId: string | null = null
   let activeConversationId: string | null = null
 
@@ -261,7 +262,7 @@ export async function POST(req: NextRequest) {
 }
 
 async function saveMessagesToDatabase(
-  supabase: any,
+  supabase: Awaited<ReturnType<typeof createClient>>,
   conversationId: string,
   userMessage: string,
   reply: string,

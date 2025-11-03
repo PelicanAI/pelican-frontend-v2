@@ -269,7 +269,14 @@ export default function SettingsPage() {
 
   const handleExportData = async () => {
     try {
-      let exportData: any = {
+      let exportData: { 
+        settings: typeof settings; 
+        exported_at: string; 
+        profile?: Record<string, unknown>;
+        user?: { email: string | undefined; created_at: string };
+        conversations?: unknown;
+        note?: string;
+      } = {
         settings,
         exported_at: new Date().toISOString(),
       }
@@ -439,7 +446,7 @@ export default function SettingsPage() {
                             Sign in to save your settings
                           </h3>
                           <p className="text-sm text-purple-700 dark:text-purple-300 mb-4">
-                            You're currently using Pelican AI in guest mode. Create an account to save your preferences and access additional features.
+                            You&apos;re currently using Pelican AI in guest mode. Create an account to save your preferences and access additional features.
                           </p>
                           <div className="flex gap-3">
                             <Button asChild size="sm" className="bg-gradient-to-r from-purple-600 to-purple-700">

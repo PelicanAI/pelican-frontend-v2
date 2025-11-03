@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { createContext, useContext, useEffect, useState } from "react"
+import { createContext, useContext, useEffect, useState, useCallback } from "react"
 import { createClient } from "@/lib/supabase/client"
 import type { User } from "@supabase/supabase-js"
 
@@ -19,35 +19,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true)
   const supabase = createClient()
 
-  useEffect(() => {
-    // Get initial session
-    const getInitialSession = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession()
-      setUser(session?.user ?? null)
-      setLoading(false)
-    }
-
-    getInitialSession()
-
-    // Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
-      setUser(session?.user ?? null)
-      setLoading(false)
-
-      // Migrate guest conversations when user logs in
-      if (event === 'SIGNED_IN' && session?.user && typeof window !== 'undefined') {
-        await migrateGuestConversations(session.user.id)
-      }
-    })
-
-    return () => subscription.unsubscribe()
-  }, [supabase.auth])
-
-  const migrateGuestConversations = async (userId: string) => {
+  const migrateGuestConversations = useCallback(async (userId: string) => {
     try {
       const guestConversations = JSON.parse(
         localStorage.getItem('pelican_guest_conversations') || '[]'
@@ -86,7 +58,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
           if (guestMessages.length > 0) {
             // Prepare messages for insertion
-            const messagesToInsert = guestMessages.map((msg: any) => ({
+            const messagesToInsert = guestMessages.map((msg: { role: string; content: string; created_at?: string; metadata?: Record<string, unknown> }) => ({
               conversation_id: newConv.id,
               user_id: userId,
               role: msg.role,
@@ -123,7 +95,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch (error) {
       console.error('Guest migration failed:', error)
     }
-  }
+  }, [supabase])
+
+  useEffect(() => {
+    // Get initial session
+    const getInitialSession = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
+      setUser(session?.user ?? null)
+      setLoading(false)
+    }
+
+    getInitialSession()
+
+    // Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      setUser(session?.user ?? null)
+      setLoading(false)
+
+      // Migrate guest conversations when user logs in
+      if (event === 'SIGNED_IN' && session?.user && typeof window !== 'undefined') {
+        await migrateGuestConversations(session.user.id)
+      }
+    })
+
+    return () => subscription.unsubscribe()
+  }, [supabase.auth, migrateGuestConversations])
 
   const signOut = async () => {
     await supabase.auth.signOut()

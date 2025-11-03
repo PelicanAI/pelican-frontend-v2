@@ -37,7 +37,7 @@ export function captureException(error: Error, context?: SentryContext) {
   // })
 }
 
-export function addBreadcrumb(message: string, data?: Record<string, any>) {
+export function addBreadcrumb(message: string, data?: Record<string, unknown>) {
   console.log("[Sentry] Breadcrumb:", message, data)
 
   // TODO: Replace with actual Sentry integration

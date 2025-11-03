@@ -375,8 +375,8 @@ export const PremiumChatInput = forwardRef<PremiumChatInputRef, PremiumChatInput
                 <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-3">
                   <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-full text-sm text-amber-700 dark:text-amber-300">
                     <div className="w-2 h-2 bg-amber-500 rounded-full animate-pulse" />
-                    Queued: "{pendingDraft.slice(0, 30)}
-                    {pendingDraft.length > 30 ? "..." : ""}"
+                    Queued: &quot;{pendingDraft.slice(0, 30)}
+                    {pendingDraft.length > 30 ? "..." : ""}&quot;
                   </div>
                 </motion.div>
               )}
@@ -528,12 +528,11 @@ export const PremiumChatInput = forwardRef<PremiumChatInputRef, PremiumChatInput
                         inputState === "rate-limited" && "opacity-50 cursor-not-allowed",
                       )}
                       rows={1}
-                      style={{
-                        height: `${UI.TEXTAREA_MIN_HEIGHT}px`,
-                        WebkitFieldSizing: "content",
-                        // @ts-ignore - fieldSizing is experimental CSS property not in TS types yet
-                        fieldSizing: "content",
-                      } as React.CSSProperties}
+                    style={{
+                      height: `${UI.TEXTAREA_MIN_HEIGHT}px`,
+                      WebkitFieldSizing: "content",
+                      fieldSizing: "content",
+                    } as React.CSSProperties}
                     />
 
                     <AnimatePresence>

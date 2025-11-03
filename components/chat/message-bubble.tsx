@@ -104,7 +104,7 @@ function formatLine(line: string): string {
     ALLOWED_ATTR: {
       a: ["href", "target", "rel", "class"],
       span: ["class"],
-    },
+    } as unknown as string[],
   })
 }
 
@@ -370,13 +370,13 @@ function MessageContent({
 
     return (
       <DataTable
-        data={parsedData.data as any}
+        data={parsedData.data}
         title={parsedData.title}
-        {...(isStructured
+        {...(isStructured && 'columns' in parsedData
           ? {
-              columns: (parsedData as any).columns,
-              query: (parsedData as any).query,
-              summary: (parsedData as any).summary,
+              columns: parsedData.columns,
+              query: parsedData.query,
+              summary: parsedData.summary,
             }
           : {})}
         onToggle={() => setShowRawText(true)}

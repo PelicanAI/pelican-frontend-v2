@@ -5,11 +5,11 @@ import { useMemo } from 'react'
 import { cn } from '@/lib/utils'
 
 interface DataTableProps {
-  data: DataPoint[] | Record<string, any>[]
+  data: DataPoint[] | Record<string, unknown>[]
   columns?: Column[]
   title?: string
   query?: string
-  summary?: Record<string, any>
+  summary?: Record<string, unknown>
   onToggle?: () => void
 }
 
@@ -22,13 +22,13 @@ const DEFAULT_ARROW_COLUMNS: Column[] = [
 ]
 
 // Helper: Format value based on type
-function formatValue(value: any, type?: string): string {
+function formatValue(value: unknown, type?: string): string {
   if (value === null || value === undefined) return '—'
   return String(value)
 }
 
 // Helper: Get cell styling based on type and value
-function getCellClass(value: any, type?: string, isFirstColumn?: boolean): string {
+function getCellClass(value: unknown, type?: string, isFirstColumn?: boolean): string {
   const base = "px-4 py-3 text-sm"
   const sticky = isFirstColumn ? "sticky left-0 bg-inherit" : ""
 
@@ -52,8 +52,8 @@ function getCellClass(value: any, type?: string, isFirstColumn?: boolean): strin
 }
 
 // Helper: Check if data is legacy arrow format
-function isArrowFormat(data: any[]): data is DataPoint[] {
-  return data.length > 0 && 'forwardReturn' in data[0]
+function isArrowFormat(data: (DataPoint | Record<string, unknown>)[]): data is DataPoint[] {
+  return data.length > 0 && data[0] !== undefined && 'forwardReturn' in data[0]
 }
 
 export function DataTable({ data, columns, title = "Market Data", query, summary, onToggle }: DataTableProps) {

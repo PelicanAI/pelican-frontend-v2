@@ -20,9 +20,10 @@ import {
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
 import Image from "next/image"
+import type { User } from "@supabase/supabase-js"
 
 export default function MarketingPage() {
-  const [user, setUser] = useState<any>(null)
+  const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [includeCommunity, setIncludeCommunity] = useState(false)
@@ -262,11 +263,11 @@ export default function MarketingPage() {
               Step Into the Cockpit. PelicanAI is Here
             </h2>
             <p className="text-lg lg:text-xl mb-8 leading-relaxed" style={{ color: "#B4BED0" }}>
-              Meet Pelican Trading, your intelligent trading companion. This is trading's next evolution — not another
+              Meet Pelican Trading, your intelligent trading companion. This is trading&apos;s next evolution — not another
               alert service, but a tool built by traders, for traders. Ask it anything. Break down your strategy. Get
               feedback that actually makes you better. Pelican combines market context, trading psychology, and
-              performance analysis into one powerful voice — yours. It's not hype. It's your edge, sharpened daily.
-              Whether you're navigating macro chaos or chasing your next setup — Pelican is the co-pilot you've always
+              performance analysis into one powerful voice — yours. It&apos;s not hype. It&apos;s your edge, sharpened daily.
+              Whether you&apos;re navigating macro chaos or chasing your next setup — Pelican is the co-pilot you&apos;ve always
               needed.
             </p>
             <Button
@@ -561,7 +562,7 @@ export default function MarketingPage() {
               {/* Origin Story */}
               <div className="bg-gradient-to-r from-gray-900/50 to-gray-800/30 rounded-2xl p-8 border border-gray-700/50">
                 <p className="text-lg leading-relaxed mb-6" style={{ color: "#B4BED0" }}>
-                  Pelican Trading wasn't built in a lab or spun up by a venture fund. It was built by traders — people
+                  Pelican Trading wasn&apos;t built in a lab or spun up by a venture fund. It was built by traders — people
                   who live this game every day, who know the grind of wins, losses, and the constant battle with
                   psychology.
                 </p>
@@ -581,7 +582,7 @@ export default function MarketingPage() {
                     Built Brick by Brick
                   </h3>
                   <p className="text-lg leading-relaxed mb-4" style={{ color: "#B4BED0" }}>
-                    Pelican didn't come from a corporate playbook. It was coded, broken, and rebuilt from scratch by
+                    Pelican didn&apos;t come from a corporate playbook. It was coded, broken, and rebuilt from scratch by
                     traders turned devs who knew exactly what was missing.
                   </p>
                   <p className="text-lg leading-relaxed mb-4" style={{ color: "#B4BED0" }}>
@@ -618,18 +619,18 @@ export default function MarketingPage() {
                   Forged by the Architect of Modern Markets
                 </h3>
                 <p className="text-lg leading-relaxed mb-6" style={{ color: "#B4BED0" }}>
-                  Pelican isn't just trader-made anymore. Today, the team includes{" "}
+                  Pelican isn&apos;t just trader-made anymore. Today, the team includes{" "}
                   <span className="text-purple-400 font-semibold">Ray Campbell</span> — one of the original architects
-                  behind the New York Stock Exchange's electronic platform.
+                  behind the New York Stock Exchange&apos;s electronic platform.
                 </p>
                 <p className="text-lg leading-relaxed mb-6" style={{ color: "#B4BED0" }}>
                   Ray helped build the ultra-low latency, high-throughput systems that power billions of dollars in
-                  trades daily — the very backbone of modern markets. Now, he's bringing that same institutional-grade
+                  trades daily — the very backbone of modern markets. Now, he&apos;s bringing that same institutional-grade
                   engineering to Pelican.
                 </p>
                 <blockquote className="border-l-4 border-purple-500 pl-6 italic text-lg" style={{ color: "#DCE4F0" }}>
-                  "For years, I built tools that gave an edge to Wall Street. Pelican is about giving that power back to
-                  the people — tools with the same precision, speed, and reliability, but accessible to every trader."
+                  &quot;For years, I built tools that gave an edge to Wall Street. Pelican is about giving that power back to
+                  the people — tools with the same precision, speed, and reliability, but accessible to every trader.&quot;
                   <footer className="text-purple-400 font-semibold mt-2">— Ray Campbell</footer>
                 </blockquote>
               </div>
@@ -640,18 +641,18 @@ export default function MarketingPage() {
                   Our Mission
                 </h3>
                 <p className="text-lg leading-relaxed mb-6" style={{ color: "#B4BED0" }}>
-                  Most trading services drown you in noise and false realities. Pelican's mission is to cut through it.
-                  We're building the first AI assistant that trades the way traders actually trade — combining data,
-                  discipline, and psychology in one place, while adapting to each trader's journey.
+                  Most trading services drown you in noise and false realities. Pelican&apos;s mission is to cut through it.
+                  We&apos;re building the first AI assistant that trades the way traders actually trade — combining data,
+                  discipline, and psychology in one place, while adapting to each trader&apos;s journey.
                 </p>
                 <p className="text-lg leading-relaxed mb-8" style={{ color: "#B4BED0" }}>
                   By fusing Wall Street-grade engineering with real trading experience, Pelican bridges the gap between
                   retail and institutional markets once and for all. Every trader deserves access to the same
-                  intelligence, speed, and resilience that power the world's largest exchanges.
+                  intelligence, speed, and resilience that power the world&apos;s largest exchanges.
                 </p>
                 <div className="bg-gradient-to-r from-purple-600/20 to-blue-600/20 rounded-xl p-6 border border-purple-500/30">
                   <p className="text-xl font-semibold mb-4" style={{ color: "#DCE4F0" }}>
-                    Pelican isn't just another tool — it's the future of how humans and AI trade together.
+                    Pelican isn&apos;t just another tool — it&apos;s the future of how humans and AI trade together.
                   </p>
                   <Button
                     size="lg"
@@ -937,7 +938,7 @@ export default function MarketingPage() {
                     How do I get started?
                   </CardTitle>
                   <CardDescription className="text-base leading-relaxed" style={{ color: "#B4BED0" }}>
-                    Simply click "Chat with PelicanAI" to start using our AI assistant for free. You can upgrade to Pro
+                    Simply click &quot;Chat with PelicanAI&quot; to start using our AI assistant for free. You can upgrade to Pro
                     anytime for full access to all features and tools.
                   </CardDescription>
                 </CardHeader>

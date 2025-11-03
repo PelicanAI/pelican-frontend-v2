@@ -5,7 +5,7 @@ interface RequestConfig {
   options: RequestInit
   retryCount?: number
   maxRetries?: number
-  context?: any
+  context?: Record<string, unknown>
 }
 
 interface RequestState {

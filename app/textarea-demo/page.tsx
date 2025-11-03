@@ -42,7 +42,7 @@ export default function TextareaDemoPage() {
               <Palette className="h-5 w-5 text-purple-500" />
               Key Features
             </CardTitle>
-            <CardDescription>Premium styling that matches and exceeds ChatGPT's quality</CardDescription>
+            <CardDescription>Premium styling that matches and exceeds ChatGPT&apos;s quality</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">

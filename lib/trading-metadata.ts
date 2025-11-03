@@ -39,9 +39,12 @@ export function extractTradingMetadata(content: string): TradingMetadata {
   for (const pattern of pricePatterns) {
     const matches = content.matchAll(pattern)
     for (const match of matches) {
-      const price = parseFloat(match[1])
-      if (!isNaN(price) && price > 0) {
-        prices.push(price)
+      const priceString = match[1]
+      if (priceString) {
+        const price = parseFloat(priceString)
+        if (!isNaN(price) && price > 0) {
+          prices.push(price)
+        }
       }
     }
   }

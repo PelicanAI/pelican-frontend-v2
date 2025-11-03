@@ -4,8 +4,9 @@ import { LIMITS } from "@/lib/constants"
 import { streamWithRetry } from "@/lib/api-retry"
 import { sanitizeMessage, sanitizeTitle } from "@/lib/sanitize"
 import { logger } from "@/lib/logger"
-import { AuthenticationError, ValidationError, ExternalAPIError, getUserFriendlyError } from "@/lib/errors"
+import { AuthenticationError, ExternalAPIError, getUserFriendlyError } from "@/lib/errors"
 import { getTradingSessionId } from "@/lib/trading-metadata"
+import type { User } from "@supabase/supabase-js"
 
 interface ChatRequest {
   message: string
@@ -17,7 +18,7 @@ interface ChatRequest {
 }
 
 export async function POST(req: NextRequest) {
-  let user: any = null
+  let user: User | null = null
   let effectiveUserId: string | null = null
   let activeConversationId: string | null = null
 
@@ -187,7 +188,7 @@ export async function POST(req: NextRequest) {
 }
 
 async function saveMessagesToDatabase(
-  supabase: any,
+  supabase: Awaited<ReturnType<typeof createClient>>,
   conversationId: string,
   userMessage: string,
   reply: string,

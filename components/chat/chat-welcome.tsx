@@ -55,7 +55,7 @@ export function ChatWelcome({ onQuickStart }: ChatWelcomeProps) {
               onClick={() => onQuickStart(suggestion.message)}
             >
               <h3 className="font-medium text-sm mb-1">{suggestion.title}</h3>
-              <p className="text-xs text-muted-foreground">"{suggestion.subtitle}"</p>
+              <p className="text-xs text-muted-foreground">&quot;{suggestion.subtitle}&quot;</p>
             </Card>
           ))}
         </div>
