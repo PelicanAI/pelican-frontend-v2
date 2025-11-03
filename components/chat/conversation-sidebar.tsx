@@ -57,7 +57,7 @@ export function ConversationSidebar({
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editTitle, setEditTitle] = useState("")
 
-  const { list: conversations, isLoading, deleteConversation, updateConversation } = useConversations()
+  const { list: conversations, isLoading, remove, rename } = useConversations()
 
   const filteredConversations = useMemo(() => {
     return conversations.filter((conv) => {
@@ -98,7 +98,7 @@ export function ConversationSidebar({
 
   const handleDeleteConversation = async (conversationId: string) => {
     if (window.confirm('Delete this conversation?')) {
-      const success = await deleteConversation(conversationId)
+      const success = await remove(conversationId)
       if (success && currentConversationId === conversationId) {
         onNewConversation()
       }
@@ -107,7 +107,7 @@ export function ConversationSidebar({
 
   const handleRenameConversation = async (conversationId: string, newTitle: string) => {
     if (newTitle && newTitle.trim()) {
-      await updateConversation(conversationId, { title: newTitle.trim() })
+      await rename(conversationId, newTitle.trim())
       setEditingId(null)
       setEditTitle("")
     }
@@ -164,14 +164,16 @@ export function ConversationSidebar({
         }}
       >
         {/* Main content */}
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 max-w-[180px]">
           <h3 className="font-medium text-sm truncate text-sidebar-foreground">
-            {conversation.title || 'New conversation'}
+            {(conversation.title || 'New conversation').length > 25
+              ? `${(conversation.title || 'New conversation').slice(0, 25)}...`
+              : conversation.title || 'New conversation'}
           </h3>
         </div>
 
-        {/* Action buttons - ALWAYS VISIBLE */}
-        <div className="flex items-center gap-1 flex-shrink-0">
+        {/* Action buttons - VISIBLE ON HOVER */}
+        <div className="flex items-center gap-1 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
           {/* Rename button */}
           <button
             onClick={(e) => {
@@ -179,22 +181,24 @@ export function ConversationSidebar({
               setEditingId(conversation.id)
               setEditTitle(conversation.title || 'New conversation')
             }}
-            className="p-1.5 rounded hover:bg-sidebar-accent opacity-70 hover:opacity-100 transition-opacity"
-            title="Rename"
+            className="p-1.5 rounded hover:bg-sidebar-accent transition-colors"
+            title="Rename conversation"
+            aria-label="Rename conversation"
           >
-            <Edit3 className="h-3.5 w-3.5" />
+            <Edit3 className="h-4 w-4" />
           </button>
 
-          {/* Delete button - RED */}
+          {/* Delete button */}
           <button
             onClick={(e) => {
               e.stopPropagation()
               handleDeleteConversation(conversation.id)
             }}
-            className="p-1.5 rounded hover:bg-red-500/20 opacity-70 hover:opacity-100 transition-opacity"
-            title="Delete"
+            className="p-1.5 rounded hover:bg-red-500/20 transition-colors"
+            title="Delete conversation"
+            aria-label="Delete conversation"
           >
-            <Trash2 className="h-3.5 w-3.5 text-red-400" />
+            <Trash2 className="h-4 w-4 text-red-400" />
           </button>
         </div>
       </div>
@@ -209,7 +213,7 @@ export function ConversationSidebar({
     <div
       className={cn(
         "relative z-20",
-        isMobileSheet ? "w-full h-full" : "w-80 h-screen border-r",
+        isMobileSheet ? "w-full h-full" : "w-[280px] h-screen border-r",
         "flex flex-col bg-sidebar",
         className,
       )}

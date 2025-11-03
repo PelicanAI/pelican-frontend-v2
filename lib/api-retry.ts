@@ -33,8 +33,26 @@ export async function fetchWithRetry(
   url: string,
   options: RequestInit & { retryOptions?: RetryOptions } = {},
 ): Promise<Response> {
+  // Increase timeout for pelican_response endpoint (requests can take 60+ seconds)
+  const isPelicanResponse = url.includes('/api/pelican_response')
+  const extendedTimeout = isPelicanResponse ? 120000 : undefined // 120s for pelican, use default otherwise
   const { retryOptions, ...fetchOptions } = options
-  const config = { ...DEFAULT_OPTIONS, ...retryOptions }
+  const config = { 
+    ...DEFAULT_OPTIONS, 
+    ...retryOptions,
+    timeout: extendedTimeout || retryOptions?.timeout || DEFAULT_OPTIONS.timeout
+  }
+  
+  // Disable retries on timeout for long-running requests (don't spam backend)
+  const shouldRetryOnTimeout = !isPelicanResponse
+  const originalShouldRetry = config.shouldRetry
+  config.shouldRetry = (error: Error, attempt: number) => {
+    // Don't retry on timeout for pelican_response - just wait
+    if (error.message.includes("timeout") && !shouldRetryOnTimeout) {
+      return false
+    }
+    return originalShouldRetry ? originalShouldRetry(error, attempt) : true
+  }
 
   let lastError: Error | null = null
 

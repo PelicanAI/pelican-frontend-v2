@@ -41,40 +41,13 @@ export function StreamingMessage({
       return
     }
 
-    // For backend streaming (if available in future)
+    // For real backend streaming - display content immediately as it arrives
     if (message.isStreaming && message.content !== displayedContent) {
-      if (!displayedContent && message.content) {
-        setShowTypingIndicator(true)
-        const indicatorTimeout = setTimeout(() => {
-          setShowTypingIndicator(false)
-          setIsRevealing(true)
-        }, 500)
-
-        return () => clearTimeout(indicatorTimeout)
-      }
-
-      if (!showTypingIndicator) {
-        setIsRevealing(true)
-
-        // Character-by-character for real streaming
-        const content = message.content
-        let currentIndex = displayedContent.length
-
-        const typeInterval = setInterval(
-          () => {
-            if (currentIndex < content.length) {
-              setDisplayedContent(content.slice(0, currentIndex + 1))
-              currentIndex++
-            } else {
-              setIsRevealing(false)
-              clearInterval(typeInterval)
-            }
-          },
-          Math.random() * (LIMITS.TYPING_INTERVAL_MAX_MS - LIMITS.TYPING_INTERVAL_MIN_MS) + LIMITS.TYPING_INTERVAL_MIN_MS,
-        )
-
-        return () => clearInterval(typeInterval)
-      }
+      // Show content immediately when streaming (no artificial delays)
+      // This gives users instant feedback as tokens arrive from the backend
+      setDisplayedContent(message.content)
+      setIsRevealing(false)
+      setShowTypingIndicator(false)
     } 
     // For non-streaming: Show content immediately (no animation for now)
     else if (!message.isStreaming && message.content) {

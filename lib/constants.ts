@@ -71,6 +71,7 @@ export const STORAGE_KEYS = {
 
 export const API_ENDPOINTS = {
   CHAT: "/api/chat",
+  PELICAN_STREAM: "/api/pelican_stream",
   UPLOAD: "/api/upload",
   CONVERSATIONS: "/api/conversations",
   MESSAGES: "/api/messages",

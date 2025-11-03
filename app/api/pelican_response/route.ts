@@ -1,18 +1,17 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { LIMITS } from "@/lib/constants"
-import { streamWithRetry } from "@/lib/api-retry"
+import { fetchWithRetry } from "@/lib/api-retry"
 import { sanitizeMessage, sanitizeTitle } from "@/lib/sanitize"
 import { logger } from "@/lib/logger"
-import { AuthenticationError, ValidationError, ExternalAPIError, getUserFriendlyError } from "@/lib/errors"
+import { AuthenticationError, ExternalAPIError, getUserFriendlyError } from "@/lib/errors"
 import { getTradingSessionId } from "@/lib/trading-metadata"
 
-interface ChatRequest {
+interface PelicanResponseRequest {
   message: string
   conversationId?: string
-  stream?: boolean
-  temperature?: number
-  max_tokens?: number
+  conversationHistory?: Array<{ role: string; content: string }>
+  conversation_history?: Array<{ role: string; content: string }>
   fileIds?: string[]
 }
 
@@ -22,9 +21,23 @@ export async function POST(req: NextRequest) {
   let activeConversationId: string | null = null
 
   try {
-    const signal = req.signal // Extract AbortController signal from request
+    const signal = req.signal
 
-    const { message, conversationId, fileIds }: ChatRequest = await req.json()
+    const { 
+      message, 
+      conversationId, 
+      conversationHistory, 
+      conversation_history 
+    }: PelicanResponseRequest = await req.json()
+    
+    // Use conversationHistory or conversation_history (backwards compatibility)
+    const history = conversationHistory || conversation_history || []
+    
+    logger.info("Received request", {
+      messageLength: message?.length || 0,
+      conversationId,
+      historyLength: history.length,
+    })
 
     if (!message || message.trim().length === 0) {
       return new Response(JSON.stringify({ error: "Message cannot be empty" }), {
@@ -39,7 +52,7 @@ export async function POST(req: NextRequest) {
 
     activeConversationId = conversationId || null
 
-    // Require authentication - no guest mode
+    // Require authentication
     const {
       data: { user: authUser },
       error: authError,
@@ -50,6 +63,7 @@ export async function POST(req: NextRequest) {
     user = authUser
     effectiveUserId = user.id
 
+    // Create conversation if needed
     if (!activeConversationId && effectiveUserId) {
       const title = sanitizeTitle(userMessage, LIMITS.TITLE_PREVIEW_LENGTH)
 
@@ -84,37 +98,26 @@ export async function POST(req: NextRequest) {
       throw new ExternalAPIError("Pelican", "API URL not configured", "AI service is temporarily unavailable. Please try again later.")
     }
 
+    // Call backend pelican_response endpoint - simple POST, no streaming
     const endpoint = `${apiUrl}/api/pelican_response`
-    logger.info("Using Pelican API endpoint", { endpoint })
+    logger.info("Calling Pelican API", { endpoint, conversationId: activeConversationId })
 
-    // Generate trading session ID for memory continuity
-    const sessionId = effectiveUserId ? getTradingSessionId(effectiveUserId) : null
-
-    // TODO: Backend will fetch conversation context using conversation_id
-    // TODO: Backend will extract and save trading metadata
-    // TODO: Backend will update message metadata in Supabase after processing
-    
     const requestBody = {
       message: userMessage,
       user_id: effectiveUserId || "anonymous",
       conversation_id: activeConversationId || null,
-      session_id: activeConversationId || null,  // Backward compatibility - same as conversation_id
+      session_id: activeConversationId || null,
       timestamp: new Date().toISOString(),
-      stream: false,  // Streaming disabled
+      stream: false,  // No streaming - get full JSON response
+      conversationHistory: history,  // Send conversation history to backend
+      conversation_history: history,  // Backend might expect both formats
     }
-    
-    logger.info("Sending request to backend", {
-      conversationId: activeConversationId,
-      userId: effectiveUserId,
-      messageLength: userMessage.length,
-    })
 
-    // Disable streaming - always request JSON response
-    const response = await streamWithRetry(endpoint, {
+    const response = await fetchWithRetry(endpoint, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Accept": "application/json",  // Request JSON, not streaming
+        "Accept": "application/json",
         "X-API-Key": apiKey,
       },
       body: JSON.stringify(requestBody),
@@ -136,9 +139,9 @@ export async function POST(req: NextRequest) {
       throw new Error(`API request failed with status ${response.status}`)
     }
 
-    // Always return JSON - streaming disabled
+    // Get full JSON response - no streaming
     const data = await response.json()
-    logger.info("Received JSON response", {
+    logger.info("Received Pelican API response", {
       conversationId: activeConversationId,
       userId: effectiveUserId,
       responseLength: (data.text || data.reply || data.content || "").length,
@@ -146,11 +149,12 @@ export async function POST(req: NextRequest) {
 
     const reply = data.text || data.reply || data.content || "No response received"
 
-    // Always save to database for authenticated users
+    // Save messages to database
     if (activeConversationId && effectiveUserId) {
       await saveMessagesToDatabase(supabase, activeConversationId, userMessage, reply, effectiveUserId)
     }
 
+    // Return simple JSON response matching frontend expectations
     return NextResponse.json({
       choices: [
         {
@@ -171,7 +175,7 @@ export async function POST(req: NextRequest) {
     }
 
     const friendlyError = getUserFriendlyError(error)
-    logger.error("Chat API error", error instanceof Error ? error : new Error(String(error)), {
+    logger.error("Pelican response API error", error instanceof Error ? error : new Error(String(error)), {
       conversationId: activeConversationId,
       userId: effectiveUserId,
     })
@@ -193,21 +197,20 @@ async function saveMessagesToDatabase(
   reply: string,
   userId: string,
 ) {
-  // Backend will handle metadata extraction
   const { data: insertData, error: insertError } = await supabase.from("messages").insert([
     {
       conversation_id: conversationId,
       user_id: userId,
       role: "user",
       content: userMessage,
-      metadata: {},  // Backend will populate this
+      metadata: {},
     },
     {
       conversation_id: conversationId,
       user_id: userId,
       role: "assistant",
       content: reply,
-      metadata: {},  // Backend will populate this
+      metadata: {},
     },
   ]).select()
 
@@ -250,3 +253,4 @@ async function saveMessagesToDatabase(
     }
   }
 }
+

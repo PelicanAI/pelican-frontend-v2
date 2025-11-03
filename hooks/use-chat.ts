@@ -142,14 +142,31 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
       try {
         logger.info("Sending message to Pelican API", { messageLength: content.length })
 
-        const response = await makeRequest(API_ENDPOINTS.CHAT, {
+        // Build conversation history from existing messages (excluding the new user message)
+        const conversationHistory = messagesRef.current
+          .filter((msg) => msg.role !== "system" && msg.id !== userMessage.id && msg.id !== assistantMessage.id)
+          .map((msg) => ({
+            role: msg.role,
+            content: msg.content,
+          }))
+          .slice(-LIMITS.MESSAGE_CONTEXT) // Limit to last N messages
+
+        logger.info("Sending conversation history", { 
+          historyLength: conversationHistory.length,
+          conversationId: currentConversationId 
+        })
+
+        // Simple POST to pelican_response endpoint - no streaming
+        const response = await makeRequest("/api/pelican_response", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            message: userMessage.content,  // Only send the new message content
+            message: userMessage.content,
             conversationId: currentConversationId,
+            conversationHistory: conversationHistory,
+            conversation_history: conversationHistory, // Backend expects both formats
             fileIds: options.fileIds,
           }),
         })
@@ -158,114 +175,27 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
           throw new Error(`API request failed with status ${response.status}`)
         }
 
-        const contentType = response.headers.get("content-type")
-        if (contentType?.includes("text/event-stream")) {
-          const reader = response.body?.getReader()
-          const decoder = new TextDecoder()
+        // Non-streaming response - wait for complete JSON response
+        const data = await response.json()
+        logger.info("Received API response", { hasError: !!data.error })
 
-          if (!reader) {
-            throw new Error("No response body reader available")
-          }
-
-          let buffer = ""
-          let streamingContent = ""
-
-            while (true) {
-              if (localAbortController.signal.aborted) {
-                logger.info("Stream cancelled by user")
-                reader.cancel()
-                break
-              }
-
-              const { done, value } = await reader.read()
-              if (done) break
-
-              if (localAbortController.signal.aborted) {
-                logger.info("Stream cancelled during processing")
-                reader.cancel()
-                return
-              }
-
-            buffer += decoder.decode(value, { stream: true })
-            const lines = buffer.split("\n")
-            buffer = lines.pop() || ""
-
-            for (const line of lines) {
-              if (localAbortController.signal.aborted) {
-                logger.info("Stream cancelled during line processing")
-                reader.cancel()
-                return
-              }
-
-              if (line.startsWith("data: ")) {
-                const data = line.slice(6)
-                if (data === "[DONE]") {
-                  break
-                }
-
-                try {
-                  const parsed = JSON.parse(data)
-
-                  if (parsed.choices?.[0]?.delta?.content) {
-                    streamingContent += parsed.choices[0].delta.content
-                    setMessages((prev) =>
-                      prev.map((msg) =>
-                        msg.id === assistantMessage.id ? { ...msg, content: streamingContent, isStreaming: true } : msg,
-                      ),
-                    )
-                  } else if (parsed.choices?.[0]?.finish_reason === "stop") {
-                    if (parsed.conversationId && !currentConversationId) {
-                      setCurrentConversationId(parsed.conversationId)
-                      onConversationCreated?.(parsed.conversationId)
-                      logger.info("New conversation created", { conversationId: parsed.conversationId })
-                    }
-
-                    const finalMessage = {
-                      ...assistantMessage,
-                      content: streamingContent || parsed.choices[0].message?.content || "No response received",
-                      isStreaming: false,
-                    }
-                    setMessages((prev) => prev.map((msg) => (msg.id === assistantMessage.id ? finalMessage : msg)))
-
-                    onFinish?.(finalMessage)
-                  }
-                } catch (parseError) {
-                  logger.error("Failed to parse streaming data", parseError instanceof Error ? parseError : new Error(String(parseError)))
-                }
-              }
-            }
-          }
-
-          if (localAbortController.signal.aborted) {
-            setMessages((prev) =>
-              streamingContent
-                ? prev.map((msg) =>
-                    msg.id === assistantMessage.id ? { ...msg, content: streamingContent, isStreaming: false } : msg,
-                  )
-                : prev.filter((msg) => msg.id !== assistantMessage.id), // Remove if no content
-            )
-          }
-        } else {
-          const data = await response.json()
-          logger.info("Received API response", { hasError: !!data.error })
-
-          if (data.error) {
-            throw new Error(data.error)
-          }
-
-          const reply = data.choices?.[0]?.message?.content || "No response received"
-
-          if (data.conversationId && !currentConversationId) {
-            setCurrentConversationId(data.conversationId)
-            onConversationCreated?.(data.conversationId)
-            logger.info("New conversation created", { conversationId: data.conversationId })
-          }
-
-          const finalMessage = { ...assistantMessage, content: reply, isStreaming: false }
-          setMessages((prev) => prev.map((msg) => (msg.id === assistantMessage.id ? finalMessage : msg)))
-
-          onFinish?.(finalMessage)
+        if (data.error) {
+          throw new Error(data.error)
         }
+
+        // Handle both OpenAI-style and simpler Pelican format
+        const reply = data.choices?.[0]?.message?.content || data.content || "No response received"
+
+        if (data.conversationId && !currentConversationId) {
+          setCurrentConversationId(data.conversationId)
+          onConversationCreated?.(data.conversationId)
+          logger.info("New conversation created", { conversationId: data.conversationId })
+        }
+
+        const finalMessage = { ...assistantMessage, content: reply, isStreaming: false }
+        setMessages((prev) => prev.map((msg) => (msg.id === assistantMessage.id ? finalMessage : msg)))
+
+        onFinish?.(finalMessage)
 
         if (currentConversationId) {
           mutateConversation()
@@ -295,10 +225,9 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
             `High demand detected. ${queueStatus.queued > 0 ? `Position in queue: ${queueStatus.queued}` : "Your message will be processed shortly."}`,
           )
         } else if (error instanceof Error && error.message.includes("timeout")) {
-          const retryAction = () => {
-            sendMessage(content, { ...options, skipUserMessage: true })
-          }
-          addSystemMessage("Request timed out. The server took too long to respond. Please try again.", retryAction)
+          // Don't auto-retry - user can manually retry if needed
+          // Long requests (60+ seconds) are normal for pelican_response
+          addSystemMessage("Request is taking longer than expected. Please wait, or cancel and try again.")
         } else if (error instanceof Error && error.message.includes("401")) {
           addSystemMessage("Authentication error. Please sign in again to continue.")
         } else if (error instanceof Error && error.message.includes("403")) {
