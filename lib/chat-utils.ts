@@ -68,3 +68,39 @@ export function createSystemMessage(content: string, retryAction?: () => void): 
     retryAction,
   }
 }
+
+/**
+ * Process Pelican API response to handle both old format (plain text) and new format (object with attachments)
+ */
+export interface ProcessedResponse {
+  text: string
+  attachments: Attachment[]
+  hasAttachments: boolean
+}
+
+export function processPelicanResponse(response: unknown): ProcessedResponse {
+  // Check if response is an object with content and potential attachments
+  if (typeof response === "object" && response !== null && "content" in response) {
+    // New format with potential attachments
+    const obj = response as { content?: string; attachments?: Attachment[] }
+    return {
+      text: obj.content || "",
+      attachments: obj.attachments || [],
+      hasAttachments: Array.isArray(obj.attachments) && obj.attachments.length > 0,
+    }
+  } else if (typeof response === "string") {
+    // Old format - plain text
+    return {
+      text: response,
+      attachments: [],
+      hasAttachments: false,
+    }
+  } else {
+    // Fallback for unexpected formats
+    return {
+      text: String(response || ""),
+      attachments: [],
+      hasAttachments: false,
+    }
+  }
+}

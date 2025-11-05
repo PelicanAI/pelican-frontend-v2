@@ -183,8 +183,12 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
           throw new Error(data.error)
         }
 
-        // Handle both OpenAI-style and simpler Pelican format
-        const reply = data.choices?.[0]?.message?.content || data.content || "No response received"
+        // Handle both OpenAI-style and simpler Pelican format, including attachments
+        const rawReply = data.choices?.[0]?.message?.content || data.content || data
+        const processedResponse = typeof rawReply === "object" ? rawReply : { content: rawReply }
+        
+        const reply = processedResponse.content || rawReply || "No response received"
+        const attachments = processedResponse.attachments || []
 
         if (data.conversationId && !currentConversationId) {
           setCurrentConversationId(data.conversationId)
@@ -192,7 +196,12 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
           logger.info("New conversation created", { conversationId: data.conversationId })
         }
 
-        const finalMessage = { ...assistantMessage, content: reply, isStreaming: false }
+        const finalMessage = { 
+          ...assistantMessage, 
+          content: reply, 
+          attachments: attachments,
+          isStreaming: false 
+        }
         setMessages((prev) => prev.map((msg) => (msg.id === assistantMessage.id ? finalMessage : msg)))
 
         onFinish?.(finalMessage)

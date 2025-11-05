@@ -9,6 +9,7 @@ import { RelativeTimestamp } from "@/components/ui/relative-timestamp"
 import { AttachmentChip } from "./attachment-chip"
 import { MessageActions } from "./message-actions"
 import { EnhancedTypingDots } from "./enhanced-typing-dots"
+import { TableImageDisplay } from "./table-image-display"
 import { motion, AnimatePresence } from "framer-motion"
 import { useState, useCallback, useMemo } from "react"
 import { Copy, Check } from "lucide-react"
@@ -175,46 +176,64 @@ export function MessageBubble({
     if (!attachments || attachments.length === 0) return null
 
     return (
-      <motion.div
-        className="flex flex-wrap gap-2 mb-3"
-        initial={{ opacity: 0, y: 5 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, delay: 0.1 }}
-      >
+      <div className="attachments-container">
         {attachments.map((attachment, index) => {
           const isImage =
             attachment.type.toLowerCase().includes("image") ||
             attachment.name.toLowerCase().match(/\.(png|jpg|jpeg|gif|webp)$/i)
 
-          if (isImage) {
+          // Check if this is a Pelican-generated table image
+          const isPelicanTable = 
+            isImage && 
+            (attachment.name.toLowerCase().includes("pelican_analysis") || 
+             attachment.name.toLowerCase().includes("pelican_table"))
+
+          if (isPelicanTable) {
+            // Use the enhanced TableImageDisplay component for Pelican tables
+            return <TableImageDisplay key={index} attachment={attachment} />
+          } else if (isImage) {
+            // Regular image - simple display
             return (
               <motion.div
                 key={index}
-                className="relative group"
+                className="flex flex-wrap gap-2 mb-3"
+                initial={{ opacity: 0, y: 5 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.1 }}
               >
-                <img
-                  src={attachment.url || "/placeholder.svg"}
-                  alt={attachment.name}
-                  className="max-w-[200px] rounded-lg shadow-sm cursor-pointer"
-                  onClick={() => window.open(attachment.url, "_blank")}
-                />
-                <div className="absolute bottom-1 left-1 bg-black/70 text-white text-xs px-2 py-1 rounded opacity-0">
-                  {attachment.name}
+                <div className="relative group">
+                  <img
+                    src={attachment.url || "/placeholder.svg"}
+                    alt={attachment.name}
+                    className="max-w-[200px] rounded-lg shadow-sm cursor-pointer"
+                    onClick={() => window.open(attachment.url, "_blank")}
+                  />
+                  <div className="absolute bottom-1 left-1 bg-black/70 text-white text-xs px-2 py-1 rounded opacity-0">
+                    {attachment.name}
+                  </div>
                 </div>
               </motion.div>
             )
           }
 
+          // Non-image attachments
           return (
-            <AttachmentChip
+            <motion.div
               key={index}
-              name={attachment.name}
-              type={attachment.type}
-              onClick={() => window.open(attachment.url, "_blank")}
-            />
+              className="flex flex-wrap gap-2 mb-3"
+              initial={{ opacity: 0, y: 5 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: 0.1 }}
+            >
+              <AttachmentChip
+                name={attachment.name}
+                type={attachment.type}
+                onClick={() => window.open(attachment.url, "_blank")}
+              />
+            </motion.div>
           )
         })}
-      </motion.div>
+      </div>
     )
   }
 
