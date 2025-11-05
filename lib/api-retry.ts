@@ -35,7 +35,7 @@ export async function fetchWithRetry(
 ): Promise<Response> {
   // Increase timeout for pelican_response endpoint (requests can take 60+ seconds)
   const isPelicanResponse = url.includes('/api/pelican_response')
-  const extendedTimeout = isPelicanResponse ? 120000 : undefined // 120s for pelican, use default otherwise
+  const extendedTimeout = isPelicanResponse ? 300000 : undefined // 300s (5 minutes) for pelican, use default otherwise
   const { retryOptions, ...fetchOptions } = options
   const config = { 
     ...DEFAULT_OPTIONS, 
