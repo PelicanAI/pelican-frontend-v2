@@ -186,6 +186,17 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
         // Handle both OpenAI-style and simpler Pelican format, including attachments
         const rawReply = data.choices?.[0]?.message?.content || data.content || data
         
+        // 🔍 [DEBUG] Raw API response logging
+        logger.info("🔍 [DEBUG] Raw API response", { 
+          hasChoices: !!data.choices,
+          hasContent: !!data.content,
+          rawReplyType: typeof rawReply,
+          rawReplyKeys: typeof rawReply === 'object' && rawReply !== null ? Object.keys(rawReply) : null,
+          isObject: typeof rawReply === 'object' && rawReply !== null,
+          hasContentProperty: typeof rawReply === 'object' && rawReply !== null && 'content' in rawReply,
+          hasAttachmentsProperty: typeof rawReply === 'object' && rawReply !== null && 'attachments' in rawReply
+        })
+        
         // Extract content and attachments - handle both old format (string) and new format (object)
         let reply: string
         let attachments: Array<{ type: string; name: string; url: string }> = []
@@ -208,6 +219,18 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
         if (typeof reply !== 'string') {
           reply = String(reply || "No response received")
         }
+
+        // ✅ [DEBUG] Extracted from response logging
+        logger.info("✅ [DEBUG] Extracted from response", { 
+          replyLength: reply?.length || 0,
+          attachmentsCount: attachments.length,
+          firstAttachment: attachments[0] ? {
+            type: attachments[0].type,
+            name: attachments[0].name,
+            urlLength: attachments[0].url?.length || 0,
+            urlPrefix: attachments[0].url?.substring(0, 50) || 'no url'
+          } : null
+        })
 
         if (data.conversationId && !currentConversationId) {
           setCurrentConversationId(data.conversationId)
