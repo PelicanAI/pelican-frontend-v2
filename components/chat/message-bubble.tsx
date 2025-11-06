@@ -183,41 +183,57 @@ export function MessageBubble({
     if (!attachments || attachments.length === 0) return null
 
     return (
-      <div className="attachments-container">
+      <div className="attachments-container my-4">
         {attachments.map((attachment, index) => {
           const isImage =
-            attachment.type.toLowerCase().includes("image") ||
-            attachment.name.toLowerCase().match(/\.(png|jpg|jpeg|gif|webp)$/i)
+            attachment.type?.toLowerCase().includes("image") ||
+            attachment.type === "image/png" ||
+            attachment.type === "image/jpeg" ||
+            attachment.type === "image/jpg" ||
+            attachment.type === "image/gif" ||
+            attachment.type === "image/webp" ||
+            attachment.name?.toLowerCase().match(/\.(png|jpg|jpeg|gif|webp)$/i)
 
           // Check if this is a Pelican-generated table image
+          // Backend sends table images with type: "image/png" 
           const isPelicanTable = 
             isImage && 
-            (attachment.name.toLowerCase().includes("pelican_analysis") || 
-             attachment.name.toLowerCase().includes("pelican_table"))
+            (attachment.type === "image/png" ||
+             attachment.name?.toLowerCase().includes("pelican_analysis") || 
+             attachment.name?.toLowerCase().includes("pelican_table") ||
+             attachment.name?.toLowerCase().includes("table"))
 
           if (isPelicanTable) {
             // Use the enhanced TableImageDisplay component for Pelican tables
             return <TableImageDisplay key={index} attachment={attachment} />
           } else if (isImage) {
-            // Regular image - simple display
+            // Regular image - display with proper styling
             return (
               <motion.div
                 key={index}
-                className="flex flex-wrap gap-2 mb-3"
+                className="my-3"
                 initial={{ opacity: 0, y: 5 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: 0.1 }}
               >
-                <div className="relative group">
+                <div className="relative group bg-background rounded-lg border border-border shadow-sm overflow-hidden">
                   <img
                     src={attachment.url || "/placeholder.svg"}
-                    alt={attachment.name}
-                    className="max-w-[200px] rounded-lg shadow-sm cursor-pointer"
+                    alt={attachment.name || "Attachment"}
+                    className="w-full h-auto max-w-full cursor-pointer"
+                    style={{ maxHeight: "600px", objectFit: "contain" }}
                     onClick={() => window.open(attachment.url, "_blank")}
+                    onError={(e) => {
+                      // Fallback if image fails to load
+                      const target = e.target as HTMLImageElement
+                      target.src = "/placeholder.svg"
+                    }}
                   />
-                  <div className="absolute bottom-1 left-1 bg-black/70 text-white text-xs px-2 py-1 rounded opacity-0">
-                    {attachment.name}
-                  </div>
+                  {attachment.name && (
+                    <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      {attachment.name}
+                    </div>
+                  )}
                 </div>
               </motion.div>
             )
@@ -233,8 +249,8 @@ export function MessageBubble({
               transition={{ duration: 0.3, delay: 0.1 }}
             >
               <AttachmentChip
-                name={attachment.name}
-                type={attachment.type}
+                name={attachment.name || "Attachment"}
+                type={attachment.type || "application/octet-stream"}
                 onClick={() => window.open(attachment.url, "_blank")}
               />
             </motion.div>

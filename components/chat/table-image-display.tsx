@@ -124,11 +124,19 @@ export function TableImageDisplay({ attachment }: TableImageDisplayProps) {
 
         <img
           src={attachment.url}
-          alt="Pelican Analysis Table"
+          alt={attachment.name || "Pelican Analysis Table"}
           className={`w-full h-auto ${!imageLoaded ? "hidden" : ""}`}
           onLoad={() => setImageLoaded(true)}
-          onError={() => setError(true)}
-          style={{ maxHeight: "800px", objectFit: "contain" }}
+          onError={() => {
+            console.error("Failed to load table image:", attachment.url)
+            setError(true)
+          }}
+          style={{ 
+            maxHeight: "800px", 
+            maxWidth: "100%",
+            objectFit: "contain",
+            display: imageLoaded ? "block" : "none"
+          }}
         />
 
         {imageLoaded && (
