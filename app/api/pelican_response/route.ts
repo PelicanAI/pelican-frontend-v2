@@ -15,6 +15,18 @@ interface PelicanResponseRequest {
   fileIds?: string[]
 }
 
+interface PelicanResponsePayload {
+  choices: Array<{
+    message: {
+      role: string
+      content: string | { content: string; attachments: Array<{ type: string; name: string; url: string }> }
+    }
+    finish_reason: string
+  }>
+  conversationId: string | null
+  timestamp: string
+}
+
 export async function POST(req: NextRequest) {
   let user: User | null = null
   let effectiveUserId: string | null = null
@@ -174,7 +186,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Return JSON response with attachments if present
-    const responsePayload: any = {
+    const responsePayload: PelicanResponsePayload = {
       choices: [
         {
           message: {
