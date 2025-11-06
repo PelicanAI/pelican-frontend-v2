@@ -185,10 +185,29 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
 
         // Handle both OpenAI-style and simpler Pelican format, including attachments
         const rawReply = data.choices?.[0]?.message?.content || data.content || data
-        const processedResponse = typeof rawReply === "object" ? rawReply : { content: rawReply }
         
-        const reply = processedResponse.content || rawReply || "No response received"
-        const attachments = processedResponse.attachments || []
+        // Extract content and attachments - handle both old format (string) and new format (object)
+        let reply: string
+        let attachments: Array<{ type: string; name: string; url: string }> = []
+        
+        if (typeof rawReply === 'object' && rawReply !== null && 'content' in rawReply) {
+          // New format with attachments: { content: string, attachments: [...] }
+          reply = typeof rawReply.content === 'string' ? rawReply.content : String(rawReply.content || '')
+          attachments = Array.isArray(rawReply.attachments) ? rawReply.attachments : []
+        } else if (typeof rawReply === 'string') {
+          // Old format (plain string)
+          reply = rawReply
+          attachments = []
+        } else {
+          // Fallback - ensure we always have a string
+          reply = String(rawReply || "No response received")
+          attachments = []
+        }
+        
+        // Final safety check - ensure reply is always a string
+        if (typeof reply !== 'string') {
+          reply = String(reply || "No response received")
+        }
 
         if (data.conversationId && !currentConversationId) {
           setCurrentConversationId(data.conversationId)

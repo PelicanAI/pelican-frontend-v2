@@ -34,6 +34,11 @@ export interface StructuredDataTable {
  * @returns Structured data table, or null if not found
  */
 export function detectStructuredData(text: string): StructuredDataTable | null {
+  // Defensive check - ensure text is a string
+  if (typeof text !== 'string') {
+    return null
+  }
+  
   if (!text || text.trim().length === 0) {
     return null
   }
@@ -85,6 +90,11 @@ export function detectStructuredData(text: string): StructuredDataTable | null {
  * @returns Parsed data table with title, or null if no valid pattern found
  */
 export function detectArrowFormat(text: string): ParsedDataTable | null {
+  // Defensive check - ensure text is a string
+  if (typeof text !== 'string') {
+    return null
+  }
+  
   if (!text || text.trim().length === 0) {
     return null
   }
@@ -203,6 +213,11 @@ export function calculateStats(data: DataPoint[]): { avgReturn: string; percentP
  * @returns Structured data or parsed data table, or null if no format matches
  */
 export function detectDataTable(text: string): StructuredDataTable | ParsedDataTable | null {
+  // Defensive check - ensure text is a string
+  if (typeof text !== 'string') {
+    return null
+  }
+  
   // Try structured format FIRST (most reliable, unambiguous)
   const structured = detectStructuredData(text)
   if (structured) {

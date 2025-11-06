@@ -14,9 +14,12 @@ interface ChatMessageProps {
 
 export function ChatMessage({ message, onRegenerate, showActions = false }: ChatMessageProps) {
   const isUser = message.role === "user"
+  
+  // Defensive check - ensure content is always a string
+  const safeContent = typeof message.content === 'string' ? message.content : String(message.content || '')
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(message.content)
+    navigator.clipboard.writeText(safeContent)
   }
 
   return (
@@ -36,7 +39,7 @@ export function ChatMessage({ message, onRegenerate, showActions = false }: Chat
         {/* Content */}
         <div className="flex-1 min-w-0">
           <div className="prose prose-sm max-w-none dark:prose-invert">
-            <div className="whitespace-pre-wrap">{message.content}</div>
+            <div className="whitespace-pre-wrap">{safeContent}</div>
           </div>
 
           {/* Actions */}

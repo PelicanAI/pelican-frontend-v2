@@ -139,32 +139,54 @@ export async function POST(req: NextRequest) {
 
     // Always return JSON - streaming disabled
     const data = await response.json()
+    
+    // Handle both old format (plain string) and new format (object with content and attachments)
+    let reply: string
+    let attachments: Array<{ type: string; name: string; url: string }> = []
+    
+    if (typeof data.reply === 'object' && data.reply !== null && 'content' in data.reply) {
+      // New format with attachments
+      reply = data.reply.content || "No response received"
+      attachments = data.reply.attachments || []
+    } else if (typeof data.reply === 'string') {
+      // Old format (plain string)
+      reply = data.reply
+      attachments = []
+    } else {
+      // Fallback to other possible fields
+      reply = data.text || data.content || "No response received"
+      attachments = []
+    }
+
     logger.info("Received JSON response", {
       conversationId: activeConversationId,
       userId: effectiveUserId,
-      responseLength: (data.text || data.reply || data.content || "").length,
+      responseLength: reply.length,
+      hasAttachments: attachments.length > 0,
+      attachmentCount: attachments.length,
     })
 
-    const reply = data.text || data.reply || data.content || "No response received"
-
-    // Always save to database for authenticated users
+    // Always save to database for authenticated users (save only the text content, not attachments)
     if (activeConversationId && effectiveUserId) {
       await saveMessagesToDatabase(supabase, activeConversationId, userMessage, reply, effectiveUserId)
     }
 
-    return NextResponse.json({
+    // Return JSON response with attachments if present
+    const responsePayload: any = {
       choices: [
         {
           message: {
             role: "assistant",
-            content: reply,
+            content: attachments.length > 0 ? { content: reply, attachments } : reply,
           },
           finish_reason: "stop",
         },
       ],
       conversationId: activeConversationId,
       timestamp: data.timestamp || new Date().toISOString(),
-    })
+    }
+
+    return NextResponse.json(responsePayload)
   } catch (error) {
     if (error instanceof Error && error.name === "AbortError") {
       logger.info("Request aborted by user")

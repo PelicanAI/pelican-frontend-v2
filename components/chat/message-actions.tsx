@@ -44,7 +44,7 @@ import {
 import { useToast } from "@/hooks/use-toast"
 import { useConversations } from "@/hooks/use-conversations"
 import type { Message } from "@/lib/chat-utils"
-import { cn } from "@/lib/utils"
+import { cn, safeTrim } from "@/lib/utils"
 
 interface MessageActionsProps {
   message: Message
@@ -69,10 +69,13 @@ export function MessageActions({
   isRegenerating = false,
   canDelete = true,
 }: MessageActionsProps) {
+  // Defensive check - ensure content is always a string
+  const safeContent = typeof message.content === 'string' ? message.content : String(message.content || '')
+  
   const [copied, setCopied] = useState(false)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
-  const [editContent, setEditContent] = useState(message.content)
+  const [editContent, setEditContent] = useState(safeContent)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const { toast } = useToast()
   const router = useRouter()
@@ -103,7 +106,7 @@ export function MessageActions({
 
   const handleCopy = async () => {
     try {
-      const markdownContent = `**${message.role === "user" ? "You" : "Pelican AI"}:** ${message.content}`
+      const markdownContent = `**${message.role === "user" ? "You" : "Pelican AI"}:** ${safeContent}`
       await navigator.clipboard.writeText(markdownContent)
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
@@ -125,7 +128,7 @@ export function MessageActions({
       try {
         await navigator.share({
           title: "Pelican AI Chat",
-          text: message.content,
+          text: safeContent,
         })
       } catch (error) {
         // User cancelled or error occurred
@@ -165,13 +168,14 @@ export function MessageActions({
   const handleEdit = () => {
     if (message.role === "user" && onEdit) {
       setIsEditing(true)
-      setEditContent(message.content)
+      setEditContent(safeContent)
     }
   }
 
   const handleSaveEdit = () => {
-    if (editContent.trim() !== "" && onEdit) {
-      onEdit(message.id, editContent.trim())
+    const trimmedContent = safeTrim(editContent)
+    if (trimmedContent !== "" && onEdit) {
+      onEdit(message.id, trimmedContent)
       setIsEditing(false)
       toast({
         title: "Message updated",
@@ -182,7 +186,7 @@ export function MessageActions({
 
   const handleCancelEdit = () => {
     setIsEditing(false)
-    setEditContent(message.content)
+    setEditContent(safeContent)
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -210,7 +214,7 @@ export function MessageActions({
             <X className="w-3 h-3 mr-1" />
             Cancel
           </Button>
-          <Button size="sm" onClick={handleSaveEdit} disabled={!editContent.trim()}>
+          <Button size="sm" onClick={handleSaveEdit} disabled={!safeTrim(editContent)}>
             <Save className="w-3 h-3 mr-1" />
             Save
           </Button>

@@ -29,33 +29,36 @@ export function StreamingMessage({
   showActions = true,
   isDarkMode = false,
 }: StreamingMessageProps) {
-  const [displayedContent, setDisplayedContent] = useState(message.role === "user" ? message.content : "")
+  // Defensive check - ensure content is always a string
+  const safeContent = typeof message.content === 'string' ? message.content : String(message.content || '')
+  
+  const [displayedContent, setDisplayedContent] = useState(message.role === "user" ? safeContent : "")
   const [isRevealing, setIsRevealing] = useState(false)
   const [showTypingIndicator, setShowTypingIndicator] = useState(false)
 
   useEffect(() => {
     if (message.role === "user") {
-      setDisplayedContent(message.content)
+      setDisplayedContent(safeContent)
       setIsRevealing(false)
       setShowTypingIndicator(false)
       return
     }
 
     // For real backend streaming - display content immediately as it arrives
-    if (message.isStreaming && message.content !== displayedContent) {
+    if (message.isStreaming && safeContent !== displayedContent) {
       // Show content immediately when streaming (no artificial delays)
       // This gives users instant feedback as tokens arrive from the backend
-      setDisplayedContent(message.content)
+      setDisplayedContent(safeContent)
       setIsRevealing(false)
       setShowTypingIndicator(false)
     } 
     // For non-streaming: Show content immediately (no animation for now)
-    else if (!message.isStreaming && message.content) {
-      setDisplayedContent(message.content)
+    else if (!message.isStreaming && safeContent) {
+      setDisplayedContent(safeContent)
       setIsRevealing(false)
       setShowTypingIndicator(false)
     }
-  }, [message.content, message.isStreaming, displayedContent, message.role, showTypingIndicator, isRevealing])
+  }, [safeContent, message.isStreaming, displayedContent, message.role, showTypingIndicator, isRevealing])
 
   const displayMessage = {
     ...message,
@@ -65,7 +68,7 @@ export function StreamingMessage({
   // Allow user to click to instantly reveal full message
   const handleClick = () => {
     if (isRevealing && message.role === "assistant") {
-      setDisplayedContent(message.content)
+      setDisplayedContent(safeContent)
       setIsRevealing(false)
       setShowTypingIndicator(false)
     }

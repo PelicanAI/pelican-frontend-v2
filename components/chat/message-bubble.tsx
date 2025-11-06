@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { cn } from "@/lib/utils"
+import { cn, safeTrim } from "@/lib/utils"
 import type { Message } from "@/lib/chat-utils"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { RelativeTimestamp } from "@/components/ui/relative-timestamp"
@@ -28,6 +28,11 @@ type ContentSegment =
 const LINK_REGEX = /(https?:\/\/[^\s]+)/g
 
 function parseContentSegments(rawContent: string): ContentSegment[] {
+  // Defensive check - ensure rawContent is a string
+  if (typeof rawContent !== 'string') {
+    rawContent = String(rawContent || '')
+  }
+  
   const lines = rawContent.split("\n")
   const segments: ContentSegment[] = []
 
@@ -63,7 +68,7 @@ function parseContentSegments(rawContent: string): ContentSegment[] {
       } else {
         flushText()
         isInCodeBlock = true
-        const language = fenceMatch[1]?.trim()
+        const language = fenceMatch[1] ? safeTrim(fenceMatch[1]) : undefined
         currentLanguage = language ? language : undefined
       }
       continue
@@ -152,7 +157,9 @@ export function MessageBubble({
       triggerHapticFeedback()
 
       try {
-        await navigator.clipboard.writeText(message.content)
+        // Defensive check - ensure content is a string
+        const contentToCopy = typeof message.content === 'string' ? message.content : String(message.content || '')
+        await navigator.clipboard.writeText(contentToCopy)
         setCopied(true)
         setTimeout(() => setCopied(false), 2000)
 
@@ -365,10 +372,14 @@ function MessageContent({
   isDarkMode?: boolean
 }) {
   const [showRawText, setShowRawText] = useState(false)
-  const parsedData = useMemo(() => (!isStreaming ? detectDataTable(content) : null), [content, isStreaming])
-  const segments = useMemo(() => parseContentSegments(content), [content])
+  
+  // Defensive check - ensure content is always a string
+  const safeContent = typeof content === 'string' ? content : String(content || '')
+  
+  const parsedData = useMemo(() => (!isStreaming ? detectDataTable(safeContent) : null), [safeContent, isStreaming])
+  const segments = useMemo(() => parseContentSegments(safeContent), [safeContent])
 
-  if (showSkeleton && !content) {
+  if (showSkeleton && !safeContent) {
     return (
       <div className="flex items-center gap-2">
         <div className="h-4 bg-current/20 rounded animate-pulse w-24" />
@@ -376,11 +387,11 @@ function MessageContent({
     )
   }
 
-  if (!content && isStreaming) {
+  if (!safeContent && isStreaming) {
     return <EnhancedTypingDots variant="thinking" />
   }
 
-  if (!content) {
+  if (!safeContent) {
     return <div className="text-muted-foreground italic">No content</div>
   }
 
@@ -402,6 +413,8 @@ function MessageContent({
       />
     )
   }
+  
+  // Use safeContent for all remaining content rendering
 
   return (
     <motion.div
