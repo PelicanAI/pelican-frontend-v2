@@ -230,7 +230,7 @@ async function saveMessagesToDatabase(
   reply: string,
   userId: string,
 ) {
-  const { data: insertData, error: insertError } = await supabase.from("messages").insert([
+  const { error: insertError } = await supabase.from("messages").insert([
     {
       conversation_id: conversationId,
       user_id: userId,

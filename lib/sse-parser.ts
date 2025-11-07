@@ -3,12 +3,13 @@
  * Handles backend streaming format: data: {json}\n\n
  */
 export interface SSEMessage {
-  type: 'status' | 'content' | 'attachments' | 'done' | 'error';
+  type: 'status' | 'content' | 'attachments' | 'done' | 'error' | 'conversationId';
   message?: string;      // For status events
   delta?: string;        // For content events (token chunks)
-  data?: any;           // For attachments events
+  data?: Array<{ type: string; name: string; url: string }>; // For attachments events
   full_response?: string; // For done events
   latency_ms?: number;   // For done events
+  conversationId?: string; // For conversationId events
 }
 
 export class SSEParser {

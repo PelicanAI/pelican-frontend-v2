@@ -1,4 +1,4 @@
-import { type NextRequest, NextResponse } from "next/server"
+import { type NextRequest } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { LIMITS } from "@/lib/constants"
 import { sanitizeMessage, sanitizeTitle } from "@/lib/sanitize"
@@ -78,11 +78,7 @@ export async function POST(req: NextRequest) {
       activeConversationId = newConversation.id
       logger.info("Created new conversation", { conversationId: activeConversationId, userId: effectiveUserId })
 
-      // Emit conversationId event first
-      const encoder = new TextEncoder()
-      const conversationIdEvent = `data: ${JSON.stringify({ type: 'conversationId', conversationId: activeConversationId })}\n\n`
-      
-      // We'll send this after setting up the stream
+      // We'll emit conversationId event after setting up the stream
     }
 
     const apiKey = process.env.PEL_API_KEY
@@ -196,7 +192,7 @@ export async function POST(req: NextRequest) {
                     })
                   }
                 } catch (e) {
-                  logger.error("Failed to parse SSE event", e, { line })
+                  logger.error("Failed to parse SSE event", e instanceof Error ? e : new Error(String(e)), { line })
                 }
               }
             }
@@ -205,7 +201,7 @@ export async function POST(req: NextRequest) {
           if (error instanceof Error && error.name === 'AbortError') {
             logger.info("Stream aborted by client")
           } else {
-            logger.error("Stream error", error)
+            logger.error("Stream error", error instanceof Error ? error : new Error(String(error)))
             const errorEvent = `data: ${JSON.stringify({ type: 'error', message: 'Stream interrupted' })}\n\n`
             controller.enqueue(encoder.encode(errorEvent))
           }
@@ -237,7 +233,6 @@ export async function POST(req: NextRequest) {
     })
 
     // Return SSE error event
-    const encoder = new TextEncoder()
     const errorEvent = `data: ${JSON.stringify({ 
       type: 'error', 
       message: friendlyError.message 
@@ -261,7 +256,7 @@ async function saveMessagesToDatabase(
   reply: string,
   userId: string,
 ) {
-  const { data: insertData, error: insertError } = await supabase.from("messages").insert([
+  const { error: insertError } = await supabase.from("messages").insert([
     {
       conversation_id: conversationId,
       user_id: userId,

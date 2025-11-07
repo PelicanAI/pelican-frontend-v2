@@ -65,8 +65,8 @@ export function useStreamingChat() {
         switch (event.type) {
           case 'conversationId':
             // Handle new conversation ID event
-            if ((event as any).conversationId) {
-              callbacks.onConversationCreated?.((event as any).conversationId);
+            if (event.conversationId) {
+              callbacks.onConversationCreated?.(event.conversationId);
             }
             break;
             

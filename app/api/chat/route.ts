@@ -229,7 +229,7 @@ async function saveMessagesToDatabase(
   userId: string,
 ) {
   // Backend will handle metadata extraction
-  const { data: insertData, error: insertError } = await supabase.from("messages").insert([
+  const { error: insertError } = await supabase.from("messages").insert([
     {
       conversation_id: conversationId,
       user_id: userId,
