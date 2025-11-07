@@ -5,8 +5,12 @@ import { type Message, createUserMessage, createAssistantMessage, createSystemMe
 import useSWR, { mutate } from "swr"
 import { useConversations } from "./use-conversations"
 import { useRequestManager } from "./use-request-manager"
+import { useStreamingChat } from "./use-streaming-chat"
 import { STORAGE_KEYS, API_ENDPOINTS, LIMITS } from "@/lib/constants"
 import { logger } from "@/lib/logger"
+
+// FEATURE FLAG - set true to enable streaming
+const USE_STREAMING = true
 
 interface UseChatOptions {
   conversationId?: string | null
@@ -31,6 +35,13 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
   const messagesRef = useRef<Message[]>([])
 
   const { user } = useConversations()
+  
+  // Add streaming hook
+  const { 
+    sendMessage: sendStreamingMessage, 
+    isStreaming,
+    cancelStream 
+  } = useStreamingChat()
 
   const { makeRequest, cancelAllRequests, getQueueStatus } = useRequestManager({
     maxRetries: 3,
@@ -321,6 +332,170 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
     ],
   )
 
+  // Streaming version of sendMessage
+  const sendMessageStreaming = useCallback(
+    async (content: string, options: SendMessageOptions = {}) => {
+      if (isStreaming || isLoading) return
+
+      cancelAllRequests()
+      cancelStream()
+
+      const userMessage = createUserMessage(content)
+      if (options.attachments) {
+        userMessage.attachments = options.attachments
+      }
+
+      // Only add user message if not regenerating (skipUserMessage flag)
+      if (!options.skipUserMessage) {
+        setMessages((prev) => [...prev, userMessage])
+      }
+
+      // Create empty assistant message with streaming flag
+      const assistantMessage = createAssistantMessage("")
+      assistantMessage.isStreaming = true
+      setMessages((prev) => [...prev, assistantMessage])
+
+      try {
+        logger.info("Sending streaming message", { messageLength: content.length })
+
+        // Build conversation history
+        const conversationHistory = messagesRef.current
+          .filter((msg) => msg.role !== "system" && msg.id !== userMessage.id && msg.id !== assistantMessage.id)
+          .slice(-LIMITS.MESSAGE_CONTEXT)
+
+        // Stream response
+        await sendStreamingMessage(
+          content,
+          conversationHistory,
+          {
+            onStart: () => {
+              logger.info("[Streaming] Started")
+            },
+
+            onConversationCreated: (newConversationId) => {
+              setCurrentConversationId(newConversationId)
+              onConversationCreated?.(newConversationId)
+              logger.info("[Streaming] New conversation created", { conversationId: newConversationId })
+            },
+
+            onStatus: (status) => {
+              logger.info("[Streaming] Status", { status })
+            },
+
+            onChunk: (delta) => {
+              // Append delta to assistant message
+              setMessages((prev) => 
+                prev.map((msg) => 
+                  msg.id === assistantMessage.id
+                    ? { ...msg, content: msg.content + delta }
+                    : msg
+                )
+              )
+            },
+
+            onComplete: (fullResponse, latency) => {
+              // Mark as complete, use full_response (handles edge cases)
+              setMessages((prev) =>
+                prev.map((msg) =>
+                  msg.id === assistantMessage.id
+                    ? { ...msg, content: fullResponse, isStreaming: false }
+                    : msg
+                )
+              )
+              logger.info("[Streaming] Complete", { latency })
+              
+              const finalMessage = { 
+                ...assistantMessage, 
+                content: fullResponse, 
+                isStreaming: false 
+              }
+              onFinish?.(finalMessage)
+
+              if (currentConversationId) {
+                mutateConversation()
+              }
+              mutate(API_ENDPOINTS.CONVERSATIONS)
+            },
+
+            onAttachments: (attachments) => {
+              // Store attachments with the message
+              setMessages((prev) =>
+                prev.map((msg) =>
+                  msg.id === assistantMessage.id
+                    ? { ...msg, attachments }
+                    : msg
+                )
+              )
+              logger.info("[Streaming] Attachments", { count: attachments.length })
+            },
+
+            onError: (error) => {
+              logger.error("[Streaming] Error", new Error(error))
+              setMessages((prev) =>
+                prev.map((msg) =>
+                  msg.id === assistantMessage.id
+                    ? { 
+                        ...msg, 
+                        content: `Error: ${error}. Please try again.`, 
+                        isStreaming: false 
+                      }
+                    : msg
+                )
+              )
+              onError?.(new Error(error))
+            }
+          },
+          currentConversationId
+        )
+      } catch (error) {
+        logger.error("Streaming error", error instanceof Error ? error : new Error(String(error)))
+        
+        if (error instanceof Error && error.name === "AbortError") {
+          logger.info("Stream cancelled by user")
+          // Keep partial content if any was generated
+          setMessages((prev) =>
+            prev.map((msg) =>
+              msg.id === assistantMessage.id
+                ? { ...msg, isStreaming: false }
+                : msg
+            )
+          )
+        } else {
+          // Remove failed assistant message
+          setMessages((prev) => prev.filter((msg) => msg.id !== assistantMessage.id))
+          
+          const retryAction = () => {
+            sendMessageStreaming(content, { ...options, skipUserMessage: true })
+          }
+          addSystemMessage("Something went wrong. Please try again.", retryAction)
+        }
+
+        onError?.(error instanceof Error ? error : new Error("Unknown error"))
+      }
+    },
+    [
+      isLoading,
+      isStreaming,
+      currentConversationId,
+      mutateConversation,
+      onError,
+      onFinish,
+      onConversationCreated,
+      sendStreamingMessage,
+      cancelStream,
+      cancelAllRequests,
+      addSystemMessage,
+    ],
+  )
+
+  // Keep existing non-streaming sendMessage unchanged
+  const sendMessageNonStreaming = sendMessage
+
+  // Choose based on feature flag
+  const sendMessageFinal = USE_STREAMING 
+    ? sendMessageStreaming 
+    : sendMessageNonStreaming
+
   const stopGeneration = useCallback(() => {
     if (abortControllerRef.current) {
       logger.info("Stopping generation - aborting controller")
@@ -369,17 +544,26 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
       const newMessages = currentMessages.slice(0, actualIndex)
 
       // Regenerate with skipUserMessage flag to avoid duplicating the user's question
-      setTimeout(() => sendMessage(userMessage.content, { skipUserMessage: true }), 0)
+      setTimeout(() => sendMessageFinal(userMessage.content, { skipUserMessage: true }), 0)
 
       return newMessages
     })
-  }, [sendMessage])
+  }, [sendMessageFinal])
+
+  // Update stopGeneration to handle streaming
+  const stopGenerationFinal = useCallback(() => {
+    if (USE_STREAMING && isStreaming) {
+      cancelStream()
+    } else {
+      stopGeneration()
+    }
+  }, [isStreaming, cancelStream, stopGeneration])
 
   return {
     messages,
-    isLoading,
-    sendMessage,
-    stopGeneration,
+    isLoading: isLoading || isStreaming,
+    sendMessage: sendMessageFinal,
+    stopGeneration: stopGenerationFinal,
     clearMessages,
     removeMessage,
     regenerateLastMessage,
@@ -387,5 +571,7 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
     addSystemMessage,
     removeSystemMessage,
     conversationNotFound,
+    // Only expose cancel if streaming enabled
+    ...(USE_STREAMING ? { cancelStream } : {}),
   }
 }

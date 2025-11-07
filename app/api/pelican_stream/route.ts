@@ -1,16 +1,15 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { LIMITS } from "@/lib/constants"
-import { streamWithRetry } from "@/lib/api-retry"
-import { sanitizeMessage } from "@/lib/sanitize"
+import { sanitizeMessage, sanitizeTitle } from "@/lib/sanitize"
 import { logger } from "@/lib/logger"
 import { AuthenticationError, ExternalAPIError, getUserFriendlyError } from "@/lib/errors"
-import { getTradingSessionId } from "@/lib/trading-metadata"
 import type { User } from "@supabase/supabase-js"
 
-interface PelicanStreamRequest {
+interface StreamingRequest {
   message: string
-  conversationId?: string
+  conversationId?: string | null
+  conversationHistory?: Array<{ role: string; content: string }>
   fileIds?: string[]
 }
 
@@ -22,7 +21,17 @@ export async function POST(req: NextRequest) {
   try {
     const signal = req.signal
 
-    const { message, conversationId }: PelicanStreamRequest = await req.json()
+    const { 
+      message, 
+      conversationId, 
+      conversationHistory = []
+    }: StreamingRequest = await req.json()
+    
+    logger.info("Received streaming request", {
+      messageLength: message?.length || 0,
+      conversationId,
+      historyLength: conversationHistory.length,
+    })
 
     if (!message || message.trim().length === 0) {
       return new Response(JSON.stringify({ error: "Message cannot be empty" }), {
@@ -48,6 +57,34 @@ export async function POST(req: NextRequest) {
     user = authUser
     effectiveUserId = user.id
 
+    // Create conversation if needed
+    if (!activeConversationId && effectiveUserId) {
+      const title = sanitizeTitle(userMessage, LIMITS.TITLE_PREVIEW_LENGTH)
+
+      const { data: newConversation, error: createError } = await supabase
+        .from("conversations")
+        .insert({
+          user_id: effectiveUserId,
+          title: title,
+        })
+        .select()
+        .single()
+
+      if (createError) {
+        logger.error("Failed to create conversation", createError, { userId: effectiveUserId })
+        throw new Error("Failed to create conversation in database")
+      }
+
+      activeConversationId = newConversation.id
+      logger.info("Created new conversation", { conversationId: activeConversationId, userId: effectiveUserId })
+
+      // Emit conversationId event first
+      const encoder = new TextEncoder()
+      const conversationIdEvent = `data: ${JSON.stringify({ type: 'conversationId', conversationId: activeConversationId })}\n\n`
+      
+      // We'll send this after setting up the stream
+    }
+
     const apiKey = process.env.PEL_API_KEY
     const apiUrl = process.env.PEL_API_URL
 
@@ -61,12 +98,9 @@ export async function POST(req: NextRequest) {
       throw new ExternalAPIError("Pelican", "API URL not configured", "AI service is temporarily unavailable. Please try again later.")
     }
 
-    // Use the pelican_stream endpoint
+    // Call backend streaming endpoint
     const endpoint = `${apiUrl}/api/pelican_stream`
-    logger.info("Using Pelican stream API endpoint", { endpoint })
-
-    // Generate trading session ID for memory continuity
-    const sessionId = effectiveUserId ? getTradingSessionId(effectiveUserId) : null
+    logger.info("Calling Pelican streaming API", { endpoint, conversationId: activeConversationId })
 
     const requestBody = {
       message: userMessage,
@@ -74,36 +108,25 @@ export async function POST(req: NextRequest) {
       conversation_id: activeConversationId || null,
       session_id: activeConversationId || null,
       timestamp: new Date().toISOString(),
+      stream: true,  // Enable streaming
+      conversationHistory: conversationHistory,
+      conversation_history: conversationHistory,  // Backend might expect both formats
     }
 
-    logger.info("Sending stream request to Pelican backend", {
-      conversationId: activeConversationId,
-      userId: effectiveUserId,
-      messageLength: userMessage.length,
-    })
-
-    // Check if client requested streaming (always expect streaming for this endpoint)
-    const acceptHeader = req.headers.get("accept") || "text/event-stream"
-    
-    const response = await streamWithRetry(endpoint, {
+    const response = await fetch(endpoint, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Accept": acceptHeader,  // Forward Accept header to backend
+        "Accept": "text/event-stream",
         "X-API-Key": apiKey,
       },
       body: JSON.stringify(requestBody),
       signal,
-      retryOptions: {
-        maxRetries: 2,
-        baseDelay: 1000,
-        maxDelay: 5000,
-      },
     })
 
     if (!response.ok) {
       const errorText = await response.text()
-      logger.error("Pelican stream API request failed", new Error(errorText), {
+      logger.error("Pelican streaming API request failed", new Error(errorText), {
         status: response.status,
         userId: effectiveUserId,
         conversationId: activeConversationId,
@@ -111,134 +134,96 @@ export async function POST(req: NextRequest) {
       throw new Error(`API request failed with status ${response.status}`)
     }
 
-    const contentType = response.headers.get("content-type")
-    if (contentType?.includes("text/stream") || contentType?.includes("text/event-stream")) {
-      // Stream the response directly to the client with minimal transformation
-      // The backend should already be sending data in the format: data: {content: "..."}\n
-      const decoder = new TextDecoder()
-      let fullResponseContent = ""
-      let buffer = ""
+    // Create a TransformStream to handle the SSE stream
+    const encoder = new TextEncoder()
+    let fullResponse = ""
+    
+    const stream = new ReadableStream({
+      async start(controller) {
+        // Send conversationId event if we created a new conversation
+        if (activeConversationId && !conversationId) {
+          const conversationIdEvent = `data: ${JSON.stringify({ type: 'conversationId', conversationId: activeConversationId })}\n\n`
+          controller.enqueue(encoder.encode(conversationIdEvent))
+        }
 
-      const stream = new ReadableStream({
-        async start(controller) {
-          const reader = response.body?.getReader()
-          if (!reader) {
-            controller.close()
-            return
-          }
+        const reader = response.body?.getReader()
+        if (!reader) {
+          controller.error(new Error("No response body"))
+          return
+        }
 
-          try {
-            while (true) {
-              if (signal?.aborted) {
-                logger.info("Request aborted, stopping stream", { conversationId: activeConversationId })
-                reader.cancel()
-                controller.close()
-                return
-              }
+        const decoder = new TextDecoder()
+        let buffer = ""
 
-              const { done, value } = await reader.read()
-              if (done) break
+        try {
+          while (true) {
+            const { done, value } = await reader.read()
+            
+            if (done) {
+              break
+            }
 
-              // Debug: Log what backend is sending
-              const chunkText = decoder.decode(value, { stream: true })
-              logger.info("Backend chunk received", { 
-                chunkLength: chunkText.length,
-                chunkPreview: chunkText.slice(0, 100),
-                hasDataPrefix: chunkText.includes("data: ")
-              })
-              console.log('Backend raw chunk:', chunkText.slice(0, 200))
+            buffer += decoder.decode(value, { stream: true })
+            const lines = buffer.split('\n\n')
+            buffer = lines.pop() || ''
 
-              // Forward chunks directly - backend handles the formatting
-              controller.enqueue(value)
+            for (const line of lines) {
+              if (line.startsWith('data: ')) {
+                try {
+                  const jsonStr = line.slice(6)
+                  const event = JSON.parse(jsonStr)
+                  
+                  // Forward the event to the client
+                  controller.enqueue(encoder.encode(`${line}\n\n`))
 
-              // Parse chunks to extract content for database saving
-              buffer += decoder.decode(value, { stream: true })
-              const lines = buffer.split("\n")
-              buffer = lines.pop() || ""
-
-              for (const line of lines) {
-                if (line.startsWith("data: ")) {
-                  const data = line.slice(6)
-                  if (data === "[DONE]") {
-                    continue
+                  // Capture content for database storage
+                  if (event.type === 'content' && event.delta) {
+                    fullResponse += event.delta
+                  } else if (event.type === 'done' && event.full_response) {
+                    fullResponse = event.full_response
                   }
 
-                  try {
-                    const parsed = JSON.parse(data)
-                    if (parsed.content) {
-                      fullResponseContent += parsed.content
-                    }
-                  } catch (parseError) {
-                    // Ignore parse errors for individual chunks
+                  // Save to database when done
+                  if (event.type === 'done' && activeConversationId && effectiveUserId) {
+                    saveMessagesToDatabase(
+                      supabase, 
+                      activeConversationId, 
+                      userMessage, 
+                      fullResponse, 
+                      effectiveUserId
+                    ).catch((err) => {
+                      logger.error("Failed to save messages", err)
+                    })
                   }
+                } catch (e) {
+                  logger.error("Failed to parse SSE event", e, { line })
                 }
               }
             }
-
-            // Process remaining buffer
-            if (buffer) {
-              const lines = buffer.split("\n")
-              for (const line of lines) {
-                if (line.startsWith("data: ")) {
-                  const data = line.slice(6)
-                  if (data === "[DONE]") {
-                    continue
-                  }
-
-                  try {
-                    const parsed = JSON.parse(data)
-                    if (parsed.content) {
-                      fullResponseContent += parsed.content
-                    }
-                  } catch (parseError) {
-                    // Ignore parse errors
-                  }
-                }
-              }
-            }
-
-            // Save messages to database after stream completes
-            if (!signal?.aborted && activeConversationId && effectiveUserId && fullResponseContent.trim()) {
-              await saveMessagesToDatabase(supabase, activeConversationId, userMessage, fullResponseContent.trim(), effectiveUserId)
-            }
-          } catch (error) {
-            if (error instanceof Error && error.name === "AbortError") {
-              logger.info("Stream aborted by user", { conversationId: activeConversationId })
-              controller.close()
-              return
-            }
-            logger.error("Streaming error occurred", error instanceof Error ? error : new Error(String(error)), {
-              conversationId: activeConversationId,
-              userId: effectiveUserId,
-            })
-            controller.error(error)
-          } finally {
-            controller.close()
           }
-        },
-      })
+        } catch (error) {
+          if (error instanceof Error && error.name === 'AbortError') {
+            logger.info("Stream aborted by client")
+          } else {
+            logger.error("Stream error", error)
+            const errorEvent = `data: ${JSON.stringify({ type: 'error', message: 'Stream interrupted' })}\n\n`
+            controller.enqueue(encoder.encode(errorEvent))
+          }
+        } finally {
+          controller.close()
+          reader.releaseLock()
+        }
+      }
+    })
 
-      return new Response(stream, {
-        headers: {
-          "Content-Type": "text/event-stream",
-          "Cache-Control": "no-cache",
-          Connection: "keep-alive",
-        },
-      })
-    } else {
-      // Non-streaming response fallback
-      const data = await response.json()
-      logger.info("Received non-streaming response", {
-        conversationId: activeConversationId,
-        userId: effectiveUserId,
-      })
-
-      return NextResponse.json({
-        content: data.text || data.reply || data.content || "No response received",
-        conversationId: activeConversationId,
-        timestamp: data.timestamp || new Date().toISOString(),
-      })
-    }
+    return new Response(stream, {
+      headers: {
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache",
+        "Connection": "keep-alive",
+        "X-Accel-Buffering": "no", // Disable Nginx buffering
+      },
+    })
   } catch (error) {
     if (error instanceof Error && error.name === "AbortError") {
       logger.info("Request aborted by user")
@@ -246,18 +231,26 @@ export async function POST(req: NextRequest) {
     }
 
     const friendlyError = getUserFriendlyError(error)
-    logger.error("Pelican stream API error", error instanceof Error ? error : new Error(String(error)), {
+    logger.error("Pelican streaming API error", error instanceof Error ? error : new Error(String(error)), {
       conversationId: activeConversationId,
       userId: effectiveUserId,
     })
 
-    return NextResponse.json(
-      {
-        error: friendlyError.message,
-        code: error instanceof Error && "statusCode" in error ? error.statusCode : friendlyError.statusCode,
+    // Return SSE error event
+    const encoder = new TextEncoder()
+    const errorEvent = `data: ${JSON.stringify({ 
+      type: 'error', 
+      message: friendlyError.message 
+    })}\n\n`
+    
+    return new Response(errorEvent, {
+      status: 200, // Keep 200 for SSE
+      headers: {
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache",
+        "X-Accel-Buffering": "no",
       },
-      { status: friendlyError.statusCode },
-    )
+    })
   }
 }
 
@@ -268,21 +261,20 @@ async function saveMessagesToDatabase(
   reply: string,
   userId: string,
 ) {
-  // Backend will handle metadata extraction
   const { data: insertData, error: insertError } = await supabase.from("messages").insert([
     {
       conversation_id: conversationId,
       user_id: userId,
       role: "user",
       content: userMessage,
-      metadata: {}, // Backend will populate this
+      metadata: {},
     },
     {
       conversation_id: conversationId,
       user_id: userId,
       role: "assistant",
       content: reply,
-      metadata: {}, // Backend will populate this
+      metadata: {},
     },
   ]).select()
 
@@ -325,4 +317,3 @@ async function saveMessagesToDatabase(
     }
   }
 }
-

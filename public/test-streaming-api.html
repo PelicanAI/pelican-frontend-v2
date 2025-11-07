@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Streaming API Test</title>
+    <style>
+        body {
+            font-family: monospace;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .test-section {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .success { color: green; }
+        .error { color: red; }
+        .info { color: blue; }
+        .chunk { 
+            background: #f0f0f0; 
+            padding: 5px; 
+            margin: 2px 0;
+            border-left: 3px solid #0066cc;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+        }
+        #output {
+            white-space: pre-wrap;
+            background: #f5f5f5;
+            padding: 10px;
+            border: 1px solid #ddd;
+            height: 400px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Pelican Streaming API Test</h1>
+    
+    <div class="test-section">
+        <h2>Test Controls</h2>
+        <button onclick="testNonStreaming()">Test Non-Streaming API</button>
+        <button onclick="testStreaming()">Test Streaming API</button>
+        <button onclick="testFeatureFlag()">Check Feature Flag</button>
+        <button onclick="clearOutput()">Clear Output</button>
+    </div>
+
+    <div class="test-section">
+        <h2>Test Output</h2>
+        <div id="output"></div>
+    </div>
+
+    <script>
+        const output = document.getElementById('output');
+        
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const className = type;
+            output.innerHTML += `<div class="${className}">[${timestamp}] ${message}</div>`;
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function clearOutput() {
+            output.innerHTML = '';
+        }
+
+        async function testNonStreaming() {
+            log('=== Testing Non-Streaming Endpoint (/api/pelican_response) ===', 'info');
+            
+            try {
+                const response = await fetch('/api/pelican_response', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: "What's AAPL at?",
+                        conversationHistory: [],
+                    }),
+                });
+
+                if (!response.ok) {
+                    log(`❌ Failed: ${response.status} ${response.statusText}`, 'error');
+                    const text = await response.text();
+                    log(`Response: ${text}`, 'error');
+                    return;
+                }
+
+                const data = await response.json();
+                log('✅ Non-streaming endpoint works!', 'success');
+                
+                if (data.choices?.[0]?.message?.content) {
+                    const content = data.choices[0].message.content;
+                    const preview = typeof content === 'string' 
+                        ? content.substring(0, 100) + '...' 
+                        : JSON.stringify(content).substring(0, 100) + '...';
+                    log(`Response preview: ${preview}`, 'info');
+                } else if (data.error) {
+                    log(`API Error: ${data.error}`, 'error');
+                } else {
+                    log('Response structure:', 'info');
+                    log(JSON.stringify(data, null, 2), 'info');
+                }
+            } catch (error) {
+                log(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testStreaming() {
+            log('=== Testing Streaming Endpoint (/api/pelican_stream) ===', 'info');
+            
+            try {
+                const response = await fetch('/api/pelican_stream', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: "What's AAPL at?",
+                        conversationHistory: [],
+                    }),
+                });
+
+                if (!response.ok) {
+                    log(`❌ Failed: ${response.status} ${response.statusText}`, 'error');
+                    const text = await response.text();
+                    log(`Response: ${text}`, 'error');
+                    return;
+                }
+
+                log('✅ Streaming endpoint accessible!', 'success');
+                log(`Content-Type: ${response.headers.get('content-type')}`, 'info');
+
+                // Parse SSE stream
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let buffer = '';
+                let eventCount = 0;
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+
+                    buffer += decoder.decode(value, { stream: true });
+                    const lines = buffer.split('\\n\\n');
+                    buffer = lines.pop() || '';
+
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            eventCount++;
+                            try {
+                                const data = JSON.parse(line.slice(6));
+                                
+                                if (data.type === 'status') {
+                                    log(`📊 STATUS: ${data.message}`, 'info');
+                                } else if (data.type === 'content') {
+                                    log(`📝 CONTENT: "${data.delta}"`, 'chunk');
+                                } else if (data.type === 'done') {
+                                    log(`✅ DONE (${data.latency_ms}ms)`, 'success');
+                                    log(`Full response length: ${data.full_response?.length || 0} chars`, 'info');
+                                } else if (data.type === 'error') {
+                                    log(`❌ ERROR: ${data.message}`, 'error');
+                                } else if (data.type === 'attachments') {
+                                    log(`📎 ATTACHMENTS: ${data.data?.length || 0} items`, 'info');
+                                } else {
+                                    log(`Unknown event type: ${data.type}`, 'info');
+                                }
+                            } catch (e) {
+                                log(`Parse error: ${e.message}`, 'error');
+                            }
+                        }
+                    }
+                }
+
+                log(`Stream complete. Total events: ${eventCount}`, 'success');
+
+            } catch (error) {
+                log(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testFeatureFlag() {
+            log('=== Checking Feature Flag Status ===', 'info');
+            
+            // This is a simple check - in real app, we'd need to expose this somehow
+            log('Feature flag USE_STREAMING is currently: false (hardcoded in use-chat.ts)', 'info');
+            log('To enable streaming, edit hooks/use-chat.ts and set USE_STREAMING = true', 'info');
+        }
+
+        // Auto-run basic test on load
+        window.addEventListener('load', () => {
+            log('Streaming API Test Page Loaded', 'success');
+            log('Click the buttons above to test different endpoints', 'info');
+        });
+    </script>
+</body>
+</html>
