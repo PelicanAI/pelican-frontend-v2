@@ -77,10 +77,23 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
   useEffect(() => {
     setCurrentConversationId(conversationId || null)
     setConversationNotFound(false)
+    
     if (conversationId !== loadedConversationRef.current) {
-      // Clear messages immediately when switching conversations to prevent showing old messages
-      setMessages([])
-      loadedConversationRef.current = null
+      // Only clear messages when switching between two REAL conversations
+      // Don't clear when going from null → first conversation (cold start)
+      // This prevents the welcome screen from flashing on initial load
+      const isSwitchingConversations = 
+        loadedConversationRef.current !== null && 
+        conversationId !== null &&
+        conversationId !== loadedConversationRef.current
+      
+      if (isSwitchingConversations) {
+        // Clear messages immediately when switching to prevent showing old messages
+        setMessages([])
+        loadedConversationRef.current = null
+      }
+      // If cold start (null → conversationId), let the fetch populate messages
+      // without clearing first - this prevents welcome screen flash
     }
   }, [conversationId])
 
@@ -95,13 +108,16 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
 
     if (conversationData?.conversation?.messages && loadedConversationRef.current !== currentConversationId) {
       logger.info("Loading messages for conversation", { conversationId: currentConversationId })
-      const loadedMessages = conversationData.conversation.messages.map((msg: any) => ({
-        id: msg.id,
-        role: msg.role as "user" | "assistant",
-        content: msg.content,
-        timestamp: new Date(msg.created_at),
-        isStreaming: false,
-      }))
+      const loadedMessages = conversationData.conversation.messages
+        .map((msg: any) => ({
+          id: msg.id,
+          role: msg.role as "user" | "assistant",
+          content: msg.content,
+          timestamp: new Date(msg.created_at),
+          isStreaming: false,
+        }))
+        .sort((a: Message, b: Message) => a.timestamp.getTime() - b.timestamp.getTime()) // Sort chronologically (oldest first)
+      
       setMessages(loadedMessages)
       loadedConversationRef.current = currentConversationId
       setConversationNotFound(false)

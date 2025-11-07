@@ -33,10 +33,13 @@ export function escapeHtml(text: string): string {
 
 /**
  * Sanitizes user message content
- * - Removes dangerous patterns
- * - Escapes HTML entities
+ * - Removes dangerous patterns (scripts, iframes, etc.)
  * - Trims whitespace
  * - Limits length to prevent abuse
+ * 
+ * NOTE: Does NOT escape HTML entities - we store raw text and let
+ * React/DOMPurify handle escaping at render time. This prevents
+ * apostrophes from showing as &#x27; in the UI.
  */
 export function sanitizeMessage(message: string, maxLength: number = 10000): string {
   if (!message || typeof message !== "string") {
@@ -45,11 +48,13 @@ export function sanitizeMessage(message: string, maxLength: number = 10000): str
 
   let sanitized = message.trim()
 
+  // Remove dangerous patterns (scripts, iframes, etc.)
   for (const pattern of DANGEROUS_PATTERNS) {
     sanitized = sanitized.replace(pattern, "")
   }
 
-  sanitized = escapeHtml(sanitized)
+  // DO NOT escape HTML here - store raw text
+  // React auto-escapes text content, and DOMPurify sanitizes HTML content at render time
 
   if (sanitized.length > maxLength) {
     sanitized = sanitized.slice(0, maxLength)
