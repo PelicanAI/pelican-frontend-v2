@@ -90,10 +90,10 @@ const USE_STREAMING = true;  // ← Change this
 1. [ ] Simple Query Test
    - Send: "What's AAPL at?"
    - Verify:
-    - [ ] Empty message bubble appears immediately
-    - [ ] Streaming indicator shows plain text "Pelican is thinking..."
-    - [ ] Text appears word-by-word
-    - [ ] Indicator disappears when complete
+     - [ ] Empty message bubble appears immediately
+     - [ ] Streaming indicator shows: "▊ Generating response..."
+     - [ ] Text appears word-by-word
+     - [ ] Indicator disappears when complete
 
 2. [ ] Complex Query Test
    - Send: "Why is NVDA moving today?"

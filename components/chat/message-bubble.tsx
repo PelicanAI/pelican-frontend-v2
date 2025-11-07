@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { RelativeTimestamp } from "@/components/ui/relative-timestamp"
 import { AttachmentChip } from "./attachment-chip"
 import { MessageActions } from "./message-actions"
+import { EnhancedTypingDots } from "./enhanced-typing-dots"
 import { TableImageDisplay } from "./table-image-display"
 import { motion, AnimatePresence } from "framer-motion"
 import { useState, useCallback, useMemo } from "react"
@@ -17,7 +18,6 @@ import { useToast } from "@/hooks/use-toast"
 import { getMessageAnimationVariant } from "@/lib/animation-config"
 import { detectDataTable } from '@/lib/data-parsers'
 import { DataTable } from '@/components/chat/data-visualizations/data-table'
-import { PelicanThinkingIndicator } from "./pelican-thinking-indicator"
 import DOMPurify from "isomorphic-dompurify"
 import { escapeHtml } from "@/lib/sanitize"
 
@@ -404,7 +404,7 @@ function MessageContent({
   }
 
   if (!safeContent && isStreaming) {
-    return <PelicanThinkingIndicator className="mt-2" />
+    return <EnhancedTypingDots variant="thinking" />
   }
 
   if (!safeContent) {
@@ -494,7 +494,6 @@ function MessageContent({
         })}
       </div>
 
-      {isStreaming && <PelicanThinkingIndicator className="mt-2" />}
     </motion.div>
   )
 }

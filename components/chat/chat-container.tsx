@@ -11,12 +11,12 @@ import type { Message } from "@/lib/chat-utils"
 import { useToast } from "@/hooks/use-toast"
 import { DragDropOverlay } from "./drag-drop-overlay"
 import { isAcceptedFileType } from "@/lib/file-utils"
+import { EnhancedTypingDots } from "./enhanced-typing-dots"
 import { JumpToLatestButton } from "./JumpToLatestButton"
 import { SystemMessage } from "./SystemMessage"
 import { ConversationHistorySkeleton } from "./conversation-history-skeleton"
 import { NewMessagesPill } from "./new-messages-pill"
 import { ErrorMessage } from "./error-message"
-import { PelicanThinkingIndicator } from "./pelican-thinking-indicator"
 
 interface ChatContainerProps {
   messages: Message[]
@@ -454,7 +454,7 @@ export function ChatContainer({
                       />
                     </div>
                     <div className="flex-1 min-w-0 max-w-[700px]">
-                      <PelicanThinkingIndicator className="mt-0" />
+                      <EnhancedTypingDots variant="processing" />
                     </div>
                   </div>
                 </div>
