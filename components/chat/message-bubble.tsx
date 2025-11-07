@@ -495,11 +495,9 @@ function MessageContent({
       </div>
 
       {isStreaming && (
-        <motion.span
-          className="inline-block w-[2px] h-[1.2em] ml-0.5 bg-current opacity-70"
-          animate={{ opacity: [0.7, 0, 0.7] }}
-          transition={{ duration: 0.8, repeat: Infinity, ease: "easeInOut" }}
-        />
+        <div className="text-xs text-muted-foreground mt-2">
+          Generating response...
+        </div>
       )}
     </motion.div>
   )
