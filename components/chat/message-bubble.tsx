@@ -8,7 +8,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { RelativeTimestamp } from "@/components/ui/relative-timestamp"
 import { AttachmentChip } from "./attachment-chip"
 import { MessageActions } from "./message-actions"
-import { EnhancedTypingDots } from "./enhanced-typing-dots"
 import { TableImageDisplay } from "./table-image-display"
 import { motion, AnimatePresence } from "framer-motion"
 import { useState, useCallback, useMemo } from "react"
@@ -404,7 +403,11 @@ function MessageContent({
   }
 
   if (!safeContent && isStreaming) {
-    return <EnhancedTypingDots variant="thinking" />
+    return (
+      <div className="text-xs text-muted-foreground mt-2">
+        Generating response...
+      </div>
+    )
   }
 
   if (!safeContent) {

@@ -13,7 +13,7 @@
 1. **Immediate Changes:**
    - Messages will start streaming token-by-token
    - Users will see content appear progressively
-   - Streaming indicator (▊) will show during generation
+   - Streaming indicator will display "Generating response..." during generation
    - ~40% faster perceived response time
 
 2. **Event Flow:**

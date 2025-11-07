@@ -11,7 +11,6 @@ import type { Message } from "@/lib/chat-utils"
 import { useToast } from "@/hooks/use-toast"
 import { DragDropOverlay } from "./drag-drop-overlay"
 import { isAcceptedFileType } from "@/lib/file-utils"
-import { EnhancedTypingDots } from "./enhanced-typing-dots"
 import { JumpToLatestButton } from "./JumpToLatestButton"
 import { SystemMessage } from "./SystemMessage"
 import { ConversationHistorySkeleton } from "./conversation-history-skeleton"
@@ -453,8 +452,8 @@ export function ChatContainer({
                         transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
                       />
                     </div>
-                    <div className="flex-1 min-w-0 max-w-[700px]">
-                      <EnhancedTypingDots variant="processing" />
+                    <div className="flex-1 min-w-0 max-w-[700px] text-xs text-muted-foreground">
+                      Generating response...
                     </div>
                   </div>
                 </div>
