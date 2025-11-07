@@ -57,7 +57,9 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
   const shouldFetchConversation =
     !!currentConversationId &&
     !currentConversationId.startsWith("guest-") &&
-    !currentConversationId.startsWith("temp-")
+    !currentConversationId.startsWith("temp-") &&
+    !isStreaming && // Don't fetch while streaming - messages aren't in DB yet
+    !isLoading // Don't fetch while loading - prevents race condition
 
   const {
     data: conversationData,
