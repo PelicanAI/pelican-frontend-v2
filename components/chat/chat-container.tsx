@@ -16,6 +16,7 @@ import { SystemMessage } from "./SystemMessage"
 import { ConversationHistorySkeleton } from "./conversation-history-skeleton"
 import { NewMessagesPill } from "./new-messages-pill"
 import { ErrorMessage } from "./error-message"
+import { PelicanThinkingIndicator } from "./pelican-thinking-indicator"
 
 interface ChatContainerProps {
   messages: Message[]
@@ -452,8 +453,8 @@ export function ChatContainer({
                         transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
                       />
                     </div>
-                    <div className="flex-1 min-w-0 max-w-[700px] text-xs text-muted-foreground">
-                      Pelican is thinking...
+                    <div className="flex-1 min-w-0 max-w-[700px]">
+                      <PelicanThinkingIndicator className="mt-0" />
                     </div>
                   </div>
                 </div>

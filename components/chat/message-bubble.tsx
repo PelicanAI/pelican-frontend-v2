@@ -17,6 +17,7 @@ import { useToast } from "@/hooks/use-toast"
 import { getMessageAnimationVariant } from "@/lib/animation-config"
 import { detectDataTable } from '@/lib/data-parsers'
 import { DataTable } from '@/components/chat/data-visualizations/data-table'
+import { PelicanThinkingIndicator } from "./pelican-thinking-indicator"
 import DOMPurify from "isomorphic-dompurify"
 import { escapeHtml } from "@/lib/sanitize"
 
@@ -403,11 +404,7 @@ function MessageContent({
   }
 
   if (!safeContent && isStreaming) {
-    return (
-      <div className="text-xs text-muted-foreground mt-2">
-        Pelican is thinking...
-      </div>
-    )
+    return <PelicanThinkingIndicator className="mt-2" />
   }
 
   if (!safeContent) {
@@ -497,11 +494,7 @@ function MessageContent({
         })}
       </div>
 
-      {isStreaming && (
-        <div className="text-xs text-muted-foreground mt-2">
-          Pelican is thinking...
-        </div>
-      )}
+      {isStreaming && <PelicanThinkingIndicator className="mt-2" />}
     </motion.div>
   )
 }
