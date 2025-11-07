@@ -453,7 +453,7 @@ export function ChatContainer({
                       />
                     </div>
                     <div className="flex-1 min-w-0 max-w-[700px] text-xs text-muted-foreground">
-                      Generating response...
+                      Pelican is thinking...
                     </div>
                   </div>
                 </div>

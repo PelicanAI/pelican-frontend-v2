@@ -405,7 +405,7 @@ function MessageContent({
   if (!safeContent && isStreaming) {
     return (
       <div className="text-xs text-muted-foreground mt-2">
-        Generating response...
+        Pelican is thinking...
       </div>
     )
   }
@@ -499,7 +499,7 @@ function MessageContent({
 
       {isStreaming && (
         <div className="text-xs text-muted-foreground mt-2">
-          Generating response...
+          Pelican is thinking...
         </div>
       )}
     </motion.div>

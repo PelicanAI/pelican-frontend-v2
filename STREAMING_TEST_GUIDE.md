@@ -91,7 +91,7 @@ const USE_STREAMING = true;  // ← Change this
    - Send: "What's AAPL at?"
    - Verify:
     - [ ] Empty message bubble appears immediately
-    - [ ] Streaming indicator shows plain text "Generating response..."
+    - [ ] Streaming indicator shows plain text "Pelican is thinking..."
     - [ ] Text appears word-by-word
     - [ ] Indicator disappears when complete
 
