@@ -1,6 +1,6 @@
 export const LIMITS = {
   FILE_SIZE_MB: 15,
-  MESSAGE_CONTEXT: 30, // Expanded for trading context - allows better position/trade recall
+  MESSAGE_CONTEXT: 150, // Context window for comprehensive conversation history
   CHAT_MAX_TOKENS: 4000,
   FREE_TIER_MESSAGES: 10,
   TITLE_PREVIEW_LENGTH: 50,

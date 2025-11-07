@@ -39,7 +39,8 @@ export async function POST(req: NextRequest) {
       message, 
       conversationId, 
       conversationHistory, 
-      conversation_history 
+      conversation_history,
+      fileIds = []
     }: PelicanResponseRequest = await req.json()
     
     // Use conversationHistory or conversation_history (backwards compatibility)
@@ -123,6 +124,7 @@ export async function POST(req: NextRequest) {
       stream: false,  // No streaming - get full JSON response
       conversationHistory: history,  // Send conversation history to backend
       conversation_history: history,  // Backend might expect both formats
+      files: fileIds || [], // Forward file IDs to backend
     }
 
     const response = await fetchWithRetry(endpoint, {

@@ -285,14 +285,14 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
               onClick={() => fileInputRef.current?.click()}
               disabled={disabled}
               className={cn(
-                "flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center",
+                "flex-shrink-0 w-11 h-11 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center",
                 "transition-all duration-200",
                 "hover:bg-muted",
                 disabled && "opacity-50 cursor-not-allowed",
               )}
               title="Attach file"
             >
-              <Paperclip className="h-4 w-4 text-muted-foreground" />
+              <Paperclip className="h-5 w-5 text-muted-foreground" />
             </motion.button>
 
             {/* Textarea */}
@@ -335,7 +335,7 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
               onClick={isAIResponding && onStopResponse ? onStopResponse : handleSubmit}
               disabled={!isAIResponding && isSendDisabled}
               className={cn(
-                "flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center",
+                "flex-shrink-0 w-11 h-11 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center",
                 "transition-all duration-200",
                 isAIResponding
                   ? "bg-red-500 hover:bg-red-600 text-white"
@@ -344,14 +344,17 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
                     : "bg-primary hover:bg-primary/90 text-primary-foreground shadow-md shadow-primary/20",
               )}
             >
-              <motion.div
-                key={isAIResponding ? "stop" : "send"}
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ duration: 0.15 }}
-              >
-                {isAIResponding ? <Square className="h-4 w-4" /> : <Send className="h-4 w-4" />}
-              </motion.div>
+              <AnimatePresence mode="wait" initial={false}>
+                <motion.div
+                  key={isAIResponding ? "stop" : "send"}
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.8, opacity: 0 }}
+                  transition={{ duration: 0.1, ease: 'easeOut' }}
+                >
+                  {isAIResponding ? <Square className="h-5 w-5" /> : <Send className="h-5 w-5" />}
+                </motion.div>
+              </AnimatePresence>
             </motion.button>
 
             <input

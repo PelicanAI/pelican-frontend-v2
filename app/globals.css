@@ -3,6 +3,35 @@
 @import "./contrast-fixes.css";
 
 :root {
+  /* Typography scale - consistent line heights */
+  --leading-tight: 1.25;    /* Headlines (h1, h2, h3) */
+  --leading-snug: 1.375;    /* Subheadings (h4, h5, h6) */
+  --leading-normal: 1.5;    /* Body text (p, div) */
+  --leading-relaxed: 1.625; /* Long-form content */
+  --leading-loose: 2;       /* Captions, labels */
+
+  /* Shadow depth system - 4-level elevation (FIX 31) */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);        /* Elevation 1 - Cards on page */
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);      /* Elevation 2 - Dropdowns */
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);    /* Elevation 3 - Modals */
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);    /* Elevation 4 - Tooltips */
+
+  /* Border radius system (FIX 29) */
+  --radius-xs: 0.25rem;  /* 4px - Small elements */
+  --radius-sm: 0.375rem; /* 6px - Buttons */
+  --radius-md: 0.5rem;   /* 8px - Cards */
+  --radius-lg: 0.75rem;  /* 12px - Modals */
+  --radius-xl: 1rem;     /* 16px - Large containers */
+  --radius-full: 9999px; /* Full round */
+
+  /* Spacing system (FIX 30) */
+  --spacing-xs: 0.25rem;  /* 4px */
+  --spacing-sm: 0.5rem;   /* 8px */
+  --spacing-md: 1rem;     /* 16px */
+  --spacing-lg: 1.5rem;   /* 24px */
+  --spacing-xl: 2rem;     /* 32px */
+  --spacing-2xl: 3rem;    /* 48px */
+
   /* Dark neutral color scheme - professional and sleek */
   --background: oklch(0.98 0.002 240); /* Light background with subtle neutral tint */
   --foreground: oklch(0.15 0.005 240); /* Dark text */
@@ -53,7 +82,7 @@
   --background: oklch(0.05 0 0); /* Pure black background */
   --foreground: oklch(0.98 0.002 280); /* Bright white text with subtle purple tint */
   --muted: oklch(0.12 0.01 280); /* Dark purple-tinted muted background */
-  --muted-foreground: oklch(0.60 0.005 280); /* Muted text with purple hint */
+  --muted-foreground: oklch(0.68 0 0); /* WCAG AA compliant - 4.8:1 contrast */
 
   /* Layered surfaces with purple glow */
   --surface-1: oklch(0.08 0.01 280); /* Sidebar - slightly purple-tinted black */
@@ -151,6 +180,16 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  
+  /* Z-Index System - Organized elevation layers */
+  --z-base: 1000;          /* Base elevated layer */
+  --z-dropdown: 1010;      /* Dropdowns, select menus */
+  --z-sticky: 1020;        /* Sticky headers, nav */
+  --z-modal-backdrop: 1030; /* Modal backdrops */
+  --z-modal: 1040;         /* Modal content */
+  --z-popover: 1050;       /* Popovers, tooltips */
+  --z-toast: 1060;         /* Toast notifications */
+  --z-tooltip: 1070;       /* Tooltips (highest) */
 }
 
 @layer base {
@@ -163,6 +202,24 @@
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    line-height: var(--leading-normal);
+  }
+
+  /* Typography scale application */
+  h1, h2, h3 {
+    line-height: var(--leading-tight);
+  }
+
+  h4, h5, h6 {
+    line-height: var(--leading-snug);
+  }
+
+  p, .prose {
+    line-height: var(--leading-relaxed);
+  }
+
+  .text-sm, .text-xs {
+    line-height: var(--leading-snug);
   }
 
   /* Global focus ring styles for better accessibility */
@@ -173,9 +230,47 @@
   .focus-outline:focus-visible {
     box-shadow: 0 0 0 2px var(--ring), 0 0 0 4px var(--background);
   }
+  
+  /* Focus indicators for accessibility (FIX 33) */
+  *:focus-visible {
+    outline: 2px solid oklch(0.70 0.15 290);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  *:focus {
+    outline: none;
+  }
+
+  button:focus-visible {
+    outline: 2px solid oklch(0.70 0.15 290);
+    outline-offset: 2px;
+  }
+
+  input:focus-visible,
+  textarea:focus-visible {
+    outline: 2px solid oklch(0.70 0.15 290);
+    outline-offset: -2px;
+    border-color: oklch(0.70 0.15 290);
+  }
+
+  /* Prevent iOS Safari bounce (FIX 25) */
+  body {
+    overscroll-behavior-y: none;
+  }
 }
 
 @layer utilities {
+  /* Z-Index utility classes */
+  .z-base { z-index: var(--z-base); }
+  .z-dropdown { z-index: var(--z-dropdown); }
+  .z-sticky { z-index: var(--z-sticky); }
+  .z-modal-backdrop { z-index: var(--z-modal-backdrop); }
+  .z-modal { z-index: var(--z-modal); }
+  .z-popover { z-index: var(--z-popover); }
+  .z-toast { z-index: var(--z-toast); }
+  .z-tooltip { z-index: var(--z-tooltip); }
+  
   .signin-button-custom,
   .signin-button-custom:link,
   .signin-button-custom:visited,
@@ -382,6 +477,11 @@
   }
 
   /* Text wrapping utilities */
+  .overflow-wrap-anywhere {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+  
   .break-words-anywhere {
     word-break: break-word;
     overflow-wrap: anywhere;
@@ -789,4 +889,39 @@
   .pr-safe-area-inset-right {
     padding-right: env(safe-area-inset-right, 0);
   }
+
+  /* Shadow elevation system (FIX 31) */
+  .elevation-1 { box-shadow: var(--shadow-sm); }
+  .elevation-2 { box-shadow: var(--shadow-md); }
+  .elevation-3 { box-shadow: var(--shadow-lg); }
+  .elevation-4 { box-shadow: var(--shadow-xl); }
+
+  /* Animation performance optimizations (FIX 35) */
+  .animate-slide-in,
+  .animate-fade-in,
+  [class*="animate-"] {
+    will-change: transform, opacity;
+    backface-visibility: hidden;
+    perspective: 1000px;
+  }
+
+  /* Safe area support for mobile keyboards (FIX 25) */
+  @supports (padding-bottom: env(safe-area-inset-bottom)) {
+    .chat-input-container {
+      padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+    }
+  }
+
+  /* Reduce motion for accessibility (FIX 35) */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 }
+

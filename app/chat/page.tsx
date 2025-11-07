@@ -233,7 +233,7 @@ export default function ChatPage() {
       )}
 
       {!sidebarCollapsed && (
-        <div className="hidden md:block">
+        <div className="hidden xl:block">
           <ConversationSidebar
             currentConversationId={conversationRouter.currentConversationId || undefined}
             onConversationSelect={handleConversationSelect}
@@ -277,11 +277,11 @@ export default function ChatPage() {
       </Sheet>
 
       <div className="flex-1 flex flex-col h-full min-w-0">
-        <div className="md:hidden border-b p-4 flex items-center justify-between bg-background border-border">
+        <div className="xl:hidden border-b p-4 flex items-center justify-between bg-background border-border">
           <Sheet open={mobileSheetOpen} onOpenChange={setMobileSheetOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="sm" className="glow-button glow-ghost">
-                <Menu className="h-4 w-4 text-foreground" />
+              <Button variant="ghost" size="sm" className="h-11 w-11 min-h-[44px] min-w-[44px] glow-button glow-ghost">
+                <Menu className="h-5 w-5 text-foreground" />
               </Button>
             </SheetTrigger>
           </Sheet>
@@ -294,7 +294,7 @@ export default function ChatPage() {
 
         {/* Desktop sidebar toggle button - only show when sidebar is collapsed */}
         {sidebarCollapsed && (
-          <div className="hidden md:flex items-center justify-between p-4 border-b border-border bg-background">
+          <div className="hidden xl:flex items-center justify-between p-4 border-b border-border bg-background">
             <Button
               variant="ghost"
               size="sm"

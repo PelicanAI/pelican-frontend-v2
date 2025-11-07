@@ -26,6 +26,10 @@ export function useSmartScroll(options: SmartScrollOptions = {}) {
     debounceMs = 100,
   } = options
 
+  // Memory leak prevention
+  const timeoutRefs = useRef<Set<NodeJS.Timeout>>(new Set())
+  const isMountedRef = useRef(true)
+
   const containerRef = useRef<HTMLDivElement>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
   const scrollTimeoutRef = useRef<NodeJS.Timeout>()
@@ -40,6 +44,29 @@ export function useSmartScroll(options: SmartScrollOptions = {}) {
     hasNewMessages: false,
     isStreaming: false,
   })
+
+  // Helper to create tracked timeout
+  const createTimeout = useCallback((callback: () => void, delay: number) => {
+    const timeout = setTimeout(() => {
+      if (isMountedRef.current) {
+        callback()
+      }
+      timeoutRefs.current.delete(timeout)
+    }, delay)
+    timeoutRefs.current.add(timeout)
+    return timeout
+  }, [])
+
+  // Cleanup on unmount
+  useEffect(() => {
+    isMountedRef.current = true
+    return () => {
+      isMountedRef.current = false
+      // Clear all timeouts
+      timeoutRefs.current.forEach(timeout => clearTimeout(timeout))
+      timeoutRefs.current.clear()
+    }
+  }, [])
 
   // Detect if user is on mobile
   const isMobile = typeof window !== "undefined" && window.innerWidth < 768
@@ -56,8 +83,11 @@ export function useSmartScroll(options: SmartScrollOptions = {}) {
 
   const scrollToBottom = useCallback(
     (behavior: ScrollBehavior = scrollBehavior) => {
+      // FIX 24: Use requestAnimationFrame to prevent scroll jumps
       if (bottomRef.current) {
-        bottomRef.current.scrollIntoView({ behavior })
+        requestAnimationFrame(() => {
+          bottomRef.current?.scrollIntoView({ behavior })
+        })
       }
     },
     [scrollBehavior],
@@ -91,12 +121,12 @@ export function useSmartScroll(options: SmartScrollOptions = {}) {
     }
 
     // Reset user scrolling state after debounce period
-    scrollTimeoutRef.current = setTimeout(() => {
+    scrollTimeoutRef.current = createTimeout(() => {
       setState((prev) => ({ ...prev, isUserScrolling: false }))
     }, debounceMs)
 
     lastScrollTopRef.current = currentScrollTop
-  }, [checkIfNearBottom, debounceMs])
+  }, [checkIfNearBottom, debounceMs, createTimeout])
 
   // Scroll to show user message at top when they send a message
   const scrollToUserMessage = useCallback((messageId?: string) => {
@@ -108,7 +138,7 @@ export function useSmartScroll(options: SmartScrollOptions = {}) {
     console.log('[Scroll] 🎯 Scrolling to message:', messageId)
     
     // Simple, reliable approach: let scrollIntoView handle everything
-    setTimeout(() => {
+    createTimeout(() => {
       const messageElement = document.querySelector(`[data-message-id="${messageId}"]`)
       
       if (messageElement) {
@@ -120,7 +150,7 @@ export function useSmartScroll(options: SmartScrollOptions = {}) {
         })
         
         // Add offset to position message with proper spacing from top
-        setTimeout(() => {
+        createTimeout(() => {
           const container = containerRef.current
           if (container && container.scrollHeight > container.clientHeight) {
             // Container is scrollable - scroll container
@@ -138,7 +168,7 @@ export function useSmartScroll(options: SmartScrollOptions = {}) {
         console.log('[Scroll] ❌ Message element not found in DOM')
       }
     }, 100)
-  }, [])
+  }, [createTimeout])
 
   // Claude/ChatGPT style auto-scroll: handles all scenarios
   const handleNewMessage = useCallback(
@@ -162,7 +192,7 @@ export function useSmartScroll(options: SmartScrollOptions = {}) {
         console.log('[Scroll] Triggering scroll in 50ms...')
         // Always scroll to show the user message at top of viewport
         // This mimics Claude's behavior: you see your message + thinking indicator
-        setTimeout(() => {
+        createTimeout(() => {
           console.log('[Scroll] ⏰ Executing scrollToUserMessage now')
           scrollToUserMessage(messageId)
         }, 50) // Very short delay - the scroll function has retry logic built in
@@ -191,11 +221,11 @@ export function useSmartScroll(options: SmartScrollOptions = {}) {
       }
 
       // Reset new messages flag
-      setTimeout(() => {
+      createTimeout(() => {
         setState((prev) => ({ ...prev, hasNewMessages: false }))
       }, 1000)
     },
-    [checkIfNearBottom, scrollToBottom, scrollToUserMessage],
+    [checkIfNearBottom, scrollToBottom, scrollToUserMessage, createTimeout],
   )
 
   // Reset scroll state when streaming ends

@@ -163,34 +163,49 @@ export function useFileUpload({ sendMessage, addSystemMessage, chatInputRef }: U
 
       try {
         const uploadPromises = newPendingAttachments.map(async (pendingAttachment) => {
-          const formData = new FormData()
-          formData.append("file", pendingAttachment.file)
+          try {
+            const formData = new FormData()
+            formData.append("file", pendingAttachment.file)
 
-          const response = await fetch(API_ENDPOINTS.UPLOAD, {
-            method: "POST",
-            body: formData,
-          })
+            const response = await fetch(API_ENDPOINTS.UPLOAD, {
+              method: "POST",
+              body: formData,
+            })
 
-          if (!response.ok) {
-            const error = await response.json()
-            setPendingAttachments((prev) =>
-              prev.map((a) => (a.id === pendingAttachment.id ? { ...a, isError: true } : a)),
+            if (!response.ok) {
+              const error = await response.json()
+              throw new Error(error.error || "Upload failed")
+            }
+
+            const result = await response.json()
+            console.log("[v0] File uploaded:", pendingAttachment.file.name, result.url)
+
+            // Mark as successful
+            setPendingAttachments((prev) => 
+              prev.filter((a) => a.id !== pendingAttachment.id)
             )
-            throw new Error(error.error || "Upload failed")
+
+            return { success: true, result }
+          } catch (error) {
+            // Mark as error but don't throw - let Promise.allSettled handle it
+            setPendingAttachments((prev) =>
+              prev.map((a) => 
+                a.id === pendingAttachment.id 
+                  ? { ...a, isError: true, errorMessage: error instanceof Error ? error.message : 'Unknown error' } 
+                  : a
+              ),
+            )
+            return { 
+              success: false, 
+              error: error instanceof Error ? error.message : 'Unknown error' 
+            }
           }
-
-          const result = await response.json()
-          console.log("[v0] File uploaded:", pendingAttachment.file.name, result.url)
-
-          setPendingAttachments((prev) => prev.filter((a) => a.id !== pendingAttachment.id))
-
-          return result
         })
 
         const results = await Promise.allSettled(uploadPromises)
         const successfulResults = results
-          .filter((result): result is PromiseFulfilledResult<any> => result.status === "fulfilled")
-          .map((result) => result.value)
+          .filter((result): result is PromiseFulfilledResult<any> => result.status === "fulfilled" && result.value.success)
+          .map((result) => result.value.result)
 
         if (successfulResults.length > 0) {
           const attachments = successfulResults.map((result) => ({
@@ -204,7 +219,9 @@ export function useFileUpload({ sendMessage, addSystemMessage, chatInputRef }: U
           await sendMessage("", { attachments, fileIds })
         }
 
-        const failedCount = results.filter((result) => result.status === "rejected").length
+        const failedCount = results.filter((result) => 
+          result.status === "rejected" || (result.status === "fulfilled" && !result.value.success)
+        ).length
         if (failedCount > 0) {
           addSystemMessage(`${failedCount} file(s) failed to upload. You can retry them.`)
         }

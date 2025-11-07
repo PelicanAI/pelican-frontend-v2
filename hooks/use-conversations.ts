@@ -93,20 +93,26 @@ export function useConversations() {
   }, [])
 
   useEffect(() => {
+    let cancelled = false
+    let subscription: any = null
+
     // Get current user
     const getUser = async () => {
       const {
         data: { user },
       } = await supabase.auth.getUser()
+      
+      if (cancelled) return
+      
       setUser(user)
 
-      if (user?.id) {
+      if (user?.id && !cancelled) {
         loadConversations(user.id)
-      } else if (guestUserId) {
+      } else if (guestUserId && !cancelled) {
         const guestConversations = loadGuestConversations()
         setConversations(guestConversations)
         setLoading(false)
-      } else {
+      } else if (!cancelled) {
         setLoading(false)
       }
     }
@@ -116,24 +122,33 @@ export function useConversations() {
     }
 
     // Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      setUser(session?.user || null)
+    const setupListener = async () => {
+      const { data } = supabase.auth.onAuthStateChange((event, session) => {
+        if (cancelled) return
+        
+        setUser(session?.user || null)
 
-      if (session?.user?.id) {
-        loadConversations(session.user.id)
-      } else if (guestUserId) {
-        const guestConversations = loadGuestConversations()
-        setConversations(guestConversations)
-        setLoading(false)
-      } else {
-        setConversations([])
-        setLoading(false)
-      }
-    })
+        if (session?.user?.id && !cancelled) {
+          loadConversations(session.user.id)
+        } else if (guestUserId && !cancelled) {
+          const guestConversations = loadGuestConversations()
+          setConversations(guestConversations)
+          setLoading(false)
+        } else if (!cancelled) {
+          setConversations([])
+          setLoading(false)
+        }
+      })
+      
+      subscription = data.subscription
+    }
+    
+    setupListener()
 
-    return () => subscription.unsubscribe()
+    return () => {
+      cancelled = true
+      subscription?.unsubscribe()
+    }
   }, [guestUserId])
 
   useEffect(() => {

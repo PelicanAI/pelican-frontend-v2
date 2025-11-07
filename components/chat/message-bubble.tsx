@@ -27,13 +27,9 @@ type ContentSegment =
 
 const LINK_REGEX = /(https?:\/\/[^\s]+)/g
 
-function parseContentSegments(rawContent: string): ContentSegment[] {
-  // Defensive check - ensure rawContent is a string
-  if (typeof rawContent !== 'string') {
-    rawContent = String(rawContent || '')
-  }
-  
-  const lines = rawContent.split("\n")
+function parseContentSegments(content: string): ContentSegment[] {
+  // No defensive check needed - type system guarantees string
+  const lines = content.split("\n")
   const segments: ContentSegment[] = []
 
   let isInCodeBlock = false
@@ -96,21 +92,37 @@ function parseContentSegments(rawContent: string): ContentSegment[] {
 }
 
 function formatLine(line: string): string {
-  const escaped = escapeHtml(line)
-  const boldFormatted = escaped.replace(/\*\*(.*?)\*\*/g, '<strong class="font-[600]">$1</strong>')
-  const italicFormatted = boldFormatted.replace(/\*(.*?)\*/g, '<em>$1</em>')
-  const linkFormatted = italicFormatted.replace(
-    LINK_REGEX,
-    (match) =>
-      `<a href="${match}" target="_blank" rel="noopener noreferrer" class="text-teal-600 font-[500] break-all">${match}</a>`
-  )
-
-  return DOMPurify.sanitize(linkFormatted, {
+  // Step 1: Escape HTML first
+  let escaped = escapeHtml(line)
+  
+  // Step 2: Apply markdown formatting on escaped content
+  escaped = escaped.replace(/\*\*(.*?)\*\*/g, '<strong class="font-[600]">$1</strong>')
+  escaped = escaped.replace(/\*(.*?)\*/g, '<em>$1</em>')
+  
+  // Step 3: Safe link handling with URL validation
+  escaped = escaped.replace(LINK_REGEX, (match) => {
+    try {
+      const url = new URL(match)
+      // Only allow http/https protocols
+      if (!['http:', 'https:'].includes(url.protocol)) {
+        return match // Don't linkify invalid protocols
+      }
+      // Sanitize URL to prevent attribute injection
+      const sanitizedUrl = DOMPurify.sanitize(match, {ALLOWED_TAGS: []})
+      return `<a href="${sanitizedUrl}" target="_blank" rel="noopener noreferrer" class="text-teal-600 font-[500] break-all">${match}</a>`
+    } catch {
+      return match // Invalid URL, don't linkify
+    }
+  })
+  
+  // Step 4: Final sanitization with strict URI regexp
+  return DOMPurify.sanitize(escaped, {
     ALLOWED_TAGS: ["strong", "em", "a", "span", "br"],
-    ALLOWED_ATTR: {
+    ALLOWED_ATTR: { 
       a: ["href", "target", "rel", "class"],
       span: ["class"],
     } as unknown as string[],
+    ALLOWED_URI_REGEXP: /^https?:\/\//i // Only allow http/https
   })
 }
 
@@ -276,10 +288,10 @@ export function MessageBubble({
         onMouseLeave={() => setIsHovered(false)}
       >
         {/* User message - clean, no bubble, right-aligned */}
-        <div className="max-w-3xl mx-auto px-8">
+        <div className="max-w-3xl mx-auto px-4 sm:px-8">
           <div className="flex gap-6 items-start justify-end">
             {/* Message content */}
-            <div className="max-w-[700px]">
+            <div className="max-w-[700px] md:max-w-[600px]">
               <div className="text-base leading-relaxed break-words text-foreground">
                 {renderAttachments(message.attachments)}
                 {message.content}
@@ -319,7 +331,7 @@ export function MessageBubble({
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* AI message - clean, no bubble, no background */}
-      <div className="max-w-3xl mx-auto px-8">
+      <div className="max-w-3xl mx-auto px-4 sm:px-8">
         <div className="flex gap-6 items-start">
           {/* AI avatar */}
           <div className="flex-shrink-0">
@@ -458,6 +470,13 @@ function MessageContent({
                   <div className="p-3 text-sm overflow-x-auto whitespace-pre max-w-full leading-[1.5]">
                     <code>{sanitizedCode}</code>
                   </div>
+                  
+                  {/* Scroll gradient indicator (FIX 27) */}
+                  <div 
+                    className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-muted/30 via-muted/20 to-transparent pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity"
+                    aria-hidden="true"
+                  />
+                  
                   {segment.language && (
                     <span className="absolute top-2 right-2 text-[10px] uppercase tracking-wide text-gray-400">
                       {segment.language}
@@ -465,7 +484,7 @@ function MessageContent({
                   )}
                   <button
                     type="button"
-                    className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-gray-200"
+                    className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-gray-200 h-8 w-8 min-h-[36px] min-w-[36px]"
                     onClick={() => navigator.clipboard.writeText(segment.content)}
                     aria-label="Copy code"
                   >

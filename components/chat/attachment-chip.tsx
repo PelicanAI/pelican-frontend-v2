@@ -79,10 +79,10 @@ export function AttachmentChip({ name, type, onRemove, onClick, isError, onRetry
             variant="ghost"
             size="sm"
             onClick={onRetry}
-            className="h-4 w-4 p-0 ml-1 hover:bg-red-100 dark:hover:bg-red-900/50"
+            className="h-6 w-6 min-h-[44px] min-w-[44px] p-0 ml-1 hover:bg-red-100 dark:hover:bg-red-900/50"
             title="Retry upload"
           >
-            <RotateCcw className="h-3 w-3" />
+            <RotateCcw className="h-4 w-4" />
             <span className="sr-only">Retry upload</span>
           </Button>
         )}
@@ -94,9 +94,9 @@ export function AttachmentChip({ name, type, onRemove, onClick, isError, onRetry
               e.stopPropagation()
               onRemove()
             }}
-            className="h-4 w-4 p-0 ml-1 hover:bg-red-100 dark:hover:bg-red-900/50"
+            className="h-6 w-6 min-h-[44px] min-w-[44px] p-0 ml-1 hover:bg-red-100 dark:hover:bg-red-900/50"
           >
-            <X className="h-3 w-3" />
+            <X className="h-4 w-4" />
             <span className="sr-only">Remove attachment</span>
           </Button>
         )}
@@ -129,9 +129,9 @@ export function AttachmentChip({ name, type, onRemove, onClick, isError, onRetry
             e.stopPropagation()
             onRemove()
           }}
-          className="h-4 w-4 p-0 ml-1 hover:bg-blue-100 dark:hover:bg-blue-900/50"
+          className="h-6 w-6 min-h-[44px] min-w-[44px] p-0 ml-1 hover:bg-blue-100 dark:hover:bg-blue-900/50"
         >
-          <X className="h-3 w-3" />
+          <X className="h-4 w-4" />
           <span className="sr-only">Remove attachment</span>
         </Button>
       )}

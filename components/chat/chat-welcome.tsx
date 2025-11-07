@@ -31,15 +31,21 @@ export function ChatWelcome({ onQuickStart }: ChatWelcomeProps) {
   ]
 
   return (
-    <div className="flex-1 flex items-center justify-center p-8">
+    <div className="flex-1 flex items-center justify-center p-8 min-h-[500px]">
       <div className="max-w-2xl mx-auto text-center space-y-8">
         {/* Logo */}
-        <div className="flex justify-center mb-6">
-          <img src="/pelican-logo.png" alt="PelicanAI" className="w-12 h-12 object-contain" />
+        <div className="flex justify-center mb-6 h-12">
+          <img 
+            src="/pelican-logo.png" 
+            alt="PelicanAI" 
+            className="w-12 h-12 object-contain"
+            width="48"
+            height="48" 
+          />
         </div>
 
         {/* Welcome Message */}
-        <div className="space-y-4">
+        <div className="space-y-4 min-h-[100px]">
           <h1 className="text-3xl font-semibold text-balance">How can I help you trade today?</h1>
           <p className="text-muted-foreground text-balance">
             Ask me about market analysis, trading strategies, or get real-time insights
@@ -47,11 +53,11 @@ export function ChatWelcome({ onQuickStart }: ChatWelcomeProps) {
         </div>
 
         {/* Suggestion Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-8 min-h-[200px]">
           {suggestions.map((suggestion, index) => (
             <Card
               key={index}
-              className="p-4 cursor-pointer hover:bg-muted/50 transition-colors text-left"
+              className="p-4 cursor-pointer hover:bg-muted/50 transition-colors text-left h-20"
               onClick={() => onQuickStart(suggestion.message)}
             >
               <h3 className="font-medium text-sm mb-1">{suggestion.title}</h3>

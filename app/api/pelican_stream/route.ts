@@ -17,6 +17,7 @@ export async function POST(req: NextRequest) {
   let user: User | null = null
   let effectiveUserId: string | null = null
   let activeConversationId: string | null = null
+  let isNewConversation = false // Track if we created a new conversation
 
   try {
     const signal = req.signal
@@ -24,7 +25,8 @@ export async function POST(req: NextRequest) {
     const { 
       message, 
       conversationId, 
-      conversationHistory = []
+      conversationHistory = [],
+      fileIds = []
     }: StreamingRequest = await req.json()
     
     logger.info("Received streaming request", {
@@ -76,9 +78,10 @@ export async function POST(req: NextRequest) {
       }
 
       activeConversationId = newConversation.id
+      isNewConversation = true
       logger.info("Created new conversation", { conversationId: activeConversationId, userId: effectiveUserId })
 
-      // We'll emit conversationId event after setting up the stream
+      // DON'T send conversationId event yet - wait until messages are saved successfully
     }
 
     const apiKey = process.env.PEL_API_KEY
@@ -107,6 +110,7 @@ export async function POST(req: NextRequest) {
       stream: true,  // Enable streaming
       conversationHistory: conversationHistory,
       conversation_history: conversationHistory,  // Backend might expect both formats
+      files: fileIds || [], // Forward file IDs to backend
     }
 
     const response = await fetch(endpoint, {
@@ -136,11 +140,7 @@ export async function POST(req: NextRequest) {
     
     const stream = new ReadableStream({
       async start(controller) {
-        // Send conversationId event if we created a new conversation
-        if (activeConversationId && !conversationId) {
-          const conversationIdEvent = `data: ${JSON.stringify({ type: 'conversationId', conversationId: activeConversationId })}\n\n`
-          controller.enqueue(encoder.encode(conversationIdEvent))
-        }
+        // DON'T send conversationId event yet - will send after successful message save
 
         const reader = response.body?.getReader()
         if (!reader) {
@@ -181,15 +181,40 @@ export async function POST(req: NextRequest) {
 
                   // Save to database when done
                   if (event.type === 'done' && activeConversationId && effectiveUserId) {
-                    saveMessagesToDatabase(
-                      supabase, 
-                      activeConversationId, 
-                      userMessage, 
-                      fullResponse, 
-                      effectiveUserId
-                    ).catch((err) => {
-                      logger.error("Failed to save messages", err)
-                    })
+                    try {
+                      await saveMessagesToDatabase(
+                        supabase, 
+                        activeConversationId, 
+                        userMessage, 
+                        fullResponse, 
+                        effectiveUserId
+                      )
+                      
+                      // NOW send conversationId event (only if newly created AND messages saved successfully)
+                      if (isNewConversation) {
+                        const conversationIdEvent = `data: ${JSON.stringify({ 
+                          type: 'conversationId', 
+                          conversationId: activeConversationId 
+                        })}\n\n`
+                        controller.enqueue(encoder.encode(conversationIdEvent))
+                        logger.info("Sent conversationId event after successful message save", { conversationId: activeConversationId })
+                      }
+                    } catch (err) {
+                      logger.error("Failed to save messages", err instanceof Error ? err : new Error(String(err)))
+                      
+                      // Rollback: Delete empty conversation if this was newly created
+                      if (isNewConversation && activeConversationId) {
+                        try {
+                          await supabase
+                            .from("conversations")
+                            .delete()
+                            .eq("id", activeConversationId)
+                          logger.info("Rolled back empty conversation after save failure", { conversationId: activeConversationId })
+                        } catch (deleteErr) {
+                          logger.error("Failed to rollback conversation", deleteErr instanceof Error ? deleteErr : new Error(String(deleteErr)))
+                        }
+                      }
+                    }
                   }
                 } catch (e) {
                   logger.error("Failed to parse SSE event", e instanceof Error ? e : new Error(String(e)), { line })

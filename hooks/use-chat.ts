@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useCallback, useRef, useEffect } from "react"
-import { type Message, createUserMessage, createAssistantMessage, createSystemMessage } from "@/lib/chat-utils"
+import { type Message, createUserMessage, createAssistantMessage, createSystemMessage, generateMessageId } from "@/lib/chat-utils"
 import useSWR, { mutate } from "swr"
 import { useConversations } from "./use-conversations"
 import { useRequestManager } from "./use-request-manager"
@@ -19,6 +19,25 @@ interface UseChatOptions {
   onConversationCreated?: (conversationId: string) => void
 }
 
+// Type safety interfaces for Pelican API responses
+interface PelicanAPIResponse {
+  type?: string
+  data?: any
+  structuredContent?: StructuredContent
+  message?: string
+  error?: string
+}
+
+interface StructuredContent {
+  type: string
+  data: any
+}
+
+// Type guard for structured content
+function isStructuredContent(data: any): data is StructuredContent {
+  return data && typeof data === 'object' && 'type' in data && 'data' in data
+}
+
 interface SendMessageOptions {
   attachments?: Array<{ type: string; name: string; url: string }>
   fileIds?: string[]
@@ -30,6 +49,7 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
   const [isLoading, setIsLoading] = useState(false)
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(conversationId || null)
   const [conversationNotFound, setConversationNotFound] = useState(false)
+  const [currentRequestId, setCurrentRequestId] = useState<string | null>(null)
   const loadedConversationRef = useRef<string | null>(null)
   const abortControllerRef = useRef<AbortController | null>(null)
   const messagesRef = useRef<Message[]>([])
@@ -67,7 +87,8 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
     mutate: mutateConversation,
   } = useSWR(shouldFetchConversation ? `/api/conversations/${currentConversationId}` : null, {
     revalidateOnFocus: false,
-    revalidateOnReconnect: true,
+    revalidateOnReconnect: false, // Disable auto-revalidation on reconnect to prevent data loss
+    dedupingInterval: 5000, // Prevent rapid refetches
     onError: (error) => {
       logger.error("Conversation fetch error", error instanceof Error ? error : new Error(String(error)))
       if (error.status === 404 || error.status === 403) {
@@ -174,11 +195,11 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
         // Build conversation history from existing messages (excluding the new user message)
         const conversationHistory = messagesRef.current
           .filter((msg) => msg.role !== "system" && msg.id !== userMessage.id && msg.id !== assistantMessage.id)
+          .slice(-(LIMITS.MESSAGE_CONTEXT - 1)) // Reserve 1 slot for new message
           .map((msg) => ({
             role: msg.role,
             content: msg.content,
           }))
-          .slice(-LIMITS.MESSAGE_CONTEXT) // Limit to last N messages
 
         logger.info("Sending conversation history", { 
           historyLength: conversationHistory.length,
@@ -355,6 +376,21 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
     async (content: string, options: SendMessageOptions = {}) => {
       if (isStreaming || isLoading) return
 
+      // Generate unique request ID
+      const requestId = generateMessageId()
+      
+      // Cancel previous request if exists
+      if (currentRequestId) {
+        abortControllerRef.current?.abort()
+        cancelStream()
+        // Clean up previous streaming assistant message
+        setMessages(prev => 
+          prev.filter(msg => !msg.isStreaming || msg.id !== currentRequestId)
+        )
+      }
+      
+      setCurrentRequestId(requestId)
+      
       cancelAllRequests()
       cancelStream()
 
@@ -368,8 +404,9 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
         setMessages((prev) => [...prev, userMessage])
       }
 
-      // Create empty assistant message with streaming flag
+      // Create empty assistant message with streaming flag, linked to request ID
       const assistantMessage = createAssistantMessage("")
+      assistantMessage.id = requestId // Link to request ID
       assistantMessage.isStreaming = true
       setMessages((prev) => [...prev, assistantMessage])
 
@@ -379,7 +416,7 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
         // Build conversation history
         const conversationHistory = messagesRef.current
           .filter((msg) => msg.role !== "system" && msg.id !== userMessage.id && msg.id !== assistantMessage.id)
-          .slice(-LIMITS.MESSAGE_CONTEXT)
+          .slice(-(LIMITS.MESSAGE_CONTEXT - 1)) // Reserve 1 slot for new message
 
         // Stream response
         await sendStreamingMessage(
@@ -422,6 +459,9 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
               )
               logger.info("[Streaming] Complete", { latency })
               
+              // Clear request ID after successful completion
+              setCurrentRequestId(null)
+              
               const finalMessage = { 
                 ...assistantMessage, 
                 content: fullResponse, 
@@ -449,6 +489,10 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
 
             onError: (error) => {
               logger.error("[Streaming] Error", new Error(error))
+              
+              // Clear request ID on error
+              setCurrentRequestId(null)
+              
               setMessages((prev) =>
                 prev.map((msg) =>
                   msg.id === assistantMessage.id
@@ -467,6 +511,9 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
         )
       } catch (error) {
         logger.error("Streaming error", error instanceof Error ? error : new Error(String(error)))
+        
+        // Clear request ID on any error
+        setCurrentRequestId(null)
         
         if (error instanceof Error && error.name === "AbortError") {
           logger.info("Stream cancelled by user")
@@ -495,6 +542,7 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
       isLoading,
       isStreaming,
       currentConversationId,
+      currentRequestId,
       mutateConversation,
       onError,
       onFinish,
@@ -514,12 +562,39 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
     ? sendMessageStreaming 
     : sendMessageNonStreaming
 
-  const stopGeneration = useCallback(() => {
+  const stopGeneration = useCallback(async () => {
     if (abortControllerRef.current) {
       logger.info("Stopping generation - aborting controller")
       abortControllerRef.current.abort()
     }
     cancelAllRequests()
+    
+    // Find the currently streaming message
+    const streamingMessage = messages.find(m => m.isStreaming)
+    
+    // Save partial response to database if exists
+    if (streamingMessage && streamingMessage.content && currentConversationId) {
+      try {
+        await fetch('/api/messages/save-partial', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            conversationId: currentConversationId,
+            messageId: streamingMessage.id,
+            content: streamingMessage.content,
+            role: streamingMessage.role,
+            isPartial: true,
+          })
+        })
+        logger.info("Saved partial message to database", { 
+          messageId: streamingMessage.id,
+          contentLength: streamingMessage.content.length 
+        })
+      } catch (error) {
+        logger.error("Failed to save partial message", error instanceof Error ? error : new Error(String(error)))
+      }
+    }
+    
     setIsLoading(false)
     setMessages((prev) =>
       prev
@@ -532,7 +607,7 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
         )
         .filter((msg): msg is Message => msg !== null),
     )
-  }, [cancelAllRequests])
+  }, [cancelAllRequests, messages, currentConversationId])
 
   const clearMessages = useCallback(() => {
     setMessages([])
