@@ -118,6 +118,12 @@ export function sanitizeUrl(url: string): string | null {
 
 /**
  * Sanitizes conversation title
+ * - Removes newlines and extra whitespace
+ * - Limits length
+ * 
+ * NOTE: Does NOT escape HTML entities - we store raw text and let
+ * React handle escaping at render time. This prevents apostrophes
+ * from showing as &#x27; in conversation titles.
  */
 export function sanitizeTitle(title: string, maxLength: number = 200): string {
   if (!title || typeof title !== "string") {
@@ -126,7 +132,8 @@ export function sanitizeTitle(title: string, maxLength: number = 200): string {
 
   let sanitized = title.trim().replace(/[\n\r\t]/g, " ").replace(/\s+/g, " ")
 
-  sanitized = escapeHtml(sanitized)
+  // DO NOT escape HTML here - store raw text
+  // React auto-escapes text content when rendering conversation titles
 
   if (sanitized.length > maxLength) {
     sanitized = sanitized.slice(0, maxLength) + "..."
