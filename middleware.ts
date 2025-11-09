@@ -2,22 +2,22 @@ import { updateSession } from "@/lib/supabase/middleware"
 import { rateLimit, getClientIdentifier } from "@/lib/rate-limit"
 import type { NextRequest } from "next/server"
 import { NextResponse } from "next/server"
-import createMiddleware from 'next-intl/middleware';
-import { locales } from './i18n/request';
+// import createMiddleware from 'next-intl/middleware';
+// import { locales } from './i18n/request';
 
-// Create i18n middleware
-const intlMiddleware = createMiddleware({
-  locales,
-  defaultLocale: 'en',
-  localePrefix: 'as-needed' // Don't add /en prefix for default locale
-});
+// Create i18n middleware - DISABLED for now to prevent routing issues
+// const intlMiddleware = createMiddleware({
+//   locales,
+//   defaultLocale: 'en',
+//   localePrefix: 'as-needed'
+// });
 
 export async function middleware(request: NextRequest) {
-  // Handle i18n routing first (but skip for API routes)
-  if (!request.nextUrl.pathname.startsWith('/api')) {
-    const intlResponse = intlMiddleware(request);
-    if (intlResponse) return intlResponse;
-  }
+  // i18n routing DISABLED - language switching will be client-side only
+  // if (!request.nextUrl.pathname.startsWith('/api')) {
+  //   const intlResponse = intlMiddleware(request);
+  //   if (intlResponse) return intlResponse;
+  // }
   // Rate limit chat endpoint - critical for scalability
   if (request.nextUrl.pathname === "/api/chat") {
     const clientId = getClientIdentifier(request)
