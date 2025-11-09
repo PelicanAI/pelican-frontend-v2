@@ -74,12 +74,14 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
     },
   })
 
+  // 🔧 FIX: Only fetch from DB when switching conversations, not during active conversation
   const shouldFetchConversation =
     !!currentConversationId &&
     !currentConversationId.startsWith("guest-") &&
     !currentConversationId.startsWith("temp-") &&
     !isStreaming && // Don't fetch while streaming - messages aren't in DB yet
-    !isLoading // Don't fetch while loading - prevents race condition
+    !isLoading && // Don't fetch while loading - prevents race condition
+    currentConversationId !== loadedConversationRef.current // Only fetch if we haven't loaded this conversation yet
 
   const {
     data: conversationData,
@@ -129,8 +131,15 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
       return
     }
 
+    // 🔧 FIX: Only load messages from DB when switching to a NEW conversation
+    // This prevents stale DB data from overwriting fresh UI state during active conversation
     if (conversationData?.conversation?.messages && loadedConversationRef.current !== currentConversationId) {
-      logger.info("Loading messages for conversation", { conversationId: currentConversationId })
+      logger.info("Loading messages for conversation", { 
+        conversationId: currentConversationId,
+        dbMessageCount: conversationData.conversation.messages.length,
+        currentUIMessageCount: messagesRef.current.length
+      })
+      
       const loadedMessages = conversationData.conversation.messages
         .map((msg: any) => ({
           id: msg.id,
@@ -141,16 +150,26 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
         }))
         .sort((a: Message, b: Message) => a.timestamp.getTime() - b.timestamp.getTime()) // Sort chronologically (oldest first)
       
-      setMessages(loadedMessages)
-      loadedConversationRef.current = currentConversationId
-      setConversationNotFound(false)
+      // 🔧 FIX: Only update if this is truly a conversation switch
+      // Don't update if we're in the middle of a conversation (isLoading or isStreaming)
+      if (!isLoading && !isStreaming) {
+        setMessages(loadedMessages)
+        loadedConversationRef.current = currentConversationId
+        setConversationNotFound(false)
+      } else {
+        logger.info("Skipping message load - conversation in progress", {
+          isLoading,
+          isStreaming,
+          conversationId: currentConversationId
+        })
+      }
     } else if (!currentConversationId && loadedConversationRef.current !== null) {
       logger.info("Clearing messages for new conversation")
       setMessages([])
       loadedConversationRef.current = null
       setConversationNotFound(false)
     }
-  }, [conversationData, conversationError, currentConversationId])
+  }, [conversationData, conversationError, currentConversationId, isLoading, isStreaming])
 
   useEffect(() => {
     messagesRef.current = messages
@@ -172,6 +191,16 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
 
       cancelAllRequests()
 
+      // 🔧 FIX: Capture conversation history BEFORE modifying state
+      // This ensures we send the correct context, not stale data from SWR refetch
+      const conversationHistory = messagesRef.current
+        .filter((msg) => msg.role !== "system")
+        .slice(-(LIMITS.MESSAGE_CONTEXT - 1)) // Reserve 1 slot for new message
+        .map((msg) => ({
+          role: msg.role,
+          content: msg.content,
+        }))
+
       const userMessage = createUserMessage(content)
       if (options.attachments) {
         userMessage.attachments = options.attachments
@@ -190,18 +219,8 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
       abortControllerRef.current = localAbortController
 
       try {
-        logger.info("Sending message to Pelican API", { messageLength: content.length })
-
-        // Build conversation history from existing messages (excluding the new user message)
-        const conversationHistory = messagesRef.current
-          .filter((msg) => msg.role !== "system" && msg.id !== userMessage.id && msg.id !== assistantMessage.id)
-          .slice(-(LIMITS.MESSAGE_CONTEXT - 1)) // Reserve 1 slot for new message
-          .map((msg) => ({
-            role: msg.role,
-            content: msg.content,
-          }))
-
-        logger.info("Sending conversation history", { 
+        logger.info("Sending message to Pelican API", { 
+          messageLength: content.length,
           historyLength: conversationHistory.length,
           conversationId: currentConversationId 
         })
@@ -298,9 +317,13 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
 
         onFinish?.(finalMessage)
 
-        if (currentConversationId) {
-          mutateConversation()
-        }
+        // 🔧 FIX: Don't refetch conversation immediately - causes race condition
+        // Trust the local UI state. Only refetch on conversation switch or manual refresh.
+        // if (currentConversationId) {
+        //   mutateConversation()
+        // }
+        
+        // Update the conversations list (sidebar) but not the current conversation messages
         mutate(API_ENDPOINTS.CONVERSATIONS)
       } catch (error) {
         logger.error("Chat error", error instanceof Error ? error : new Error(String(error)), {
@@ -394,6 +417,12 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
       cancelAllRequests()
       cancelStream()
 
+      // 🔧 FIX: Capture conversation history BEFORE modifying state
+      // This ensures we send the correct context, not stale data from SWR refetch
+      const conversationHistory = messagesRef.current
+        .filter((msg) => msg.role !== "system")
+        .slice(-(LIMITS.MESSAGE_CONTEXT - 1)) // Reserve 1 slot for new message
+
       const userMessage = createUserMessage(content)
       if (options.attachments) {
         userMessage.attachments = options.attachments
@@ -411,12 +440,10 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
       setMessages((prev) => [...prev, assistantMessage])
 
       try {
-        logger.info("Sending streaming message", { messageLength: content.length })
-
-        // Build conversation history
-        const conversationHistory = messagesRef.current
-          .filter((msg) => msg.role !== "system" && msg.id !== userMessage.id && msg.id !== assistantMessage.id)
-          .slice(-(LIMITS.MESSAGE_CONTEXT - 1)) // Reserve 1 slot for new message
+        logger.info("Sending streaming message", { 
+          messageLength: content.length,
+          historyLength: conversationHistory.length 
+        })
 
         // Stream response
         await sendStreamingMessage(
@@ -469,9 +496,13 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
               }
               onFinish?.(finalMessage)
 
-              if (currentConversationId) {
-                mutateConversation()
-              }
+              // 🔧 FIX: Don't refetch conversation immediately - causes race condition
+              // Trust the local UI state. Only refetch on conversation switch.
+              // if (currentConversationId) {
+              //   mutateConversation()
+              // }
+              
+              // Update the conversations list (sidebar) but not the current conversation messages
               mutate(API_ENDPOINTS.CONVERSATIONS)
             },
 
@@ -652,6 +683,16 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
     }
   }, [isStreaming, cancelStream, stopGeneration])
 
+  // 🔧 FIX: Add manual refresh capability for when user switches conversations
+  const refreshConversation = useCallback(() => {
+    if (currentConversationId && !isLoading && !isStreaming) {
+      logger.info("Manually refreshing conversation from database", { conversationId: currentConversationId })
+      // Reset loaded ref to allow refetch
+      loadedConversationRef.current = null
+      mutateConversation()
+    }
+  }, [currentConversationId, isLoading, isStreaming, mutateConversation])
+
   return {
     messages,
     isLoading: isLoading || isStreaming,
@@ -664,6 +705,7 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
     addSystemMessage,
     removeSystemMessage,
     conversationNotFound,
+    refreshConversation, // Expose manual refresh for conversation switches
     // Only expose cancel if streaming enabled
     ...(USE_STREAMING ? { cancelStream } : {}),
   }

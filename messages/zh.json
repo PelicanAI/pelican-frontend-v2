@@ -1,0 +1,43 @@
+{
+  "common": {
+    "appName": "PelicanAI",
+    "newChat": "新对话",
+    "search": "搜索对话...",
+    "account": "账户",
+    "viewProfile": "查看个人资料",
+    "settings": "设置",
+    "signOut": "登出",
+    "cancel": "取消",
+    "save": "保存",
+    "delete": "删除",
+    "edit": "编辑",
+    "retry": "重试"
+  },
+  "chat": {
+    "messagePlaceholder": "给 Pelican 发消息...",
+    "sendMessage": "发送消息",
+    "stopGeneration": "停止生成",
+    "attachFile": "附加文件",
+    "welcomeTitle": "欢迎使用 PelicanAI",
+    "welcomeSubtitle": "今天我能如何帮助您交易？",
+    "emptyConversations": "还没有对话",
+    "fileUploadFailed": "个文件上传失败。您可以重试。",
+    "noInternet": "无网络连接。在您重新上线之前，您的消息将无法发送。",
+    "thinking": "思考中...",
+    "typing": "输入中..."
+  },
+  "market": {
+    "marketOverview": "市场概览",
+    "marketsOpen": "市场开盘",
+    "marketsClosed": "市场休市",
+    "indices": "指数",
+    "volatility": "波动性",
+    "sectorPerformance": "行业表现",
+    "watchlist": "关注列表",
+    "technology": "科技",
+    "financials": "金融",
+    "healthcare": "医疗",
+    "energy": "能源"
+  }
+}
+

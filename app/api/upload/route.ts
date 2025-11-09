@@ -47,7 +47,17 @@ export async function POST(request: NextRequest) {
     addBreadcrumb("Upload request started", { requestId })
     console.log(`[${requestId}] Upload request started`)
 
-    const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
+    const supabase = createClient(
+      process.env.SUPABASE_URL!, 
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false,
+          detectSessionInUrl: false
+        }
+      }
+    )
 
     const authHeader = request.headers.get("authorization")
     if (authHeader) {
@@ -62,38 +72,9 @@ export async function POST(request: NextRequest) {
       guestId = `guest_${ip}`
     }
 
-    const { data: buckets, error: listError } = await supabase.storage.listBuckets()
-
-    if (listError) {
-      console.error(`[${requestId}] Error listing buckets:`, listError)
-      captureException(new Error(`Failed to list buckets: ${listError.message}`), {
-        reqId: requestId,
-        userId,
-        guestId,
-      })
-      return NextResponse.json({ error: "Storage service unavailable" }, { status: 500 })
-    }
-
-    const pelicanBucket = buckets?.find((bucket) => bucket.name === "pelican")
-
-    if (!pelicanBucket) {
-      console.log(`[${requestId}] Creating pelican bucket`)
-      addBreadcrumb("Creating pelican bucket", { requestId })
-      const { error: createError } = await supabase.storage.createBucket("pelican", {
-        public: false,
-        fileSizeLimit: "20mb",
-      })
-
-      if (createError) {
-        console.error(`[${requestId}] Error creating bucket:`, createError)
-        captureException(new Error(`Failed to create bucket: ${createError.message}`), {
-          reqId: requestId,
-          userId,
-          guestId,
-        })
-        return NextResponse.json({ error: "Failed to initialize storage" }, { status: 500 })
-      }
-    }
+    // Skip bucket listing/creation - assume pelican bucket exists
+    // RLS on storage.buckets prevents listing, but we can still upload to the bucket
+    console.log(`[${requestId}] Using pelican bucket (assumed to exist)`)
 
     const formData = await request.formData()
     const file = formData.get("file") as File

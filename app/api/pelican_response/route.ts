@@ -182,11 +182,13 @@ export async function POST(req: NextRequest) {
       attachmentCount: attachments.length,
     })
 
-    // Save messages to database (save only the text content, not attachments)
-    if (activeConversationId && effectiveUserId) {
-      await saveMessagesToDatabase(supabase, activeConversationId, userMessage, reply, effectiveUserId)
-    }
-
+    // 🔧 FIX: Backend already saves messages and creates embeddings
+    // Removed duplicate saveMessagesToDatabase() call to prevent constraint violations
+    // The backend Pelican service handles:
+    // - Message persistence
+    // - Memory embedding creation
+    // - Conversation metadata updates
+    
     // Return JSON response with attachments if present
     const responsePayload: PelicanResponsePayload = {
       choices: [
@@ -225,67 +227,7 @@ export async function POST(req: NextRequest) {
   }
 }
 
-async function saveMessagesToDatabase(
-  supabase: Awaited<ReturnType<typeof createClient>>,
-  conversationId: string,
-  userMessage: string,
-  reply: string,
-  userId: string,
-) {
-  const { error: insertError } = await supabase.from("messages").insert([
-    {
-      conversation_id: conversationId,
-      user_id: userId,
-      role: "user",
-      content: userMessage,
-      metadata: {},
-    },
-    {
-      conversation_id: conversationId,
-      user_id: userId,
-      role: "assistant",
-      content: reply,
-      metadata: {},
-    },
-  ]).select()
-
-  if (insertError) {
-    logger.error("Failed to save messages to database", insertError, {
-      conversationId,
-      userId,
-      code: insertError.code,
-      details: insertError.details,
-      hint: insertError.hint,
-    })
-  } else {
-    logger.info("Messages saved to conversation", { conversationId, userId })
-
-    const { count: messageCount, error: countError } = await supabase
-      .from("messages")
-      .select("*", { count: "exact", head: true })
-      .eq("conversation_id", conversationId)
-
-    if (countError) {
-      logger.error("Failed to count messages", countError, { conversationId })
-    }
-
-    const { error: updateError } = await supabase
-      .from("conversations")
-      .update({
-        updated_at: new Date().toISOString(),
-        message_count: messageCount || 0,
-        last_message_preview: userMessage.slice(0, 100) + (userMessage.length > 100 ? "..." : ""),
-      })
-      .eq("id", conversationId)
-      .eq("user_id", userId)
-
-    if (updateError) {
-      logger.error("Failed to update conversation metadata", updateError, {
-        code: updateError.code,
-        conversationId,
-        userId,
-      })
-    }
-  }
-}
+// 🔧 REMOVED: saveMessagesToDatabase function
+// The backend Pelican service handles all message persistence and embedding creation.
+// This function was causing duplicate inserts and constraint violations.
 

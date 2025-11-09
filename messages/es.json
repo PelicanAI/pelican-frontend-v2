@@ -1,0 +1,43 @@
+{
+  "common": {
+    "appName": "PelicanAI",
+    "newChat": "Nuevo chat",
+    "search": "Buscar conversaciones...",
+    "account": "Cuenta",
+    "viewProfile": "Ver perfil",
+    "settings": "Configuración",
+    "signOut": "Cerrar sesión",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "retry": "Reintentar"
+  },
+  "chat": {
+    "messagePlaceholder": "Mensaje a Pelican...",
+    "sendMessage": "Enviar mensaje",
+    "stopGeneration": "Detener generación",
+    "attachFile": "Adjuntar archivo",
+    "welcomeTitle": "Bienvenido a PelicanAI",
+    "welcomeSubtitle": "¿Cómo puedo ayudarte a operar hoy?",
+    "emptyConversations": "Aún no hay conversaciones",
+    "fileUploadFailed": "archivo(s) no se pudieron cargar. Puedes reintentarlos.",
+    "noInternet": "Sin conexión a Internet. Tus mensajes no se enviarán hasta que vuelvas a estar en línea.",
+    "thinking": "Pensando...",
+    "typing": "Escribiendo..."
+  },
+  "market": {
+    "marketOverview": "Resumen del Mercado",
+    "marketsOpen": "Mercados Abiertos",
+    "marketsClosed": "Mercados Cerrados",
+    "indices": "ÍNDICES",
+    "volatility": "VOLATILIDAD",
+    "sectorPerformance": "RENDIMIENTO POR SECTOR",
+    "watchlist": "LISTA DE SEGUIMIENTO",
+    "technology": "Tecnología",
+    "financials": "Finanzas",
+    "healthcare": "Salud",
+    "energy": "Energía"
+  }
+}
+

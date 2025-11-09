@@ -1,0 +1,43 @@
+{
+  "common": {
+    "appName": "PelicanAI",
+    "newChat": "新しいチャット",
+    "search": "会話を検索...",
+    "account": "アカウント",
+    "viewProfile": "プロフィールを表示",
+    "settings": "設定",
+    "signOut": "サインアウト",
+    "cancel": "キャンセル",
+    "save": "保存",
+    "delete": "削除",
+    "edit": "編集",
+    "retry": "再試行"
+  },
+  "chat": {
+    "messagePlaceholder": "Pelicanにメッセージを送る...",
+    "sendMessage": "メッセージを送信",
+    "stopGeneration": "生成を停止",
+    "attachFile": "ファイルを添付",
+    "welcomeTitle": "PelicanAIへようこそ",
+    "welcomeSubtitle": "今日の取引をどのようにお手伝いできますか？",
+    "emptyConversations": "まだ会話がありません",
+    "fileUploadFailed": "個のファイルのアップロードに失敗しました。再試行できます。",
+    "noInternet": "インターネット接続がありません。オンラインに戻るまでメッセージは送信されません。",
+    "thinking": "考え中...",
+    "typing": "入力中..."
+  },
+  "market": {
+    "marketOverview": "マーケット概要",
+    "marketsOpen": "市場オープン",
+    "marketsClosed": "市場クローズ",
+    "indices": "指数",
+    "volatility": "ボラティリティ",
+    "sectorPerformance": "セクターパフォーマンス",
+    "watchlist": "ウォッチリスト",
+    "technology": "テクノロジー",
+    "financials": "金融",
+    "healthcare": "ヘルスケア",
+    "energy": "エネルギー"
+  }
+}
+

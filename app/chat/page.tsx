@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Menu } from "lucide-react"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { LanguageSelector } from "@/components/language-selector"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
 import { SettingsModal } from "@/components/settings-modal"
@@ -289,7 +290,10 @@ export default function ChatPage() {
             <img src="/pelican-logo.png" alt="PelicanAI" className="w-6 h-6 object-contain" />
             <span className="font-semibold text-foreground">Pelican AI</span>
           </div>
-          <ThemeToggle />
+          <div className="flex items-center gap-2">
+            <LanguageSelector />
+            <ThemeToggle />
+          </div>
         </div>
 
         {/* Desktop sidebar toggle button - only show when sidebar is collapsed */}
