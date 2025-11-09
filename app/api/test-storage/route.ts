@@ -28,8 +28,7 @@ export async function GET() {
     if (listError) {
       return NextResponse.json({ 
         error: "Cannot list buckets", 
-        details: listError.message,
-        code: listError.code
+        details: listError.message
       }, { status: 500 })
     }
 
