@@ -160,8 +160,36 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Failed to upload file" }, { status: 500 })
     }
 
-    const fileId = uuidv4()
-    addBreadcrumb("File uploaded successfully", { requestId, fileId })
+    addBreadcrumb("File uploaded to storage successfully", { requestId, storageKey })
+
+    // Save file metadata to database
+    const { data: fileRecord, error: dbError } = await supabase
+      .from("files")
+      .insert({
+        user_id: userId || null,
+        storage_path: storageKey,
+        mime_type: file.type,
+        name: sanitizedFilename,
+        size: file.size,
+      })
+      .select()
+      .single()
+
+    if (dbError || !fileRecord) {
+      console.error(`[${requestId}] Database insert error:`, dbError)
+      // Clean up: delete the uploaded file from storage since DB insert failed
+      await supabase.storage.from("pelican").remove([storageKey])
+      captureException(new Error(`Failed to save file metadata: ${dbError?.message}`), {
+        reqId: requestId,
+        userId,
+        guestId,
+        fileMeta,
+      })
+      return NextResponse.json({ error: "Failed to save file metadata" }, { status: 500 })
+    }
+
+    const fileId = fileRecord.id
+    addBreadcrumb("File metadata saved to database", { requestId, fileId })
 
     const { data: signedUrlData, error: signedUrlError } = await supabase.storage
       .from("pelican")
