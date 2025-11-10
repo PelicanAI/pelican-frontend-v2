@@ -21,6 +21,7 @@ interface UseFileUploadOptions {
 
 export function useFileUpload({ sendMessage, addSystemMessage, chatInputRef }: UseFileUploadOptions) {
   const [pendingAttachments, setPendingAttachments] = useState<PendingAttachment[]>([])
+  const [uploadedFiles, setUploadedFiles] = useState<Array<{ id: string; type: string; name: string; url: string }>>([])
 
   const handleFileUpload = useCallback(
     async (file: File) => {
@@ -77,19 +78,15 @@ export function useFileUpload({ sendMessage, addSystemMessage, chatInputRef }: U
 
         console.log("[upload] ok", { name, type, size, url })
 
-        const attachments = [
-          {
-            type,
-            name,
-            url,
-          },
-        ]
-
-        const fileIds = [fileId]
-
+        // Store uploaded file info - DON'T auto-send
+        setUploadedFiles((prev) => [...prev, { id: fileId, type, name, url }])
         setPendingAttachments((prev) => prev.filter((a) => a.id !== attachmentId))
 
-        await sendMessage("", { attachments, fileIds })
+        console.log("[FileUpload] File uploaded successfully, waiting for user to send message", {
+          fileId,
+          name,
+          type
+        })
 
         setTimeout(() => {
           chatInputRef.current?.focus()
@@ -180,6 +177,14 @@ export function useFileUpload({ sendMessage, addSystemMessage, chatInputRef }: U
             const result = await response.json()
             console.log("[v0] File uploaded:", pendingAttachment.file.name, result.url)
 
+            // Store uploaded file info
+            setUploadedFiles((prev) => [...prev, { 
+              id: result.id, 
+              type: result.type, 
+              name: result.name, 
+              url: result.url 
+            }])
+
             // Mark as successful
             setPendingAttachments((prev) => 
               prev.filter((a) => a.id !== pendingAttachment.id)
@@ -208,21 +213,8 @@ export function useFileUpload({ sendMessage, addSystemMessage, chatInputRef }: U
           .map((result) => result.value.result)
 
         if (successfulResults.length > 0) {
-          const attachments = successfulResults.map((result) => ({
-            type: result.type,
-            name: result.name,
-            url: result.url,
-          }))
-
-          const fileIds = successfulResults.map((result) => result.id)
-
-          // DON'T auto-send - let user add message and send manually
-          // Files will be attached to the next message they send
-          // await sendMessage("", { attachments, fileIds })
-          
           console.log("[FileUpload] Files uploaded successfully, waiting for user to send message", {
-            attachments,
-            fileIds
+            count: successfulResults.length
           })
         }
 
@@ -246,11 +238,32 @@ export function useFileUpload({ sendMessage, addSystemMessage, chatInputRef }: U
     [sendMessage, addSystemMessage, chatInputRef],
   )
 
+  const clearUploadedFiles = useCallback(() => {
+    setUploadedFiles([])
+  }, [])
+
+  const removeUploadedFile = useCallback((index: number) => {
+    setUploadedFiles((prev) => prev.filter((_, i) => i !== index))
+  }, [])
+
+  const getUploadedFileIds = useCallback(() => {
+    return uploadedFiles.map(f => f.id)
+  }, [uploadedFiles])
+
+  const getUploadedAttachments = useCallback(() => {
+    return uploadedFiles.map(f => ({ type: f.type, name: f.name, url: f.url }))
+  }, [uploadedFiles])
+
   return {
     pendingAttachments,
+    uploadedFiles,
     handleFileUpload,
     handleMultipleFileUpload,
     handleRetryUpload,
     handleRemovePendingAttachment,
+    clearUploadedFiles,
+    removeUploadedFile,
+    getUploadedFileIds,
+    getUploadedAttachments,
   }
 }

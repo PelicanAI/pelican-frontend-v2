@@ -41,7 +41,7 @@ export async function GET() {
     if (pelicanBucket) {
       const { error: filesError } = await supabase.storage
         .from('pelican')
-        .list('uploads', { limit: 1 })
+        .list('', { limit: 1 })
       
       canListFiles = !filesError
       listFilesError = filesError?.message

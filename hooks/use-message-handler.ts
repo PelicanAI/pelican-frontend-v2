@@ -27,7 +27,7 @@ export function useMessageHandler({
   }, [])
 
   const handleSendMessage = useCallback(
-    async (content: string, options?: { forceQueue?: boolean }) => {
+    async (content: string, options?: { forceQueue?: boolean; fileIds?: string[]; attachments?: any[] }) => {
       if (chatLoading || options?.forceQueue) {
         setPendingDraft(content)
         setDraftConversationId(currentConversationId)
@@ -35,7 +35,10 @@ export function useMessageHandler({
         return
       }
 
-      await sendMessage(content)
+      await sendMessage(content, { 
+        fileIds: options?.fileIds, 
+        attachments: options?.attachments 
+      })
       setTimeout(() => {
         chatInputRef.current?.focus()
       }, 100)

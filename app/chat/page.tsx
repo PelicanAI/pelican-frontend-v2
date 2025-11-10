@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect, useCallback } from "react"
 import { useRouter, usePathname, useSearchParams } from "next/navigation"
 import { ConversationSidebar } from "@/components/chat/conversation-sidebar"
 import { ChatContainer } from "@/components/chat/chat-container"
@@ -174,6 +174,21 @@ export default function ChatPage() {
     messageHandler.handleSendMessage(message)
   }
 
+  const handleSendMessageWithFiles = useCallback(async (message: string) => {
+    // Get uploaded file IDs and attachments
+    const fileIds = fileUpload.getUploadedFileIds()
+    const attachments = fileUpload.getUploadedAttachments()
+    
+    // Send message with files
+    await messageHandler.handleSendMessage(message, { 
+      fileIds: fileIds.length > 0 ? fileIds : undefined,
+      attachments: attachments.length > 0 ? attachments : undefined
+    })
+    
+    // Clear uploaded files after sending
+    fileUpload.clearUploadedFiles()
+  }, [fileUpload, messageHandler])
+
   const handleConversationSelect = (id: string) => {
     conversationRouter.handleConversationSelect(id)
     setMobileSheetOpen(false)
@@ -336,7 +351,7 @@ export default function ChatPage() {
             <div className="max-w-5xl mx-auto w-full px-3 py-3">
               <ChatInput
                 ref={chatInputRef}
-                onSendMessage={messageHandler.handleSendMessage}
+                onSendMessage={handleSendMessageWithFiles}
                 onStopResponse={handleStopGeneration}
                 onFileUpload={fileUpload.handleMultipleFileUpload}
                 disabled={false}
@@ -346,15 +361,31 @@ export default function ChatPage() {
                 onTypingDuringResponse={messageHandler.handleTypingDuringResponse}
                 isAIResponding={chatLoading}
                 pendingDraft={messageHandler.pendingDraft}
-                attachments={fileUpload.pendingAttachments.map((pa) => ({
-                  name: pa.file.name,
-                  type: pa.file.type,
-                  url: "",
-                }))}
+                attachments={[
+                  ...fileUpload.pendingAttachments.map((pa) => ({
+                    name: pa.file.name,
+                    type: pa.file.type,
+                    url: "",
+                  })),
+                  ...fileUpload.uploadedFiles.map((f) => ({
+                    name: f.name,
+                    type: f.type,
+                    url: f.url,
+                  }))
+                ]}
                 onRemoveAttachment={(index: number) => {
-                  const attachment = fileUpload.pendingAttachments[index]
-                  if (attachment) {
-                    fileUpload.handleRemovePendingAttachment(attachment.id)
+                  const pendingCount = fileUpload.pendingAttachments.length
+                  
+                  if (index < pendingCount) {
+                    // Remove from pending
+                    const attachment = fileUpload.pendingAttachments[index]
+                    if (attachment) {
+                      fileUpload.handleRemovePendingAttachment(attachment.id)
+                    }
+                  } else {
+                    // Remove from uploaded files
+                    const uploadedIndex = index - pendingCount
+                    fileUpload.removeUploadedFile(uploadedIndex)
                   }
                 }}
                 pendingAttachments={fileUpload.pendingAttachments}

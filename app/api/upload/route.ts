@@ -136,7 +136,7 @@ export async function POST(request: NextRequest) {
     const month = String(now.getMonth() + 1).padStart(2, "0")
     const uuid = uuidv4()
     const fileExtension = sanitizedFilename.split(".").pop() || "bin"
-    const storageKey = `uploads/${year}/${month}/${uuid}.${fileExtension}`
+    const storageKey = `${year}/${month}/${uuid}.${fileExtension}`
 
     console.log(`[${requestId}] Uploading new file: ${file.name} (${file.size} bytes) as ${storageKey}`)
     addBreadcrumb("Uploading new file", { requestId, storageKey })
