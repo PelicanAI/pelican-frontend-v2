@@ -538,7 +538,8 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
               onError?.(new Error(error))
             }
           },
-          currentConversationId
+          currentConversationId,
+          options.fileIds || []
         )
       } catch (error) {
         logger.error("Streaming error", error instanceof Error ? error : new Error(String(error)))

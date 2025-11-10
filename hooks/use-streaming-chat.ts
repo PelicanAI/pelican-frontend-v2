@@ -20,7 +20,8 @@ export function useStreamingChat() {
     message: string,
     conversationHistory: Message[],
     callbacks: StreamingCallbacks,
-    conversationId?: string | null
+    conversationId?: string | null,
+    fileIds?: string[]
   ) => {
     // Create abort controller for cancellation
     const controller = new AbortController();
@@ -45,6 +46,7 @@ export function useStreamingChat() {
               content: msg.content
             })),
           conversationId: conversationId,
+          fileIds: fileIds || [],
         }),
         signal: controller.signal
       });
