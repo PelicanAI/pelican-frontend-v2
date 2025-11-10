@@ -216,7 +216,14 @@ export function useFileUpload({ sendMessage, addSystemMessage, chatInputRef }: U
 
           const fileIds = successfulResults.map((result) => result.id)
 
-          await sendMessage("", { attachments, fileIds })
+          // DON'T auto-send - let user add message and send manually
+          // Files will be attached to the next message they send
+          // await sendMessage("", { attachments, fileIds })
+          
+          console.log("[FileUpload] Files uploaded successfully, waiting for user to send message", {
+            attachments,
+            fileIds
+          })
         }
 
         const failedCount = results.filter((result) => 
