@@ -524,17 +524,31 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
               // Clear request ID on error
               setCurrentRequestId(null)
               
-              setMessages((prev) =>
-                prev.map((msg) =>
-                  msg.id === assistantMessage.id
-                    ? { 
-                        ...msg, 
-                        content: `Error: ${error}. Please try again.`, 
-                        isStreaming: false 
-                      }
-                    : msg
-                )
-              )
+              // Provide helpful error messages based on error type
+              let errorMessage = error
+              if (error.includes('504') || error.includes('timeout')) {
+                errorMessage = 'The request timed out. The AI is taking longer than expected to respond. This usually means the backend is overloaded or the query is complex. Please try again or simplify your question.'
+              } else if (error.includes('503')) {
+                errorMessage = 'Service temporarily unavailable. The backend may be restarting or under maintenance. Please wait a moment and try again.'
+              } else if (error.includes('502')) {
+                errorMessage = 'Bad gateway. Unable to connect to the AI backend. Please check your backend service status.'
+              } else if (error.includes('500')) {
+                errorMessage = 'Internal server error. Something went wrong on the backend. Please try again.'
+              } else if (error.includes('429')) {
+                errorMessage = 'Rate limit exceeded. Too many requests. Please wait a moment before trying again.'
+              } else if (error.includes('401') || error.includes('403')) {
+                errorMessage = 'Authentication error. Please sign in again.'
+              }
+              
+              // Remove the assistant message and show a system message instead
+              setMessages((prev) => prev.filter((msg) => msg.id !== assistantMessage.id))
+              
+              // Add system message with retry action
+              const retryAction = () => {
+                sendMessageStreaming(content, { ...options, skipUserMessage: true })
+              }
+              addSystemMessage(errorMessage, retryAction)
+              
               onError?.(new Error(error))
             }
           },
