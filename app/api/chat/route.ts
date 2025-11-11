@@ -183,6 +183,21 @@ export async function POST(req: NextRequest) {
       hasAttachments: attachments.length > 0,
       attachmentCount: attachments.length,
     })
+    
+    // ✅ [DEBUG] Log successful response handling
+    console.log('[CHAT_RESPONSE] Successfully processed API response', {
+      conversationId: activeConversationId,
+      replyLength: reply.length,
+      hasAttachments: attachments.length > 0,
+      timestamp: new Date().toISOString()
+    })
+    
+    // Send to Sentry for visibility
+    Sentry.captureMessage('[CHAT_RESPONSE] Successfully processed API response', {
+      level: 'info',
+      tags: { endpoint: '/api/chat', status: 'success' },
+      extra: { conversationId: activeConversationId, replyLength: reply.length, hasAttachments: attachments.length > 0 }
+    })
 
     // 🔧 FIX: Backend already saves messages and creates embeddings
     // Removed duplicate saveMessagesToDatabase() call to prevent constraint violations
@@ -217,6 +232,21 @@ export async function POST(req: NextRequest) {
     logger.error("Chat API error", error instanceof Error ? error : new Error(String(error)), {
       conversationId: activeConversationId,
       userId: effectiveUserId,
+    })
+    
+    // ❌ [ERROR] Log errors for debugging
+    console.error('[CHAT_RESPONSE] API Error', {
+      conversationId: activeConversationId,
+      userId: effectiveUserId,
+      errorMessage: error instanceof Error ? error.message : String(error),
+      errorName: error instanceof Error ? error.name : 'Unknown',
+      timestamp: new Date().toISOString()
+    })
+    
+    // Capture the error in Sentry
+    Sentry.captureException(error, {
+      tags: { endpoint: '/api/chat', error_location: 'api_handler' },
+      extra: { conversationId: activeConversationId, userId: effectiveUserId }
     })
 
     return NextResponse.json(

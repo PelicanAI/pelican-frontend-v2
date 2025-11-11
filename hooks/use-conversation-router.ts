@@ -91,7 +91,8 @@ export function useConversationRouter({
   const handleNewConversation = async () => {
     console.log("🔵 [New Chat] Button clicked")
     
-    // Prevent multiple clicks from creating multiple conversations
+    // ⚡ DEBOUNCE FIX: Prevent multiple rapid clicks from creating multiple conversations
+    // This is CRITICAL - without this, double-clicks create two conversations
     if (isCreatingNewRef.current) {
       console.log("🔵 [New Chat] Already creating, ignoring click")
       return
@@ -112,6 +113,7 @@ export function useConversationRouter({
       
       if (!newConversation) {
         console.error("🔴 [New Chat] Failed to create conversation")
+        isCreatingNewRef.current = false // Reset flag on error
         return
       }
       
@@ -153,10 +155,11 @@ export function useConversationRouter({
       }, 100)
       
     } finally {
-      // Reset the flag after a short delay to allow the navigation to complete
+      // Reset the flag after a short delay (1 second) to prevent double-clicks from creating multiple chats
+      // This is longer than before to ensure the navigation fully completes
       setTimeout(() => {
         isCreatingNewRef.current = false
-      }, 500)
+      }, 1000)
     }
   }
 

@@ -186,6 +186,22 @@ export async function POST(req: NextRequest) {
       responseLength: reply.length,
       hasAttachments: attachments.length > 0,
       attachmentCount: attachments.length,
+      dataKeys: Object.keys(data),
+    })
+    
+    // ✅ [DEBUG] Log successful response handling
+    console.log('[PELICAN_RESPONSE] Successfully processed API response', {
+      conversationId: activeConversationId,
+      replyLength: reply.length,
+      hasAttachments: attachments.length > 0,
+      timestamp: new Date().toISOString()
+    })
+    
+    // Send to Sentry for visibility
+    Sentry.captureMessage('[PELICAN_RESPONSE] Successfully processed API response', {
+      level: 'info',
+      tags: { endpoint: '/api/pelican_response', status: 'success' },
+      extra: { conversationId: activeConversationId, replyLength: reply.length, hasAttachments: attachments.length > 0 }
     })
 
     // 🔧 FIX: Backend already saves messages and creates embeddings
@@ -221,6 +237,21 @@ export async function POST(req: NextRequest) {
     logger.error("Pelican response API error", error instanceof Error ? error : new Error(String(error)), {
       conversationId: activeConversationId,
       userId: effectiveUserId,
+    })
+    
+    // ❌ [ERROR] Log errors for debugging
+    console.error('[PELICAN_RESPONSE] API Error', {
+      conversationId: activeConversationId,
+      userId: effectiveUserId,
+      errorMessage: error instanceof Error ? error.message : String(error),
+      errorName: error instanceof Error ? error.name : 'Unknown',
+      timestamp: new Date().toISOString()
+    })
+    
+    // Capture the error in Sentry
+    Sentry.captureException(error, {
+      tags: { endpoint: '/api/pelican_response', error_location: 'api_handler' },
+      extra: { conversationId: activeConversationId, userId: effectiveUserId }
     })
 
     return NextResponse.json(

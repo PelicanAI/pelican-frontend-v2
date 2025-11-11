@@ -129,6 +129,11 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
     if (conversationError && (conversationError.status === 404 || conversationError.status === 403)) {
       logger.info("Conversation access denied or not found", { conversationId: currentConversationId })
       setConversationNotFound(true)
+      captureCriticalError(conversationError, {
+        location: "api_call",
+        endpoint: `/api/conversations/${currentConversationId}`,
+        conversationId: currentConversationId,
+      })
       return
     }
 
@@ -543,7 +548,19 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
             },
 
             onError: (error) => {
-              logger.error("[Streaming] Error", new Error(error))
+              logger.error("[Streaming] Error", new Error(error), {
+                conversationId: currentConversationId,
+                messageLength: content.length,
+                errorMessage: error,
+              })
+              
+              // Capture in Sentry for critical errors
+              captureCriticalError(new Error(error), {
+                location: "streaming",
+                endpoint: "/api/pelican_stream",
+                conversationId: currentConversationId,
+                messageLength: content.length,
+              })
               
               // Clear request ID on error
               setCurrentRequestId(null)

@@ -209,10 +209,20 @@ export function ChatContainer({
     const isStreaming = lastMessage?.isStreaming || false
     const currentLastMessageId = lastMessage?.id
     
-    // Detect if a NEW message was added (not just an update to existing message)
+    // ⚡ PERFORMANCE FIX: Early return if nothing changed
+    // During streaming, content updates occur without message count changes
+    // Skip expensive scroll operations if only message content changed
     const messageWasAdded = messages.length > prevMessagesLengthRef.current
     const lastMessageChanged = currentLastMessageId !== prevLastMessageIdRef.current
     const messagesAdded = messages.length - prevMessagesLengthRef.current
+    
+    // If only a message is being streamed (no new messages added), skip scroll handling
+    // to avoid re-render loop. The streaming content update will be handled by the
+    // streaming message component itself
+    if (isStreaming && !messageWasAdded) {
+      // Just update the ref and return - don't call handleNewMessage during content updates
+      return
+    }
     
     // BUG FIX: When user sends, TWO messages are added simultaneously:
     // 1. User message
@@ -238,19 +248,16 @@ export function ChatContainer({
       }
     }
 
-    console.log('[Chat Container] 🔍 Message change detected:', {
-      messageCount: messages.length,
-      prevCount: prevMessagesLengthRef.current,
-      messagesAdded,
-      messageWasAdded,
-      lastMessageChanged,
-      lastMessageRole: lastMessage?.role,
-      lastMessageId: lastMessage?.id,
-      isStreaming,
-      userMessageFound: userMessageToScrollTo ? '✅ YES - USER SENT MESSAGE' : '❌ No',
-      userMessageId: userMessageToScrollTo?.id,
-      userMessagePosition: userMessageToScrollTo ? messages.findIndex(m => m.id === userMessageToScrollTo?.id) + 1 : 'N/A'
-    })
+    // ⚡ PERFORMANCE: Only log when messages are actually added, not on every stream update
+    if (messageWasAdded) {
+      console.log('[Chat Container] ✅ NEW MESSAGE(S) detected:', {
+        messageCount: messages.length,
+        prevCount: prevMessagesLengthRef.current,
+        messagesAdded,
+        userMessageFound: userMessageToScrollTo ? '✅ YES' : '❌ No',
+        userMessageId: userMessageToScrollTo?.id,
+      })
+    }
 
     // Check if user is near bottom to show new messages pill
     if (!state.isNearBottom && !isStreaming) {
@@ -265,16 +272,9 @@ export function ChatContainer({
     if (messageWasAdded) {
       if (isUserMessage && userMessageToScrollTo) {
         console.log('[Chat Container] 📨 NEW USER MESSAGE detected, triggering scroll!')
-        console.log('[Chat Container] User message ID:', userMessageToScrollTo.id)
         handleNewMessage(false, true, userMessageToScrollTo.id)
       } else {
-        console.log('[Chat Container] 📨 New message(s) added, but not from user')
-        handleNewMessage(isStreaming, false, lastMessage?.id)
-      }
-    } else {
-      console.log('[Chat Container] 🔄 Message updated (streaming), checking streaming state')
-      // Still need to handle streaming updates
-      if (isStreaming) {
+        console.log('[Chat Container] 📨 New assistant message added')
         handleNewMessage(isStreaming, false, lastMessage?.id)
       }
     }

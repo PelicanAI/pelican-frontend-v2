@@ -3,6 +3,7 @@ import { SSEParser, type SSEMessage } from '@/lib/sse-parser';
 import type { Message } from '@/lib/chat-utils';
 import { instrumentedFetch, captureCriticalError } from '@/lib/sentry-utils';
 import { createClient } from '@/lib/supabase/client';
+import { streamWithRetry } from '@/lib/api-retry';
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://pelican-backend.fly.dev';
 
@@ -45,9 +46,9 @@ export function useStreamingChat() {
 
       const token = session.access_token;
       
-      // Call Fly.io backend directly - no Vercel proxy, no timeout constraints
+      // Call Fly.io backend directly with retry logic for network resilience
       const response = await instrumentedFetch(`${BACKEND_URL}/api/pelican_stream`, async () => {
-        return await fetch(`${BACKEND_URL}/api/pelican_stream`, {
+        return await streamWithRetry(`${BACKEND_URL}/api/pelican_stream`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -64,7 +65,20 @@ export function useStreamingChat() {
             conversationId: conversationId,
             fileIds: fileIds || [],
           }),
-          signal: controller.signal
+          signal: controller.signal,
+          retryOptions: {
+            maxRetries: 2, // Retry failed connections up to 2 times
+            baseDelay: 1000, // Start with 1 second delay
+            shouldRetry: (error: Error) => {
+              // Don't retry if user cancelled
+              if (error.name === 'AbortError') return false;
+              // Don't retry auth errors
+              if (error.message.includes('401') || error.message.includes('403')) return false;
+              // Retry network errors (Failed to fetch)
+              if (error.message.includes('Failed to fetch') || error.message.includes('network')) return true;
+              return true;
+            }
+          }
         });
       });
 
@@ -110,6 +124,14 @@ export function useStreamingChat() {
             break;
             
           case 'error':
+            console.error('[STREAMING] Error event from backend:', event.message);
+            // Capture streaming errors in Sentry
+            captureCriticalError(new Error(event.message || 'Unknown streaming error'), {
+              location: 'streaming',
+              endpoint: `${BACKEND_URL}/api/pelican_stream`,
+              conversationId: conversationId || null,
+              messageLength: message.length,
+            });
             callbacks.onError?.(event.message || 'Unknown error');
             break;
         }

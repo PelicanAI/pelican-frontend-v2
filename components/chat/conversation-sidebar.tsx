@@ -6,6 +6,16 @@ import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
+import {
   Plus,
   Search,
   MessageSquare,
@@ -56,6 +66,7 @@ export function ConversationSidebar({
   const [searchQuery, setSearchQuery] = useState("")
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editTitle, setEditTitle] = useState("")
+  const [deletingId, setDeletingId] = useState<string | null>(null)
 
   const { list: conversations, isLoading, remove, rename } = useConversations()
 
@@ -96,13 +107,14 @@ export function ConversationSidebar({
     return groups
   }, [filteredConversations])
 
-  const handleDeleteConversation = async (conversationId: string) => {
-    if (window.confirm('Delete this conversation?')) {
-      const success = await remove(conversationId)
-      if (success && currentConversationId === conversationId) {
-        onNewConversation()
-      }
+  const handleDeleteConversation = async () => {
+    if (!deletingId) return
+    
+    const success = await remove(deletingId)
+    if (success && currentConversationId === deletingId) {
+      onNewConversation()
     }
+    setDeletingId(null)
   }
 
   const handleRenameConversation = async (conversationId: string, newTitle: string) => {
@@ -192,7 +204,7 @@ export function ConversationSidebar({
           <button
             onClick={(e) => {
               e.stopPropagation()
-              handleDeleteConversation(conversation.id)
+              setDeletingId(conversation.id)
             }}
             className="p-1.5 rounded hover:bg-red-500/20 transition-colors"
             title="Delete conversation"
@@ -397,6 +409,30 @@ export function ConversationSidebar({
           </form>
         </div>
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={!!deletingId} onOpenChange={(open) => !open && setDeletingId(null)}>
+        <AlertDialogContent className="sm:max-w-[425px]">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <Trash2 className="h-5 w-5 text-destructive" />
+              Delete Conversation
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-base">
+              Are you sure you want to delete this conversation? All messages will be permanently removed. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="hover:bg-muted">Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteConversation}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90 focus:ring-destructive"
+            >
+              Delete Conversation
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

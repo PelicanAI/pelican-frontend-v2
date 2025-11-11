@@ -103,6 +103,7 @@ export default function ChatPage() {
     clearMessages,
     regenerateLastMessage,
     addSystemMessage,
+    conversationNotFound,
   } = useChat({
     conversationId: conversationIdFromUrl,
     onError: (error) => {
@@ -163,6 +164,15 @@ export default function ChatPage() {
       router.replace('/chat')
     }
   }, [conversationIdFromUrl, router])
+
+  // Handle conversation not found - redirect to new chat
+  useEffect(() => {
+    if (conversationNotFound && conversationIdFromUrl) {
+      console.error('[CHAT] Conversation not found:', conversationIdFromUrl)
+      // Redirect to new chat without the invalid conversation ID
+      router.replace('/chat')
+    }
+  }, [conversationNotFound, conversationIdFromUrl, router])
 
   const fileUpload = useFileUpload({
     sendMessage,
