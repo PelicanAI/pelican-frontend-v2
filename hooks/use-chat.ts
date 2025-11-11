@@ -236,11 +236,7 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
         }
 
         const token = session.access_token
-        const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL
-
-        if (!BACKEND_URL) {
-          throw new Error("NEXT_PUBLIC_BACKEND_URL environment variable not configured")
-        }
+        const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://pelican-backend.fly.dev'
 
         // Call Fly.io backend directly - no Vercel proxy, no timeout constraints
         const response = await instrumentedFetch(`${BACKEND_URL}/api/pelican_response`, async () => {

@@ -4,11 +4,7 @@ import type { Message } from '@/lib/chat-utils';
 import { instrumentedFetch, captureCriticalError } from '@/lib/sentry-utils';
 import { createClient } from '@/lib/supabase/client';
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
-
-if (!BACKEND_URL) {
-  throw new Error('NEXT_PUBLIC_BACKEND_URL environment variable not configured');
-}
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://pelican-backend.fly.dev';
 
 interface StreamingCallbacks {
   onStart?: () => void;
