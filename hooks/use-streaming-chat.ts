@@ -125,7 +125,7 @@ export function useStreamingChat() {
       } else {
         // Capture critical streaming errors in Sentry
         captureCriticalError(error, {
-          location: 'streaming_direct',
+          location: 'streaming',
           endpoint: `${BACKEND_URL}/api/pelican_stream`,
           conversationId: conversationId || null,
           messageLength: message.length,
