@@ -88,6 +88,12 @@ export async function POST(req: NextRequest) {
 
       activeConversationId = newConversation.id
       logger.info("Created new conversation", { conversationId: activeConversationId, userId: effectiveUserId })
+      console.log("✅ [CHAT_RESPONSE] Created conversation in DB:", { 
+        conversationId: activeConversationId,
+        title: newConversation.title,
+        userId: effectiveUserId,
+        createdAt: newConversation.created_at
+      })
     }
 
     const apiKey = process.env.PEL_API_KEY

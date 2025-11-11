@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo, useCallback } from "react"
 import { createClient } from "@/lib/supabase/client"
 import type { User } from "@supabase/supabase-js"
+import * as Sentry from "@sentry/nextjs"
 
 interface Conversation {
   id: string
@@ -189,10 +190,20 @@ export function useConversations() {
 
   const createConversation = async (title = "New Conversation") => {
     const effectiveUserId = user?.id || guestUserId
-    if (!effectiveUserId) return null
+    if (!effectiveUserId) {
+      console.error("❌ [Create Conversation] No user ID available")
+      return null
+    }
 
     if (user?.id) {
       try {
+        console.log("🔷 [Create Conversation] Attempting to create conversation", { 
+          userId: effectiveUserId, 
+          title,
+          userExists: !!user,
+          userEmail: user?.email 
+        })
+        
         const { data, error } = await supabase
           .from("conversations")
           .insert({
@@ -202,10 +213,37 @@ export function useConversations() {
           .select()
           .single()
 
-        if (error) throw error
+        if (error) {
+          console.error("❌ [Create Conversation] Database error:", {
+            errorMessage: error.message,
+            errorCode: error.code,
+            errorDetails: error
+          })
+          throw error
+        }
+        
+        console.log("✅ [Create Conversation] Successfully created:", { 
+          conversationId: data?.id,
+          title: data?.title,
+          createdAt: data?.created_at 
+        })
+        
+        // Reload conversations to reflect the new one
+        if (user?.id) {
+          await loadConversations(user.id)
+        }
+        
         return data
       } catch (error) {
-        console.error("Failed to create conversation:", error)
+        console.error("❌ [Create Conversation] Failed:", {
+          errorMessage: error instanceof Error ? error.message : String(error),
+          errorStack: error instanceof Error ? error.stack : undefined
+        })
+        // Capture in Sentry
+        Sentry.captureException(error, {
+          tags: { location: 'createConversation' },
+          extra: { userId: effectiveUserId, title }
+        })
         return null
       }
     } else {
