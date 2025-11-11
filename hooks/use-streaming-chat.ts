@@ -1,6 +1,14 @@
 import { useState, useCallback, useRef } from 'react';
 import { SSEParser, type SSEMessage } from '@/lib/sse-parser';
 import type { Message } from '@/lib/chat-utils';
+import { instrumentedFetch, captureCriticalError } from '@/lib/sentry-utils';
+import { createClient } from '@/lib/supabase/client';
+
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+
+if (!BACKEND_URL) {
+  throw new Error('NEXT_PUBLIC_BACKEND_URL environment variable not configured');
+}
 
 interface StreamingCallbacks {
   onStart?: () => void;
@@ -31,32 +39,46 @@ export function useStreamingChat() {
     try {
       callbacks.onStart?.();
       
-      // POST to streaming endpoint
-      const response = await fetch('/api/pelican_stream', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          message,
-          conversationHistory: conversationHistory
-            .filter(msg => msg.role !== 'system')
-            .map(msg => ({
-              role: msg.role,
-              content: msg.content
-            })),
-          conversationId: conversationId,
-          fileIds: fileIds || [],
-        }),
-        signal: controller.signal
+      // Get Supabase session token for authentication
+      const supabase = createClient();
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError || !session) {
+        throw new Error('Authentication required. Please sign in again.');
+      }
+
+      const token = session.access_token;
+      
+      // Call Fly.io backend directly - no Vercel proxy, no timeout constraints
+      const response = await instrumentedFetch(`${BACKEND_URL}/api/pelican_stream`, async () => {
+        return await fetch(`${BACKEND_URL}/api/pelican_stream`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            message,
+            conversationHistory: conversationHistory
+              .filter(msg => msg.role !== 'system')
+              .map(msg => ({
+                role: msg.role,
+                content: msg.content
+              })),
+            conversationId: conversationId,
+            fileIds: fileIds || [],
+          }),
+          signal: controller.signal
+        });
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        const errorText = await response.text();
+        throw new Error(`Backend error: ${response.status} - ${errorText}`);
       }
 
       if (!response.body) {
-        throw new Error('No response body received');
+        throw new Error('No response body received from backend');
       }
 
       // Parse SSE stream
@@ -99,8 +121,16 @@ export function useStreamingChat() {
       
     } catch (error) {
       if (error instanceof Error && error.name === 'AbortError') {
-        console.log('[Stream] Cancelled by user');
+        console.log('[PELICAN-DIRECT] Stream cancelled by user');
       } else {
+        // Capture critical streaming errors in Sentry
+        captureCriticalError(error, {
+          location: 'streaming_direct',
+          endpoint: `${BACKEND_URL}/api/pelican_stream`,
+          conversationId: conversationId || null,
+          messageLength: message.length,
+        });
+        
         callbacks.onError?.(
           error instanceof Error ? error.message : 'Stream failed'
         );

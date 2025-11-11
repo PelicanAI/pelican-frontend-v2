@@ -8,6 +8,7 @@ import { useRequestManager } from "./use-request-manager"
 import { useStreamingChat } from "./use-streaming-chat"
 import { STORAGE_KEYS, API_ENDPOINTS, LIMITS } from "@/lib/constants"
 import { logger } from "@/lib/logger"
+import { instrumentedFetch, captureCriticalError } from "@/lib/sentry-utils"
 
 // FEATURE FLAG - set true to enable streaming
 const USE_STREAMING = true
@@ -225,19 +226,38 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
           conversationId: currentConversationId 
         })
 
-        // Simple POST to pelican_response endpoint - no streaming
-        const response = await makeRequest("/api/pelican_response", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            message: userMessage.content,
-            conversationId: currentConversationId,
-            conversationHistory: conversationHistory,
-            conversation_history: conversationHistory, // Backend expects both formats
-            fileIds: options.fileIds,
-          }),
+        // Get Supabase session token for direct backend authentication
+        const { createClient } = await import("@/lib/supabase/client")
+        const supabase = createClient()
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+        
+        if (sessionError || !session) {
+          throw new Error("Authentication required. Please sign in again.")
+        }
+
+        const token = session.access_token
+        const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL
+
+        if (!BACKEND_URL) {
+          throw new Error("NEXT_PUBLIC_BACKEND_URL environment variable not configured")
+        }
+
+        // Call Fly.io backend directly - no Vercel proxy, no timeout constraints
+        const response = await instrumentedFetch(`${BACKEND_URL}/api/pelican_response`, async () => {
+          return await makeRequest(`${BACKEND_URL}/api/pelican_response`, {
+            method: "POST",
+            headers: {
+              "Authorization": `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              message: userMessage.content,
+              conversationId: currentConversationId,
+              conversationHistory: conversationHistory,
+              conversation_history: conversationHistory, // Backend expects both formats
+              fileIds: options.fileIds,
+            }),
+          })
         })
 
         if (!response.ok) {
@@ -338,6 +358,14 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
           setMessages((prev) => prev.filter((msg) => msg.id !== assistantMessage.id))
           return
         }
+
+        // Capture critical API errors in Sentry (except user cancellations)
+        captureCriticalError(error, {
+          location: "api_call",
+          endpoint: "/api/pelican_response",
+          conversationId: currentConversationId,
+          messageLength: content.length,
+        })
 
         // Remove failed assistant message for other errors too
         setMessages((prev) => prev.filter((msg) => msg.id !== assistantMessage.id))

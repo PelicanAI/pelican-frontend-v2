@@ -70,9 +70,12 @@ export const STORAGE_KEYS = {
 } as const
 
 export const API_ENDPOINTS = {
-  CHAT: "/api/chat",
-  PELICAN_STREAM: "/api/pelican_stream",
+  CHAT: "/api/chat", // Legacy - not used for Pelican queries
+  PELICAN_STREAM: "/api/pelican_stream", // Legacy - now calls Fly.io directly
   UPLOAD: "/api/upload",
   CONVERSATIONS: "/api/conversations",
   MESSAGES: "/api/messages",
 } as const
+
+// Direct backend URLs (no Vercel proxy)
+export const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://pelican-backend.fly.dev'

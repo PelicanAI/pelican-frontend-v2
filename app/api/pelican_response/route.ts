@@ -6,6 +6,7 @@ import { sanitizeMessage, sanitizeTitle } from "@/lib/sanitize"
 import { logger } from "@/lib/logger"
 import { AuthenticationError, ExternalAPIError, getUserFriendlyError } from "@/lib/errors"
 import type { User } from "@supabase/supabase-js"
+import * as Sentry from "@sentry/nextjs"
 
 interface PelicanResponseRequest {
   message: string
@@ -71,6 +72,11 @@ export async function POST(req: NextRequest) {
       error: authError,
     } = await supabase.auth.getUser()
     if (authError || !authUser) {
+      // Capture authentication failures in Sentry
+      Sentry.captureException(new AuthenticationError(), {
+        tags: { error_location: 'authentication', endpoint: '/api/pelican_response' },
+        extra: { authError: authError?.message }
+      })
       throw new AuthenticationError()
     }
     user = authUser

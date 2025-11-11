@@ -5,6 +5,7 @@ import { GeistMono } from "geist/font/mono"
 import { Analytics } from "@vercel/analytics/next"
 import { Providers } from "@/lib/providers"
 import { Suspense } from "react"
+import * as Sentry from '@sentry/nextjs'
 import "./globals.css"
 
 const inter = Inter({
@@ -13,10 +14,15 @@ const inter = Inter({
   variable: "--font-inter",
 })
 
-export const metadata: Metadata = {
-  title: "Pelican AI - Elite Trading Assistant",
-  description: "AI-powered trading assistant for smarter trading decisions",
-  generator: "v0.app",
+export function generateMetadata(): Metadata {
+  return {
+    title: "Pelican AI - Elite Trading Assistant",
+    description: "AI-powered trading assistant for smarter trading decisions",
+    generator: "v0.app",
+    other: {
+      ...Sentry.getTraceData()
+    }
+  }
 }
 
 export default function RootLayout({

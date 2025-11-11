@@ -34,8 +34,12 @@ export async function fetchWithRetry(
   options: RequestInit & { retryOptions?: RetryOptions } = {},
 ): Promise<Response> {
   // Increase timeout for pelican_response endpoint (requests can take 60+ seconds)
-  const isPelicanResponse = url.includes('/api/pelican_response')
-  const extendedTimeout = isPelicanResponse ? 300000 : undefined // 300s (5 minutes) for pelican, use default otherwise
+  // Note: Direct backend calls to Fly.io have no timeout constraints
+  const isPelicanResponse = url.includes('/api/pelican_response') || url.includes('/pelican_response')
+  const isDirectBackendCall = url.includes('pelican-backend.fly.dev')
+  
+  // No timeout for direct backend calls - let them run as long as needed
+  const extendedTimeout = isDirectBackendCall ? undefined : (isPelicanResponse ? 300000 : undefined)
   const { retryOptions, ...fetchOptions } = options
   const config = { 
     ...DEFAULT_OPTIONS, 
@@ -44,7 +48,7 @@ export async function fetchWithRetry(
   }
   
   // Disable retries on timeout for long-running requests (don't spam backend)
-  const shouldRetryOnTimeout = !isPelicanResponse
+  const shouldRetryOnTimeout = !isPelicanResponse && !isDirectBackendCall
   const originalShouldRetry = config.shouldRetry
   config.shouldRetry = (error: Error, attempt: number) => {
     // Don't retry on timeout for pelican_response - just wait
