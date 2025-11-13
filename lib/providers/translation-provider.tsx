@@ -50,9 +50,10 @@ export function TranslationProvider({ children }: { children: ReactNode }) {
     
     // Determine which translation file to load
     // If locale has translations, use it; otherwise use English
-    const translationLocale = translatedLocales.includes(locale as any) 
-      ? locale 
-      : 'en';
+    const translationLocale: (typeof translatedLocales)[number] = 
+      (translatedLocales as readonly string[]).includes(locale) 
+        ? (locale as (typeof translatedLocales)[number])
+        : 'en';
 
     import(`@/messages/${translationLocale}.json`)
       .then(module => {
