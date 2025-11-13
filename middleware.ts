@@ -20,10 +20,13 @@ async function getLocale(req: NextRequest): Promise<string> {
   // 3. Browser language
   const acceptLanguage = req.headers.get('accept-language');
   if (acceptLanguage) {
-    const browserLocale = acceptLanguage.split(',')[0].split('-')[0].toLowerCase();
-    const supportedLocales = ['en', 'zh', 'es', 'fr', 'ar', 'pt', 'ru', 'ja', 'de', 'ko', 'it', 'tr', 'nl', 'pl', 'sv', 'id', 'uk', 'he', 'el', 'cs', 'ro', 'hu', 'da', 'fi', 'no', 'sk', 'vi', 'th', 'ms'];
-    if (supportedLocales.includes(browserLocale)) {
-      return browserLocale;
+    const firstLang = acceptLanguage.split(',')[0];
+    if (firstLang) {
+      const browserLocale = firstLang.split('-')[0].toLowerCase();
+      const supportedLocales = ['en', 'zh', 'es', 'fr', 'ar', 'pt', 'ru', 'ja', 'de', 'ko', 'it', 'tr', 'nl', 'pl', 'sv', 'id', 'uk', 'he', 'el', 'cs', 'ro', 'hu', 'da', 'fi', 'no', 'sk', 'vi', 'th', 'ms'];
+      if (supportedLocales.includes(browserLocale)) {
+        return browserLocale;
+      }
     }
   }
 
