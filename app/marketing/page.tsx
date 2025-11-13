@@ -21,6 +21,7 @@ import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
 import Image from "next/image"
 import type { User } from "@supabase/supabase-js"
+import { LanguageSelector } from "@/components/language-selector"
 
 export default function MarketingPage() {
   const [user, setUser] = useState<User | null>(null)
@@ -127,6 +128,7 @@ export default function MarketingPage() {
 
             {/* User Area */}
             <div className="hidden md:flex items-center gap-3">
+              <LanguageSelector />
               <Button asChild className="bg-purple-600 hover:bg-purple-700 text-white">
                 <Link href="/">
                   <MessageSquare className="w-4 h-4 mr-2" />
@@ -194,6 +196,9 @@ export default function MarketingPage() {
                 >
                   FAQ
                 </button>
+                <div className="flex items-center gap-2 mt-4 pb-2 border-b border-gray-800">
+                  <LanguageSelector />
+                </div>
                 <div className="flex flex-col gap-2 mt-4">
                   <Button asChild className="bg-purple-600 hover:bg-purple-700 text-white">
                     <Link href="/">

@@ -22,7 +22,8 @@ async function getLocale(req: NextRequest): Promise<string> {
   if (acceptLanguage) {
     const firstLang = acceptLanguage.split(',')[0];
     if (firstLang) {
-      const browserLocale = firstLang.split('-')[0].toLowerCase();
+      // FIX: Handle potential undefined from split
+      const browserLocale = firstLang.split('-')[0]?.toLowerCase() || 'en';
       const supportedLocales = ['en', 'zh', 'es', 'fr', 'ar', 'pt', 'ru', 'ja', 'de', 'ko', 'it', 'tr', 'nl', 'pl', 'sv', 'id', 'uk', 'he', 'el', 'cs', 'ro', 'hu', 'da', 'fi', 'no', 'sk', 'vi', 'th', 'ms'];
       if (supportedLocales.includes(browserLocale)) {
         return browserLocale;
