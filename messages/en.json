@@ -38,6 +38,24 @@
     "financials": "Financials",
     "healthcare": "Healthcare",
     "energy": "Energy"
+  },
+  "marketing": {
+    "features": "Features",
+    "about": "About",
+    "pricing": "Pricing",
+    "faq": "FAQ",
+    "chatWithPelicanAI": "Chat with PelicanAI",
+    "signIn": "Sign In",
+    "getStarted": "Get Started",
+    "heroTitle": "AI-Powered Trading",
+    "heroTitleHighlight": "Intelligence",
+    "heroSubtitle": "Step Into the Cockpit. PelicanAI is Here",
+    "heroDescription": "Meet Pelican Trading, your intelligent trading companion. This is trading's next evolution — not another alert service, but a tool built by traders, for traders. Ask it anything. Break down your strategy. Get feedback that actually makes you better. Pelican combines market context, trading psychology, and performance analysis into one powerful voice — yours. It's not hype. It's your edge, sharpened daily. Whether you're navigating macro chaos or chasing your next setup — Pelican is the co-pilot you've always needed.",
+    "learnMore": "Learn More",
+    "powerfulTradingFeatures": "Powerful Trading",
+    "featuresHighlight": "Features",
+    "discoverSuite": "Discover the comprehensive suite of tools designed to elevate your trading performance with intelligence, autonomy, and community.",
+    "coreFeatures": "Core Features"
   }
 }
 

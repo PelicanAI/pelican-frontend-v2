@@ -38,6 +38,24 @@
     "financials": "Finanzas",
     "healthcare": "Salud",
     "energy": "Energía"
+  },
+  "marketing": {
+    "features": "Características",
+    "about": "Acerca de",
+    "pricing": "Precios",
+    "faq": "Preguntas Frecuentes",
+    "chatWithPelicanAI": "Chatear con PelicanAI",
+    "signIn": "Iniciar Sesión",
+    "getStarted": "Comenzar",
+    "heroTitle": "Trading Potenciado por IA",
+    "heroTitleHighlight": "Inteligencia",
+    "heroSubtitle": "Sube a la Cabina. PelicanAI está Aquí",
+    "heroDescription": "Conoce Pelican Trading, tu compañero de trading inteligente. Esta es la próxima evolución del trading: no otro servicio de alertas, sino una herramienta construida por traders, para traders. Pregúntale cualquier cosa. Analiza tu estrategia. Obtén retroalimentación que realmente te mejore. Pelican combina contexto de mercado, psicología de trading y análisis de rendimiento en una voz poderosa: la tuya. No es exageración. Es tu ventaja, afilada diariamente. Ya sea que estés navegando el caos macro o persiguiendo tu próxima configuración, Pelican es el copiloto que siempre necesitas.",
+    "learnMore": "Saber Más",
+    "powerfulTradingFeatures": "Potentes Características de Trading",
+    "featuresHighlight": "Características",
+    "discoverSuite": "Descubre la suite integral de herramientas diseñadas para elevar tu rendimiento comercial con inteligencia, autonomía y comunidad.",
+    "coreFeatures": "Características Principales"
   }
 }
 

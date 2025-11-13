@@ -22,8 +22,10 @@ import { createClient } from "@/lib/supabase/client"
 import Image from "next/image"
 import type { User } from "@supabase/supabase-js"
 import { LanguageSelector } from "@/components/language-selector"
+import { useT } from "@/lib/providers/translation-provider"
 
 export default function MarketingPage() {
+  const t = useT()
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -64,7 +66,7 @@ export default function MarketingPage() {
               <div className="flex items-center gap-3">
                 <Image
                   src="/pelican-logo.png"
-                  alt="Pelican AI"
+                  alt={t.common.appName}
                   width={40}
                   height={40}
                   className="h-8 w-auto brightness-110 saturate-125 contrast-105 drop-shadow-md pelican-pulse"
@@ -72,7 +74,7 @@ export default function MarketingPage() {
                     filter: "hue-rotate(5deg) saturate(1.4) brightness(1.2) contrast(1.1)",
                   }}
                 />
-                <span className="text-xl font-bold text-white">PelicanAI</span>
+                <span className="text-xl font-bold text-white">{t.common.appName}</span>
               </div>
 
               {/* Social Media - Desktop */}
@@ -104,25 +106,25 @@ export default function MarketingPage() {
                 onClick={() => scrollToSection("features")}
                 className="text-gray-300 hover:text-white transition-colors"
               >
-                Features
+                {t.marketing.features}
               </button>
               <button
                 onClick={() => scrollToSection("about")}
                 className="text-gray-300 hover:text-white transition-colors"
               >
-                About
+                {t.marketing.about}
               </button>
               <button
                 onClick={() => scrollToSection("pricing")}
                 className="text-gray-300 hover:text-white transition-colors"
               >
-                Pricing
+                {t.marketing.pricing}
               </button>
               <button
                 onClick={() => scrollToSection("faq")}
                 className="text-gray-300 hover:text-white transition-colors"
               >
-                FAQ
+                {t.marketing.faq}
               </button>
             </nav>
 
@@ -132,7 +134,7 @@ export default function MarketingPage() {
               <Button asChild className="bg-purple-600 hover:bg-purple-700 text-white">
                 <Link href="/">
                   <MessageSquare className="w-4 h-4 mr-2" />
-                  Chat with PelicanAI
+                  {t.marketing.chatWithPelicanAI}
                 </Link>
               </Button>
               {!isLoading && !user && (
@@ -143,11 +145,11 @@ export default function MarketingPage() {
                     className="border-gray-600 text-white hover:bg-gray-800 bg-transparent hover:text-white signin-button-custom"
                   >
                     <Link href="/auth/login" className="signin-button-custom">
-                      Sign In
+                      {t.marketing.signIn}
                     </Link>
                   </Button>
                   <Button asChild className="bg-purple-700 hover:bg-purple-800 text-white">
-                    <Link href="/auth/signup">Get Started</Link>
+                    <Link href="/auth/signup">{t.marketing.getStarted}</Link>
                   </Button>
                 </>
               )}
@@ -170,7 +172,7 @@ export default function MarketingPage() {
                   }}
                   className="text-gray-300 hover:text-white transition-colors text-left"
                 >
-                  Features
+                  {t.marketing.features}
                 </button>
                 <button
                   onClick={() => {
@@ -179,7 +181,7 @@ export default function MarketingPage() {
                   }}
                   className="text-gray-300 hover:text-white transition-colors text-left"
                 >
-                  About
+                  {t.marketing.about}
                 </button>
                 <button
                   onClick={() => {
@@ -188,13 +190,13 @@ export default function MarketingPage() {
                   }}
                   className="text-gray-300 hover:text-white transition-colors text-left"
                 >
-                  Pricing
+                  {t.marketing.pricing}
                 </button>
                 <button
                   onClick={() => scrollToSection("faq")}
                   className="text-gray-300 hover:text-white transition-colors text-left"
                 >
-                  FAQ
+                  {t.marketing.faq}
                 </button>
                 <div className="flex items-center gap-2 mt-4 pb-2 border-b border-gray-800">
                   <LanguageSelector />
@@ -203,7 +205,7 @@ export default function MarketingPage() {
                   <Button asChild className="bg-purple-600 hover:bg-purple-700 text-white">
                     <Link href="/">
                       <MessageSquare className="w-4 h-4 mr-2" />
-                      Chat with PelicanAI
+                      {t.marketing.chatWithPelicanAI}
                     </Link>
                   </Button>
                   {!isLoading && !user && (
@@ -214,11 +216,11 @@ export default function MarketingPage() {
                         className="border-gray-600 text-white hover:bg-gray-800 bg-transparent hover:text-white signin-button-custom"
                       >
                         <Link href="/auth/login" className="signin-button-custom">
-                          Sign In
+                          {t.marketing.signIn}
                         </Link>
                       </Button>
                       <Button asChild className="bg-purple-700 hover:bg-purple-800 text-white">
-                        <Link href="/auth/signup">Get Started</Link>
+                        <Link href="/auth/signup">{t.marketing.getStarted}</Link>
                       </Button>
                     </>
                   )}
@@ -237,7 +239,7 @@ export default function MarketingPage() {
             <div className="relative">
               <Image
                 src="/pelican-logo.png"
-                alt="Pelican AI"
+                alt={t.common.appName}
                 width={400}
                 height={400}
                 className="w-80 h-80 lg:w-96 lg:h-96 brightness-110 saturate-125 contrast-105 drop-shadow-2xl pelican-pulse"
@@ -259,28 +261,23 @@ export default function MarketingPage() {
           {/* Content Side */}
           <div className="text-center lg:text-left">
             <h1 className="text-4xl lg:text-6xl font-bold mb-6" style={{ color: "#DCE4F0" }}>
-              AI-Powered Trading{" "}
+              {t.marketing.heroTitle}{" "}
               <span className="bg-gradient-to-r from-purple-400 to-purple-600 bg-clip-text text-transparent">
-                Intelligence
+                {t.marketing.heroTitleHighlight}
               </span>
             </h1>
             <h2 className="text-2xl lg:text-3xl font-semibold mb-8" style={{ color: "#DCE4F0" }}>
-              Step Into the Cockpit. PelicanAI is Here
+              {t.marketing.heroSubtitle}
             </h2>
             <p className="text-lg lg:text-xl mb-8 leading-relaxed" style={{ color: "#B4BED0" }}>
-              Meet Pelican Trading, your intelligent trading companion. This is trading&apos;s next evolution — not another
-              alert service, but a tool built by traders, for traders. Ask it anything. Break down your strategy. Get
-              feedback that actually makes you better. Pelican combines market context, trading psychology, and
-              performance analysis into one powerful voice — yours. It&apos;s not hype. It&apos;s your edge, sharpened daily.
-              Whether you&apos;re navigating macro chaos or chasing your next setup — Pelican is the co-pilot you&apos;ve always
-              needed.
+              {t.marketing.heroDescription}
             </p>
             <Button
               size="lg"
               className="bg-white text-gray-900 hover:bg-gray-100 font-semibold px-8 py-3 rounded-full"
               onClick={() => scrollToSection("features")}
             >
-              Learn More
+              {t.marketing.learnMore}
             </Button>
           </div>
         </div>
@@ -307,20 +304,19 @@ export default function MarketingPage() {
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl lg:text-5xl font-bold mb-6" style={{ color: "#DCE4F0" }}>
-              Powerful Trading{" "}
+              {t.marketing.powerfulTradingFeatures}{" "}
               <span className="bg-gradient-to-r from-purple-400 to-purple-600 bg-clip-text text-transparent">
-                Features
+                {t.marketing.featuresHighlight}
               </span>
             </h2>
             <p className="text-xl lg:text-2xl" style={{ color: "#B4BED0" }}>
-              Discover the comprehensive suite of tools designed to elevate your trading performance with intelligence,
-              autonomy, and community.
+              {t.marketing.discoverSuite}
             </p>
           </div>
 
           <div className="mb-16">
             <h3 className="text-2xl lg:text-3xl font-bold mb-8 text-center" style={{ color: "#DCE4F0" }}>
-              Core Features
+              {t.marketing.coreFeatures}
             </h3>
 
             {/* AI Trading Assistant - Featured Card */}

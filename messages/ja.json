@@ -38,6 +38,24 @@
     "financials": "金融",
     "healthcare": "ヘルスケア",
     "energy": "エネルギー"
+  },
+  "marketing": {
+    "features": "機能",
+    "about": "について",
+    "pricing": "料金",
+    "faq": "よくある質問",
+    "chatWithPelicanAI": "PelicanAIとチャット",
+    "signIn": "サインイン",
+    "getStarted": "始める",
+    "heroTitle": "AI搭載の取引",
+    "heroTitleHighlight": "インテリジェンス",
+    "heroSubtitle": "コックピットに入ってください。PelicanAIがここにあります",
+    "heroDescription": "Pelican Trading、あなたのインテリジェントな取引パートナーをご紹介します。これは取引の次の進化です——もう一つのアラートサービスではなく、トレーダーがトレーダーのために構築したツールです。何でも聞いてください。戦略を分解してください。実際にあなたを良くするフィードバックを得てください。Pelicanは市場コンテキスト、取引心理学、パフォーマンス分析を一つの強力な声——あなたの声——に組み合わせます。それは誇大広告ではありません。それは毎日磨かれるあなたの利点です。マクロの混乱をナビゲートしているのか、次のセットアップを追いかけているのかに関わらず、Pelicanはあなたが常に必要としていたコパイロットです。",
+    "learnMore": "詳細を見る",
+    "powerfulTradingFeatures": "強力な取引",
+    "featuresHighlight": "機能",
+    "discoverSuite": "インテリジェンス、自律性、コミュニティを通じて取引パフォーマンスを向上させるために設計された包括的なツールスイートを発見してください。",
+    "coreFeatures": "コア機能"
   }
 }
 

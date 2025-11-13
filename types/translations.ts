@@ -39,5 +39,23 @@ export interface Translations {
     healthcare: string;
     energy: string;
   };
+  marketing: {
+    features: string;
+    about: string;
+    pricing: string;
+    faq: string;
+    chatWithPelicanAI: string;
+    signIn: string;
+    getStarted: string;
+    heroTitle: string;
+    heroTitleHighlight: string;
+    heroSubtitle: string;
+    heroDescription: string;
+    learnMore: string;
+    powerfulTradingFeatures: string;
+    featuresHighlight: string;
+    discoverSuite: string;
+    coreFeatures: string;
+  };
 }
 

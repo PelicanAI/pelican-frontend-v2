@@ -38,6 +38,24 @@
     "financials": "金融",
     "healthcare": "医疗",
     "energy": "能源"
+  },
+  "marketing": {
+    "features": "功能",
+    "about": "关于",
+    "pricing": "定价",
+    "faq": "常见问题",
+    "chatWithPelicanAI": "与 PelicanAI 聊天",
+    "signIn": "登录",
+    "getStarted": "开始使用",
+    "heroTitle": "AI驱动的交易",
+    "heroTitleHighlight": "智能",
+    "heroSubtitle": "进入驾驶舱。PelicanAI 来了",
+    "heroDescription": "认识 Pelican Trading，您的智能交易伙伴。这是交易的下一次革命——不是另一个提醒服务，而是由交易员为交易员打造的工具。问它任何问题。分解您的策略。获得真正让您进步的反饋。Pelican 将市场背景、交易心理学和绩效分析结合成一个强大的声音——您的声音。这不是炒作。这是您的优势，每天都在加强。无论您是在应对宏观混乱还是追逐下一个设置——Pelican 是您一直需要的副驾驶。",
+    "learnMore": "了解更多",
+    "powerfulTradingFeatures": "强大的交易",
+    "featuresHighlight": "功能",
+    "discoverSuite": "发现旨在通过智能、自主和社区提升您交易绩效的全面工具套件。",
+    "coreFeatures": "核心功能"
   }
 }
 
