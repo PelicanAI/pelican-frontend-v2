@@ -2,22 +2,68 @@ import { updateSession } from "@/lib/supabase/middleware"
 import { rateLimit, getClientIdentifier } from "@/lib/rate-limit"
 import type { NextRequest } from "next/server"
 import { NextResponse } from "next/server"
-// import createMiddleware from 'next-intl/middleware';
-// import { locales } from './i18n/request';
+import { countryToLocale, type Locale } from '@/lib/languages'
 
-// Create i18n middleware - DISABLED for now to prevent routing issues
-// const intlMiddleware = createMiddleware({
-//   locales,
-//   defaultLocale: 'en',
-//   localePrefix: 'as-needed'
-// });
+async function getLocale(req: NextRequest): Promise<string> {
+  // 1. Check cookie
+  const cookieLocale = req.cookies.get('locale')?.value;
+  if (cookieLocale) {
+    return cookieLocale;
+  }
+
+  // 2. IP-based detection
+  const locale = await detectLocaleFromIP(req);
+  if (locale) {
+    return locale;
+  }
+
+  // 3. Browser language
+  const acceptLanguage = req.headers.get('accept-language');
+  if (acceptLanguage) {
+    const browserLocale = acceptLanguage.split(',')[0].split('-')[0].toLowerCase();
+    const supportedLocales = ['en', 'zh', 'es', 'fr', 'ar', 'pt', 'ru', 'ja', 'de', 'ko', 'it', 'tr', 'nl', 'pl', 'sv', 'id', 'uk', 'he', 'el', 'cs', 'ro', 'hu', 'da', 'fi', 'no', 'sk', 'vi', 'th', 'ms'];
+    if (supportedLocales.includes(browserLocale)) {
+      return browserLocale;
+    }
+  }
+
+  return 'en';
+}
+
+async function detectLocaleFromIP(req: NextRequest): Promise<string | null> {
+  try {
+    // Try Cloudflare headers first
+    const cfCountry = req.headers.get('cf-ipcountry');
+    if (cfCountry && countryToLocale[cfCountry]) {
+      return countryToLocale[cfCountry];
+    }
+
+    // Fallback to IP geolocation API
+    const ip = req.headers.get('x-forwarded-for')?.split(',')[0] || 
+               req.headers.get('x-real-ip') ||
+               req.ip;
+    
+    if (ip && !ip.includes('127.0.0.1') && !ip.includes('::1')) {
+      const response = await fetch(`https://ipapi.co/${ip}/country_code/`, {
+        signal: AbortSignal.timeout(1000)
+      });
+      
+      if (response.ok) {
+        const country = await response.text();
+        return countryToLocale[country.trim()] || null;
+      }
+    }
+  } catch (error) {
+    console.error('IP detection failed:', error);
+  }
+  
+  return null;
+}
 
 export async function middleware(request: NextRequest) {
-  // i18n routing DISABLED - language switching will be client-side only
-  // if (!request.nextUrl.pathname.startsWith('/api')) {
-  //   const intlResponse = intlMiddleware(request);
-  //   if (intlResponse) return intlResponse;
-  // }
+  // Skip API routes for locale detection, but still apply rate limiting
+  const isApiRoute = request.nextUrl.pathname.startsWith('/api');
+  
   // Rate limit chat endpoint - critical for scalability
   if (request.nextUrl.pathname === "/api/chat") {
     const clientId = getClientIdentifier(request)
@@ -41,12 +87,12 @@ export async function middleware(request: NextRequest) {
       )
     }
 
-    const response = await updateSession(request)
-    response.headers.set("X-RateLimit-Limit", result.limit.toString())
-    response.headers.set("X-RateLimit-Remaining", result.remaining.toString())
-    response.headers.set("X-RateLimit-Reset", new Date(result.resetTime).toISOString())
+    const apiResponse = await updateSession(request)
+    apiResponse.headers.set("X-RateLimit-Limit", result.limit.toString())
+    apiResponse.headers.set("X-RateLimit-Remaining", result.remaining.toString())
+    apiResponse.headers.set("X-RateLimit-Reset", new Date(result.resetTime).toISOString())
 
-    return response
+    return apiResponse
   }
 
   // Rate limit upload endpoint
@@ -71,15 +117,34 @@ export async function middleware(request: NextRequest) {
     }
 
     // Add rate limit headers to successful requests
-    const response = await updateSession(request)
-    response.headers.set("X-RateLimit-Limit", result.limit.toString())
-    response.headers.set("X-RateLimit-Remaining", result.remaining.toString())
-    response.headers.set("X-RateLimit-Reset", new Date(result.resetTime).toISOString())
+    const apiResponse = await updateSession(request)
+    apiResponse.headers.set("X-RateLimit-Limit", result.limit.toString())
+    apiResponse.headers.set("X-RateLimit-Remaining", result.remaining.toString())
+    apiResponse.headers.set("X-RateLimit-Reset", new Date(result.resetTime).toISOString())
 
-    return response
+    return apiResponse
   }
 
-  // Existing code for other paths
+  // For non-API routes, update session and add locale detection
+  if (!isApiRoute) {
+    const sessionResponse = await updateSession(request)
+    let locale = await getLocale(request);
+    
+    // Set locale cookie if not already set
+    if (!request.cookies.get('locale')) {
+      sessionResponse.cookies.set('locale', locale, {
+        maxAge: 60 * 60 * 24 * 365,
+        sameSite: 'lax',
+        path: '/'
+      });
+    }
+
+    // Add locale to headers for server components
+    sessionResponse.headers.set('x-locale', locale);
+    return sessionResponse;
+  }
+
+  // Existing code for other API paths
   return await updateSession(request)
 }
 

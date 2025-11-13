@@ -5,6 +5,7 @@ import type React from "react"
 import { AuthProvider } from "./auth-provider"
 import { SWRProvider } from "./swr-provider"
 import { ToastProvider } from "./toast-provider"
+import { TranslationProvider } from "./translation-provider"
 import { ThemeProvider } from "@/components/theme-provider"
 
 export function Providers({ children }: { children: React.ReactNode }) {
@@ -16,11 +17,13 @@ export function Providers({ children }: { children: React.ReactNode }) {
       disableTransitionOnChange={false}
       storageKey="pelican-theme"
     >
-      <SWRProvider>
-        <AuthProvider>
-          <ToastProvider>{children}</ToastProvider>
-        </AuthProvider>
-      </SWRProvider>
+      <TranslationProvider>
+        <SWRProvider>
+          <AuthProvider>
+            <ToastProvider>{children}</ToastProvider>
+          </AuthProvider>
+        </SWRProvider>
+      </TranslationProvider>
     </ThemeProvider>
   )
 }

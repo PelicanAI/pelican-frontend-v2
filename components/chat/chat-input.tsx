@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/card"
 import { Send, Paperclip, Square, Search, MapPin, Globe, Calendar, Mic } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { AttachmentChip } from "./attachment-chip"
+import { useT } from "@/lib/providers/translation-provider"
 // import { InputSuggestions } from "./input-suggestions"
 // import { useInputSuggestions } from "@/hooks/use-input-suggestions"
 import { motion, AnimatePresence } from "framer-motion"
@@ -81,7 +82,7 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
       disabledSend = false,
       onQueueMessage,
       queueEnabled = false,
-      placeholder = "Ask anything...",
+      placeholder,
       isDarkMode = false,
       onTypingDuringResponse,
       isAIResponding = false,
@@ -95,6 +96,8 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
     },
     ref,
   ) => {
+    const t = useT()
+    const actualPlaceholder = placeholder || t.chat.messagePlaceholder
     const [showThinkingNote, setShowThinkingNote] = useState(false)
     const [isDragOver, setIsDragOver] = useState(false)
     const [isFocused, setIsFocused] = useState(false)
@@ -290,7 +293,7 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
                 "hover:bg-muted",
                 disabled && "opacity-50 cursor-not-allowed",
               )}
-              title="Attach file"
+              title={t.chat.attachFile}
             >
               <Paperclip className="h-5 w-5 text-muted-foreground" />
             </motion.button>
@@ -306,7 +309,7 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
                 setIsFocused(false)
                 // setTimeout(() => clearSuggestions(), 200) - DISABLED
               }}
-              placeholder="Message Pelican..."
+              placeholder={actualPlaceholder}
               disabled={disabled}
               className={cn(
                 "flex-1 bg-transparent outline-none resize-none",

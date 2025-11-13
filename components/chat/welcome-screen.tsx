@@ -1,11 +1,15 @@
 "use client"
 
+import { useT } from "@/lib/providers/translation-provider"
+
 interface WelcomeScreenProps {
   onQuickStart: (message: string) => void
   onSettingsClick?: () => void
 }
 
 export function WelcomeScreen({ onQuickStart }: WelcomeScreenProps) {
+  const t = useT()
+
   return (
     <div className="flex-1 flex items-center justify-center p-8 bg-background min-h-[600px]">
       <div
@@ -18,7 +22,7 @@ export function WelcomeScreen({ onQuickStart }: WelcomeScreenProps) {
         <div className="flex justify-center h-32">
           <img 
             src="/pelican-logo.png" 
-            alt="PelicanAI" 
+            alt={t.common.appName} 
             className="w-32 h-32 object-contain" 
             width="128"
             height="128"
@@ -26,8 +30,11 @@ export function WelcomeScreen({ onQuickStart }: WelcomeScreenProps) {
         </div>
 
         <h1 className="text-4xl font-semibold text-balance text-foreground tracking-tight h-auto">
-          Welcome to PelicanAI
+          {t.chat.welcomeTitle}
         </h1>
+        <p className="text-lg text-muted-foreground">
+          {t.chat.welcomeSubtitle}
+        </p>
       </div>
     </div>
   )

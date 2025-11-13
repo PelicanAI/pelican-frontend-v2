@@ -31,6 +31,7 @@ import { useConversations } from "@/hooks/use-conversations"
 import Link from "next/link"
 import Image from "next/image"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { useT } from "@/lib/providers/translation-provider"
 
 interface Conversation {
   id: string
@@ -63,6 +64,7 @@ export function ConversationSidebar({
   isNavigating = false,
   navigatingToId,
 }: ConversationSidebarProps) {
+  const t = useT()
   const [searchQuery, setSearchQuery] = useState("")
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editTitle, setEditTitle] = useState("")
@@ -178,9 +180,9 @@ export function ConversationSidebar({
         {/* Main content */}
         <div className="flex-1 min-w-0 max-w-[180px]">
           <h3 className="font-medium text-sm truncate text-sidebar-foreground">
-            {(conversation.title || 'New conversation').length > 25
-              ? `${(conversation.title || 'New conversation').slice(0, 25)}...`
-              : conversation.title || 'New conversation'}
+            {(conversation.title || t.common.newChat).length > 25
+              ? `${(conversation.title || t.common.newChat).slice(0, 25)}...`
+              : conversation.title || t.common.newChat}
           </h3>
         </div>
 
@@ -191,7 +193,7 @@ export function ConversationSidebar({
             onClick={(e) => {
               e.stopPropagation()
               setEditingId(conversation.id)
-              setEditTitle(conversation.title || 'New conversation')
+              setEditTitle(conversation.title || t.common.newChat)
             }}
             className="p-1.5 rounded hover:bg-sidebar-accent transition-colors"
             title="Rename conversation"
@@ -269,7 +271,7 @@ export function ConversationSidebar({
           className="w-full h-10 bg-gradient-to-r from-purple-600 via-violet-600 to-purple-600 hover:from-purple-700 hover:via-violet-700 hover:to-purple-700 text-white"
         >
           <Plus className="w-4 h-4 mr-2" />
-          New chat
+          {t.common.newChat}
         </Button>
       </div>
 
@@ -278,7 +280,7 @@ export function ConversationSidebar({
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
           <Input
-            placeholder="Search conversations..."
+            placeholder={t.common.search}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="h-10 pl-10 pr-3 bg-sidebar/50 border-sidebar-border/50"
@@ -297,10 +299,10 @@ export function ConversationSidebar({
             <div className="flex flex-col items-center justify-center py-8 px-6 text-center">
               <MessageSquare className="h-8 w-8 mb-2 text-muted-foreground/20" />
               <p className="text-xs font-medium text-muted-foreground/60">
-                No conversations yet
+                {t.chat.emptyConversations}
               </p>
               <p className="text-xs mt-1 text-muted-foreground/40">
-                Click &quot;New chat&quot; to start
+                Click &quot;{t.common.newChat}&quot; to start
               </p>
             </div>
           ) : (
@@ -382,8 +384,8 @@ export function ConversationSidebar({
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1 text-left min-w-0">
-                <p className="text-sm font-medium text-sidebar-foreground truncate">Account</p>
-                <p className="text-[10px] text-muted-foreground">View profile</p>
+                <p className="text-sm font-medium text-sidebar-foreground truncate">{t.common.account}</p>
+                <p className="text-[10px] text-muted-foreground">{t.common.viewProfile}</p>
               </div>
             </Link>
           </Button>
@@ -423,12 +425,12 @@ export function ConversationSidebar({
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="hover:bg-muted">Cancel</AlertDialogCancel>
+            <AlertDialogCancel className="hover:bg-muted">{t.common.cancel}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDeleteConversation}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90 focus:ring-destructive"
             >
-              Delete Conversation
+              {t.common.delete}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

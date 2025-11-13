@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Menu } from "lucide-react"
 import { ThemeToggle } from "@/components/theme-toggle"
-import { SimpleLanguageSelector } from "@/components/simple-language-selector"
+import { LanguageSelector } from "@/components/language-selector"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
 import { SettingsModal } from "@/components/settings-modal"
@@ -316,7 +316,7 @@ export default function ChatPage() {
             <span className="font-semibold text-foreground">Pelican AI</span>
           </div>
           <div className="flex items-center gap-2">
-            <SimpleLanguageSelector />
+            <LanguageSelector />
             <ThemeToggle />
           </div>
         </div>
