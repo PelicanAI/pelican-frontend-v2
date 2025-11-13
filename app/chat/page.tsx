@@ -337,7 +337,10 @@ export default function ChatPage() {
               <img src="/pelican-logo.png" alt="PelicanAI" className="w-6 h-6 object-contain" />
               <span className="font-semibold text-foreground">Pelican AI</span>
             </div>
-            <ThemeToggle />
+            <div className="flex items-center gap-2">
+              <LanguageSelector />
+              <ThemeToggle />
+            </div>
           </div>
         )}
 

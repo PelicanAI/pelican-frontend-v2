@@ -31,6 +31,7 @@ import { useConversations } from "@/hooks/use-conversations"
 import Link from "next/link"
 import Image from "next/image"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { LanguageSelector } from "@/components/language-selector"
 import { useT } from "@/lib/providers/translation-provider"
 
 interface Conversation {
@@ -251,6 +252,7 @@ export function ConversationSidebar({
             </span>
           </Link>
           <div className="flex items-center gap-1">
+            <LanguageSelector />
             <ThemeToggle />
             {onToggleCollapse && !isMobileSheet && (
               <Button

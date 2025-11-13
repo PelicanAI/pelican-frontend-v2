@@ -329,34 +329,32 @@ export default function MarketingPage() {
                         <Brain className="w-8 h-8 text-white" />
                       </div>
                       <CardTitle className="text-2xl lg:text-3xl mb-4" style={{ color: "#DCE4F0" }}>
-                        AI Trading Assistant
+                        {t.marketing.aiTradingAssistant}
                       </CardTitle>
                       <CardDescription className="text-lg mb-6 leading-relaxed" style={{ color: "#B4BED0" }}>
-                        Intelligent market analysis, personalized trading advice, and instant answers to your trading
-                        questions 24/7 — powered by PelicanAI. Get market context, personalized coaching, and strategic
-                        insights whenever you need them.
+                        {t.marketing.aiTradingAssistantDesc}
                       </CardDescription>
                       <Button asChild className="bg-purple-600 hover:bg-purple-700 text-white">
-                        <Link href="/">Launch Assistant</Link>
+                        <Link href="/">{t.marketing.launchAssistant}</Link>
                       </Button>
                     </div>
                     <div className="grid grid-cols-1 gap-4">
                       <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/50">
-                        <h4 className="font-semibold mb-2 text-purple-400">Market Context</h4>
+                        <h4 className="font-semibold mb-2 text-purple-400">{t.marketing.marketContext}</h4>
                         <p className="text-sm" style={{ color: "#B4BED0" }}>
-                          Real-time market analysis and insights
+                          {t.marketing.marketContextDesc}
                         </p>
                       </div>
                       <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/50">
-                        <h4 className="font-semibold mb-2 text-blue-400">Personalized Coaching</h4>
+                        <h4 className="font-semibold mb-2 text-blue-400">{t.marketing.personalizedCoaching}</h4>
                         <p className="text-sm" style={{ color: "#B4BED0" }}>
-                          Tailored advice for your trading style
+                          {t.marketing.personalizedCoachingDesc}
                         </p>
                       </div>
                       <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/50">
-                        <h4 className="font-semibold mb-2 text-green-400">24/7 Availability</h4>
+                        <h4 className="font-semibold mb-2 text-green-400">{t.marketing.availability24}</h4>
                         <p className="text-sm" style={{ color: "#B4BED0" }}>
-                          Always available when markets are moving
+                          {t.marketing.availability24Desc}
                         </p>
                       </div>
                     </div>
@@ -368,7 +366,7 @@ export default function MarketingPage() {
 
           <div className="mb-16">
             <h3 className="text-2xl lg:text-3xl font-bold mb-8 text-center" style={{ color: "#DCE4F0" }}>
-              Build with Pelican
+              {t.marketing.buildWithPelican}
             </h3>
 
             <div className="grid lg:grid-cols-2 gap-8 max-w-5xl mx-auto">
@@ -379,29 +377,29 @@ export default function MarketingPage() {
                     <TrendingUp className="w-8 h-8 text-white" />
                   </div>
                   <CardTitle className="text-xl mb-4" style={{ color: "#DCE4F0" }}>
-                    Custom Strategies
+                    {t.marketing.customStrategies}
                   </CardTitle>
                   <CardDescription className="text-base mb-6 leading-relaxed" style={{ color: "#B4BED0" }}>
-                    Develop and test personalized trading strategies using historical market data and backtesting tools.
+                    {t.marketing.customStrategiesDesc}
                   </CardDescription>
 
                   <div className="space-y-3 mb-6">
                     <div className="flex items-center gap-3">
                       <div className="w-2 h-2 bg-orange-400 rounded-full"></div>
                       <span className="text-sm" style={{ color: "#B4BED0" }}>
-                        Statistical Edge
+                        {t.marketing.statisticalEdge}
                       </span>
                     </div>
                     <div className="flex items-center gap-3">
                       <div className="w-2 h-2 bg-red-400 rounded-full"></div>
                       <span className="text-sm" style={{ color: "#B4BED0" }}>
-                        Historical Analysis
+                        {t.marketing.historicalAnalysis}
                       </span>
                     </div>
                     <div className="flex items-center gap-3">
                       <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
                       <span className="text-sm" style={{ color: "#B4BED0" }}>
-                        Data-Driven Insights
+                        {t.marketing.dataDrivenInsights}
                       </span>
                     </div>
                   </div>
@@ -410,7 +408,7 @@ export default function MarketingPage() {
                     variant="outline"
                     className="border-gray-600 text-gray-300 hover:bg-gray-800 w-full bg-transparent"
                   >
-                    Build Strategy
+                    {t.marketing.buildStrategy}
                   </Button>
                 </CardHeader>
               </Card>
@@ -422,29 +420,29 @@ export default function MarketingPage() {
                     <Brain className="w-8 h-8 text-white" />
                   </div>
                   <CardTitle className="text-xl mb-4" style={{ color: "#DCE4F0" }}>
-                    Statistical Edge
+                    {t.marketing.statisticalEdge}
                   </CardTitle>
                   <CardDescription className="text-base mb-6 leading-relaxed" style={{ color: "#B4BED0" }}>
-                    Analyze historical data to find trading opportunities and develop data-driven trading approaches.
+                    {t.marketing.statisticalEdgeDesc}
                   </CardDescription>
 
                   <div className="space-y-3 mb-6">
                     <div className="flex items-center gap-3">
                       <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
                       <span className="text-sm" style={{ color: "#B4BED0" }}>
-                        Historical Analysis
+                        {t.marketing.historicalAnalysis}
                       </span>
                     </div>
                     <div className="flex items-center gap-3">
                       <div className="w-2 h-2 bg-cyan-400 rounded-full"></div>
                       <span className="text-sm" style={{ color: "#B4BED0" }}>
-                        Edge Detection
+                        {t.marketing.edgeDetection}
                       </span>
                     </div>
                     <div className="flex items-center gap-3">
                       <div className="w-2 h-2 bg-teal-400 rounded-full"></div>
                       <span className="text-sm" style={{ color: "#B4BED0" }}>
-                        Data-Driven Insights
+                        {t.marketing.dataDrivenInsights}
                       </span>
                     </div>
                   </div>
@@ -453,7 +451,7 @@ export default function MarketingPage() {
                     variant="outline"
                     className="border-gray-600 text-gray-300 hover:bg-gray-800 w-full bg-transparent"
                   >
-                    Analyze Data
+                    {t.marketing.analyzeData}
                   </Button>
                 </CardHeader>
               </Card>
@@ -462,7 +460,7 @@ export default function MarketingPage() {
 
           <div>
             <h3 className="text-2xl lg:text-3xl font-bold mb-8 text-center" style={{ color: "#DCE4F0" }}>
-              Complete Trading Ecosystem
+              {t.marketing.completeEcosystem}
             </h3>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
@@ -473,14 +471,13 @@ export default function MarketingPage() {
                     <Brain className="w-8 h-8 text-white" />
                   </div>
                   <CardTitle className="text-xl mb-4" style={{ color: "#DCE4F0" }}>
-                    AI Trading Assistant
+                    {t.marketing.aiTradingAssistant}
                   </CardTitle>
                   <CardDescription className="text-base mb-6" style={{ color: "#B4BED0" }}>
-                    Your intelligent trading companion for market analysis, strategy development, and real-time
-                    insights.
+                    {t.marketing.aiTradingAssistantCardDesc}
                   </CardDescription>
                   <Button asChild className="bg-purple-600 hover:bg-purple-700 text-white w-full">
-                    <Link href="/">Launch Assistant</Link>
+                    <Link href="/">{t.marketing.launchAssistant}</Link>
                   </Button>
                 </CardHeader>
               </Card>
@@ -492,16 +489,16 @@ export default function MarketingPage() {
                     <MessageSquare className="w-8 h-8 text-white" />
                   </div>
                   <CardTitle className="text-xl mb-4" style={{ color: "#DCE4F0" }}>
-                    1-on-1 Coaching
+                    {t.marketing.oneOnOneCoaching}
                   </CardTitle>
                   <CardDescription className="text-base mb-6" style={{ color: "#B4BED0" }}>
-                    Personalized trading mentorship and guidance from experienced professionals.
+                    {t.marketing.oneOnOneCoachingDesc}
                   </CardDescription>
                   <Button
                     variant="outline"
                     className="border-gray-600 text-gray-300 hover:bg-gray-800 w-full bg-transparent"
                   >
-                    Start Coaching
+                    {t.marketing.startCoaching}
                   </Button>
                 </CardHeader>
               </Card>
@@ -513,20 +510,20 @@ export default function MarketingPage() {
                     <TrendingUp className="w-8 h-8 text-white" />
                   </div>
                   <CardTitle className="text-xl mb-4" style={{ color: "#DCE4F0" }}>
-                    Trading Community
+                    {t.marketing.tradingCommunity}
                   </CardTitle>
                   <CardDescription className="text-base mb-2" style={{ color: "#B4BED0" }}>
-                    Join our exclusive trading community powered by TradingAnalytix partnership.
+                    {t.marketing.tradingCommunityDesc}
                   </CardDescription>
                   <CardDescription className="text-sm mb-6 text-purple-400">
-                    TradingAnalytix Partnership
+                    {t.marketing.tradingAnalytixPartnership}
                   </CardDescription>
                   <Button
                     variant="outline"
                     className="border-gray-600 text-gray-300 hover:bg-gray-800 w-full bg-transparent"
                     onClick={() => window.open("https://discord.gg/Sv6gjaymb2", "_blank")}
                   >
-                    Join Community
+                    {t.marketing.joinCommunity}
                   </Button>
                 </CardHeader>
               </Card>
@@ -548,13 +545,13 @@ export default function MarketingPage() {
             {/* Header */}
             <div className="text-center mb-16">
               <h2 className="text-4xl lg:text-5xl font-bold mb-6" style={{ color: "#DCE4F0" }}>
-                About{" "}
+                {t.marketing.aboutPelicanTrading.split(" ")[0]}{" "}
                 <span className="bg-gradient-to-r from-purple-400 to-purple-600 bg-clip-text text-transparent">
-                  Pelican Trading
+                  {t.marketing.aboutPelicanTrading.split(" ").slice(1).join(" ")}
                 </span>
               </h2>
               <p className="text-xl lg:text-2xl font-semibold" style={{ color: "#B4BED0" }}>
-                From Obsession to Institution-Grade AI
+                {t.marketing.fromObsessionToInstitution}
               </p>
             </div>
 
@@ -563,16 +560,10 @@ export default function MarketingPage() {
               {/* Origin Story */}
               <div className="bg-gradient-to-r from-gray-900/50 to-gray-800/30 rounded-2xl p-8 border border-gray-700/50">
                 <p className="text-lg leading-relaxed mb-6" style={{ color: "#B4BED0" }}>
-                  Pelican Trading wasn&apos;t built in a lab or spun up by a venture fund. It was built by traders — people
-                  who live this game every day, who know the grind of wins, losses, and the constant battle with
-                  psychology.
+                  {t.marketing.aboutStory1}
                 </p>
                 <p className="text-lg leading-relaxed" style={{ color: "#B4BED0" }}>
-                  Eight years ago, the founder of Pelican,{" "}
-                  <span className="text-purple-400 font-semibold">Nick Groves</span>, walked away from the traditional
-                  path to go all-in on the markets. No degree, no safety net, no inside edge — just curiosity,
-                  obsession, and a Wi-Fi connection. What began as reverse-engineering strategies and journaling every
-                  mistake has now evolved into an AI platform unlike anything else in the market.
+                  {t.marketing.aboutStory2}
                 </p>
               </div>
 
@@ -580,15 +571,13 @@ export default function MarketingPage() {
               <div className="grid lg:grid-cols-2 gap-8 items-center">
                 <div>
                   <h3 className="text-2xl lg:text-3xl font-bold mb-6" style={{ color: "#DCE4F0" }}>
-                    Built Brick by Brick
+                    {t.marketing.builtBrickByBrick}
                   </h3>
                   <p className="text-lg leading-relaxed mb-4" style={{ color: "#B4BED0" }}>
-                    Pelican didn&apos;t come from a corporate playbook. It was coded, broken, and rebuilt from scratch by
-                    traders turned devs who knew exactly what was missing.
+                    {t.marketing.builtBrickByBrickDesc1}
                   </p>
                   <p className="text-lg leading-relaxed mb-4" style={{ color: "#B4BED0" }}>
-                    Every feature — from the AI brain to live market modules, from journaling to psychology triggers —
-                    was handcrafted with one purpose: to make traders sharper in real time.
+                    {t.marketing.builtBrickByBrickDesc2}
                   </p>
                 </div>
                 <div className="flex justify-center">
@@ -617,21 +606,16 @@ export default function MarketingPage() {
               {/* Ray Campbell Section */}
               <div className="bg-gradient-to-l from-purple-900/20 to-blue-900/20 rounded-2xl p-8 border border-purple-500/20">
                 <h3 className="text-2xl lg:text-3xl font-bold mb-6" style={{ color: "#DCE4F0" }}>
-                  Forged by the Architect of Modern Markets
+                  {t.marketing.forgedByArchitect}
                 </h3>
                 <p className="text-lg leading-relaxed mb-6" style={{ color: "#B4BED0" }}>
-                  Pelican isn&apos;t just trader-made anymore. Today, the team includes{" "}
-                  <span className="text-purple-400 font-semibold">Ray Campbell</span> — one of the original architects
-                  behind the New York Stock Exchange&apos;s electronic platform.
+                  {t.marketing.forgedByArchitectDesc1}
                 </p>
                 <p className="text-lg leading-relaxed mb-6" style={{ color: "#B4BED0" }}>
-                  Ray helped build the ultra-low latency, high-throughput systems that power billions of dollars in
-                  trades daily — the very backbone of modern markets. Now, he&apos;s bringing that same institutional-grade
-                  engineering to Pelican.
+                  {t.marketing.forgedByArchitectDesc2}
                 </p>
                 <blockquote className="border-l-4 border-purple-500 pl-6 italic text-lg" style={{ color: "#DCE4F0" }}>
-                  &quot;For years, I built tools that gave an edge to Wall Street. Pelican is about giving that power back to
-                  the people — tools with the same precision, speed, and reliability, but accessible to every trader.&quot;
+                  &quot;{t.marketing.rayCampbellQuote}&quot;
                   <footer className="text-purple-400 font-semibold mt-2">— Ray Campbell</footer>
                 </blockquote>
               </div>
@@ -639,28 +623,24 @@ export default function MarketingPage() {
               {/* Mission */}
               <div className="text-center">
                 <h3 className="text-2xl lg:text-3xl font-bold mb-6" style={{ color: "#DCE4F0" }}>
-                  Our Mission
+                  {t.marketing.ourMission}
                 </h3>
                 <p className="text-lg leading-relaxed mb-6" style={{ color: "#B4BED0" }}>
-                  Most trading services drown you in noise and false realities. Pelican&apos;s mission is to cut through it.
-                  We&apos;re building the first AI assistant that trades the way traders actually trade — combining data,
-                  discipline, and psychology in one place, while adapting to each trader&apos;s journey.
+                  {t.marketing.ourMissionDesc1}
                 </p>
                 <p className="text-lg leading-relaxed mb-8" style={{ color: "#B4BED0" }}>
-                  By fusing Wall Street-grade engineering with real trading experience, Pelican bridges the gap between
-                  retail and institutional markets once and for all. Every trader deserves access to the same
-                  intelligence, speed, and resilience that power the world&apos;s largest exchanges.
+                  {t.marketing.ourMissionDesc2}
                 </p>
                 <div className="bg-gradient-to-r from-purple-600/20 to-blue-600/20 rounded-xl p-6 border border-purple-500/30">
                   <p className="text-xl font-semibold mb-4" style={{ color: "#DCE4F0" }}>
-                    Pelican isn&apos;t just another tool — it&apos;s the future of how humans and AI trade together.
+                    {t.marketing.ourMissionTagline}
                   </p>
                   <Button
                     size="lg"
                     className="bg-purple-600 hover:bg-purple-700 text-white font-semibold px-8 py-3 rounded-full"
                     asChild
                   >
-                    <Link href="/auth/signup">Create an Account</Link>
+                    <Link href="/auth/signup">{t.marketing.createAccount}</Link>
                   </Button>
                 </div>
               </div>
@@ -680,11 +660,10 @@ export default function MarketingPage() {
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl lg:text-5xl font-bold mb-6" style={{ color: "#DCE4F0" }}>
-              Choose Your Trading{" "}
-              <span className="bg-gradient-to-r from-purple-400 to-purple-600 bg-clip-text text-transparent">Edge</span>
+              {t.marketing.chooseYourTradingEdge}
             </h2>
             <p className="text-xl lg:text-2xl" style={{ color: "#B4BED0" }}>
-              Unlock advanced AI-powered trading insights and join thousands of successful traders using PelicanAI
+              {t.marketing.unlockAdvanced}
             </p>
           </div>
 
@@ -701,7 +680,7 @@ export default function MarketingPage() {
 
                   <div className="text-center mb-8">
                     <h3 className="text-2xl font-bold mb-2" style={{ color: "#DCE4F0" }}>
-                      Free
+                      {t.marketing.freePlan}
                     </h3>
                     <div className="mb-4">
                       <span className="text-4xl font-bold" style={{ color: "#DCE4F0" }}>
@@ -709,22 +688,22 @@ export default function MarketingPage() {
                       </span>
                     </div>
                     <p className="text-sm" style={{ color: "#B4BED0" }}>
-                      Get started with basic PelicanAI features
+                      {t.marketing.freePlanDesc}
                     </p>
                   </div>
 
                   <div className="space-y-4 mb-8">
                     <div className="flex items-center gap-3">
                       <Check className="w-5 h-5 text-green-400 flex-shrink-0" />
-                      <span style={{ color: "#B4BED0" }}>10 AI conversations per day</span>
+                      <span style={{ color: "#B4BED0" }}>{t.marketing.freePlanFeature1}</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <Check className="w-5 h-5 text-green-400 flex-shrink-0" />
-                      <span style={{ color: "#B4BED0" }}>Basic market analysis</span>
+                      <span style={{ color: "#B4BED0" }}>{t.marketing.freePlanFeature2}</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <Check className="w-5 h-5 text-green-400 flex-shrink-0" />
-                      <span style={{ color: "#B4BED0" }}>Email support</span>
+                      <span style={{ color: "#B4BED0" }}>{t.marketing.freePlanFeature3}</span>
                     </div>
                   </div>
 
@@ -733,7 +712,7 @@ export default function MarketingPage() {
                     className="w-full border-gray-600 text-white hover:bg-gray-800 bg-transparent"
                     disabled
                   >
-                    Current Plan
+                    {t.marketing.currentPlan}
                   </Button>
                 </CardHeader>
               </Card>
@@ -743,7 +722,7 @@ export default function MarketingPage() {
                 {/* Most Popular Badge */}
                 <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
                   <div className="bg-gradient-to-r from-purple-500 to-purple-600 text-white px-4 py-2 rounded-full text-sm font-semibold">
-                    Most Popular
+                    {t.marketing.mostPopular}
                   </div>
                 </div>
 
@@ -756,55 +735,54 @@ export default function MarketingPage() {
 
                   <div className="text-center mb-8">
                     <h3 className="text-2xl font-bold mb-2" style={{ color: "#DCE4F0" }}>
-                      PelicanAI Pro
+                      {t.marketing.pelicanAIPro}
                     </h3>
                     <div className="mb-4">
                       <span className="text-4xl font-bold" style={{ color: "#DCE4F0" }}>
-                        $49.99
+                        {t.marketing.pelicanAIProPrice.split("/")[0]}
                       </span>
                       <span className="text-lg" style={{ color: "#B4BED0" }}>
-                        /month
+                        {t.marketing.pelicanAIProPrice.includes("/") ? "/" + t.marketing.pelicanAIProPrice.split("/")[1] : ""}
                       </span>
                     </div>
                     <p className="text-sm" style={{ color: "#B4BED0" }}>
-                      Unlock the full power of PelicanAI
+                      {t.marketing.pelicanAIProDesc}
                     </p>
                   </div>
 
                   <div className="space-y-4 mb-8">
                     <div className="flex items-center gap-3">
                       <Check className="w-5 h-5 text-green-400 flex-shrink-0" />
-                      <span style={{ color: "#B4BED0" }}>Unlimited AI conversations</span>
+                      <span style={{ color: "#B4BED0" }}>{t.marketing.proFeature1}</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <Check className="w-5 h-5 text-green-400 flex-shrink-0" />
-                      <span style={{ color: "#B4BED0" }}>Advanced technical analysis</span>
+                      <span style={{ color: "#B4BED0" }}>{t.marketing.proFeature2}</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <Check className="w-5 h-5 text-green-400 flex-shrink-0" />
-                      <span style={{ color: "#B4BED0" }}>Real-time market alerts</span>
+                      <span style={{ color: "#B4BED0" }}>{t.marketing.proFeature3}</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <Check className="w-5 h-5 text-green-400 flex-shrink-0" />
-                      <span style={{ color: "#B4BED0" }}>Priority support</span>
+                      <span style={{ color: "#B4BED0" }}>{t.marketing.proFeature4}</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <Check className="w-5 h-5 text-green-400 flex-shrink-0" />
-                      <span style={{ color: "#B4BED0" }}>Trading strategy backtesting</span>
+                      <span style={{ color: "#B4BED0" }}>{t.marketing.proFeature5}</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <Check className="w-5 h-5 text-green-400 flex-shrink-0" />
-                      <span style={{ color: "#B4BED0" }}>Portfolio optimization tools</span>
+                      <span style={{ color: "#B4BED0" }}>{t.marketing.proFeature6}</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <Check className="w-5 h-5 text-green-400 flex-shrink-0" />
-                      <span style={{ color: "#B4BED0" }}>1-on-1 coaching session credits</span>
+                      <span style={{ color: "#B4BED0" }}>{t.marketing.proFeature7}</span>
                     </div>
                     <div className="flex items-start gap-3">
                       <Check className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
                       <div>
-                        <span style={{ color: "#B4BED0" }}>🏆 Optional access to the TradingAnalytix community </span>
-                        <span className="text-yellow-400 font-medium">($10/month)</span>
+                        <span style={{ color: "#B4BED0" }}>{t.marketing.proFeature8}</span>
                       </div>
                     </div>
                   </div>
@@ -814,10 +792,10 @@ export default function MarketingPage() {
                     <div className="flex items-center justify-between mb-3">
                       <div>
                         <h4 className="font-semibold" style={{ color: "#DCE4F0" }}>
-                          Add TradingAnalytix Community Access
+                          {t.marketing.addTradingAnalytix}
                         </h4>
                         <p className="text-sm" style={{ color: "#B4BED0" }}>
-                          {includeCommunity ? "Yes, include for $10/month" : "Optional add-on"}
+                          {includeCommunity ? "Yes, include for $10/month" : t.marketing.optionalAddOn}
                         </p>
                       </div>
                       <button
@@ -834,12 +812,12 @@ export default function MarketingPage() {
                       </button>
                     </div>
                     <p className="text-xs" style={{ color: "#B4BED0" }}>
-                      Optional add-on includes chatroom, live shows, and more
+                      {t.marketing.optionalAddOnDesc}
                     </p>
                   </div>
 
                   <Button className="w-full bg-white text-gray-900 hover:bg-gray-100 font-semibold">
-                    Start Premium
+                    {t.marketing.startPremium}
                   </Button>
                 </CardHeader>
               </Card>
@@ -859,10 +837,10 @@ export default function MarketingPage() {
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl lg:text-5xl font-bold mb-6" style={{ color: "#DCE4F0" }}>
-              Frequently Asked Questions
+              {t.marketing.frequentlyAskedQuestions}
             </h2>
             <p className="text-xl lg:text-2xl" style={{ color: "#B4BED0" }}>
-              Get answers to common questions about PelicanAI and our trading platform.
+              {t.marketing.faqSubtitle}
             </p>
           </div>
 
@@ -872,11 +850,10 @@ export default function MarketingPage() {
               <Card className="bg-gray-900/50 border-gray-700/50 hover:border-purple-500/30 transition-colors">
                 <CardHeader className="p-6">
                   <CardTitle className="text-xl mb-4" style={{ color: "#DCE4F0" }}>
-                    What is PelicanAI?
+                    {t.marketing.faqQ1}
                   </CardTitle>
                   <CardDescription className="text-base leading-relaxed" style={{ color: "#B4BED0" }}>
-                    PelicanAI is an AI-powered trading assistant that provides real-time market analysis, trading
-                    strategies, and personalized coaching. Built by professional traders for traders of all levels.
+                    {t.marketing.faqA1}
                   </CardDescription>
                 </CardHeader>
               </Card>
@@ -885,11 +862,10 @@ export default function MarketingPage() {
               <Card className="bg-gray-900/50 border-gray-700/50 hover:border-purple-500/30 transition-colors">
                 <CardHeader className="p-6">
                   <CardTitle className="text-xl mb-4" style={{ color: "#DCE4F0" }}>
-                    How much does it cost?
+                    {t.marketing.faqQ2}
                   </CardTitle>
                   <CardDescription className="text-base leading-relaxed" style={{ color: "#B4BED0" }}>
-                    We offer a free plan with up to 10 messages per day, and PelicanAI Pro at $49.99/month for unlimited
-                    access, premium features, and priority support.
+                    {t.marketing.faqA2}
                   </CardDescription>
                 </CardHeader>
               </Card>
@@ -898,10 +874,10 @@ export default function MarketingPage() {
               <Card className="bg-gray-900/50 border-gray-700/50 hover:border-purple-500/30 transition-colors">
                 <CardHeader className="p-6">
                   <CardTitle className="text-xl mb-4" style={{ color: "#DCE4F0" }}>
-                    What markets does PelicanAI cover?
+                    {t.marketing.faqQ3}
                   </CardTitle>
                   <CardDescription className="text-base leading-relaxed" style={{ color: "#B4BED0" }}>
-                    PelicanAI provides analysis for stocks, ETFs, futures, forex, and cryptocurrencies.
+                    {t.marketing.faqA3}
                   </CardDescription>
                 </CardHeader>
               </Card>
@@ -910,11 +886,10 @@ export default function MarketingPage() {
               <Card className="bg-gray-900/50 border-gray-700/50 hover:border-purple-500/30 transition-colors">
                 <CardHeader className="p-6">
                   <CardTitle className="text-xl mb-4" style={{ color: "#DCE4F0" }}>
-                    Is my data secure?
+                    {t.marketing.faqQ4}
                   </CardTitle>
                   <CardDescription className="text-base leading-relaxed" style={{ color: "#B4BED0" }}>
-                    Yes, we use enterprise-grade security with encrypted data transmission and storage. We never store
-                    your trading account credentials or execute trades without your permission.
+                    {t.marketing.faqA4}
                   </CardDescription>
                 </CardHeader>
               </Card>
@@ -923,11 +898,10 @@ export default function MarketingPage() {
               <Card className="bg-gray-900/50 border-gray-700/50 hover:border-purple-500/30 transition-colors">
                 <CardHeader className="p-6">
                   <CardTitle className="text-xl mb-4" style={{ color: "#DCE4F0" }}>
-                    Can I get personal coaching?
+                    {t.marketing.faqQ5}
                   </CardTitle>
                   <CardDescription className="text-base leading-relaxed" style={{ color: "#B4BED0" }}>
-                    Yes! We offer 1-on-1 coaching sessions with Nick Groves and access to the TradingAnalytix community
-                    for personalized guidance and strategy development.
+                    {t.marketing.faqA5}
                   </CardDescription>
                 </CardHeader>
               </Card>
@@ -936,11 +910,10 @@ export default function MarketingPage() {
               <Card className="bg-gray-900/50 border-gray-700/50 hover:border-purple-500/30 transition-colors">
                 <CardHeader className="p-6">
                   <CardTitle className="text-xl mb-4" style={{ color: "#DCE4F0" }}>
-                    How do I get started?
+                    {t.marketing.faqQ6}
                   </CardTitle>
                   <CardDescription className="text-base leading-relaxed" style={{ color: "#B4BED0" }}>
-                    Simply click &quot;Chat with PelicanAI&quot; to start using our AI assistant for free. You can upgrade to Pro
-                    anytime for full access to all features and tools.
+                    {t.marketing.faqA6}
                   </CardDescription>
                 </CardHeader>
               </Card>
