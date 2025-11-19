@@ -6,6 +6,7 @@ import { Analytics } from "@vercel/analytics/next"
 import { Providers } from "@/lib/providers"
 import { Suspense } from "react"
 import * as Sentry from '@sentry/nextjs'
+import SentryErrorBoundary from "@/components/sentry-error-boundary"
 import "./globals.css"
 
 const inter = Inter({
@@ -33,9 +34,11 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`font-sans antialiased ${inter.variable} ${GeistMono.variable}`}>
-        <Suspense fallback={null}>
-          <Providers>{children}</Providers>
-        </Suspense>
+        <SentryErrorBoundary>
+          <Suspense fallback={null}>
+            <Providers>{children}</Providers>
+          </Suspense>
+        </SentryErrorBoundary>
         <Analytics />
       </body>
     </html>

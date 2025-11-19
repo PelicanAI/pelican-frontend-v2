@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo, useCallback } from "react"
 import { createClient } from "@/lib/supabase/client"
 import type { User } from "@supabase/supabase-js"
 import * as Sentry from "@sentry/nextjs"
+import { captureError } from "@/lib/sentry-helper"
 
 interface Conversation {
   id: string
@@ -439,13 +440,17 @@ export function useConversations() {
 
       try {
         if (user?.id) {
-          const { error } = await supabase
-            .from("conversations")
-            .update({ title: newTitle })
-            .eq("id", conversationId)
-            .eq("user_id", effectiveUserId)
-
-          if (error) throw error
+          // USE THE API ROUTE - Critical for consistency
+          const response = await fetch(`/api/conversations/${conversationId}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title: newTitle })
+          });
+          
+          if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || 'Failed to rename');
+          }
         } else {
           const currentConversations = loadGuestConversations()
           const updatedConversations = currentConversations.map((conv) =>
@@ -455,7 +460,13 @@ export function useConversations() {
         }
         return true
       } catch (error) {
-        console.error("Failed to rename conversation:", error)
+        captureError(error, {
+          action: 'rename_conversation',
+          component: 'use-conversations',
+          conversationId,
+          userId: user?.id,
+          newTitle
+        })
         // Revert optimistic update
         setConversations(previousConversations)
         return false

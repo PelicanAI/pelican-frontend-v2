@@ -338,6 +338,20 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
 
         onFinish?.(finalMessage)
 
+        // Update conversation title if it's the first real message
+        if (messages.length <= 2 && currentConversationId) { // 2 because we just added user + assistant
+          const title = userMessage.content.slice(0, 50) + (userMessage.content.length > 50 ? '...' : '');
+          
+          // Use the API route for consistency
+          fetch(`/api/conversations/${currentConversationId}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title })
+          }).catch(err => {
+            console.error('Failed to update title:', err);
+          });
+        }
+
         // 🔧 FIX: Don't refetch conversation immediately - causes race condition
         // Trust the local UI state. Only refetch on conversation switch or manual refresh.
         // if (currentConversationId) {

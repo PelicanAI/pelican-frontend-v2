@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
+import * as Sentry from "@sentry/nextjs"
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -35,13 +36,22 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       .single()
 
     if (error) {
-      console.error("[v0] Error fetching conversation:", error)
+      Sentry.captureException(error, {
+        tags: { 
+          action: 'conversation_fetch',
+          conversation_id: id 
+        },
+        extra: { userId: user.id }
+      })
       return NextResponse.json({ error: "Conversation not found" }, { status: 404 })
     }
 
     return NextResponse.json({ conversation })
   } catch (error) {
-    console.error("[v0] Conversation API error:", error)
+    Sentry.captureException(error, {
+      tags: { endpoint: '/api/conversations/[id]', method: 'GET' },
+      level: 'error'
+    })
     return NextResponse.json(
       {
         error: "Failed to fetch conversation",
@@ -91,7 +101,13 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       .is("deleted_at", null) // Ensure we don't update deleted conversations
 
     if (error) {
-      console.error("[v0] Error updating conversation:", error)
+      Sentry.captureException(error, {
+        tags: { 
+          action: 'conversation_update',
+          conversation_id: id 
+        },
+        extra: { updateData, userId: user.id }
+      })
       return NextResponse.json(
         {
           error: "Failed to update conversation",
@@ -103,7 +119,10 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error("[v0] Update conversation API error:", error)
+    Sentry.captureException(error, {
+      tags: { endpoint: '/api/conversations/[id]', method: 'PATCH' },
+      level: 'error'
+    })
     return NextResponse.json(
       {
         error: "Failed to update conversation",
@@ -139,7 +158,13 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
       .is("deleted_at", null) // Only delete non-deleted conversations
 
     if (error) {
-      console.error("[v0] Error deleting conversation:", error)
+      Sentry.captureException(error, {
+        tags: { 
+          action: 'conversation_delete',
+          conversation_id: id 
+        },
+        extra: { userId: user.id }
+      })
       return NextResponse.json(
         {
           error: "Failed to delete conversation",
@@ -151,7 +176,10 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error("[v0] Delete conversation API error:", error)
+    Sentry.captureException(error, {
+      tags: { endpoint: '/api/conversations/[id]', method: 'DELETE' },
+      level: 'error'
+    })
     return NextResponse.json(
       {
         error: "Failed to delete conversation",

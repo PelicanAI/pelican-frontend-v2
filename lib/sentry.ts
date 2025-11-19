@@ -1,5 +1,10 @@
-// Sentry integration structure (requires @sentry/nextjs package)
-// This is a placeholder structure - actual Sentry integration would need proper setup
+/**
+ * Legacy Sentry module - Re-exports from sentry-helper.ts
+ * This file is kept for backward compatibility with existing imports
+ * New code should import directly from @/lib/sentry-helper
+ */
+
+import { captureError as captureErrorHelper, addBreadcrumb as addBreadcrumbHelper } from "./sentry-helper"
 
 interface SentryContext {
   reqId?: string
@@ -13,37 +18,19 @@ interface SentryContext {
   }
 }
 
+/**
+ * @deprecated Use captureError from @/lib/sentry-helper instead
+ */
 export function captureException(error: Error, context?: SentryContext) {
-  // In a real implementation, this would use Sentry.captureException
-  console.error("[Sentry] Error captured:", {
-    error: {
-      message: error.message,
-      stack: error.stack,
-      name: error.name,
-    },
-    context,
+  captureErrorHelper(error, {
+    userId: context?.userId || context?.guestId,
+    ...context,
   })
-
-  // TODO: Replace with actual Sentry integration
-  // Sentry.captureException(error, {
-  //   tags: {
-  //     reqId: context?.reqId,
-  //     userId: context?.userId,
-  //     guestId: context?.guestId
-  //   },
-  //   extra: {
-  //     fileMeta: context?.fileMeta
-  //   }
-  // })
 }
 
+/**
+ * @deprecated Use addBreadcrumb from @/lib/sentry-helper instead
+ */
 export function addBreadcrumb(message: string, data?: Record<string, unknown>) {
-  console.log("[Sentry] Breadcrumb:", message, data)
-
-  // TODO: Replace with actual Sentry integration
-  // Sentry.addBreadcrumb({
-  //   message,
-  //   data,
-  //   timestamp: Date.now() / 1000
-  // })
+  addBreadcrumbHelper(message, data)
 }

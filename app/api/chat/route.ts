@@ -212,6 +212,54 @@ export async function POST(req: NextRequest) {
     // - Memory embedding creation
     // - Conversation metadata updates
 
+    // CRITICAL: Force message save verification
+    // Backend uses fire-and-forget, so we need to ensure saves happen
+    if (activeConversationId && effectiveUserId) {
+      try {
+        // Save user message
+        await supabase
+          .from("messages")
+          .insert({
+            conversation_id: activeConversationId,
+            user_id: effectiveUserId,
+            role: "user",
+            content: userMessage,
+            created_at: new Date().toISOString(),
+          });
+        
+        // Save assistant reply
+        await supabase
+          .from("messages")
+          .insert({
+            conversation_id: activeConversationId,
+            user_id: effectiveUserId,
+            role: "assistant",
+            content: reply,
+            metadata: attachments.length > 0 ? { attachments } : {},
+            created_at: new Date().toISOString(),
+          });
+        
+        // Update conversation updated_at
+        await supabase
+          .from("conversations")
+          .update({ 
+            updated_at: new Date().toISOString(),
+            // Update title if it's still "New Chat"
+            ...(data.first_message && { title: userMessage.slice(0, 50) + '...' })
+          })
+          .eq("id", activeConversationId);
+          
+        console.log('✅ Messages saved to database');
+      } catch (saveError) {
+        console.error('⚠️ Failed to save messages, backend may retry:', saveError);
+        // Don't throw - still return the response even if save fails
+        Sentry.captureException(saveError, {
+          tags: { action: 'manual_message_save' },
+          extra: { conversationId: activeConversationId }
+        });
+      }
+    }
+
     // Return JSON response with attachments if present
     const responsePayload: ChatResponsePayload = {
       choices: [

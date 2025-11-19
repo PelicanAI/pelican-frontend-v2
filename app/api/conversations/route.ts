@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
+import * as Sentry from "@sentry/nextjs"
 
 export async function GET(req: NextRequest) {
   try {
@@ -54,7 +55,13 @@ export async function GET(req: NextRequest) {
     const { data: conversations, error } = await query.order("updated_at", { ascending: false }).limit(limit)
 
     if (error) {
-      console.error("[v0] Error fetching conversations:", error)
+      Sentry.captureException(error, {
+        tags: { 
+          action: 'conversations_fetch',
+          filter 
+        },
+        extra: { userId: user.id, search, limit }
+      })
       return NextResponse.json({ error: "Failed to fetch conversations" }, { status: 500 })
     }
 
@@ -73,7 +80,10 @@ export async function GET(req: NextRequest) {
       hasMore: conversations.length === limit,
     })
   } catch (error) {
-    console.error("[v0] Conversations API error:", error)
+    Sentry.captureException(error, {
+      tags: { endpoint: '/api/conversations', method: 'GET' },
+      level: 'error'
+    })
     return NextResponse.json(
       {
         error: "Failed to fetch conversations",
@@ -109,14 +119,25 @@ export async function POST(req: NextRequest) {
       .single()
 
     if (error) {
-      console.error("[v0] Error creating conversation:", error)
+      Sentry.captureException(error, {
+        tags: { 
+          action: 'conversation_create'
+        },
+        extra: { userId: user.id, title }
+      })
       return NextResponse.json({ error: "Failed to create conversation" }, { status: 500 })
     }
 
-    console.log("[v0] Created new conversation:", conversation.id)
+    // Success - optionally log to console in development
+    if (process.env.NODE_ENV === 'development') {
+      console.log("[v0] Created new conversation:", conversation.id)
+    }
     return NextResponse.json({ conversation })
   } catch (error) {
-    console.error("[v0] Create conversation API error:", error)
+    Sentry.captureException(error, {
+      tags: { endpoint: '/api/conversations', method: 'POST' },
+      level: 'error'
+    })
     return NextResponse.json(
       {
         error: "Failed to create conversation",

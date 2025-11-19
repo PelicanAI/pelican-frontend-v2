@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pelican - Environment Diagnostic</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      padding: 40px 20px;
+      line-height: 1.6;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    h1 {
+      color: #60a5fa;
+      margin-bottom: 30px;
+      font-size: 32px;
+    }
+    .section {
+      background: #1e293b;
+      border-radius: 12px;
+      padding: 25px;
+      margin-bottom: 20px;
+      border-left: 4px solid #60a5fa;
+    }
+    h2 {
+      color: #60a5fa;
+      font-size: 20px;
+      margin-bottom: 15px;
+    }
+    .warning {
+      background: #451a03;
+      border-left-color: #f59e0b;
+      color: #fbbf24;
+    }
+    .error {
+      background: #450a0a;
+      border-left-color: #ef4444;
+      color: #fca5a5;
+    }
+    .success {
+      background: #052e16;
+      border-left-color: #10b981;
+      color: #6ee7b7;
+    }
+    pre {
+      background: #0f172a;
+      padding: 15px;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-size: 13px;
+      margin: 10px 0;
+    }
+    button {
+      background: #3b82f6;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      margin: 5px 5px 5px 0;
+    }
+    button:hover { background: #2563eb; }
+    .result {
+      margin-top: 15px;
+      padding: 15px;
+      border-radius: 8px;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      display: none;
+    }
+    .result.show { display: block; }
+    .result.success { background: #064e3b; color: #6ee7b7; }
+    .result.error { background: #7f1d1d; color: #fca5a5; }
+    code {
+      background: #334155;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔧 Pelican Environment Diagnostic</h1>
+    
+    <div class="section error">
+      <h2>⚠️ CRITICAL: Anon Key May Be Truncated</h2>
+      <p>Your <code>SUPABASE_ANON_KEY</code> appears to end with "MU" which looks incomplete.</p>
+      <p>JWT tokens should have a complete signature (usually longer).</p>
+      <p><strong>Action Required:</strong></p>
+      <ol style="margin-left: 20px; margin-top: 10px;">
+        <li>Go to <a href="https://supabase.com/dashboard" target="_blank" style="color: #60a5fa;">Supabase Dashboard</a></li>
+        <li>Select your project: <strong>ewcqmsfaostcwmgybbub</strong></li>
+        <li>Go to Settings → API</li>
+        <li>Copy the FULL <code>anon</code> public key (make sure you get all of it)</li>
+        <li>Update <code>.env.local</code> with the complete key</li>
+      </ol>
+    </div>
+
+    <div class="section">
+      <h2>📋 Current Environment Status</h2>
+      <p><strong>Supabase URL:</strong> <code>https://ewcqmsfaostcwmgybbub.supabase.co</code> ✅</p>
+      <p><strong>Anon Key:</strong> <code>Ends with ...MU</code> ⚠️ (Possibly truncated)</p>
+      <p><strong>Service Role:</strong> <code>Present</code> ✅</p>
+      <p><strong>Backend URL:</strong> <code>https://pelican-backend.fly.dev</code> ✅</p>
+    </div>
+
+    <div class="section">
+      <h2>🧪 Test 1: Supabase Connection</h2>
+      <p>Click to test if Supabase client can be created with your credentials.</p>
+      <button onclick="testSupabaseConnection()">Test Connection</button>
+      <div id="result-1" class="result"></div>
+    </div>
+
+    <div class="section">
+      <h2>🧪 Test 2: Fetch Conversations</h2>
+      <p>Attempt to query the conversations table (requires sign-in).</p>
+      <button onclick="testFetchConversations()">Test Query</button>
+      <div id="result-2" class="result"></div>
+    </div>
+
+    <div class="section">
+      <h2>🧪 Test 3: Manual Message Insert</h2>
+      <p>Test inserting a message directly (requires conversation ID from URL).</p>
+      <button onclick="testMessageInsert()">Test Insert</button>
+      <div id="result-3" class="result"></div>
+    </div>
+
+    <div class="section warning">
+      <h2>📝 Next Steps</h2>
+      <ol style="margin-left: 20px;">
+        <li><strong>Check Dev Server Console:</strong> Look for the Supabase error message</li>
+        <li><strong>Verify Anon Key:</strong> Make sure it's complete (not truncated)</li>
+        <li><strong>Restart Server:</strong> After fixing .env.local, restart with <code>npm run dev</code></li>
+        <li><strong>Test Again:</strong> Run these tests once server is healthy</li>
+      </ol>
+    </div>
+  </div>
+
+  <script type="module">
+    const SUPABASE_URL = 'https://ewcqmsfaostcwmgybbub.supabase.co';
+    const ANON_KEY_PARTIAL = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3Y3Ftc2Zhb3N0Y3dtZ3liYnViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE5MDc2NzgsImV4cCI6MjA2NzQ4MzY3OH0.UZ8c3R133QJ5FL0o0Q7c4MU';
+    
+    window.testSupabaseConnection = async function() {
+      const resultEl = document.getElementById('result-1');
+      resultEl.className = 'result show';
+      resultEl.textContent = '🔄 Testing connection...';
+      
+      try {
+        // Import Supabase
+        const { createClient } = await import('https://esm.sh/@supabase/supabase-js@2');
+        
+        // Try to create client
+        const supabase = createClient(SUPABASE_URL, ANON_KEY_PARTIAL);
+        
+        // Test if we can get session
+        const { data, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          resultEl.className = 'result show error';
+          resultEl.innerHTML = `❌ Connection Failed<br><br>Error: ${error.message}<br><br>This confirms the anon key is likely incomplete or invalid.`;
+        } else {
+          resultEl.className = 'result show success';
+          resultEl.innerHTML = `✅ Supabase Client Created Successfully!<br><br>Session: ${data.session ? 'Signed in as ' + data.session.user.email : 'Not signed in (this is OK)'}`;
+        }
+      } catch (err) {
+        resultEl.className = 'result show error';
+        resultEl.innerHTML = `❌ Error: ${err.message}<br><br>Could not create Supabase client.`;
+      }
+    };
+    
+    window.testFetchConversations = async function() {
+      const resultEl = document.getElementById('result-2');
+      resultEl.className = 'result show';
+      resultEl.textContent = '🔄 Fetching conversations...';
+      
+      try {
+        const { createClient } = await import('https://esm.sh/@supabase/supabase-js@2');
+        const supabase = createClient(SUPABASE_URL, ANON_KEY_PARTIAL);
+        
+        const { data: conversations, error } = await supabase
+          .from('conversations')
+          .select('id, title, created_at')
+          .limit(5);
+        
+        if (error) {
+          resultEl.className = 'result show error';
+          resultEl.innerHTML = `❌ Query Failed<br><br>Error: ${error.message}<br>Code: ${error.code}`;
+        } else {
+          resultEl.className = 'result show success';
+          resultEl.innerHTML = `✅ Query Successful!<br><br>Found ${conversations.length} conversations:<br>${JSON.stringify(conversations, null, 2)}`;
+        }
+      } catch (err) {
+        resultEl.className = 'result show error';
+        resultEl.innerHTML = `❌ Error: ${err.message}`;
+      }
+    };
+    
+    window.testMessageInsert = async function() {
+      const resultEl = document.getElementById('result-3');
+      resultEl.className = 'result show';
+      resultEl.textContent = '🔄 Testing message insert...';
+      
+      // Get conversation ID from URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const conversationId = urlParams.get('conversation');
+      
+      if (!conversationId) {
+        resultEl.className = 'result show error';
+        resultEl.innerHTML = `❌ No conversation ID in URL<br><br>Open a conversation first: /chat?conversation=UUID`;
+        return;
+      }
+      
+      try {
+        const { createClient } = await import('https://esm.sh/@supabase/supabase-js@2');
+        const supabase = createClient(SUPABASE_URL, ANON_KEY_PARTIAL);
+        
+        // Get current user
+        const { data: { user }, error: authError } = await supabase.auth.getUser();
+        
+        if (authError || !user) {
+          resultEl.className = 'result show error';
+          resultEl.innerHTML = `❌ Not signed in<br><br>Sign in first, then run this test.`;
+          return;
+        }
+        
+        // Try to insert
+        const { data, error } = await supabase
+          .from('messages')
+          .insert({
+            conversation_id: conversationId,
+            user_id: user.id,
+            role: 'user',
+            content: '🧪 TEST MESSAGE - ' + new Date().toISOString(),
+            created_at: new Date().toISOString()
+          })
+          .select();
+        
+        if (error) {
+          resultEl.className = 'result show error';
+          resultEl.innerHTML = `❌ Insert Failed<br><br>Error: ${error.message}<br>Code: ${error.code}<br>Hint: ${error.hint || 'N/A'}`;
+        } else {
+          resultEl.className = 'result show success';
+          resultEl.innerHTML = `✅ Message Inserted!<br><br>Check your chat - the test message should appear.<br><br>Data: ${JSON.stringify(data, null, 2)}`;
+        }
+      } catch (err) {
+        resultEl.className = 'result show error';
+        resultEl.innerHTML = `❌ Error: ${err.message}`;
+      }
+    };
+  </script>
+</body>
+</html>
+
