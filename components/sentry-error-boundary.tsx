@@ -22,13 +22,16 @@ export default function SentryErrorBoundary({
   );
 }
 
-function ErrorFallback({ error, reset }: { error: Error; reset: () => void }) {
+function ErrorFallback({ error, reset }: { error: unknown; reset: () => void }) {
   useEffect(() => {
     // Log error to console in development
     if (process.env.NODE_ENV === 'development') {
       console.error('Error boundary caught:', error);
     }
   }, [error]);
+  
+  const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
+  const errorStack = error instanceof Error ? error.stack : String(error);
   
   return (
     <div className="flex flex-col items-center justify-center min-h-[400px] p-4">
@@ -51,7 +54,7 @@ function ErrorFallback({ error, reset }: { error: Error; reset: () => void }) {
             Error Details (Dev Only)
           </summary>
           <pre className="mt-2 text-xs overflow-auto whitespace-pre-wrap">
-            {error.stack}
+            {errorStack}
           </pre>
         </details>
       )}
