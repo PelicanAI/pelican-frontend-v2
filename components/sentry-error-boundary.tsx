@@ -6,17 +6,15 @@ import { Button } from "@/components/ui/button";
 
 export default function SentryErrorBoundary({
   children,
-  fallback,
 }: {
   children: React.ReactNode;
-  fallback?: React.ComponentType<{ error: Error; reset: () => void }>;
 }) {
   return (
     <Sentry.ErrorBoundary
-      fallback={fallback || ErrorFallback}
+      fallback={({ error, resetError }) => <ErrorFallback error={error} reset={resetError} />}
       showDialog={false}
-      onError={(error, errorInfo) => {
-        console.error('ErrorBoundary caught:', error, errorInfo);
+      onError={(error) => {
+        console.error('ErrorBoundary caught:', error);
       }}
     >
       {children}
