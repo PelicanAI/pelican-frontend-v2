@@ -5,7 +5,7 @@ export interface ErrorContext {
   conversationId?: string;
   action?: string;
   component?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 /**

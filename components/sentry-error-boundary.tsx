@@ -37,7 +37,7 @@ function ErrorFallback({ error, reset }: { error: Error; reset: () => void }) {
       <div className="text-center max-w-md">
         <h2 className="text-2xl font-semibold mb-4">Something went wrong</h2>
         <p className="text-muted-foreground mb-6">
-          We've been notified and are working on a fix.
+          We&apos;ve been notified and are working on a fix.
         </p>
         <div className="flex gap-4 justify-center">
           <Button onClick={reset}>Try Again</Button>
