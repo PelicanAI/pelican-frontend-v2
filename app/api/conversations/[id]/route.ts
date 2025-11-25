@@ -33,6 +33,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       `)
       .eq("id", id)
       .eq("user_id", user.id)
+      .is("deleted_at", null)
       .single()
 
     if (error) {
