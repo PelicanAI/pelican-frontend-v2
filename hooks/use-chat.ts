@@ -256,7 +256,7 @@ export function useChat({ conversationId, onError, onFinish, onConversationCreat
               conversationId: currentConversationId,
               conversationHistory: conversationHistory,
               conversation_history: conversationHistory, // Backend expects both formats
-              fileIds: options.fileIds,
+              files: options.fileIds || [],
             }),
           })
         })

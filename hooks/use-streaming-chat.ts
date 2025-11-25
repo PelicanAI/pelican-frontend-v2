@@ -63,7 +63,7 @@ export function useStreamingChat() {
                 content: msg.content
               })),
             conversationId: conversationId,
-            fileIds: fileIds || [],
+            files: fileIds || [],
           }),
           signal: controller.signal,
           retryOptions: {
