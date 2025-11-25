@@ -9,6 +9,7 @@ import { ScrollContainer } from "./scroll-container"
 import { useSmartScroll } from "@/hooks/use-smart-scroll"
 import type { Message } from "@/lib/chat-utils"
 import { useToast } from "@/hooks/use-toast"
+import { useResponseTimer } from '@/hooks/use-response-timer'
 import { DragDropOverlay } from "./drag-drop-overlay"
 import { isAcceptedFileType } from "@/lib/file-utils"
 import { EnhancedTypingDots } from "./enhanced-typing-dots"
@@ -48,6 +49,7 @@ export function ChatContainer({
   networkError,
 }: ChatContainerProps) {
   const { toast } = useToast()
+  const elapsedSeconds = useResponseTimer(isLoading)
   const [isDragOver, setIsDragOver] = useState(false)
   const [dragCounter, setDragCounter] = useState(0)
   const [newMessageCount, setNewMessageCount] = useState(0)
@@ -454,7 +456,12 @@ export function ChatContainer({
                       />
                     </div>
                     <div className="flex-1 min-w-0 max-w-[700px]">
-                      <EnhancedTypingDots variant="processing" />
+                      <div className="flex items-center gap-3">
+                        <EnhancedTypingDots variant="processing" />
+                        <span className="text-xs text-muted-foreground font-mono">
+                          {elapsedSeconds}s
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
