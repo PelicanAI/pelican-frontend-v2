@@ -338,7 +338,7 @@ export const PremiumChatInput = forwardRef<PremiumChatInputRef, PremiumChatInput
 
     return (
       <div className="fixed bottom-0 left-0 right-0 z-50">
-        <div className="pb-safe-area-inset-bottom">
+        <div className="pb-[env(safe-area-inset-bottom,16px)]">
           <div
             className={cn(
               "backdrop-blur-xl border-t border-border",
@@ -347,17 +347,17 @@ export const PremiumChatInput = forwardRef<PremiumChatInputRef, PremiumChatInput
               "bg-background/80",
             )}
           >
-            <div
-              ref={containerRef}
-              className={cn(
-                "w-full max-w-sm mx-auto px-4 py-4", // Mobile: full width minus 16px padding
-                "sm:max-w-xl sm:px-6", // Tablet: max-width 600px
-                "md:max-w-3xl md:px-6 md:py-6", // Desktop: max-width 768px
-              )}
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
-              onDrop={handleDrop}
-            >
+              <div
+                ref={containerRef}
+                className={cn(
+                  "w-full max-w-full mx-auto px-3 py-3", // Mobile: full width minus padding
+                  "sm:max-w-xl sm:px-6 sm:py-4", // Tablet: max-width 600px
+                  "md:max-w-3xl md:px-6 md:py-6", // Desktop: max-width 768px
+                )}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+              >
               <AnimatePresence>
                 {isDragOver && (
                   <motion.div
@@ -453,14 +453,15 @@ export const PremiumChatInput = forwardRef<PremiumChatInputRef, PremiumChatInput
                     "bg-card",
                   )}
                 >
-                  <div className="flex items-center absolute left-4 top-1/2 -translate-y-1/2 gap-1 z-10">
+                  <div className="flex items-center absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 gap-1 z-10">
                     <Button
                       variant="ghost"
                       size="icon"
                       onClick={() => fileInputRef.current?.click()}
                       disabled={disabled}
                       className={cn(
-                        "w-8 h-8 transition-all duration-150",
+                        "w-11 h-11 sm:w-8 sm:h-8 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0",
+                        "transition-all duration-150",
                         "hover:bg-muted",
                         "active:scale-95",
                       )}
@@ -479,7 +480,8 @@ export const PremiumChatInput = forwardRef<PremiumChatInputRef, PremiumChatInput
                         onTouchEnd={stopRecording}
                         disabled={disabled}
                         className={cn(
-                          "w-8 h-8 transition-all duration-150",
+                          "w-11 h-11 min-w-[44px] min-h-[44px]",
+                          "transition-all duration-150",
                           "hover:bg-muted",
                           "active:scale-95",
                           isRecording && "bg-red-100 dark:bg-red-900/20",
@@ -519,10 +521,10 @@ export const PremiumChatInput = forwardRef<PremiumChatInputRef, PremiumChatInput
                       className={cn(
                         "w-full resize-none border-0 bg-transparent outline-none",
                         "transition-all duration-200 ease-out",
-                        "text-base md:text-[15px] leading-6",
+                        "text-[16px] leading-6", // Always 16px to prevent iOS zoom
                         "min-h-[56px] max-h-[200px] overflow-y-auto",
                         "py-4",
-                        isMobile ? "pl-20 pr-16" : "pl-14 pr-16",
+                        isMobile ? "pl-[88px] pr-16" : "pl-14 pr-16",
                         "placeholder:opacity-40",
                         "text-foreground placeholder:text-muted-foreground",
                         inputState === "rate-limited" && "opacity-50 cursor-not-allowed",
@@ -546,8 +548,8 @@ export const PremiumChatInput = forwardRef<PremiumChatInputRef, PremiumChatInput
                           <div
                             className={cn(
                               "py-4",
-                              isMobile ? "pl-20 pr-16" : "pl-14 pr-16",
-                              "text-base md:text-[15px] leading-6",
+                              isMobile ? "pl-[88px] pr-16" : "pl-14 pr-16",
+                              "text-[16px] leading-6",
                               "whitespace-pre-wrap",
                             )}
                           >
@@ -561,13 +563,14 @@ export const PremiumChatInput = forwardRef<PremiumChatInputRef, PremiumChatInput
                     </AnimatePresence>
                   </div>
 
-                  <div className="absolute right-3 bottom-3">
+                  <div className="absolute right-2 sm:right-3 bottom-2 sm:bottom-3">
                     <Button
                       onClick={isAIResponding && onStopResponse ? onStopResponse : handleSubmit}
                       disabled={(!isAIResponding && isSendDisabled) || inputState !== "default"}
                       size="icon"
                       className={cn(
-                        "w-8 h-8 transition-all duration-150",
+                        "w-11 h-11 sm:w-8 sm:h-8 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0",
+                        "transition-all duration-150",
                         "active:scale-95",
                         !isSendDisabled &&
                           !isAIResponding &&
@@ -587,7 +590,7 @@ export const PremiumChatInput = forwardRef<PremiumChatInputRef, PremiumChatInput
                         transition={{ duration: 0.15 }}
                         whileHover={{ scale: 1.05 }}
                       >
-                        {isAIResponding ? <Square className="h-4 w-4" /> : <Send className="h-4 w-4" />}
+                        {isAIResponding ? <Square className="h-5 w-5 sm:h-4 sm:w-4" /> : <Send className="h-5 w-5 sm:h-4 sm:w-4" />}
                       </motion.div>
                       <span className="sr-only">{isAIResponding ? "Stop response" : "Send message"}</span>
                     </Button>

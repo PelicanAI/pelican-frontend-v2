@@ -357,21 +357,21 @@ export function ChatContainer({
           aria-label="Chat messages"
         >
           {/* Conversation Header - Sticky */}
-          <div className="sticky top-0 z-10 flex items-center justify-between pb-2 pt-6 border-b border-border bg-background/95 backdrop-blur-sm -mx-4 sm:-mx-6 px-4 sm:px-6">
-            <div className="flex items-center gap-3">
+          <div className="sticky top-0 z-10 flex items-center justify-between pb-2 pt-4 sm:pt-6 border-b border-border bg-background/95 backdrop-blur-sm -mx-4 sm:-mx-6 px-4 sm:px-6">
+            <div className="flex items-center gap-2 sm:gap-3">
               <div className="flex flex-col">
                 <h2 className="text-sm font-medium text-foreground">
                   Trading Assistant
                 </h2>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs text-muted-foreground hidden sm:block">
                   {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
                 </p>
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-green-100 dark:bg-green-900/30">
+              <div className="flex items-center gap-1 sm:gap-1.5 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full bg-green-100 dark:bg-green-900/30">
                 <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></div>
-                <span className="text-xs font-medium text-green-700 dark:text-green-400">Markets Open</span>
+                <span className="text-[10px] sm:text-xs font-medium text-green-700 dark:text-green-400">Open</span>
               </div>
             </div>
           </div>

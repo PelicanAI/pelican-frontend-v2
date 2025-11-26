@@ -228,7 +228,7 @@ export function MessageBubble({
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: 0.1 }}
               >
-                <div className="relative group bg-background rounded-lg border border-border shadow-sm overflow-hidden">
+                <div className="relative group bg-background rounded-lg border border-border shadow-sm overflow-hidden max-w-full">
                   <img
                     src={attachment.url || "/placeholder.svg"}
                     alt={attachment.name || "Attachment"}
@@ -240,9 +240,10 @@ export function MessageBubble({
                       const target = e.target as HTMLImageElement
                       target.src = "/placeholder.svg"
                     }}
+                    loading="lazy"
                   />
                   {attachment.name && (
-                    <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-xs sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2 opacity-0 group-hover:opacity-100 transition-opacity truncate">
                       {attachment.name}
                     </div>
                   )}
@@ -289,10 +290,10 @@ export function MessageBubble({
       >
         {/* User message - clean, no bubble, right-aligned */}
         <div className="max-w-3xl mx-auto px-4 sm:px-8">
-          <div className="flex gap-6 items-start justify-end">
+          <div className="flex gap-4 sm:gap-6 items-start justify-end">
             {/* Message content */}
-            <div className="max-w-[700px] md:max-w-[600px]">
-              <div className="text-base leading-relaxed break-words text-foreground">
+            <div className="max-w-[90%] sm:max-w-[80%] md:max-w-[70%] lg:max-w-[600px]">
+              <div className="text-[16px] sm:text-base leading-relaxed break-words text-foreground">
                 {renderAttachments(message.attachments)}
                 {message.content}
               </div>
@@ -303,10 +304,10 @@ export function MessageBubble({
                   variant="ghost"
                   size="sm"
                   onClick={handleQuickCopy}
-                  className="h-7 px-2 text-xs text-muted-foreground hover:text-foreground"
+                  className="h-11 sm:h-7 px-3 sm:px-2 min-h-[44px] sm:min-h-0 text-xs text-muted-foreground hover:text-foreground"
                   title="Copy message"
                 >
-                  {copied ? <Check className="h-3 w-3 mr-1" /> : <Copy className="h-3 w-3 mr-1" />}
+                  {copied ? <Check className="h-4 w-4 sm:h-3 sm:w-3 mr-1" /> : <Copy className="h-4 w-4 sm:h-3 sm:w-3 mr-1" />}
                   {copied ? "Copied" : "Copy"}
                 </Button>
               </div>
@@ -332,20 +333,20 @@ export function MessageBubble({
     >
       {/* AI message - clean, no bubble, no background */}
       <div className="max-w-3xl mx-auto px-4 sm:px-8">
-        <div className="flex gap-6 items-start">
+        <div className="flex gap-3 sm:gap-6 items-start">
           {/* AI avatar */}
           <div className="flex-shrink-0">
             <img
               src="/pelican-logo.png"
               alt="Pelican AI"
-              className="w-8 h-8 object-contain"
+              className="w-7 h-7 sm:w-8 sm:h-8 object-contain"
             />
           </div>
 
           {/* Message content - plain text, no bubble */}
-          <div className="flex-1 min-w-0 max-w-[700px]">
+          <div className="flex-1 min-w-0 max-w-[90%] sm:max-w-[80%] md:max-w-[75%] lg:max-w-[700px]">
             {renderAttachments(message.attachments)}
-            <div className="text-base leading-relaxed text-foreground">
+            <div className="text-[16px] sm:text-base leading-relaxed text-foreground">
               <MessageContent
                 content={message.content}
                 isStreaming={isStreaming}
@@ -360,10 +361,10 @@ export function MessageBubble({
                 variant="ghost"
                 size="sm"
                 onClick={handleQuickCopy}
-                className="h-7 px-2 text-xs text-muted-foreground hover:text-foreground"
+                className="h-11 sm:h-7 px-3 sm:px-2 min-h-[44px] sm:min-h-0 text-xs text-muted-foreground hover:text-foreground"
                 title="Copy message"
               >
-                {copied ? <Check className="h-3 w-3 mr-1" /> : <Copy className="h-3 w-3 mr-1" />}
+                {copied ? <Check className="h-4 w-4 sm:h-3 sm:w-3 mr-1" /> : <Copy className="h-4 w-4 sm:h-3 sm:w-3 mr-1" />}
                 {copied ? "Copied" : "Copy"}
               </Button>
               
@@ -464,10 +465,11 @@ function MessageContent({
                 className={cn(
                   "relative group my-3 rounded-lg border overflow-hidden font-mono",
                   "bg-muted/30 border-border",
+                  "max-w-full overflow-x-auto"
                 )}
               >
                 <div className="relative">
-                  <div className="p-3 text-sm overflow-x-auto whitespace-pre max-w-full leading-[1.5]">
+                  <div className="p-3 text-[13px] sm:text-sm overflow-x-auto whitespace-pre max-w-full leading-[1.5]">
                     <code>{sanitizedCode}</code>
                   </div>
                   
@@ -484,11 +486,11 @@ function MessageContent({
                   )}
                   <button
                     type="button"
-                    className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-gray-200 h-8 w-8 min-h-[36px] min-w-[36px]"
+                    className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-gray-200 h-11 w-11 sm:h-8 sm:w-8 min-h-[44px] min-w-[44px] sm:min-h-[36px] sm:min-w-[36px] flex items-center justify-center"
                     onClick={() => navigator.clipboard.writeText(segment.content)}
                     aria-label="Copy code"
                   >
-                    <Copy className="h-4 w-4" />
+                    <Copy className="h-5 w-5 sm:h-4 sm:w-4" />
                   </button>
                 </div>
               </motion.div>

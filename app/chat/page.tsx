@@ -274,7 +274,7 @@ export default function ChatPage() {
         <SheetContent
           side="left"
           className={cn(
-            "w-[85vw] p-0 border-r-border",
+            "w-[85vw] max-w-[320px] p-0 border-r-border",
             mobileSheetOpen ? "pointer-events-auto" : "pointer-events-none",
           )}
           onOpenAutoFocus={(e) => {
@@ -345,7 +345,7 @@ export default function ChatPage() {
         )}
 
         <div className="flex-1 flex flex-col overflow-hidden">
-          <div className="flex-1 overflow-y-auto">
+          <div className="flex-1 overflow-y-auto pb-[120px] md:pb-0">
             <div className="max-w-5xl mx-auto w-full">
               <ChatContainer
                 messages={messages}
@@ -360,7 +360,12 @@ export default function ChatPage() {
             </div>
           </div>
 
-          <div className="bg-background border-t border-border pb-4">
+          <div className={cn(
+            "bg-background border-t border-border",
+            "fixed bottom-0 left-0 right-0 md:relative md:bottom-auto",
+            "pb-[env(safe-area-inset-bottom,16px)] md:pb-4",
+            "z-40"
+          )}>
             <div className="max-w-5xl mx-auto w-full px-3 py-3">
               <ChatInput
                 ref={chatInputRef}

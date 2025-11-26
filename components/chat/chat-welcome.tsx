@@ -31,33 +31,33 @@ export function ChatWelcome({ onQuickStart }: ChatWelcomeProps) {
   ]
 
   return (
-    <div className="flex-1 flex items-center justify-center p-8 min-h-[500px]">
-      <div className="max-w-2xl mx-auto text-center space-y-8">
+    <div className="flex-1 flex items-center justify-center p-4 sm:p-8 min-h-[500px]">
+      <div className="max-w-2xl mx-auto text-center space-y-6 sm:space-y-8 w-full">
         {/* Logo */}
-        <div className="flex justify-center mb-6 h-12">
+        <div className="flex justify-center mb-4 sm:mb-6 h-10 sm:h-12">
           <img 
             src="/pelican-logo.png" 
             alt="PelicanAI" 
-            className="w-12 h-12 object-contain"
+            className="w-10 h-10 sm:w-12 sm:h-12 object-contain"
             width="48"
             height="48" 
           />
         </div>
 
         {/* Welcome Message */}
-        <div className="space-y-4 min-h-[100px]">
-          <h1 className="text-3xl font-semibold text-balance">How can I help you trade today?</h1>
-          <p className="text-muted-foreground text-balance">
+        <div className="space-y-3 sm:space-y-4 min-h-[80px] sm:min-h-[100px] px-2">
+          <h1 className="text-2xl sm:text-3xl font-semibold text-balance">How can I help you trade today?</h1>
+          <p className="text-sm sm:text-base text-muted-foreground text-balance">
             Ask me about market analysis, trading strategies, or get real-time insights
           </p>
         </div>
 
         {/* Suggestion Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-8 min-h-[200px]">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-6 sm:mt-8 min-h-[200px]">
           {suggestions.map((suggestion, index) => (
             <Card
               key={index}
-              className="p-4 cursor-pointer hover:bg-muted/50 transition-colors text-left h-20"
+              className="p-4 cursor-pointer hover:bg-muted/50 active:bg-muted transition-colors text-left min-h-[72px] sm:h-20 flex flex-col justify-center"
               onClick={() => onQuickStart(suggestion.message)}
             >
               <h3 className="font-medium text-sm mb-1">{suggestion.title}</h3>
