@@ -395,7 +395,7 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
         updateMessagesWithSync((prev) =>
           prev.filter((msg) => msg.id !== assistantMessageId)
         );
-        logger.error('[CHAT-ERROR] Send failed', { error: error.message });
+        logger.error(`[CHAT-ERROR] Send failed: ${error.message}`);
       } finally {
         setIsLoading(false);
       }
