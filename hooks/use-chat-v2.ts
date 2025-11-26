@@ -381,7 +381,7 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
               updateMessagesWithSync((prev) =>
                 prev.filter((msg) => msg.id !== assistantMessageId)
               );
-              logger.error('[CHAT-ERROR] Streaming error', { error: err.message });
+              logger.error(`[CHAT-ERROR] Streaming error: ${err.message}`);
             },
           },
           currentConversationId,
