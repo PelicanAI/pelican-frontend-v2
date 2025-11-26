@@ -105,7 +105,8 @@ export default function TestStreamingPage() {
           setCurrentStatus("")
         },
       },
-      null // No conversation ID for test
+      null, // No conversation ID for test
+      [] // No file IDs for test
     )
   }
 
