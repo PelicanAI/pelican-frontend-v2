@@ -14,7 +14,7 @@ export default function TestStreamingPage() {
   const [input, setInput] = useState("")
   const [currentStatus, setCurrentStatus] = useState("")
   
-  const { sendMessage, cancelStream, isStreaming } = useStreamingChat()
+  const { sendMessage, abortStream, isStreaming } = useStreamingChat()
 
   const handleSend = async () => {
     if (!input.trim() || isStreaming) return
@@ -144,7 +144,7 @@ export default function TestStreamingPage() {
               onKeyPress={(e) => e.key === "Enter" && handleSend()}
             />
             {isStreaming ? (
-              <Button onClick={cancelStream} variant="destructive">
+              <Button onClick={abortStream} variant="destructive">
                 Cancel
               </Button>
             ) : (
