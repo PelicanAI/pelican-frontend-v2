@@ -43,19 +43,9 @@ export default function TestStreamingPage() {
     // Send streaming request
     await sendMessage(
       input,
-      messages,
+      messages.map(msg => ({ role: msg.role, content: msg.content })),
       {
-        onStart: () => {
-          console.log("[Test] Streaming started")
-          setCurrentStatus("")
-        },
-        
-        onStatus: (status) => {
-          console.log("[Test] Status:", status)
-          setCurrentStatus(status)
-        },
-        
-        onChunk: (delta) => {
+        onChunk: (delta: string) => {
           console.log("[Test] Chunk:", delta)
           setMessages(prev =>
             prev.map(msg =>
@@ -66,8 +56,8 @@ export default function TestStreamingPage() {
           )
         },
         
-        onComplete: (fullResponse, latency) => {
-          console.log("[Test] Complete:", { fullResponse, latency })
+        onComplete: (fullResponse: string) => {
+          console.log("[Test] Complete:", { fullResponse })
           setMessages(prev =>
             prev.map(msg =>
               msg.id === assistantId
@@ -78,25 +68,14 @@ export default function TestStreamingPage() {
           setCurrentStatus("")
         },
         
-        onAttachments: (attachments) => {
-          console.log("[Test] Attachments:", attachments)
-          setMessages(prev =>
-            prev.map(msg =>
-              msg.id === assistantId
-                ? { ...msg, attachments }
-                : msg
-            )
-          )
-        },
-        
-        onError: (error) => {
+        onError: (error: Error) => {
           console.error("[Test] Error:", error)
           setMessages(prev =>
             prev.map(msg =>
               msg.id === assistantId
                 ? { 
                     ...msg, 
-                    content: `Error: ${error}`, 
+                    content: `Error: ${error.message}`, 
                     isStreaming: false 
                   }
                 : msg
