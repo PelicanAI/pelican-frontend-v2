@@ -323,7 +323,7 @@ export function useStreamingChat(): UseStreamingChatReturn {
         }
 
         const err = error instanceof Error ? error : new Error(String(error));
-        logger.error('[STREAM-ERROR] Streaming failed', { error: err.message });
+        logger.error('[STREAM-ERROR] Streaming failed', err);
         callbacks.onError?.(err);
 
       } finally {
