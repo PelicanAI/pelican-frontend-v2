@@ -43,6 +43,8 @@ interface UseChatOptions {
   onError?: (error: Error) => void;
   onMessageSent?: (message: Message) => void;
   onResponseComplete?: (response: string) => void;
+  onFinish?: (message: Message) => void;
+  onConversationCreated?: (conversationId: string) => void;
 }
 
 interface UseChatReturn {
@@ -51,8 +53,12 @@ interface UseChatReturn {
   isStreaming: boolean;
   error: Error | null;
   sendMessage: (content: string, options?: SendMessageOptions) => Promise<void>;
+  stopGeneration: () => void;
   clearMessages: () => void;
+  regenerateLastMessage: () => Promise<void>;
   retryLastMessage: () => Promise<void>;
+  addSystemMessage: (content: string, retryAction?: () => void) => string;
+  conversationNotFound: boolean;
 }
 
 interface SendMessageOptions {
@@ -129,6 +135,8 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
     onError,
     onMessageSent,
     onResponseComplete,
+    onFinish,
+    onConversationCreated,
   } = options;
 
   // ---------------------------------------------------------------------------
@@ -138,6 +146,7 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
+  const [conversationNotFound, setConversationNotFound] = useState(false);
 
   // Current conversation ID (can change during conversation)
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(
@@ -171,7 +180,7 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
   // STREAMING HOOK
   // ---------------------------------------------------------------------------
 
-  const { sendMessage: sendStreamingMessage, isStreaming } = useStreamingChat();
+  const { sendMessage: sendStreamingMessage, isStreaming, abortStream } = useStreamingChat();
 
   // ---------------------------------------------------------------------------
   // SYNCHRONOUS STATE UPDATE
@@ -361,14 +370,20 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
             },
             // On complete, mark as not streaming
             onComplete: (fullResponse: string) => {
+              const finalMessage: Message = {
+                ...assistantMessage,
+                content: fullResponse,
+                isStreaming: false,
+              };
               updateMessagesWithSync((prev) =>
                 prev.map((msg) =>
                   msg.id === assistantMessageId
-                    ? { ...msg, content: fullResponse, isStreaming: false }
+                    ? finalMessage
                     : msg
                 )
               );
               onResponseComplete?.(fullResponse);
+              onFinish?.(finalMessage);
               logger.info('[CHAT-COMPLETE] Response complete', {
                 responseLength: fullResponse.length,
               });
@@ -409,6 +424,7 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
       onResponseComplete,
       sendStreamingMessage,
       updateMessagesWithSync,
+      onFinish,
     ]
   );
 
@@ -445,6 +461,33 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
     }
   }, [sendMessage, updateMessagesWithSync]);
 
+  const regenerateLastMessage = retryLastMessage;
+
+  const stopGeneration = useCallback(() => {
+    abortStream();
+    setIsLoading(false);
+    // Mark any streaming messages as no longer streaming
+    updateMessagesWithSync((prev) =>
+      prev.map((msg) => (msg.isStreaming ? { ...msg, isStreaming: false } : msg))
+    );
+    logger.info('[CHAT-STOP] Generation stopped');
+  }, [abortStream, updateMessagesWithSync]);
+
+  const addSystemMessage = useCallback(
+    (content: string, retryAction?: () => void): string => {
+      const systemMessage: Message = {
+        id: createMessageId(),
+        role: 'system',
+        content,
+        timestamp: new Date(),
+        isStreaming: false,
+      };
+      updateMessagesWithSync((prev) => [...prev, systemMessage]);
+      return systemMessage.id;
+    },
+    [updateMessagesWithSync]
+  );
+
   // ---------------------------------------------------------------------------
   // CONVERSATION LOADING
   // ---------------------------------------------------------------------------
@@ -475,8 +518,12 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
     isStreaming,
     error,
     sendMessage,
+    stopGeneration,
     clearMessages,
+    regenerateLastMessage,
     retryLastMessage,
+    addSystemMessage,
+    conversationNotFound,
   };
 }
 
