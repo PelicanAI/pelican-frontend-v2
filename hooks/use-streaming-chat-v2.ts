@@ -20,6 +20,7 @@
 
 import { useCallback, useRef, useState } from 'react';
 import { logger } from '@/lib/logger';
+import { createClient } from '@/lib/supabase/client';
 
 // =============================================================================
 // CONSTANTS
@@ -214,6 +215,11 @@ export function useStreamingChat(): UseStreamingChatReturn {
       let lastChunkTime = Date.now();
 
       try {
+        // Get Supabase session token for authentication
+        const supabase = createClient();
+        const { data: { session } } = await supabase.auth.getSession();
+        const token = session?.access_token;
+
         // Set connection timeout
         const connectionTimeoutId = setTimeout(() => {
           if (!signal.aborted) {
@@ -227,6 +233,7 @@ export function useStreamingChat(): UseStreamingChatReturn {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            ...(token && { 'Authorization': `Bearer ${token}` }),
           },
           body: JSON.stringify(payload),
           signal,
