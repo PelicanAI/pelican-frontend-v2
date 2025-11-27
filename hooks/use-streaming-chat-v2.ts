@@ -85,7 +85,13 @@ function parseSSEChunk(chunk: string): { content?: string; done?: boolean; error
   }
 
   try {
-    return JSON.parse(jsonStr);
+    const data = JSON.parse(jsonStr);
+    // Normalize backend format to expected format
+    return {
+      content: data.delta || data.content,  // Backend sends "delta", not "content"
+      done: data.type === 'done' || data.done,  // Backend sends type: "done"
+      error: data.error,
+    };
   } catch (e) {
     logger.warn('[STREAM-PARSE] Failed to parse SSE chunk', { chunk, error: e });
     return null;
