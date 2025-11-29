@@ -190,20 +190,35 @@ export function useConversations() {
   }
 
   const createConversation = async (title = "New Conversation") => {
-    const effectiveUserId = user?.id || guestUserId
-    if (!effectiveUserId) {
-      console.error("❌ [Create Conversation] No user ID available")
-      return null
+    // Always fetch fresh auth state to avoid race conditions
+    const { data: { user: currentUser }, error: authError } = await supabase.auth.getUser();
+    
+    if (authError) {
+      console.error("❌ [Create Conversation] Auth error:", authError.message);
+      Sentry.captureException(authError, {
+        tags: { location: 'createConversation', phase: 'auth' },
+      });
     }
 
-    if (user?.id) {
+    const effectiveUserId = currentUser?.id || guestUserId;
+    
+    if (!effectiveUserId) {
+      console.error("❌ [Create Conversation] No user ID available", {
+        currentUser: !!currentUser,
+        guestUserId: !!guestUserId,
+        authError: authError?.message,
+      });
+      return null;
+    }
+
+    if (currentUser?.id) {
       try {
         console.log("🔷 [Create Conversation] Attempting to create conversation", { 
           userId: effectiveUserId, 
           title,
-          userExists: !!user,
-          userEmail: user?.email 
-        })
+          userExists: !!currentUser,
+          userEmail: currentUser?.email 
+        });
         
         const { data, error } = await supabase
           .from("conversations")
@@ -212,42 +227,45 @@ export function useConversations() {
             title,
           })
           .select()
-          .single()
+          .single();
 
         if (error) {
           console.error("❌ [Create Conversation] Database error:", {
             errorMessage: error.message,
             errorCode: error.code,
             errorDetails: error
-          })
-          throw error
+          });
+          throw error;
         }
         
         console.log("✅ [Create Conversation] Successfully created:", { 
           conversationId: data?.id,
           title: data?.title,
           createdAt: data?.created_at 
-        })
+        });
         
         // Reload conversations to reflect the new one
-        if (user?.id) {
-          await loadConversations(user.id)
+        await loadConversations(currentUser.id);
+        
+        // Update local user state if it was stale
+        if (!user && currentUser) {
+          setUser(currentUser);
         }
         
-        return data
+        return data;
       } catch (error) {
         console.error("❌ [Create Conversation] Failed:", {
           errorMessage: error instanceof Error ? error.message : String(error),
           errorStack: error instanceof Error ? error.stack : undefined
-        })
-        // Capture in Sentry
+        });
         Sentry.captureException(error, {
           tags: { location: 'createConversation' },
           extra: { userId: effectiveUserId, title }
-        })
-        return null
+        });
+        return null;
       }
     } else {
+      // Guest user flow
       const newConversation: Conversation = {
         id: `guest-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         title,
@@ -257,14 +275,14 @@ export function useConversations() {
         last_message_preview: "",
         user_id: effectiveUserId,
         archived: false,
-      }
+      };
 
-      const currentConversations = loadGuestConversations()
-      const updatedConversations = [newConversation, ...currentConversations]
-      saveGuestConversations(updatedConversations)
-      setConversations(updatedConversations)
+      const currentConversations = loadGuestConversations();
+      const updatedConversations = [newConversation, ...currentConversations];
+      saveGuestConversations(updatedConversations);
+      setConversations(updatedConversations);
 
-      return newConversation
+      return newConversation;
     }
   }
 
