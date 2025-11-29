@@ -36,7 +36,7 @@ const CHUNK_TIMEOUT_MS = 30000; // 30 seconds between chunks
 
 interface StreamCallbacks {
   onChunk?: (chunk: string) => void;
-  onComplete?: (fullResponse: string) => void;
+  onComplete?: (fullResponse: string) => void | Promise<void>;
   onError?: (error: Error) => void;
 }
 
@@ -336,7 +336,7 @@ export function useStreamingChat(): UseStreamingChatReturn {
         }
 
         const err = error instanceof Error ? error : new Error(String(error));
-        logger.error('[STREAM-ERROR] Streaming failed', err);
+        logger.error(`[STREAM-ERROR] Streaming failed: ${err.message}`);
         callbacks.onError?.(err);
 
       } finally {
@@ -356,3 +356,4 @@ export function useStreamingChat(): UseStreamingChatReturn {
 }
 
 export default useStreamingChat;
+

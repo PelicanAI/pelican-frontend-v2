@@ -21,6 +21,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useStreamingChat } from './use-streaming-chat';
 import { logger } from '@/lib/logger';
+import { createClient } from '@/lib/supabase/client';
 import type { Message } from '@/lib/chat-utils';
 
 // =============================================================================
@@ -368,8 +369,8 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
                 )
               );
             },
-            // On complete, mark as not streaming
-            onComplete: (fullResponse: string) => {
+            // On complete, mark as not streaming and persist to database
+            onComplete: async (fullResponse: string) => {
               const finalMessage: Message = {
                 ...assistantMessage,
                 content: fullResponse,
@@ -387,6 +388,53 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
               logger.info('[CHAT-COMPLETE] Response complete', {
                 responseLength: fullResponse.length,
               });
+
+              // Persist messages to Supabase
+              if (currentConversationId) {
+                try {
+                  const supabase = createClient();
+                  const timestamp = new Date().toISOString();
+                  
+                  // Save user message
+                  await supabase.from('messages').insert({
+                    conversation_id: currentConversationId,
+                    role: 'user',
+                    content: content,
+                    created_at: timestamp,
+                    metadata: { version: '2.0.0' }
+                  });
+                  
+                  // Save assistant response  
+                  await supabase.from('messages').insert({
+                    conversation_id: currentConversationId,
+                    role: 'assistant',
+                    content: fullResponse,
+                    created_at: new Date().toISOString(),
+                    metadata: { version: '2.0.0' }
+                  });
+                  
+                  // Update conversation metadata
+                  await supabase
+                    .from('conversations')
+                    .update({ 
+                      updated_at: new Date().toISOString(),
+                      last_message_preview: fullResponse.substring(0, 100)
+                    })
+                    .eq('id', currentConversationId);
+                    
+                  console.log('✅ [PERSIST] Messages saved to database');
+                  logger.info('[PERSIST] Messages saved to database', {
+                    conversationId: currentConversationId,
+                    userMessageLength: content.length,
+                    assistantMessageLength: fullResponse.length,
+                  });
+                } catch (error) {
+                  console.error('❌ [PERSIST] Failed to save messages:', error);
+                  logger.error('[PERSIST] Failed to save messages', error instanceof Error ? error : new Error(String(error)), {
+                    conversationId: currentConversationId,
+                  });
+                }
+              }
             },
             // On error
             onError: (err: Error) => {
