@@ -5,17 +5,11 @@
  * This hook manages conversation state and message sending with:
  * - Synchronous state/ref updates to prevent race conditions
  * - Proper conversation history capture before API calls
+ * - Supabase persistence with RLS-compliant user_id
  * - Comprehensive logging for debugging
- * - Empty history detection and warnings
- * 
- * CRITICAL FIXES APPLIED:
- * 1. Synchronous ref update (not via useEffect)
- * 2. History captured BEFORE state updates
- * 3. Validation for empty history in existing conversations
- * 4. Comprehensive logging at each step
  * 
  * @author Pelican Engineering
- * @version 2.0.0
+ * @version 2.1.0
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -29,9 +23,9 @@ import type { Message } from '@/lib/chat-utils';
 // =============================================================================
 
 const LIMITS = {
-  MESSAGE_CONTEXT: 150, // Maximum messages to include in context
-  MAX_MESSAGE_LENGTH: 50000, // Maximum message length
-  MIN_MESSAGE_LENGTH: 1, // Minimum message length
+  MESSAGE_CONTEXT: 150,
+  MAX_MESSAGE_LENGTH: 50000,
+  MIN_MESSAGE_LENGTH: 1,
 };
 
 // =============================================================================
@@ -58,7 +52,7 @@ interface UseChatReturn {
   clearMessages: () => void;
   regenerateLastMessage: () => Promise<void>;
   retryLastMessage: () => Promise<void>;
-  addSystemMessage: (content: string, retryAction?: () => void) => string;
+  addSystemMessage: (content: string) => string;
   conversationNotFound: boolean;
 }
 
@@ -71,16 +65,10 @@ interface SendMessageOptions {
 // HELPER FUNCTIONS
 // =============================================================================
 
-/**
- * Create a unique message ID
- */
 function createMessageId(): string {
   return `msg_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 }
 
-/**
- * Create a user message object
- */
 function createUserMessage(content: string): Message {
   return {
     id: createMessageId(),
@@ -91,9 +79,6 @@ function createUserMessage(content: string): Message {
   };
 }
 
-/**
- * Create an assistant message object (initially empty for streaming)
- */
 function createAssistantMessage(content: string = ''): Message {
   return {
     id: createMessageId(),
@@ -104,9 +89,6 @@ function createAssistantMessage(content: string = ''): Message {
   };
 }
 
-/**
- * Validate message content
- */
 function validateMessage(content: string): { valid: boolean; error?: string } {
   if (!content || typeof content !== 'string') {
     return { valid: false, error: 'Message content is required' };
@@ -148,33 +130,16 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
   const [conversationNotFound, setConversationNotFound] = useState(false);
-
-  // Current conversation ID (can change during conversation)
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(
     initialConversationId ?? null
   );
 
   // ---------------------------------------------------------------------------
-  // REFS - CRITICAL FOR AVOIDING STALE CLOSURES
+  // REFS
   // ---------------------------------------------------------------------------
 
-  /**
-   * CRITICAL: This ref holds the current messages and is updated SYNCHRONOUSLY.
-   * 
-   * Unlike the useState messages, this ref is updated immediately when we
-   * call updateMessagesWithSync, ensuring we always have the latest state
-   * available without waiting for React's async state update cycle.
-   */
   const messagesRef = useRef<Message[]>([]);
-
-  /**
-   * Track which conversation we've loaded to prevent duplicate loads
-   */
   const loadedConversationRef = useRef<string | null>(null);
-
-  /**
-   * Track the last sent message for retry functionality
-   */
   const lastSentMessageRef = useRef<string | null>(null);
 
   // ---------------------------------------------------------------------------
@@ -187,18 +152,10 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
   // SYNCHRONOUS STATE UPDATE
   // ---------------------------------------------------------------------------
 
-  /**
-   * Update messages state AND ref synchronously.
-   * 
-   * CRITICAL FIX: This ensures messagesRef.current is always up-to-date
-   * when we capture history for the API call, preventing the race condition
-   * where history was captured before the ref was updated via useEffect.
-   */
   const updateMessagesWithSync = useCallback(
     (updater: (prev: Message[]) => Message[]) => {
       setMessages((prev) => {
         const next = updater(prev);
-        // Update ref SYNCHRONOUSLY within the same call
         messagesRef.current = next;
         return next;
       });
@@ -206,9 +163,6 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
     []
   );
 
-  /**
-   * Get current messages from ref (always latest)
-   */
   const getCurrentMessages = useCallback((): Message[] => {
     return messagesRef.current;
   }, []);
@@ -217,52 +171,30 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
   // HISTORY CAPTURE
   // ---------------------------------------------------------------------------
 
-  /**
-   * Capture conversation history for API call.
-   * 
-   * CRITICAL: This must be called BEFORE any state updates to ensure
-   * we capture the history as it was before the new message was added.
-   * 
-   * @param excludeSystemMessages - Filter out system messages
-   * @param maxMessages - Maximum messages to include
-   * @returns Array of message objects suitable for API call
-   */
   const captureConversationHistory = useCallback(
     (excludeSystemMessages: boolean = true, maxMessages?: number): Array<{ role: string; content: string }> => {
       const currentMessages = getCurrentMessages();
-      const limit = maxMessages ?? LIMITS.MESSAGE_CONTEXT - 1; // Reserve 1 for new message
+      const limit = maxMessages ?? LIMITS.MESSAGE_CONTEXT - 1;
 
-      // Log current state
       logger.debug('[CHAT-CAPTURE] Capturing history', {
         currentMessagesCount: currentMessages.length,
         limit,
         conversationId: currentConversationId,
       });
 
-      // Filter and map messages
       let history = currentMessages;
 
       if (excludeSystemMessages) {
         history = history.filter((msg) => msg.role !== 'system');
       }
 
-      // Take last N messages
       history = history.slice(-limit);
 
-      // Map to API format
       const apiHistory = history.map((msg) => ({
         role: msg.role,
         content: msg.content,
       }));
 
-      // Log captured history
-      logger.debug('[CHAT-CAPTURE] History captured', {
-        historyLength: apiHistory.length,
-        firstMessagePreview: apiHistory[0]?.content?.substring(0, 50),
-        lastMessagePreview: apiHistory[apiHistory.length - 1]?.content?.substring(0, 50),
-      });
-
-      // CRITICAL: Warn if sending empty history for existing conversation
       if (apiHistory.length === 0 && currentConversationId) {
         logger.warn('[CHAT-CAPTURE] WARNING: Empty history for existing conversation!', {
           conversationId: currentConversationId,
@@ -277,23 +209,101 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
   );
 
   // ---------------------------------------------------------------------------
-  // SEND MESSAGE - STREAMING
+  // MESSAGE PERSISTENCE
   // ---------------------------------------------------------------------------
 
   /**
-   * Send a message using streaming.
-   * 
-   * Flow:
-   * 1. Validate message
-   * 2. Capture history BEFORE state update
-   * 3. Update state with user message
-   * 4. Update state with empty assistant message
-   * 5. Make API call with captured history
-   * 6. Update assistant message as chunks arrive
+   * Persist messages to Supabase with proper user_id for RLS compliance.
+   * CRITICAL: user_id MUST be included for RLS policy to allow insert.
    */
+  const persistMessages = useCallback(
+    async (
+      conversationId: string,
+      userContent: string,
+      assistantContent: string
+    ): Promise<void> => {
+      try {
+        const supabase = createClient();
+        
+        // Get current user - REQUIRED for RLS policy
+        const { data: { user }, error: authError } = await supabase.auth.getUser();
+        
+        if (authError || !user) {
+          console.error('❌ [PERSIST] Auth error - cannot get user:', authError);
+          logger.error('[PERSIST] Auth error', authError || new Error('No user found'));
+          return;
+        }
+
+        const timestamp = new Date().toISOString();
+
+        // Save user message with user_id
+        const { error: userMsgError } = await supabase.from('messages').insert({
+          conversation_id: conversationId,
+          user_id: user.id,  // CRITICAL: Required for RLS
+          role: 'user',
+          content: userContent,
+          created_at: timestamp,
+          metadata: { version: '2.1.0' }
+        });
+
+        if (userMsgError) {
+          console.error('❌ [PERSIST] Failed to save user message:', userMsgError);
+          logger.error('[PERSIST] User message insert failed', new Error(userMsgError.message));
+          return;
+        }
+
+        // Save assistant response with user_id
+        const { error: assistantMsgError } = await supabase.from('messages').insert({
+          conversation_id: conversationId,
+          user_id: user.id,  // CRITICAL: Required for RLS
+          role: 'assistant',
+          content: assistantContent,
+          created_at: new Date().toISOString(),
+          metadata: { version: '2.1.0' }
+        });
+
+        if (assistantMsgError) {
+          console.error('❌ [PERSIST] Failed to save assistant message:', assistantMsgError);
+          logger.error('[PERSIST] Assistant message insert failed', new Error(assistantMsgError.message));
+          return;
+        }
+
+        // Update conversation metadata
+        const { error: updateError } = await supabase
+          .from('conversations')
+          .update({
+            updated_at: new Date().toISOString(),
+            last_message_preview: assistantContent.substring(0, 100)
+          })
+          .eq('id', conversationId);
+
+        if (updateError) {
+          console.error('❌ [PERSIST] Failed to update conversation:', updateError);
+          logger.error('[PERSIST] Conversation update failed', new Error(updateError.message));
+          return;
+        }
+
+        console.log('✅ [PERSIST] Messages saved to database');
+        logger.info('[PERSIST] Messages saved to database', {
+          conversationId,
+          userId: user.id,
+          userMessageLength: userContent.length,
+          assistantMessageLength: assistantContent.length,
+        });
+      } catch (error) {
+        console.error('❌ [PERSIST] Unexpected error:', error);
+        logger.error('[PERSIST] Unexpected error', error instanceof Error ? error : new Error(String(error)));
+      }
+    },
+    []
+  );
+
+  // ---------------------------------------------------------------------------
+  // SEND MESSAGE - STREAMING
+  // ---------------------------------------------------------------------------
+
   const sendMessageStreaming = useCallback(
     async (content: string, sendOptions: SendMessageOptions = {}): Promise<void> => {
-      // Validate
       const validation = validateMessage(content);
       if (!validation.valid) {
         const err = new Error(validation.error);
@@ -302,22 +312,13 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
         return;
       }
 
-      // Save for retry
       lastSentMessageRef.current = content;
-
-      // Clear error
       setError(null);
       setIsLoading(true);
 
-      // Create user message
       const userMessage = createUserMessage(content);
+      const conversationHistory = captureConversationHistory();
 
-      // ------------------------------------
-      // STEP 1: Capture history BEFORE state update
-      // ------------------------------------
-      const conversationHistory: Array<{ role: string; content: string }> = captureConversationHistory();
-
-      // Log what we're about to send
       logger.info('[CHAT-SEND] Preparing to send message', {
         messageLength: content.length,
         historyLength: conversationHistory.length,
@@ -325,7 +326,6 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
         isNewConversation: !currentConversationId,
       });
 
-      // Debug log for troubleshooting
       console.log('[CHAT-DEBUG] Payload construction:', {
         stateLength: messages.length,
         refLength: messagesRef.current.length,
@@ -335,31 +335,21 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
         firstMsgPreview: conversationHistory[0]?.content?.slice(0, 50),
       });
 
-      // ------------------------------------
-      // STEP 2: Update state with user message
-      // ------------------------------------
       if (!sendOptions.skipUserMessage) {
         updateMessagesWithSync((prev) => [...prev, userMessage]);
         onMessageSent?.(userMessage);
       }
 
-      // ------------------------------------
-      // STEP 3: Create assistant message placeholder
-      // ------------------------------------
       const assistantMessage = createAssistantMessage('');
       const assistantMessageId = assistantMessage.id;
 
       updateMessagesWithSync((prev) => [...prev, assistantMessage]);
 
-      // ------------------------------------
-      // STEP 4: Make streaming API call
-      // ------------------------------------
       try {
         await sendStreamingMessage(
           content,
           conversationHistory,
           {
-            // On each chunk, update assistant message
             onChunk: (chunk: string) => {
               updateMessagesWithSync((prev) =>
                 prev.map((msg) =>
@@ -369,7 +359,6 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
                 )
               );
             },
-            // On complete, mark as not streaming and persist to database
             onComplete: async (fullResponse: string) => {
               const finalMessage: Message = {
                 ...assistantMessage,
@@ -378,9 +367,7 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
               };
               updateMessagesWithSync((prev) =>
                 prev.map((msg) =>
-                  msg.id === assistantMessageId
-                    ? finalMessage
-                    : msg
+                  msg.id === assistantMessageId ? finalMessage : msg
                 )
               );
               onResponseComplete?.(fullResponse);
@@ -389,58 +376,14 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
                 responseLength: fullResponse.length,
               });
 
-              // Persist messages to Supabase
+              // Persist to database
               if (currentConversationId) {
-                try {
-                  const supabase = createClient();
-                  const timestamp = new Date().toISOString();
-                  
-                  // Save user message
-                  await supabase.from('messages').insert({
-                    conversation_id: currentConversationId,
-                    role: 'user',
-                    content: content,
-                    created_at: timestamp,
-                    metadata: { version: '2.0.0' }
-                  });
-                  
-                  // Save assistant response  
-                  await supabase.from('messages').insert({
-                    conversation_id: currentConversationId,
-                    role: 'assistant',
-                    content: fullResponse,
-                    created_at: new Date().toISOString(),
-                    metadata: { version: '2.0.0' }
-                  });
-                  
-                  // Update conversation metadata
-                  await supabase
-                    .from('conversations')
-                    .update({ 
-                      updated_at: new Date().toISOString(),
-                      last_message_preview: fullResponse.substring(0, 100)
-                    })
-                    .eq('id', currentConversationId);
-                    
-                  console.log('✅ [PERSIST] Messages saved to database');
-                  logger.info('[PERSIST] Messages saved to database', {
-                    conversationId: currentConversationId,
-                    userMessageLength: content.length,
-                    assistantMessageLength: fullResponse.length,
-                  });
-                } catch (error) {
-                  console.error('❌ [PERSIST] Failed to save messages:', error);
-                  logger.error('[PERSIST] Failed to save messages', error instanceof Error ? error : new Error(String(error)), {
-                    conversationId: currentConversationId,
-                  });
-                }
+                await persistMessages(currentConversationId, content, fullResponse);
               }
             },
-            // On error
             onError: (err: Error) => {
               setError(err);
               onError?.(err);
-              // Remove the empty assistant message on error
               updateMessagesWithSync((prev) =>
                 prev.filter((msg) => msg.id !== assistantMessageId)
               );
@@ -454,7 +397,6 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
         const error = err instanceof Error ? err : new Error(String(err));
         setError(error);
         onError?.(error);
-        // Remove the empty assistant message on error
         updateMessagesWithSync((prev) =>
           prev.filter((msg) => msg.id !== assistantMessageId)
         );
@@ -470,9 +412,10 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
       onError,
       onMessageSent,
       onResponseComplete,
+      onFinish,
+      persistMessages,
       sendStreamingMessage,
       updateMessagesWithSync,
-      onFinish,
     ]
   );
 
@@ -495,7 +438,6 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
 
   const retryLastMessage = useCallback(async () => {
     if (lastSentMessageRef.current) {
-      // Remove the last user message and any assistant response
       updateMessagesWithSync((prev) => {
         const lastUserIndex = prev.findLastIndex((m) => m.role === 'user');
         if (lastUserIndex >= 0) {
@@ -503,8 +445,6 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
         }
         return prev;
       });
-
-      // Retry
       await sendMessage(lastSentMessageRef.current);
     }
   }, [sendMessage, updateMessagesWithSync]);
@@ -514,7 +454,6 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
   const stopGeneration = useCallback(() => {
     abortStream();
     setIsLoading(false);
-    // Mark any streaming messages as no longer streaming
     updateMessagesWithSync((prev) =>
       prev.map((msg) => (msg.isStreaming ? { ...msg, isStreaming: false } : msg))
     );
@@ -522,7 +461,7 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
   }, [abortStream, updateMessagesWithSync]);
 
   const addSystemMessage = useCallback(
-    (content: string, retryAction?: () => void): string => {
+    (content: string): string => {
       const systemMessage: Message = {
         id: createMessageId(),
         role: 'system',
@@ -537,24 +476,18 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
   );
 
   // ---------------------------------------------------------------------------
-  // CONVERSATION LOADING
+  // EFFECTS
   // ---------------------------------------------------------------------------
 
-  /**
-   * Sync initial conversation ID
-   */
   useEffect(() => {
     if (initialConversationId !== currentConversationId) {
       setCurrentConversationId(initialConversationId ?? null);
     }
   }, [initialConversationId, currentConversationId]);
 
-  /**
-   * Initialize ref on mount
-   */
   useEffect(() => {
     messagesRef.current = messages;
-  }, []); // Only on mount - sync updates handle the rest
+  }, []);
 
   // ---------------------------------------------------------------------------
   // RETURN
