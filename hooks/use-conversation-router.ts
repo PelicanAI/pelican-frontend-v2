@@ -81,7 +81,10 @@ export function useConversationRouter({
     if (clearDraftForConversation && currentConversationId) {
       clearDraftForConversation(currentConversationId)
     }
-    setCurrentConversationId(id)
+    
+    // REMOVED: setCurrentConversationId(id) 
+    // Let the URL-sync useEffect handle this instead (lines 63-68)
+    // This prevents race conditions where state updates before URL navigation completes
 
     startTransition(() => {
       router.push(`${ROUTES.CHAT}?conversation=${encodeURIComponent(id)}&_r=${Date.now()}`, { scroll: false })
