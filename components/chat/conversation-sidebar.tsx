@@ -200,7 +200,7 @@ export function ConversationSidebar({
             title="Rename conversation"
             aria-label="Rename conversation"
           >
-            <Edit3 className="h-4 w-4" />
+            <Edit3 className="h-4 w-4 text-sidebar-foreground" />
           </button>
 
           {/* Delete button */}
