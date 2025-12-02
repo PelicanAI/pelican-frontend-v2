@@ -476,13 +476,21 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
   // EFFECTS
   // ---------------------------------------------------------------------------
 
+  // Store loadMessages in a ref to avoid dependency issues
+  const loadMessagesRef = useRef(loadMessages);
+  loadMessagesRef.current = loadMessages;
+
   // Load messages when conversation changes
   useEffect(() => {
     const conversationId = initialConversationId;
     
     // Skip if no conversation ID
     if (!conversationId) {
-      updateMessagesWithSync(() => []);
+      // Only clear if we have messages (avoid unnecessary state updates)
+      if (messagesRef.current.length > 0) {
+        setMessages([]);
+        messagesRef.current = [];
+      }
       setConversationNotFound(false);
       loadedConversationRef.current = null;
       setCurrentConversationId(null);
@@ -497,8 +505,8 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
     // Update current conversation ID
     setCurrentConversationId(conversationId);
     
-    // Load messages
-    loadMessages(conversationId);
+    // Load messages using ref to avoid dependency loop
+    loadMessagesRef.current(conversationId);
     
     // Cleanup: abort loading on unmount or conversation change
     return () => {
@@ -506,7 +514,7 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
         loadingAbortRef.current.abort();
       }
     };
-  }, [initialConversationId, loadMessages, updateMessagesWithSync]);
+  }, [initialConversationId]); // Only depend on conversationId - use refs for functions
 
   // Keep ref in sync with state
   useEffect(() => {
