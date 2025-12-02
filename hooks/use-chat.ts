@@ -5,17 +5,16 @@
  * This hook manages conversation state and message sending with:
  * - Synchronous state/ref updates to prevent race conditions
  * - Proper conversation history capture before API calls
- * - Supabase persistence with RLS-compliant user_id
+ * - Backend-handled message persistence (no dual persistence)
  * - Comprehensive logging for debugging
  * 
  * @author Pelican Engineering
- * @version 2.1.0
+ * @version 2.2.0
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useStreamingChat } from './use-streaming-chat';
 import { logger } from '@/lib/logger';
-import { createClient } from '@/lib/supabase/client';
 import type { Message } from '@/lib/chat-utils';
 
 // =============================================================================
@@ -208,95 +207,6 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
     [getCurrentMessages, currentConversationId]
   );
 
-  // ---------------------------------------------------------------------------
-  // MESSAGE PERSISTENCE
-  // ---------------------------------------------------------------------------
-
-  /**
-   * Persist messages to Supabase with proper user_id for RLS compliance.
-   * CRITICAL: user_id MUST be included for RLS policy to allow insert.
-   */
-  const persistMessages = useCallback(
-    async (
-      conversationId: string,
-      userContent: string,
-      assistantContent: string
-    ): Promise<void> => {
-      try {
-        const supabase = createClient();
-        
-        // Get current user - REQUIRED for RLS policy
-        const { data: { user }, error: authError } = await supabase.auth.getUser();
-        
-        if (authError || !user) {
-          console.error('❌ [PERSIST] Auth error - cannot get user:', authError);
-          logger.error('[PERSIST] Auth error', authError || new Error('No user found'));
-          return;
-        }
-
-        const timestamp = new Date().toISOString();
-
-        // Save user message with user_id
-        const { error: userMsgError } = await supabase.from('messages').insert({
-          conversation_id: conversationId,
-          user_id: user.id,  // CRITICAL: Required for RLS
-          role: 'user',
-          content: userContent,
-          created_at: timestamp,
-          metadata: { version: '2.1.0' }
-        });
-
-        if (userMsgError) {
-          console.error('❌ [PERSIST] Failed to save user message:', userMsgError);
-          logger.error('[PERSIST] User message insert failed', new Error(userMsgError.message));
-          return;
-        }
-
-        // Save assistant response with user_id
-        const { error: assistantMsgError } = await supabase.from('messages').insert({
-          conversation_id: conversationId,
-          user_id: user.id,  // CRITICAL: Required for RLS
-          role: 'assistant',
-          content: assistantContent,
-          created_at: new Date().toISOString(),
-          metadata: { version: '2.1.0' }
-        });
-
-        if (assistantMsgError) {
-          console.error('❌ [PERSIST] Failed to save assistant message:', assistantMsgError);
-          logger.error('[PERSIST] Assistant message insert failed', new Error(assistantMsgError.message));
-          return;
-        }
-
-        // Update conversation metadata
-        const { error: updateError } = await supabase
-          .from('conversations')
-          .update({
-            updated_at: new Date().toISOString(),
-            last_message_preview: assistantContent.substring(0, 100)
-          })
-          .eq('id', conversationId);
-
-        if (updateError) {
-          console.error('❌ [PERSIST] Failed to update conversation:', updateError);
-          logger.error('[PERSIST] Conversation update failed', new Error(updateError.message));
-          return;
-        }
-
-        console.log('✅ [PERSIST] Messages saved to database');
-        logger.info('[PERSIST] Messages saved to database', {
-          conversationId,
-          userId: user.id,
-          userMessageLength: userContent.length,
-          assistantMessageLength: assistantContent.length,
-        });
-      } catch (error) {
-        console.error('❌ [PERSIST] Unexpected error:', error);
-        logger.error('[PERSIST] Unexpected error', error instanceof Error ? error : new Error(String(error)));
-      }
-    },
-    []
-  );
 
   // ---------------------------------------------------------------------------
   // SEND MESSAGE - STREAMING
@@ -375,11 +285,6 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
               logger.info('[CHAT-COMPLETE] Response complete', {
                 responseLength: fullResponse.length,
               });
-
-              // Persist to database
-              if (currentConversationId) {
-                await persistMessages(currentConversationId, content, fullResponse);
-              }
             },
             onError: (err: Error) => {
               setError(err);
@@ -413,7 +318,6 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
       onMessageSent,
       onResponseComplete,
       onFinish,
-      persistMessages,
       sendStreamingMessage,
       updateMessagesWithSync,
     ]

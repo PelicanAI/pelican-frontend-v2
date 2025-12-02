@@ -24,7 +24,6 @@ import { SettingsModal } from "@/components/settings-modal"
 
 export default function ChatPage() {
   const { user, loading: authLoading } = useAuth()
-  const { updateConversation } = useConversations()
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -133,7 +132,6 @@ export default function ChatPage() {
     messages,
     stopGeneration,
     clearMessages,
-    updateConversation,
     clearDraftForConversation: messageHandler.clearDraftForConversation,
   })
 

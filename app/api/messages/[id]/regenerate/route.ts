@@ -1,7 +1,20 @@
+/**
+ * Message Regeneration API Route
+ * 
+ * Regenerates an assistant message using the Pelican API.
+ * 
+ * @version 2.0.0 - UUID Migration Compatible with RLS-safe operations
+ */
+
 import { type NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
+import * as Sentry from "@sentry/nextjs"
+import { updateMessage, logRLSError } from "@/lib/supabase/helpers"
 
-export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function POST(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
     const { id } = await params
     const supabase = await createClient()
@@ -11,11 +24,15 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       data: { user },
       error: authError,
     } = await supabase.auth.getUser()
+
     if (authError || !user) {
-      return NextResponse.json({ error: "Authentication required" }, { status: 401 })
+      return NextResponse.json(
+        { error: "Authentication required" },
+        { status: 401 }
+      )
     }
 
-    // Get the message and its conversation
+    // Get the message and verify ownership through conversation
     const { data: message, error: messageError } = await supabase
       .from("messages")
       .select(`
@@ -32,12 +49,23 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       .single()
 
     if (messageError || !message) {
-      return NextResponse.json({ error: "Message not found" }, { status: 404 })
+      Sentry.captureMessage("Message not found for regeneration", {
+        level: "warning",
+        tags: { action: "regenerate_message", message_id: id },
+        extra: { userId: user.id, error: messageError }
+      })
+      return NextResponse.json(
+        { error: "Message not found" },
+        { status: 404 }
+      )
     }
 
     // Only allow regenerating assistant messages
     if (message.role !== "assistant") {
-      return NextResponse.json({ error: "Can only regenerate assistant messages" }, { status: 400 })
+      return NextResponse.json(
+        { error: "Can only regenerate assistant messages" },
+        { status: 400 }
+      )
     }
 
     // Get conversation context (last 10 messages before this one)
@@ -50,14 +78,25 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       .limit(10)
 
     if (contextError) {
-      console.error("[v0] Error fetching context:", contextError)
-      return NextResponse.json({ error: "Failed to fetch context" }, { status: 500 })
+      console.error("[regenerate] Error fetching context:", contextError)
+      Sentry.captureException(contextError, {
+        tags: { action: "regenerate_fetch_context" },
+        extra: { conversationId: message.conversation_id }
+      })
+      return NextResponse.json(
+        { error: "Failed to fetch context" },
+        { status: 500 }
+      )
     }
 
     // Call Pelican API for regeneration
     const pelApiKey = process.env.PEL_API_KEY
     if (!pelApiKey) {
-      return NextResponse.json({ error: "Pelican API key not configured" }, { status: 500 })
+      console.error("[regenerate] Pelican API key not configured")
+      return NextResponse.json(
+        { error: "Pelican API key not configured" },
+        { status: 500 }
+      )
     }
 
     const pelResponse = await fetch("https://api.pelican.ai/v1/chat/completions", {
@@ -68,40 +107,71 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       },
       body: JSON.stringify({
         model: "gpt-4o-mini",
-        messages: contextMessages.reverse(),
+        messages: contextMessages?.reverse() || [],
         stream: false,
       }),
     })
 
     if (!pelResponse.ok) {
-      console.error("[v0] Pelican API error:", await pelResponse.text())
-      return NextResponse.json({ error: "Failed to regenerate response" }, { status: 500 })
+      const errorText = await pelResponse.text()
+      console.error("[regenerate] Pelican API error:", errorText)
+      Sentry.captureMessage("Pelican API error during regeneration", {
+        level: "error",
+        tags: { action: "regenerate_api_call" },
+        extra: { status: pelResponse.status, error: errorText }
+      })
+      return NextResponse.json(
+        { error: "Failed to regenerate response" },
+        { status: 500 }
+      )
     }
 
     const pelData = await pelResponse.json()
     const newContent = pelData.choices[0]?.message?.content
 
     if (!newContent) {
-      return NextResponse.json({ error: "No response generated" }, { status: 500 })
+      console.error("[regenerate] No content in API response")
+      return NextResponse.json(
+        { error: "No response generated" },
+        { status: 500 }
+      )
     }
 
-    // Update the message with new content
-    const { error: updateError } = await supabase.from("messages").update({ content: newContent }).eq("id", id)
+    // Update the message with new content using RLS-safe helper
+    const { data: updatedMessage, error: updateError, success } = await updateMessage(
+      supabase,
+      id,
+      { content: newContent }
+    )
 
-    if (updateError) {
-      console.error("[v0] Error updating message:", updateError)
-      return NextResponse.json({ error: "Failed to update message" }, { status: 500 })
+    if (!success || updateError) {
+      logRLSError('update', 'messages', updateError, { messageId: id, userId: user.id })
+      return NextResponse.json(
+        { error: "Failed to update message" },
+        { status: updateError?.message?.includes('RLS rejection') ? 403 : 500 }
+      )
     }
 
-    return NextResponse.json({ content: newContent })
+    console.log("[regenerate] Message updated successfully:", id)
+
+    return NextResponse.json({ 
+      content: newContent,
+      message_id: id,
+      updated_at: updatedMessage?.updated_at
+    })
+
   } catch (error) {
-    console.error("[v0] Regenerate message API error:", error)
+    console.error("[regenerate] Unexpected error:", error)
+    Sentry.captureException(error, {
+      tags: { endpoint: "/api/messages/[id]/regenerate", method: "POST" },
+      level: "error"
+    })
     return NextResponse.json(
       {
         error: "Failed to regenerate message",
         details: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 },
+      { status: 500 }
     )
   }
 }

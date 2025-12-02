@@ -12,7 +12,6 @@ interface UseConversationRouterOptions {
   messages: any[]
   stopGeneration: () => void
   clearMessages: () => void
-  updateConversation: (id: string, updates: any) => Promise<boolean>
   clearDraftForConversation?: (id: string) => void
 }
 
@@ -22,12 +21,11 @@ export function useConversationRouter({
   messages,
   stopGeneration,
   clearMessages,
-  updateConversation,
   clearDraftForConversation,
 }: UseConversationRouterOptions) {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const { createConversation, conversations } = useConversations()
+  const { create, conversations } = useConversations()
 
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(null)
   const bootstrappedRef = useRef(false)
@@ -53,12 +51,16 @@ export function useConversationRouter({
         }
       }
 
-      const id = latestId || (await createConversation("New Chat"))?.id
+      const id = latestId || (await create("New Chat"))?.id
       if (id) {
         router.replace(`${ROUTES.CHAT}?conversation=${encodeURIComponent(id)}`, { scroll: false })
       }
     })()
-  }, [searchParams, user, conversations, createConversation, router])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams, user, create, router])
+  // Note: conversations is intentionally excluded from dependencies to prevent
+  // race conditions during navigation. The bootstrap only runs once when there's
+  // no conversation in the URL, and conversations is captured in the closure.
 
   useEffect(() => {
     const cid = searchParams.get("conversation")
@@ -112,7 +114,7 @@ export function useConversationRouter({
 
       console.log("🔵 [New Chat] Creating new conversation...")
       // Create new conversation FIRST (before any state changes)
-      const newConversation = await createConversation("New Chat")
+      const newConversation = await create("New Chat")
       
       if (!newConversation) {
         console.error("🔴 [New Chat] Failed to create conversation")

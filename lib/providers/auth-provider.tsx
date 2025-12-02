@@ -1,10 +1,22 @@
 "use client"
 
-import type React from "react"
+/**
+ * Authentication Provider
+ * 
+ * Handles user authentication state and guest-to-user migration.
+ * 
+ * @version 2.0.0 - RLS-safe operations
+ */
 
+import type React from "react"
 import { createContext, useContext, useEffect, useState, useCallback } from "react"
 import { createClient } from "@/lib/supabase/client"
 import type { User } from "@supabase/supabase-js"
+import { bulkInsertWithRLSCheck, isValidUUID } from "@/lib/supabase/helpers"
+
+// ============================================================================
+// Types
+// ============================================================================
 
 interface AuthContextType {
   user: User | null
@@ -14,95 +26,133 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
+// ============================================================================
+// Constants
+// ============================================================================
+
+const GUEST_CONVERSATIONS_KEY = "pelican_guest_conversations"
+const GUEST_USER_ID_KEY = "pelican_guest_user_id"
+const GUEST_MODE_KEY = "pelican_guest_mode"
+
+// ============================================================================
+// Provider
+// ============================================================================
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
   const supabase = createClient()
 
+  // --------------------------------------------------------------------------
+  // Guest Migration
+  // --------------------------------------------------------------------------
   const migrateGuestConversations = useCallback(async (userId: string) => {
+    // Validate user ID
+    if (!isValidUUID(userId)) {
+      console.error("[Auth] Invalid user ID for migration:", userId)
+      return
+    }
+
     try {
-      const guestConversations = JSON.parse(
-        localStorage.getItem('pelican_guest_conversations') || '[]'
-      )
+      const guestConversationsRaw = localStorage.getItem(GUEST_CONVERSATIONS_KEY)
+      if (!guestConversationsRaw) return
 
-      if (guestConversations.length === 0) return
+      const guestConversations = JSON.parse(guestConversationsRaw)
+      if (!Array.isArray(guestConversations) || guestConversations.length === 0) return
 
-      console.log(`Migrating ${guestConversations.length} guest conversations to user ${userId}`)
+      console.log(`[Auth] Migrating ${guestConversations.length} guest conversations to user ${userId}`)
+
+      let migratedCount = 0
+      let failedCount = 0
 
       for (const guestConv of guestConversations) {
         try {
           // Create conversation in Supabase
           const { data: newConv, error: convError } = await supabase
-            .from('conversations')
+            .from("conversations")
             .insert({
               user_id: userId,
               title: guestConv.title || `Migrated conversation from ${new Date(guestConv.created_at).toLocaleDateString()}`,
               created_at: guestConv.created_at,
               metadata: {
                 migrated_from_guest: true,
-                original_guest_id: guestConv.id
-              }
+                original_guest_id: guestConv.id,
+              },
             })
             .select()
             .single()
 
-          if (convError) {
-            console.error('Failed to migrate conversation:', convError)
+          if (convError || !newConv) {
+            console.error("[Auth] Failed to migrate conversation:", convError)
+            failedCount++
             continue
           }
 
           // Get messages for this conversation
-          const guestMessages = JSON.parse(
-            localStorage.getItem(`pelican_guest_messages_${guestConv.id}`) || '[]'
-          )
+          const guestMessagesRaw = localStorage.getItem(`pelican_guest_messages_${guestConv.id}`)
+          if (guestMessagesRaw) {
+            const guestMessages = JSON.parse(guestMessagesRaw)
 
-          if (guestMessages.length > 0) {
-            // Prepare messages for insertion
-            const messagesToInsert = guestMessages.map((msg: { role: string; content: string; created_at?: string; metadata?: Record<string, unknown> }) => ({
-              conversation_id: newConv.id,
-              user_id: userId,
-              role: msg.role,
-              content: msg.content,
-              created_at: msg.created_at || new Date().toISOString(),
-              metadata: msg.metadata || {}
-            }))
+            if (Array.isArray(guestMessages) && guestMessages.length > 0) {
+              // Prepare messages for insertion
+              const messagesToInsert = guestMessages.map((msg: {
+                role: string
+                content: string
+                created_at?: string
+                metadata?: Record<string, unknown>
+              }) => ({
+                conversation_id: newConv.id,
+                user_id: userId,
+                role: msg.role,
+                content: msg.content,
+                created_at: msg.created_at || new Date().toISOString(),
+                metadata: msg.metadata || {},
+              }))
 
-            // Insert messages
-            const { error: msgError } = await supabase
-              .from('messages')
-              .insert(messagesToInsert)
+              // Insert messages with RLS-safe helper
+              const { success, count, error: msgError } = await bulkInsertWithRLSCheck(
+                supabase,
+                "messages",
+                messagesToInsert
+              )
 
-            if (msgError) {
-              console.error('Failed to migrate messages:', msgError)
-            } else {
-              console.log(`Migrated ${messagesToInsert.length} messages for conversation ${newConv.id}`)
+              if (!success || msgError) {
+                console.error("[Auth] Failed to migrate messages:", msgError)
+              } else {
+                console.log(`[Auth] Migrated ${count} messages for conversation ${newConv.id}`)
+              }
             }
           }
 
           // Clear the guest messages from localStorage
           localStorage.removeItem(`pelican_guest_messages_${guestConv.id}`)
+          migratedCount++
+
         } catch (error) {
-          console.error('Migration error:', error)
+          console.error("[Auth] Migration error for conversation:", error)
+          failedCount++
         }
       }
 
       // Clear all guest data
-      localStorage.removeItem('pelican_guest_conversations')
-      localStorage.removeItem('pelican_guest_mode')
-      localStorage.removeItem('pelican_guest_user_id')
+      localStorage.removeItem(GUEST_CONVERSATIONS_KEY)
+      localStorage.removeItem(GUEST_MODE_KEY)
+      localStorage.removeItem(GUEST_USER_ID_KEY)
 
-      console.log('Guest migration completed')
+      console.log(`[Auth] Guest migration completed: ${migratedCount} succeeded, ${failedCount} failed`)
+
     } catch (error) {
-      console.error('Guest migration failed:', error)
+      console.error("[Auth] Guest migration failed:", error)
     }
   }, [supabase])
 
+  // --------------------------------------------------------------------------
+  // Auth State
+  // --------------------------------------------------------------------------
   useEffect(() => {
     // Get initial session
     const getInitialSession = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession()
+      const { data: { session } } = await supabase.auth.getSession()
       setUser(session?.user ?? null)
       setLoading(false)
     }
@@ -110,14 +160,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     getInitialSession()
 
     // Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       setUser(session?.user ?? null)
       setLoading(false)
 
       // Migrate guest conversations when user logs in
-      if (event === 'SIGNED_IN' && session?.user && typeof window !== 'undefined') {
+      if (event === "SIGNED_IN" && session?.user && typeof window !== "undefined") {
         await migrateGuestConversations(session.user.id)
       }
     })
@@ -125,16 +173,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => subscription.unsubscribe()
   }, [supabase.auth, migrateGuestConversations])
 
+  // --------------------------------------------------------------------------
+  // Sign Out
+  // --------------------------------------------------------------------------
   const signOut = async () => {
     await supabase.auth.signOut()
+    
     // Clear guest mode if set
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('pelican_guest_mode')
+    if (typeof window !== "undefined") {
+      localStorage.removeItem(GUEST_MODE_KEY)
     }
   }
 
-  return <AuthContext.Provider value={{ user, loading, signOut }}>{children}</AuthContext.Provider>
+  return (
+    <AuthContext.Provider value={{ user, loading, signOut }}>
+      {children}
+    </AuthContext.Provider>
+  )
 }
+
+// ============================================================================
+// Hook
+// ============================================================================
 
 export function useAuth() {
   const context = useContext(AuthContext)

@@ -79,7 +79,7 @@ export function MessageActions({
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const { toast } = useToast()
   const router = useRouter()
-  const { createConversation } = useConversations()
+  const { create } = useConversations()
 
   const handlePin = () => {
     onPin?.(message.id)
@@ -148,7 +148,7 @@ export function MessageActions({
 
   const handleBranchChat = async () => {
     try {
-      const conversation = await createConversation("Branched Chat")
+      const conversation = await create("Branched Chat")
       if (conversation) {
         router.push(`/chat?conversation=${conversation.id}&branch=${message.id}`)
         toast({

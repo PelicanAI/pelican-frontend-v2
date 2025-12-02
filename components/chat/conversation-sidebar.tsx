@@ -71,7 +71,7 @@ export function ConversationSidebar({
   const [editTitle, setEditTitle] = useState("")
   const [deletingId, setDeletingId] = useState<string | null>(null)
 
-  const { list: conversations, isLoading, remove, rename } = useConversations()
+  const { list: conversations, loading, remove, rename } = useConversations()
 
   const filteredConversations = useMemo(() => {
     return conversations.filter((conv) => {
@@ -293,7 +293,7 @@ export function ConversationSidebar({
       {/* Conversations List */}
       <ScrollArea className="flex-1 min-h-0">
         <div className="py-2">
-          {isLoading ? (
+          {loading ? (
             <div className="flex items-center justify-center py-12">
               <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary" />
             </div>

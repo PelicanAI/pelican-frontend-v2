@@ -17,7 +17,7 @@ interface TestResult {
 export function ConversationMemoryTest() {
   const [testResults, setTestResults] = useState<TestResult[]>([])
   const [isRunning, setIsRunning] = useState(false)
-  const { conversations, createConversation, deleteConversation, user } = useConversations()
+  const { conversations, create, remove, user } = useConversations()
   const supabase = createClient()
 
   const updateTestResult = (name: string, status: "success" | "error", message: string) => {
@@ -60,7 +60,7 @@ export function ConversationMemoryTest() {
       }
 
       // Test 3: Create Conversation
-      const testConversation = await createConversation("Test Conversation - Memory Check")
+      const testConversation = await create("Test Conversation - Memory Check")
       if (testConversation) {
         updateTestResult("Create Conversation", "success", `Created conversation: ${testConversation.id}`)
 
@@ -131,7 +131,7 @@ export function ConversationMemoryTest() {
           }
 
           // Clean up test conversation
-          await deleteConversation(testConversation.id)
+          await remove(testConversation.id)
         }, 2000)
       } else {
         updateTestResult("Create Conversation", "error", "Failed to create test conversation")
