@@ -97,6 +97,7 @@ export default function ChatPage() {
   const {
     messages,
     isLoading: chatLoading,
+    isLoadingMessages,
     sendMessage,
     stopGeneration,
     clearMessages,
@@ -348,7 +349,7 @@ export default function ChatPage() {
               <ChatContainer
                 messages={messages}
                 isLoading={chatLoading}
-                isLoadingHistory={false}
+                isLoadingHistory={isLoadingMessages}
                 onStopGeneration={handleStopGeneration}
                 onRegenerateMessage={regenerateLastMessage}
                 onQuickStart={handleQuickStart}

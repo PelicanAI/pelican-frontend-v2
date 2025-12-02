@@ -3,13 +3,14 @@
  * =============================================
  * 
  * This hook manages conversation state and message sending with:
+ * - Message loading when conversation changes
  * - Synchronous state/ref updates to prevent race conditions
  * - Proper conversation history capture before API calls
  * - Backend-handled message persistence (no dual persistence)
  * - Comprehensive logging for debugging
  * 
  * @author Pelican Engineering
- * @version 2.2.0
+ * @version 3.0.0
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -53,6 +54,7 @@ interface UseChatReturn {
   retryLastMessage: () => Promise<void>;
   addSystemMessage: (content: string) => string;
   conversationNotFound: boolean;
+  isLoadingMessages: boolean;
 }
 
 interface SendMessageOptions {
@@ -127,6 +129,7 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingMessages, setIsLoadingMessages] = useState(false);
   const [error, setError] = useState<Error | null>(null);
   const [conversationNotFound, setConversationNotFound] = useState(false);
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(
@@ -140,6 +143,7 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
   const messagesRef = useRef<Message[]>([]);
   const loadedConversationRef = useRef<string | null>(null);
   const lastSentMessageRef = useRef<string | null>(null);
+  const loadingAbortRef = useRef<AbortController | null>(null);
 
   // ---------------------------------------------------------------------------
   // STREAMING HOOK
@@ -207,6 +211,94 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
     [getCurrentMessages, currentConversationId]
   );
 
+  // ---------------------------------------------------------------------------
+  // LOAD MESSAGES
+  // ---------------------------------------------------------------------------
+
+  const loadMessages = useCallback(async (conversationId: string): Promise<boolean> => {
+    // Abort any in-flight load
+    if (loadingAbortRef.current) {
+      loadingAbortRef.current.abort();
+    }
+    
+    const abortController = new AbortController();
+    loadingAbortRef.current = abortController;
+    
+    logger.info('[CHAT-LOAD] Loading conversation', { conversationId });
+    setIsLoadingMessages(true);
+    setError(null);
+    setConversationNotFound(false);
+    
+    // Clear existing messages immediately
+    updateMessagesWithSync(() => []);
+    
+    try {
+      const response = await fetch(`/api/conversations/${conversationId}/messages`, {
+        signal: abortController.signal,
+      });
+      
+      if (abortController.signal.aborted) {
+        return false;
+      }
+      
+      if (response.status === 404) {
+        logger.warn('[CHAT-LOAD] Conversation not found', { conversationId });
+        setConversationNotFound(true);
+        loadedConversationRef.current = null;
+        return false;
+      }
+      
+      if (!response.ok) {
+        throw new Error(`Failed to load messages: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      if (abortController.signal.aborted) {
+        return false;
+      }
+      
+      // Transform API messages to our Message format
+      const loadedMessages: Message[] = (data.messages || []).map((msg: any) => ({
+        id: msg.id || createMessageId(),
+        role: msg.role as 'user' | 'assistant' | 'system',
+        content: msg.content,
+        timestamp: new Date(msg.created_at || Date.now()),
+        isStreaming: false,
+      }));
+      
+      logger.info('[CHAT-LOAD] Loaded messages', { 
+        conversationId, 
+        count: loadedMessages.length 
+      });
+      
+      updateMessagesWithSync(() => loadedMessages);
+      loadedConversationRef.current = conversationId;
+      return true;
+      
+    } catch (err) {
+      if (abortController.signal.aborted) {
+        return false;
+      }
+      
+      const error = err instanceof Error ? err : new Error(String(err));
+      
+      // Don't log abort errors
+      if (error.name !== 'AbortError') {
+        logger.error('[CHAT-LOAD] Failed to load messages', error);
+        setError(error);
+        onError?.(error);
+      }
+      return false;
+    } finally {
+      if (!abortController.signal.aborted) {
+        setIsLoadingMessages(false);
+      }
+      if (loadingAbortRef.current === abortController) {
+        loadingAbortRef.current = null;
+      }
+    }
+  }, [updateMessagesWithSync, onError]);
 
   // ---------------------------------------------------------------------------
   // SEND MESSAGE - STREAMING
@@ -337,6 +429,7 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
   const clearMessages = useCallback(() => {
     updateMessagesWithSync(() => []);
     setError(null);
+    loadedConversationRef.current = null;
     logger.info('[CHAT-CLEAR] Messages cleared');
   }, [updateMessagesWithSync]);
 
@@ -383,15 +476,42 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
   // EFFECTS
   // ---------------------------------------------------------------------------
 
+  // Load messages when conversation changes
   useEffect(() => {
-    if (initialConversationId !== currentConversationId) {
-      setCurrentConversationId(initialConversationId ?? null);
+    const conversationId = initialConversationId;
+    
+    // Skip if no conversation ID
+    if (!conversationId) {
+      updateMessagesWithSync(() => []);
+      setConversationNotFound(false);
+      loadedConversationRef.current = null;
+      setCurrentConversationId(null);
+      return;
     }
-  }, [initialConversationId, currentConversationId]);
+    
+    // Skip if already loaded this conversation
+    if (loadedConversationRef.current === conversationId) {
+      return;
+    }
 
+    // Update current conversation ID
+    setCurrentConversationId(conversationId);
+    
+    // Load messages
+    loadMessages(conversationId);
+    
+    // Cleanup: abort loading on unmount or conversation change
+    return () => {
+      if (loadingAbortRef.current) {
+        loadingAbortRef.current.abort();
+      }
+    };
+  }, [initialConversationId, loadMessages, updateMessagesWithSync]);
+
+  // Keep ref in sync with state
   useEffect(() => {
     messagesRef.current = messages;
-  }, []);
+  }, [messages]);
 
   // ---------------------------------------------------------------------------
   // RETURN
@@ -409,6 +529,7 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
     retryLastMessage,
     addSystemMessage,
     conversationNotFound,
+    isLoadingMessages,
   };
 }
 
