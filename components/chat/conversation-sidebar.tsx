@@ -187,8 +187,8 @@ export function ConversationSidebar({
           </h3>
         </div>
 
-        {/* Action buttons - VISIBLE ON HOVER */}
-        <div className="flex items-center gap-1 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+        {/* Action buttons - Always visible with hover enhancement */}
+        <div className="flex items-center gap-1 flex-shrink-0">
           {/* Rename button */}
           <button
             onClick={(e) => {
@@ -196,11 +196,11 @@ export function ConversationSidebar({
               setEditingId(conversation.id)
               setEditTitle(conversation.title || t.common.newChat)
             }}
-            className="p-1.5 rounded hover:bg-sidebar-accent transition-colors"
+            className="p-1.5 rounded hover:bg-sidebar-accent transition-colors opacity-70 hover:opacity-100 text-muted-foreground hover:text-sidebar-foreground"
             title="Rename conversation"
             aria-label="Rename conversation"
           >
-            <Edit3 className="h-4 w-4 text-sidebar-foreground" />
+            <Edit3 className="h-4 w-4" />
           </button>
 
           {/* Delete button */}
@@ -209,11 +209,11 @@ export function ConversationSidebar({
               e.stopPropagation()
               setDeletingId(conversation.id)
             }}
-            className="p-1.5 rounded hover:bg-red-500/20 transition-colors"
+            className="p-1.5 rounded hover:bg-red-500/20 transition-colors opacity-70 hover:opacity-100"
             title="Delete conversation"
             aria-label="Delete conversation"
           >
-            <Trash2 className="h-4 w-4 text-red-400" />
+            <Trash2 className="h-4 w-4 text-red-500 dark:text-red-400" />
           </button>
         </div>
       </div>
