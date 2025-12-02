@@ -32,9 +32,9 @@ export async function GET(
       return NextResponse.json({ error: 'Conversation not found' }, { status: 404 })
     }
 
-    // Fetch messages for this conversation
+    // Fetch messages for this conversation from memory_messages table
     const { data: messages, error: msgError } = await supabase
-      .from('messages')
+      .from('memory_messages')
       .select('id, role, content, created_at')
       .eq('conversation_id', conversationId)
       .eq('user_id', user.id)
