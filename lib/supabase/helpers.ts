@@ -238,13 +238,11 @@ export async function upsertWithRLSCheck<T = Record<string, unknown>>(
   }
 ): Promise<RLSResult<T>> {
   try {
-    let query = supabase.from(table).upsert(values)
-    
-    if (options?.onConflict) {
-      query = query.onConflict(options.onConflict)
-    }
-    
-    const { data, error } = await query.select().single()
+    const { data, error } = await supabase
+      .from(table)
+      .upsert(values, options?.onConflict ? { onConflict: options.onConflict } : undefined)
+      .select()
+      .single()
     
     if (error) {
       return { data: null, error, success: false }
