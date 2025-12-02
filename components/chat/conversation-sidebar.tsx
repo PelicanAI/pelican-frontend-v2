@@ -429,7 +429,10 @@ export function ConversationSidebar({
           <AlertDialogFooter>
             <AlertDialogCancel className="hover:bg-muted">{t.common.cancel}</AlertDialogCancel>
             <AlertDialogAction
-              onClick={handleDeleteConversation}
+              onClick={(e) => {
+                e.preventDefault()
+                handleDeleteConversation()
+              }}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90 focus:ring-destructive"
             >
               {t.common.delete}
