@@ -351,9 +351,7 @@ export function logRLSError(
   
   // Server-side Sentry (Next.js API routes)
   if (typeof window === 'undefined') {
-    try {
-      // Dynamic import to avoid bundling issues
-      const Sentry = require('@sentry/nextjs')
+    import('@sentry/nextjs').then((Sentry) => {
       Sentry.captureException(
         error instanceof Error ? error : new Error(errorMessage),
         {
@@ -361,9 +359,9 @@ export function logRLSError(
           extra: context
         }
       )
-    } catch {
+    }).catch(() => {
       // Sentry not available, skip
-    }
+    })
   }
   
   // Client-side Sentry
