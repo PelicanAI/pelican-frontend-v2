@@ -4,7 +4,10 @@ import { useState, useCallback } from "react"
 import type { ChatInputRef } from "@/components/chat/chat-input"
 import { ACCEPTED_FILE_TYPES, LIMITS, API_ENDPOINTS } from "@/lib/constants"
 
-const isAcceptedFileType = (file: File) => ACCEPTED_FILE_TYPES.includes(file.type as any)
+const isAcceptedFileType = (file: File) => {
+  // Check if MIME type exists as a key in ACCEPTED_FILE_TYPES
+  return file.type in ACCEPTED_FILE_TYPES
+}
 
 interface PendingAttachment {
   file: File

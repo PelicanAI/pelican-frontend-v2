@@ -1,3 +1,5 @@
+import { ACCEPTED_FILE_TYPES } from "@/lib/constants"
+
 export interface UploadedFile {
   id: string
   file: File
@@ -5,27 +7,6 @@ export interface UploadedFile {
   type: "image" | "spreadsheet" | "document"
   uploadedAt: Date
 }
-
-export const ACCEPTED_FILE_TYPES = {
-  // Images
-  "image/jpeg": [".jpg", ".jpeg"],
-  "image/png": [".png"],
-  "image/gif": [".gif"],
-  "image/webp": [".webp"],
-
-  // Documents
-  "application/pdf": [".pdf"],
-  "text/plain": [".txt"],
-  "text/csv": [".csv"],
-
-  // Excel files
-  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [".xlsx"],
-  "application/vnd.ms-excel": [".xls"],
-
-  // Word documents
-  "application/vnd.openxmlformats-officedocument.wordprocessingml.document": [".docx"],
-  "application/msword": [".doc"],
-} as const
 
 export function createUploadedFile(file: File): UploadedFile {
   return {

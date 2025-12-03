@@ -5,29 +5,147 @@ import { createHash } from "crypto"
 import { sanitizeFilename } from "@/lib/sanitize"
 import { captureException, addBreadcrumb } from "@/lib/sentry"
 
-const MAX_FILE_SIZE = 15 * 1024 * 1024 // 15MB in bytes
+// =============================================================================
+// Configuration
+// =============================================================================
 
-const ALLOWED_MIME_TYPES = [
-  "image/png",
-  "image/jpeg",
-  "application/pdf",
-  "text/csv",
-  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-]
+const MAX_FILE_SIZE = 25 * 1024 * 1024 // 25MB - generous for trading data files
 
-const MAGIC_BYTES = {
+// Comprehensive MIME type support for trading AI platform
+const ALLOWED_MIME_TYPES: Record<string, string[]> = {
+  images: [
+    "image/png",
+    "image/jpeg",
+    "image/jpg",
+    "image/gif",
+    "image/webp",
+    "image/bmp",
+    "image/tiff",
+    "image/svg+xml",
+    "image/heic",
+    "image/heif",
+  ],
+  documents: [
+    "application/pdf",
+    "application/msword",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "application/rtf",
+    "text/rtf",
+  ],
+  spreadsheets: [
+    "application/vnd.ms-excel",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "application/vnd.oasis.opendocument.spreadsheet",
+  ],
+  data: [
+    "text/csv",
+    "application/csv",
+    "text/comma-separated-values",
+    "text/plain",
+    "text/tab-separated-values",
+    "application/json",
+    "text/json",
+    "application/xml",
+    "text/xml",
+  ],
+  archives: [
+    "application/zip",
+    "application/x-zip-compressed",
+    "application/gzip",
+    "application/x-gzip",
+  ],
+}
+
+const ALL_ALLOWED_MIME_TYPES = Object.values(ALLOWED_MIME_TYPES).flat()
+
+const EXTENSION_TO_MIME: Record<string, string> = {
+  ".png": "image/png",
+  ".jpg": "image/jpeg",
+  ".jpeg": "image/jpeg",
+  ".gif": "image/gif",
+  ".webp": "image/webp",
+  ".bmp": "image/bmp",
+  ".tiff": "image/tiff",
+  ".tif": "image/tiff",
+  ".svg": "image/svg+xml",
+  ".heic": "image/heic",
+  ".heif": "image/heif",
+  ".pdf": "application/pdf",
+  ".doc": "application/msword",
+  ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  ".rtf": "application/rtf",
+  ".xls": "application/vnd.ms-excel",
+  ".xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  ".ods": "application/vnd.oasis.opendocument.spreadsheet",
+  ".csv": "text/csv",
+  ".tsv": "text/tab-separated-values",
+  ".txt": "text/plain",
+  ".json": "application/json",
+  ".xml": "application/xml",
+  ".zip": "application/zip",
+  ".gz": "application/gzip",
+}
+
+const MAGIC_BYTES: Record<string, number[]> = {
   "image/png": [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a],
   "image/jpeg": [0xff, 0xd8, 0xff],
-  "application/pdf": [0x25, 0x50, 0x44, 0x46], // %PDF
-  "text/csv": [], // CSV has no magic bytes, will skip validation
-  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [0x50, 0x4b, 0x03, 0x04], // ZIP signature (XLSX is ZIP-based)
+  "image/jpg": [0xff, 0xd8, 0xff],
+  "image/gif": [0x47, 0x49, 0x46],
+  "image/webp": [0x52, 0x49, 0x46, 0x46],
+  "image/bmp": [0x42, 0x4d],
+  "image/tiff": [],
+  "image/svg+xml": [],
+  "image/heic": [],
+  "image/heif": [],
+  "application/pdf": [0x25, 0x50, 0x44, 0x46],
+  "application/msword": [0xd0, 0xcf, 0x11, 0xe0],
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document": [0x50, 0x4b, 0x03, 0x04],
+  "application/rtf": [0x7b, 0x5c, 0x72, 0x74, 0x66],
+  "text/rtf": [0x7b, 0x5c, 0x72, 0x74, 0x66],
+  "application/vnd.ms-excel": [0xd0, 0xcf, 0x11, 0xe0],
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [0x50, 0x4b, 0x03, 0x04],
+  "application/vnd.oasis.opendocument.spreadsheet": [0x50, 0x4b, 0x03, 0x04],
+  "text/csv": [],
+  "application/csv": [],
+  "text/comma-separated-values": [],
+  "text/plain": [],
+  "text/tab-separated-values": [],
+  "application/json": [],
+  "text/json": [],
+  "application/xml": [],
+  "text/xml": [],
+  "application/zip": [0x50, 0x4b, 0x03, 0x04],
+  "application/x-zip-compressed": [0x50, 0x4b, 0x03, 0x04],
+  "application/gzip": [0x1f, 0x8b],
+  "application/x-gzip": [0x1f, 0x8b],
+}
+
+// =============================================================================
+// Helper Functions
+// =============================================================================
+
+function normalizeMimeType(mimeType: string): string {
+  const parts = mimeType.split(";")
+  return (parts[0] || mimeType).trim().toLowerCase()
+}
+
+function inferMimeType(filename: string, declaredType: string): string {
+  const normalized = normalizeMimeType(declaredType)
+  if (ALL_ALLOWED_MIME_TYPES.includes(normalized)) {
+    return normalized
+  }
+  const ext = "." + filename.split(".").pop()?.toLowerCase()
+  if (ext && EXTENSION_TO_MIME[ext]) {
+    console.log(`[UPLOAD] MIME inferred from extension: ${declaredType} -> ${EXTENSION_TO_MIME[ext]}`)
+    return EXTENSION_TO_MIME[ext]
+  }
+  return normalized
 }
 
 function validateMagicBytes(buffer: ArrayBuffer, mimeType: string): boolean {
-  const magicBytes = MAGIC_BYTES[mimeType as keyof typeof MAGIC_BYTES]
-  if (!magicBytes || magicBytes.length === 0) return true // Skip validation for types without magic bytes
-
-  const fileBytes = new Uint8Array(buffer.slice(0, Math.max(8, magicBytes.length)))
+  const magicBytes = MAGIC_BYTES[mimeType]
+  if (!magicBytes || magicBytes.length === 0) return true
+  const fileBytes = new Uint8Array(buffer.slice(0, Math.max(16, magicBytes.length)))
   return magicBytes.every((byte, index) => fileBytes[index] === byte)
 }
 
@@ -37,44 +155,49 @@ function computeChecksum(buffer: ArrayBuffer): string {
   return hash.digest("hex")
 }
 
+function getFileCategory(mimeType: string): string {
+  for (const [category, types] of Object.entries(ALLOWED_MIME_TYPES)) {
+    if (types.includes(mimeType)) return category
+  }
+  return "unknown"
+}
+
+// =============================================================================
+// Main Handler
+// =============================================================================
+
 export async function POST(request: NextRequest) {
   const requestId = uuidv4()
   let userId: string | undefined
   let guestId: string | undefined
-  let fileMeta: { name: string; type: string; size: number; checksum?: string } | undefined
+  let fileMeta: { name: string; type: string; size: number; checksum?: string; category?: string } | undefined
 
   try {
     addBreadcrumb("Upload request started", { requestId })
     console.log(`[${requestId}] Upload request started`)
 
     const supabase = createClient(
-      process.env.SUPABASE_URL!, 
+      process.env.SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!,
       {
         auth: {
           autoRefreshToken: false,
           persistSession: false,
-          detectSessionInUrl: false
-        }
+          detectSessionInUrl: false,
+        },
       }
     )
 
     const authHeader = request.headers.get("authorization")
     if (authHeader) {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser(authHeader.replace("Bearer ", ""))
-      userId = user?.id
+      const { data } = await supabase.auth.getUser(authHeader.replace("Bearer ", ""))
+      userId = data.user?.id
     }
     if (!userId) {
       const forwarded = request.headers.get("x-forwarded-for")
       const ip = forwarded?.split(",")[0]?.trim() || "unknown"
       guestId = `guest_${ip}`
     }
-
-    // Skip bucket listing/creation - assume pelican bucket exists
-    // RLS on storage.buckets prevents listing, but we can still upload to the bucket
-    console.log(`[${requestId}] Using pelican bucket (assumed to exist)`)
 
     const formData = await request.formData()
     const file = formData.get("file") as File
@@ -85,90 +208,72 @@ export async function POST(request: NextRequest) {
     }
 
     const sanitizedFilename = sanitizeFilename(file.name)
+    const mimeType = inferMimeType(sanitizedFilename, file.type)
+    const category = getFileCategory(mimeType)
 
-    fileMeta = {
-      name: sanitizedFilename,
-      type: file.type,
-      size: file.size,
-    }
-
+    fileMeta = { name: sanitizedFilename, type: mimeType, size: file.size, category }
+    console.log(`[${requestId}] File: ${sanitizedFilename} (${mimeType}, ${category}, ${file.size} bytes)`)
     addBreadcrumb("File received", { requestId, fileMeta })
 
-    if (!ALLOWED_MIME_TYPES.includes(file.type)) {
-      console.log(`[${requestId}] Unsupported MIME type: ${file.type}`)
+    if (!ALL_ALLOWED_MIME_TYPES.includes(mimeType)) {
+      console.log(`[${requestId}] Unsupported MIME type: ${mimeType}`)
       return NextResponse.json(
-        {
-          error: "Unsupported file type",
-          code: "unsupported_type",
-        },
-        { status: 400 },
+        { error: `Unsupported file type: ${mimeType}`, code: "unsupported_type" },
+        { status: 400 }
       )
     }
 
     if (file.size > MAX_FILE_SIZE) {
       console.log(`[${requestId}] File too large: ${file.size} bytes`)
-      return NextResponse.json({ error: "File size exceeds 15MB limit" }, { status: 413 })
+      return NextResponse.json(
+        { error: `File exceeds ${MAX_FILE_SIZE / 1024 / 1024}MB limit`, code: "file_too_large" },
+        { status: 413 }
+      )
+    }
+
+    if (file.size === 0) {
+      return NextResponse.json({ error: "Empty files not allowed", code: "empty_file" }, { status: 400 })
     }
 
     const fileBuffer = await file.arrayBuffer()
 
-    if (!validateMagicBytes(fileBuffer, file.type)) {
-      console.log(`[${requestId}] MIME type mismatch for ${file.type}`)
+    if (!validateMagicBytes(fileBuffer, mimeType)) {
+      console.log(`[${requestId}] Magic bytes validation failed`)
       return NextResponse.json(
-        {
-          error: "File content doesn't match declared type",
-          code: "mime_mismatch",
-        },
-        { status: 400 },
+        { error: "File content doesn't match declared type", code: "mime_mismatch" },
+        { status: 400 }
       )
     }
 
     const checksum = computeChecksum(fileBuffer)
     fileMeta.checksum = checksum
-    console.log(`[${requestId}] File checksum: ${checksum}`)
-
-    addBreadcrumb("File validated and checksum computed", { requestId, checksum })
-
-    // const existingFile = await getByChecksum(checksum, file.type, file.size)
+    console.log(`[${requestId}] Checksum: ${checksum.substring(0, 16)}...`)
 
     const now = new Date()
-    const year = now.getFullYear()
-    const month = String(now.getMonth() + 1).padStart(2, "0")
-    const uuid = uuidv4()
-    const fileExtension = sanitizedFilename.split(".").pop() || "bin"
-    const storageKey = `${year}/${month}/${uuid}.${fileExtension}`
+    const storageKey = `${now.getFullYear()}/${String(now.getMonth() + 1).padStart(2, "0")}/${uuidv4()}.${sanitizedFilename.split(".").pop()?.toLowerCase() || "bin"}`
 
-    console.log(`[${requestId}] Uploading new file: ${file.name} (${file.size} bytes) as ${storageKey}`)
-    addBreadcrumb("Uploading new file", { requestId, storageKey })
+    console.log(`[${requestId}] Uploading -> ${storageKey}`)
 
-    const { data: uploadData, error: uploadError } = await supabase.storage
+    const { error: uploadError } = await supabase.storage
       .from("pelican")
       .upload(storageKey, fileBuffer, {
-        contentType: file.type,
+        contentType: mimeType,
         cacheControl: "3600",
         upsert: false,
       })
 
     if (uploadError) {
-      console.error(`[${requestId}] Upload error:`, uploadError)
-      captureException(new Error(`File upload failed: ${uploadError.message}`), {
-        reqId: requestId,
-        userId,
-        guestId,
-        fileMeta,
-      })
-      return NextResponse.json({ error: "Failed to upload file" }, { status: 500 })
+      console.error(`[${requestId}] Storage error:`, uploadError)
+      captureException(new Error(`Upload failed: ${uploadError.message}`), { reqId: requestId, userId, guestId, fileMeta })
+      return NextResponse.json({ error: "Failed to upload file", code: "storage_error" }, { status: 500 })
     }
 
-    addBreadcrumb("File uploaded to storage successfully", { requestId, storageKey })
-
-    // Save file metadata to database
     const { data: fileRecord, error: dbError } = await supabase
       .from("files")
       .insert({
         user_id: userId || null,
         storage_path: storageKey,
-        mime_type: file.type,
+        mime_type: mimeType,
         name: sanitizedFilename,
         size: file.size,
       })
@@ -176,57 +281,37 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (dbError || !fileRecord) {
-      console.error(`[${requestId}] Database insert error:`, dbError)
-      // Clean up: delete the uploaded file from storage since DB insert failed
+      console.error(`[${requestId}] DB error:`, dbError)
       await supabase.storage.from("pelican").remove([storageKey])
-      captureException(new Error(`Failed to save file metadata: ${dbError?.message}`), {
-        reqId: requestId,
-        userId,
-        guestId,
-        fileMeta,
-      })
-      return NextResponse.json({ error: "Failed to save file metadata" }, { status: 500 })
+      captureException(new Error(`DB insert failed: ${dbError?.message}`), { reqId: requestId, userId, guestId, fileMeta })
+      return NextResponse.json({ error: "Failed to save file metadata", code: "database_error" }, { status: 500 })
     }
-
-    const fileId = fileRecord.id
-    addBreadcrumb("File metadata saved to database", { requestId, fileId })
 
     const { data: signedUrlData, error: signedUrlError } = await supabase.storage
       .from("pelican")
-      .createSignedUrl(storageKey, 7 * 24 * 60 * 60) // 7 days in seconds
+      .createSignedUrl(storageKey, 7 * 24 * 60 * 60)
 
     if (signedUrlError) {
       console.error(`[${requestId}] Signed URL error:`, signedUrlError)
-      captureException(new Error(`Failed to generate signed URL: ${signedUrlError.message}`), {
-        reqId: requestId,
-        userId,
-        guestId,
-        fileMeta,
-      })
-      return NextResponse.json({ error: "Failed to generate access URL" }, { status: 500 })
+      return NextResponse.json({ error: "Failed to generate access URL", code: "signed_url_error" }, { status: 500 })
     }
 
-    console.log(`[${requestId}] Upload successful: ${storageKey}`)
-    addBreadcrumb("Upload completed successfully", { requestId, storageKey })
+    console.log(`[${requestId}] ✅ Upload complete: ${sanitizedFilename} -> ${fileRecord.id}`)
 
     return NextResponse.json({
-      id: fileId,
+      id: fileRecord.id,
       url: signedUrlData.signedUrl,
       key: storageKey,
-      name: file.name,
-      type: file.type,
+      name: sanitizedFilename,
+      type: mimeType,
       size: file.size,
       checksum,
       public: false,
     })
+
   } catch (error) {
-    console.error(`[${requestId}] Upload API error:`, error)
-    captureException(error instanceof Error ? error : new Error(String(error)), {
-      reqId: requestId,
-      userId,
-      guestId,
-      fileMeta,
-    })
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
+    console.error(`[${requestId}] Upload error:`, error)
+    captureException(error instanceof Error ? error : new Error(String(error)), { reqId: requestId, userId, guestId, fileMeta })
+    return NextResponse.json({ error: "Internal server error", code: "internal_error" }, { status: 500 })
   }
 }

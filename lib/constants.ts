@@ -1,5 +1,5 @@
 export const LIMITS = {
-  FILE_SIZE_MB: 15,
+  FILE_SIZE_MB: 25, // Updated to match backend 25MB limit
   MESSAGE_CONTEXT: 150, // Context window for comprehensive conversation history
   CHAT_MAX_TOKENS: 4000,
   FREE_TIER_MESSAGES: 10,
@@ -31,15 +31,40 @@ export const PLACEHOLDERS = [
   "Get insights on your portfolio...",
 ] as const
 
-export const ACCEPTED_FILE_TYPES = [
-  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-  "application/vnd.ms-excel",
-  "text/csv",
-  "application/pdf",
-  "image/jpeg",
-  "image/png",
-  "text/plain",
-] as const
+export const ACCEPTED_FILE_TYPES = {
+  // Images
+  "image/png": [".png"],
+  "image/jpeg": [".jpg", ".jpeg"],
+  "image/gif": [".gif"],
+  "image/webp": [".webp"],
+  "image/bmp": [".bmp"],
+  "image/tiff": [".tiff", ".tif"],
+  "image/svg+xml": [".svg"],
+  "image/heic": [".heic"],
+  "image/heif": [".heif"],
+  // Documents
+  "application/pdf": [".pdf"],
+  "application/msword": [".doc"],
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document": [".docx"],
+  "application/rtf": [".rtf"],
+  // Spreadsheets
+  "application/vnd.ms-excel": [".xls"],
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [".xlsx"],
+  "application/vnd.oasis.opendocument.spreadsheet": [".ods"],
+  // Data files
+  "text/csv": [".csv"],
+  "application/csv": [".csv"],
+  "text/plain": [".txt"],
+  "text/tab-separated-values": [".tsv"],
+  "application/json": [".json"],
+  "application/xml": [".xml"],
+  "text/xml": [".xml"],
+  // Archives
+  "application/zip": [".zip"],
+  "application/gzip": [".gz"],
+} as const
+
+export const MAX_FILE_SIZE = 25 * 1024 * 1024 // 25MB - match backend
 
 export const FILE_TYPE_NAMES = {
   xlsx: "Excel",
