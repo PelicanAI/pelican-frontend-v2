@@ -36,7 +36,7 @@ const CHUNK_TIMEOUT_MS = 30000; // 30 seconds between chunks
 
 interface StreamCallbacks {
   onChunk?: (chunk: string) => void;
-  onComplete?: (fullResponse: string) => void | Promise<void>;
+  onComplete?: (fullResponse: string, conversationId?: string) => void | Promise<void>;
   onError?: (error: Error) => void;
 }
 
@@ -74,7 +74,7 @@ interface UseStreamingChatReturn {
 /**
  * Parse SSE data from a chunk
  */
-function parseSSEChunk(chunk: string): { content?: string; done?: boolean; error?: string } | null {
+function parseSSEChunk(chunk: string): { content?: string; done?: boolean; error?: string; conversationId?: string; sessionId?: string } | null {
   if (!chunk.startsWith('data: ')) {
     return null;
   }
@@ -91,6 +91,8 @@ function parseSSEChunk(chunk: string): { content?: string; done?: boolean; error
       content: data.delta || data.content,  // Backend sends "delta", not "content"
       done: data.type === 'done' || data.done,  // Backend sends type: "done"
       error: data.error,
+      conversationId: data.conversation_id,
+      sessionId: data.session_id,
     };
   } catch (e) {
     logger.warn('[STREAM-PARSE] Failed to parse SSE chunk', { chunk, error: e });
@@ -219,6 +221,7 @@ export function useStreamingChat(): UseStreamingChatReturn {
 
       let fullResponse = '';
       let lastChunkTime = Date.now();
+      let capturedConversationId: string | undefined;
 
       try {
         // Get Supabase session token for authentication
@@ -306,7 +309,16 @@ export function useStreamingChat(): UseStreamingChatReturn {
             }
 
             if (parsed.done) {
-              logger.info('[STREAM-COMPLETE] Received done signal');
+              // Capture conversation ID from done event
+              const backendConversationId = parsed.conversationId || parsed.sessionId;
+              if (backendConversationId) {
+                capturedConversationId = backendConversationId;
+                logger.info('[STREAM-COMPLETE] Received done signal with conversation ID', {
+                  conversationId: backendConversationId,
+                });
+              } else {
+                logger.info('[STREAM-COMPLETE] Received done signal');
+              }
               continue;
             }
 
@@ -326,8 +338,8 @@ export function useStreamingChat(): UseStreamingChatReturn {
           }
         }
 
-        // Call complete callback
-        callbacks.onComplete?.(fullResponse);
+        // Call complete callback with conversation ID
+        callbacks.onComplete?.(fullResponse, capturedConversationId);
 
       } catch (error) {
         if (signal.aborted) {

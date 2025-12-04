@@ -361,7 +361,16 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
                 )
               );
             },
-            onComplete: async (fullResponse: string) => {
+            onComplete: async (fullResponse: string, newConversationId?: string) => {
+              // Capture conversation ID from backend for new conversations
+              if (!currentConversationId && newConversationId) {
+                logger.info('[CHAT-COMPLETE] Capturing conversation ID from backend', {
+                  conversationId: newConversationId,
+                });
+                setCurrentConversationId(newConversationId);
+                onConversationCreated?.(newConversationId);
+              }
+
               const finalMessage: Message = {
                 ...assistantMessage,
                 content: fullResponse,
@@ -376,6 +385,7 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
               onFinish?.(finalMessage);
               logger.info('[CHAT-COMPLETE] Response complete', {
                 responseLength: fullResponse.length,
+                conversationId: newConversationId || currentConversationId,
               });
             },
             onError: (err: Error) => {
