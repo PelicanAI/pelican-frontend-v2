@@ -1,4 +1,4 @@
-import { createClient } from "@supabase/supabase-js"
+import { createClient } from "@/lib/supabase/server"
 import { type NextRequest, NextResponse } from "next/server"
 import { v4 as uuidv4 } from "uuid"
 import { createHash } from "crypto"
@@ -168,36 +168,19 @@ function getFileCategory(mimeType: string): string {
 
 export async function POST(request: NextRequest) {
   const requestId = uuidv4()
-  let userId: string | undefined
-  let guestId: string | undefined
   let fileMeta: { name: string; type: string; size: number; checksum?: string; category?: string } | undefined
 
   try {
     addBreadcrumb("Upload request started", { requestId })
     console.log(`[${requestId}] Upload request started`)
 
-    const supabase = createClient(
-      process.env.SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!,
-      {
-        auth: {
-          autoRefreshToken: false,
-          persistSession: false,
-          detectSessionInUrl: false,
-        },
-      }
-    )
+    const supabase = await createClient()
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
 
-    const authHeader = request.headers.get("authorization")
-    if (authHeader) {
-      const { data } = await supabase.auth.getUser(authHeader.replace("Bearer ", ""))
-      userId = data.user?.id
+    if (authError || !user) {
+      return NextResponse.json({ error: "Authentication required" }, { status: 401 })
     }
-    if (!userId) {
-      const forwarded = request.headers.get("x-forwarded-for")
-      const ip = forwarded?.split(",")[0]?.trim() || "unknown"
-      guestId = `guest_${ip}`
-    }
+    const userId = user.id
 
     const formData = await request.formData()
     const file = formData.get("file") as File
@@ -264,14 +247,14 @@ export async function POST(request: NextRequest) {
 
     if (uploadError) {
       console.error(`[${requestId}] Storage error:`, uploadError)
-      captureException(new Error(`Upload failed: ${uploadError.message}`), { reqId: requestId, userId, guestId, fileMeta })
+      captureException(new Error(`Upload failed: ${uploadError.message}`), { reqId: requestId, userId, fileMeta })
       return NextResponse.json({ error: "Failed to upload file", code: "storage_error" }, { status: 500 })
     }
 
     const { data: fileRecord, error: dbError } = await supabase
       .from("files")
       .insert({
-        user_id: userId || null,
+        user_id: userId,
         storage_path: storageKey,
         mime_type: mimeType,
         name: sanitizedFilename,
@@ -283,7 +266,7 @@ export async function POST(request: NextRequest) {
     if (dbError || !fileRecord) {
       console.error(`[${requestId}] DB error:`, dbError)
       await supabase.storage.from("pelican").remove([storageKey])
-      captureException(new Error(`DB insert failed: ${dbError?.message}`), { reqId: requestId, userId, guestId, fileMeta })
+      captureException(new Error(`DB insert failed: ${dbError?.message}`), { reqId: requestId, userId, fileMeta })
       return NextResponse.json({ error: "Failed to save file metadata", code: "database_error" }, { status: 500 })
     }
 
@@ -311,7 +294,7 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error(`[${requestId}] Upload error:`, error)
-    captureException(error instanceof Error ? error : new Error(String(error)), { reqId: requestId, userId, guestId, fileMeta })
+    captureException(error instanceof Error ? error : new Error(String(error)), { reqId: requestId, fileMeta })
     return NextResponse.json({ error: "Internal server error", code: "internal_error" }, { status: 500 })
   }
 }

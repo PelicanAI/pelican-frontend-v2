@@ -5,8 +5,8 @@ import type { ChatInputRef } from "@/components/chat/chat-input"
 import { ACCEPTED_FILE_TYPES, LIMITS, API_ENDPOINTS } from "@/lib/constants"
 
 const isAcceptedFileType = (file: File) => {
-  // Check if MIME type exists as a key in ACCEPTED_FILE_TYPES
-  return file.type in ACCEPTED_FILE_TYPES
+  const normalizedMime = (file.type.split(";")[0] || file.type).trim().toLowerCase()
+  return normalizedMime in ACCEPTED_FILE_TYPES
 }
 
 interface PendingAttachment {
