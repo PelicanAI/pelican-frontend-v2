@@ -15,16 +15,16 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // First verify the conversation belongs to this user
+    // Look up memory_conversations by session_id to get the internal id
     const { data: conversation, error: convError } = await supabase
-      .from('conversations')
-      .select('id, user_id')
-      .eq('id', conversationId)
+      .from('memory_conversations')
+      .select('id, user_id, session_id')
+      .eq('session_id', conversationId)
       .eq('user_id', user.id)
       .single()
 
     if (convError || !conversation) {
-      console.log('[API] Conversation not found or access denied:', { 
+      console.log('[API] Conversation not found:', { 
         conversationId, 
         userId: user.id,
         error: convError?.message 
@@ -32,11 +32,11 @@ export async function GET(
       return NextResponse.json({ error: 'Conversation not found' }, { status: 404 })
     }
 
-    // Fetch messages for this conversation from memory_messages table
+    // Fetch messages using memory_conversations.id
     const { data: messages, error: msgError } = await supabase
       .from('memory_messages')
       .select('id, role, content, created_at')
-      .eq('conversation_id', conversationId)
+      .eq('conversation_id', conversation.id)  // Use the internal id, not session_id
       .eq('user_id', user.id)
       .order('created_at', { ascending: true })
 
@@ -47,6 +47,7 @@ export async function GET(
 
     console.log('[API] Fetched messages:', { 
       conversationId, 
+      internalId: conversation.id,
       count: messages?.length || 0 
     })
 
@@ -60,4 +61,3 @@ export async function GET(
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
-
