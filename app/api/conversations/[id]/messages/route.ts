@@ -23,13 +23,18 @@ export async function GET(
       .eq('user_id', user.id)
       .single()
 
+    // ✅ FIX: New conversations exist in `conversations` but not in `memory_conversations`
+    // until the first message is saved by the backend. Return empty array, not 404.
     if (convError || !conversation) {
-      console.log('[API] Conversation not found:', { 
+      console.log('[API] No messages found (new conversation):', { 
         conversationId, 
         userId: user.id,
         error: convError?.message 
       })
-      return NextResponse.json({ error: 'Conversation not found' }, { status: 404 })
+      return NextResponse.json({
+        messages: [],
+        conversationId
+      })
     }
 
     // Fetch messages using memory_conversations.id

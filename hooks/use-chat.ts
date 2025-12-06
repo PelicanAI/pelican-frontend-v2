@@ -241,11 +241,14 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
         return false;
       }
       
+      // ✅ FIX: Treat 404 as empty conversation, not an error
+      // This happens for new conversations where memory_conversations doesn't exist yet
       if (response.status === 404) {
-        logger.warn('[CHAT-LOAD] Conversation not found', { conversationId });
-        setConversationNotFound(true);
-        loadedConversationRef.current = null;
-        return false;
+        logger.info('[CHAT-LOAD] No messages yet (new conversation)', { conversationId });
+        updateMessagesWithSync(() => []);
+        loadedConversationRef.current = conversationId;
+        setConversationNotFound(false);
+        return true; // Success - empty conversation is valid
       }
       
       if (!response.ok) {

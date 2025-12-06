@@ -164,14 +164,14 @@ export default function ChatPage() {
     }
   }, [conversationIdFromUrl, router])
 
-  // Handle conversation not found - redirect to new chat
+  // ✅ FIX: Removed redirect - with API fix, conversationNotFound won't be set for new convos
+  // If you see this log, something unexpected happened
   useEffect(() => {
     if (conversationNotFound && conversationIdFromUrl) {
-      console.error('[CHAT] Conversation not found:', conversationIdFromUrl)
-      // Redirect to new chat without the invalid conversation ID
-      router.replace('/chat')
+      console.warn('[CHAT] Conversation not found (unexpected):', conversationIdFromUrl)
+      // Don't redirect - let user continue or handle gracefully
     }
-  }, [conversationNotFound, conversationIdFromUrl, router])
+  }, [conversationNotFound, conversationIdFromUrl])
 
   const fileUpload = useFileUpload({
     sendMessage,
