@@ -16,7 +16,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useStreamingChat } from './use-streaming-chat';
 import { logger } from '@/lib/logger';
-import type { Message } from '@/lib/chat-utils';
+import type { Message, Attachment } from '@/lib/chat-utils';
 
 // =============================================================================
 // CONSTANTS
@@ -59,6 +59,7 @@ interface UseChatReturn {
 
 interface SendMessageOptions {
   fileIds?: string[];
+  attachments?: Attachment[];
   skipUserMessage?: boolean;
 }
 
@@ -70,13 +71,14 @@ function createMessageId(): string {
   return `msg_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 }
 
-function createUserMessage(content: string): Message {
+function createUserMessage(content: string, attachments?: Attachment[]): Message {
   return {
     id: createMessageId(),
     role: 'user',
     content: content.trim(),
     timestamp: new Date(),
     isStreaming: false,
+    attachments: attachments,
   };
 }
 
@@ -321,7 +323,7 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
       setError(null);
       setIsLoading(true);
 
-      const userMessage = createUserMessage(content);
+      const userMessage = createUserMessage(content, sendOptions.attachments);
       const conversationHistory = captureConversationHistory();
 
       logger.info('[CHAT-SEND] Preparing to send message', {
@@ -341,6 +343,7 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
       });
 
       if (!sendOptions.skipUserMessage) {
+        console.log('Message being added:', userMessage);
         updateMessagesWithSync((prev) => [...prev, userMessage]);
         onMessageSent?.(userMessage);
       }
