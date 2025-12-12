@@ -15,9 +15,9 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Query memory_messages directly using conversation UUID
+    // Query messages table using conversation UUID
     const { data: messages, error } = await supabase
-      .from('memory_messages')
+      .from('messages')
       .select('id, role, content, created_at')
       .eq('conversation_id', conversationId)  // Use conversation UUID directly
       .eq('user_id', user.id)
