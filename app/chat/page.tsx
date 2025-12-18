@@ -371,9 +371,9 @@ export default function ChatPage() {
                 onSendMessage={handleSendMessageWithFiles}
                 onStopResponse={handleStopGeneration}
                 onFileUpload={fileUpload.handleMultipleFileUpload}
-                disabled={false}
-                disabledSend={chatLoading && !messageHandler.isQueueingMessage}
-                canSend={!chatLoading || messageHandler.isQueueingMessage}
+                disabled={isLoadingMessages}
+                disabledSend={(chatLoading || isLoadingMessages) && !messageHandler.isQueueingMessage}
+                canSend={(!chatLoading && !isLoadingMessages) || messageHandler.isQueueingMessage}
                 placeholder="Find me a bullish strategy"
                 onTypingDuringResponse={messageHandler.handleTypingDuringResponse}
                 isAIResponding={chatLoading}
