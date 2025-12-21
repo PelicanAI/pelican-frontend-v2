@@ -301,7 +301,7 @@ export function ChatContainer({
   if (messages.length === 0) {
     return (
       <div
-        className="flex-1 flex flex-col min-h-0 bg-background relative"
+        className="flex-1 flex flex-col min-h-0 bg-transparent relative"
         onDragEnter={handleDragEnter}
         onDragLeave={handleDragLeave}
         onDragOver={handleDragOver}
@@ -326,7 +326,7 @@ export function ChatContainer({
 
   return (
     <div
-      className="flex-1 flex flex-col min-h-0 bg-background relative"
+      className="flex-1 flex flex-col min-h-0 bg-transparent relative"
       onDragEnter={handleDragEnter}
       onDragLeave={handleDragLeave}
       onDragOver={handleDragOver}
