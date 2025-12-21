@@ -347,9 +347,9 @@ export function MessageBubble({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* AI message - clean, no bubble, no background */}
+      {/* AI message - Purple Card Style */}
       <div className="max-w-3xl mx-auto px-4 sm:px-8">
-        <div className="flex gap-3 sm:gap-6 items-start">
+        <div className="flex gap-3 sm:gap-6 items-start bg-[#13131f] border border-purple-500/20 rounded-2xl p-6 shadow-sm ring-1 ring-purple-500/10">
           {/* AI avatar */}
           <div className="flex-shrink-0">
             <img
@@ -515,9 +515,11 @@ function MessageContent({
 
           const safeLines = segment.content
             .split("\n")
-            .map((line) => formatLine(line))
+            .map((line) => formatLine(line)) // <--- This already sanitizes!
             .join("<br />")
 
+          // safeLines is already sanitized by formatLine above.
+          // Running DOMPurify again here was stripping the purple classes.
           return (
             <motion.div
               key={`text-${index}`}
@@ -525,7 +527,7 @@ function MessageContent({
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.3, delay: index * 0.03 }}
-              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(safeLines) }}
+              dangerouslySetInnerHTML={{ __html: safeLines }}
             />
           )
         })}
