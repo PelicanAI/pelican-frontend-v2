@@ -430,44 +430,31 @@ export function ChatContainer({
             )}
           </AnimatePresence>
 
-          <AnimatePresence>
-            {isLoading && messages.length > 0 && !messages[messages.length - 1]?.isStreaming && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{
-                  duration: 0.4,
-                  ease: [0.4, 0, 0.2, 1],
-                  delay: 0.5,
-                }}
-                className="w-full py-4"
-              >
-                {/* Thinking indicator - clean, no background */}
-                <div className="max-w-3xl mx-auto px-8">
-                  <div className="flex gap-6 items-start">
-                    <div className="flex-shrink-0">
-                      <motion.img
-                        src="/pelican-logo.png"
-                        alt="PelicanAI"
-                        className="w-8 h-8 object-contain rounded-full"
-                        animate={{ rotate: [0, 5, -5, 0] }}
-                        transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
-                      />
-                    </div>
-                    <div className="flex-1 min-w-0 max-w-[700px]">
-                      <div className="flex items-center gap-3">
-                        <EnhancedTypingDots variant="processing" />
-                        <span className="text-xs text-muted-foreground font-mono">
-                          {elapsedSeconds}s
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+          {/* Thinking indicator with timer - shows during initial processing */}
+          {isLoading && messages.length > 0 && messages[messages.length - 1]?.role === 'user' && (
+            <div className="flex items-center gap-3 py-4 px-4 sm:px-8 max-w-3xl mx-auto">
+              <img
+                src="/pelican-logo.png"
+                alt="Pelican AI"
+                className="w-7 h-7 sm:w-8 sm:h-8 object-contain opacity-80"
+              />
+              <div className="flex items-center gap-2">
+                <EnhancedTypingDots variant="thinking" />
+                <span className="text-xs text-muted-foreground/70 font-mono tabular-nums min-w-[2.5rem]">
+                  {elapsedSeconds}s
+                </span>
+              </div>
+            </div>
+          )}
+
+          {/* Streaming indicator with timer - shows while response is being generated */}
+          {isLoading && messages.length > 0 && messages[messages.length - 1]?.role === 'assistant' && messages[messages.length - 1]?.isStreaming && (
+            <div className="flex items-center gap-2 px-4 sm:px-8 max-w-3xl mx-auto pb-2">
+              <span className="text-xs text-muted-foreground/50 font-mono tabular-nums">
+                {elapsedSeconds}s
+              </span>
+            </div>
+          )}
 
           <div ref={bottomRef} className="h-4" />
         </div>

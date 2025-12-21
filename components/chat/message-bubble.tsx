@@ -96,7 +96,21 @@ function formatLine(line: string): string {
   let escaped = escapeHtml(line)
   
   // Step 2: Apply markdown formatting on escaped content
-  escaped = escaped.replace(/\*\*(.*?)\*\*/g, '<strong class="font-[600]">$1</strong>')
+  // Handle bold text with colored section headers
+  escaped = escaped.replace(/\*\*(.*?)\*\*/g, (_, content) => {
+    // Section headers end with colon - apply purple accent color
+    if (content.endsWith(':')) {
+      return `<strong class="font-semibold text-purple-400">${content}</strong>`
+    }
+    return `<strong class="font-[600]">${content}</strong>`
+  })
+  
+  // Also handle non-bold section headers (word followed by colon at start of line)
+  // This catches "Support:" without asterisks
+  if (/^[A-Z][a-zA-Z\s]+:/.test(escaped) && !escaped.includes('<strong')) {
+    escaped = escaped.replace(/^([A-Z][a-zA-Z\s]+:)/, '<strong class="font-semibold text-purple-400">$1</strong>')
+  }
+  
   escaped = escaped.replace(/\*(.*?)\*/g, '<em>$1</em>')
   
   // Step 3: Safe link handling with URL validation
@@ -293,7 +307,7 @@ export function MessageBubble({
           <div className="flex gap-4 sm:gap-6 items-start justify-end">
             {/* Message content */}
             <div className="max-w-[90%] sm:max-w-[80%] md:max-w-[70%] lg:max-w-[600px]">
-              <div className="text-[16px] sm:text-base leading-relaxed break-words text-foreground">
+              <div className="text-[15px] sm:text-base leading-relaxed break-words text-white bg-gradient-to-br from-purple-600 to-violet-600 rounded-2xl px-4 py-3 shadow-sm">
                 {renderAttachments(message.attachments)}
                 {message.content}
               </div>

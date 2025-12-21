@@ -54,6 +54,22 @@ interface ConversationSidebarProps {
   navigatingToId?: string
 }
 
+const getRelativeTime = (date: string): string => {
+  const now = new Date()
+  const then = new Date(date)
+  const diffMs = now.getTime() - then.getTime()
+  const diffMins = Math.floor(diffMs / 60000)
+  const diffHours = Math.floor(diffMs / 3600000)
+  const diffDays = Math.floor(diffMs / 86400000)
+
+  if (diffMins < 1) return "Just now"
+  if (diffMins < 60) return `${diffMins}m ago`
+  if (diffHours < 24) return `${diffHours}h ago`
+  if (diffDays === 1) return "Yesterday"
+  if (diffDays < 7) return `${diffDays}d ago`
+  return then.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+}
+
 export function ConversationSidebar({
   currentConversationId,
   onConversationSelect,
@@ -185,10 +201,13 @@ export function ConversationSidebar({
               ? `${(conversation.title || t.common.newChat).slice(0, 25)}...`
               : conversation.title || t.common.newChat}
           </h3>
+          <span className="text-[10px] text-muted-foreground/60 leading-none">
+            {getRelativeTime(conversation.updated_at)}
+          </span>
         </div>
 
-        {/* Action buttons - Always visible with hover enhancement */}
-        <div className="flex items-center gap-1 flex-shrink-0">
+        {/* Action buttons - Hidden until hover */}
+        <div className="flex items-center gap-1 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
           {/* Rename button */}
           <button
             onClick={(e) => {
