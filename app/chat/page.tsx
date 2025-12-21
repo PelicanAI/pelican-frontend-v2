@@ -344,8 +344,13 @@ export default function ChatPage() {
         )}
 
         <div className="flex-1 flex flex-col overflow-hidden">
-          {/* Added radial gradient background to match mockup */}
-          <div className="flex-1 overflow-y-auto pb-[120px] md:pb-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-purple-900/40 via-background to-background">
+          {/* Main scrollable area with FORCED INLINE STYLE for the glow */}
+          <div 
+            className="flex-1 overflow-y-auto pb-[120px] md:pb-0"
+            style={{ 
+              background: 'radial-gradient(ellipse at top, rgba(88, 28, 135, 0.3) 0%, transparent 70%)' 
+            }}
+          >
             <div className="max-w-5xl mx-auto w-full">
               <ChatContainer
                 messages={messages}
