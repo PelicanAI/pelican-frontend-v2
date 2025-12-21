@@ -912,6 +912,11 @@
     }
   }
 
+  /* Chat background gradient - only for dark mode */
+  .dark .chat-background-gradient {
+    background: radial-gradient(ellipse at top, rgba(88, 28, 135, 0.3) 0%, transparent 70%);
+  }
+
   /* Reduce motion for accessibility (FIX 35) */
   @media (prefers-reduced-motion: reduce) {
     *,

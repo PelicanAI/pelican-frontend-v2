@@ -344,12 +344,9 @@ export default function ChatPage() {
         )}
 
         <div className="flex-1 flex flex-col overflow-hidden">
-          {/* Main scrollable area with FORCED INLINE STYLE for the glow */}
+          {/* Main scrollable area with dark mode gradient */}
           <div 
-            className="flex-1 overflow-y-auto pb-[120px] md:pb-0"
-            style={{ 
-              background: 'radial-gradient(ellipse at top, rgba(88, 28, 135, 0.3) 0%, transparent 70%)' 
-            }}
+            className="flex-1 overflow-y-auto pb-[120px] md:pb-0 chat-background-gradient"
           >
             <div className="max-w-5xl mx-auto w-full">
               <ChatContainer
