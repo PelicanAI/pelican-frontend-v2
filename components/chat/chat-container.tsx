@@ -357,7 +357,7 @@ export function ChatContainer({
           aria-label="Chat messages"
         >
           {/* Conversation Header - Sticky */}
-          <div className="sticky top-0 z-10 flex items-center justify-between pb-2 pt-4 sm:pt-6 border-b border-border bg-background/95 backdrop-blur-sm -mx-4 sm:-mx-6 px-4 sm:px-6">
+          <div className="sticky top-0 z-10 flex items-center justify-between pb-2 pt-4 sm:pt-6 border-b border-white/5 bg-transparent backdrop-blur-sm -mx-4 sm:-mx-6 px-4 sm:px-6">
             <div className="flex items-center gap-2 sm:gap-3">
               <div className="flex flex-col">
                 <h2 className="text-sm font-medium text-foreground">
