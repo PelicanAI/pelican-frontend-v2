@@ -135,6 +135,8 @@ function formatLine(line: string): string {
     ALLOWED_ATTR: { 
       a: ["href", "target", "rel", "class"],
       span: ["class"],
+      strong: ["class"],
+      em: ["class"],
     } as unknown as string[],
     ALLOWED_URI_REGEXP: /^https?:\/\//i // Only allow http/https
   })
