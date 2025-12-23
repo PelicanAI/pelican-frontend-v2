@@ -10,7 +10,7 @@ const DEFAULT_OPTIONS: Required<RetryOptions> = {
   maxRetries: 3,
   baseDelay: 1000,
   maxDelay: 10000,
-  timeout: 30000, // 30 second default timeout to prevent hanging connections
+  timeout: 300000, // 5 minute default timeout
   shouldRetry: (error: Error) => {
     if (error.name === "AbortError") return false
     if (error.message.includes("timeout")) return true // Retry on timeout
@@ -151,7 +151,7 @@ export async function streamWithRetry(
     retryOptions: {
       maxRetries: 2,
       baseDelay: 500,
-      timeout: 120000, // 120 seconds for streaming requests - allows complex queries with extended thinking
+      timeout: 300000, // 5 minutes for streaming requests
       ...options.retryOptions,
     },
   })
