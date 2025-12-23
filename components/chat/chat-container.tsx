@@ -431,7 +431,7 @@ export function ChatContainer({
                     showActions={index === messages.length - 1}
                   />
                 </motion.div>
-              ),
+              )
             })}
           </AnimatePresence>
 
