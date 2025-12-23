@@ -384,8 +384,13 @@ export function ChatContainer({
           )}
 
           <AnimatePresence mode="popLayout">
-            {!isLoadingHistory && messages.map((message, index) =>
-              message.role === "system" ? (
+            {!isLoadingHistory && messages.map((message, index) => {
+              // Hide empty assistant messages during loading (handled by Thinking indicator below)
+              if (isLoading && message.role === 'assistant' && !message.content && index === messages.length - 1) {
+                return null
+              }
+
+              return message.role === "system" ? (
                 <motion.div
                   key={message.id}
                   initial={{ opacity: 0, y: 20 }}
@@ -431,7 +436,7 @@ export function ChatContainer({
           </AnimatePresence>
 
           {/* Thinking indicator with timer - shows during initial processing */}
-          {isLoading && messages.length > 0 && messages[messages.length - 1]?.role === 'user' && (
+          {isLoading && messages.length > 0 && (messages[messages.length - 1]?.role === 'user' || (messages[messages.length - 1]?.role === 'assistant' && !messages[messages.length - 1]?.content)) && (
             <div className="flex items-center gap-3 py-4 px-4 sm:px-8 max-w-3xl mx-auto">
               <img
                 src="/pelican-logo.png"
@@ -448,7 +453,7 @@ export function ChatContainer({
           )}
 
           {/* Streaming indicator with timer - shows while response is being generated */}
-          {isLoading && messages.length > 0 && messages[messages.length - 1]?.role === 'assistant' && messages[messages.length - 1]?.isStreaming && (
+          {isLoading && messages.length > 0 && messages[messages.length - 1]?.role === 'assistant' && messages[messages.length - 1]?.isStreaming && !!messages[messages.length - 1]?.content && (
             <div className="flex items-center gap-2 px-4 sm:px-8 max-w-3xl mx-auto pb-2">
               <span className="text-xs text-muted-foreground/50 font-mono tabular-nums">
                 {elapsedSeconds}s
