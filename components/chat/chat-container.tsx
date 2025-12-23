@@ -432,7 +432,7 @@ export function ChatContainer({
                   />
                 </motion.div>
               ),
-            )}
+            })}
           </AnimatePresence>
 
           {/* Thinking indicator with timer - shows during initial processing */}
