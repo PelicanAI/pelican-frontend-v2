@@ -47,7 +47,7 @@ export function PerplexityChatInput({
 
   const handleSubmit = () => {
     if (inputValue.trim() && !disabled) {
-      onSubmit?.(inputValue.trim())
+      onSubmit?.(inputValue) // Send raw value to preserve formatting
       setInputValue("")
       if (textareaRef.current) {
         textareaRef.current.style.height = "auto"

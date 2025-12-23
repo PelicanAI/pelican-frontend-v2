@@ -27,7 +27,7 @@ export function ChatInputSimple({
 
   const handleSubmit = () => {
     if (message.trim() && !disabled) {
-      onSendMessage(message.trim())
+      onSendMessage(message) // Send raw message to preserve newlines
       setMessage("")
       if (textareaRef.current) {
         textareaRef.current.style.height = "auto"

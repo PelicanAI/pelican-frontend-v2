@@ -150,13 +150,10 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
 
 
     const handleSubmit = () => {
+      // Check if message is empty (whitespace only)
       if (message.trim() && !disabled && !isAIResponding && canSend && !disabledSend) {
-        const trimmedMessage = message.trim()
-
-        // Save to recent searches - DISABLED
-        // saveRecentSearch(trimmedMessage)
-
-        onSendMessage(trimmedMessage)
+        // Send message preserving newlines (don't trim here, let the handler decide)
+        onSendMessage(message)
         setMessage("")
         setShowThinkingNote(false)
         // clearSuggestions() - DISABLED
@@ -312,7 +309,7 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
               placeholder={actualPlaceholder}
               disabled={disabled}
               className={cn(
-                "flex-1 bg-transparent outline-none resize-none",
+                "flex-1 bg-transparent outline-none resize-none whitespace-pre-wrap",
                 "text-[15px] leading-relaxed font-[Inter,system-ui,sans-serif]",
                 "placeholder:text-muted-foreground",
                 "text-foreground",

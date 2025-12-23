@@ -179,7 +179,7 @@ export const PremiumChatInput = forwardRef<PremiumChatInputRef, PremiumChatInput
     const handleSubmit = () => {
       if (message.trim() && !disabled && canSend && !disabledSend) {
         learnFromInput(message.trim())
-        onSendMessage(message.trim())
+        onSendMessage(message) // Send raw message to preserve newlines
         setMessage("")
         setShowThinkingNote(false)
         setCurrentSuggestion(null)

@@ -75,7 +75,7 @@ function createUserMessage(content: string, attachments?: Attachment[]): Message
   return {
     id: createMessageId(),
     role: 'user',
-    content: content.trim(),
+    content: content, // Store raw content (no trim) to preserve formatting
     timestamp: new Date(),
     isStreaming: false,
     attachments: attachments,
