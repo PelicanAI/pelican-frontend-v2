@@ -431,7 +431,7 @@ export function ChatContainer({
           </AnimatePresence>
 
           {/* Thinking indicator with timer - shows during initial processing */}
-          {isLoading && messages.length > 0 && (messages[messages.length - 1]?.role === 'user' || (messages[messages.length - 1]?.role === 'assistant' && !messages[messages.length - 1]?.content)) && (
+          {isLoading && messages.length > 0 && messages[messages.length - 1]?.role === 'user' && (
             <div className="flex items-center gap-3 py-4 px-4 sm:px-8 max-w-3xl mx-auto">
               <img
                 src="/pelican-logo.png"
@@ -448,7 +448,7 @@ export function ChatContainer({
           )}
 
           {/* Streaming indicator with timer - shows while response is being generated */}
-          {isLoading && messages.length > 0 && messages[messages.length - 1]?.role === 'assistant' && messages[messages.length - 1]?.isStreaming && !!messages[messages.length - 1]?.content && (
+          {isLoading && messages.length > 0 && messages[messages.length - 1]?.role === 'assistant' && messages[messages.length - 1]?.isStreaming && (
             <div className="flex items-center gap-2 px-4 sm:px-8 max-w-3xl mx-auto pb-2">
               <span className="text-xs text-muted-foreground/50 font-mono tabular-nums">
                 {elapsedSeconds}s
