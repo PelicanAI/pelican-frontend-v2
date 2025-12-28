@@ -41,7 +41,7 @@ export class ChatErrorBoundary extends Component<Props, State> {
     window.location.reload()
   }
 
-  render() {
+  override render() {
     if (this.state.hasError) {
       return (
         <div className="flex flex-col items-center justify-center h-full p-8 bg-background">
