@@ -25,7 +25,7 @@ export class ChatErrorBoundary extends Component<Props, State> {
     return { hasError: true, error }
   }
 
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+  override componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     Sentry.captureException(error, {
       tags: { component: 'ChatErrorBoundary' },
       extra: { componentStack: errorInfo.componentStack }
