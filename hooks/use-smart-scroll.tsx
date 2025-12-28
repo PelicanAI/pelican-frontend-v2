@@ -284,6 +284,18 @@ export function useSmartScroll(options: SmartScrollOptions = {}) {
 
   const showJump = state.isStreaming && !state.isNearBottom
 
+  const resetScrollState = useCallback(() => {
+    shouldAutoScrollRef.current = true
+    isStreamingRef.current = false
+    lastScrollTopRef.current = 0
+    setState({
+      isNearBottom: true,
+      isUserScrolling: false,
+      hasNewMessages: false,
+      isStreaming: false,
+    })
+  }, [])
+
   return {
     containerRef,
     bottomRef,
@@ -295,6 +307,7 @@ export function useSmartScroll(options: SmartScrollOptions = {}) {
     handleLongMessage,
     checkIfNearBottom,
     resetScrollAwayState,
+    resetScrollState,
     showJump,
     lastNewMessageAt,
   }

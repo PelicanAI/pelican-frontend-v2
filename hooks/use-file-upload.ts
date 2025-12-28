@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback } from "react"
+import { useState, useCallback, useRef, useEffect } from "react"
 import type { ChatInputRef } from "@/components/chat/chat-input"
 import { ACCEPTED_FILE_TYPES, LIMITS, API_ENDPOINTS } from "@/lib/constants"
 
@@ -8,6 +8,8 @@ const isAcceptedFileType = (file: File) => {
   const normalizedMime = (file.type.split(";")[0] || file.type).trim().toLowerCase()
   return normalizedMime in ACCEPTED_FILE_TYPES
 }
+
+const MAX_CONCURRENT_UPLOADS = 3
 
 interface PendingAttachment {
   file: File
@@ -26,89 +28,77 @@ export function useFileUpload({ sendMessage, addSystemMessage, chatInputRef }: U
   const [pendingAttachments, setPendingAttachments] = useState<PendingAttachment[]>([])
   const [uploadedFiles, setUploadedFiles] = useState<Array<{ id: string; type: string; name: string; url: string }>>([])
 
+  const abortControllerRef = useRef<AbortController | null>(null)
+  const mountedRef = useRef(true)
+
+  useEffect(() => {
+    mountedRef.current = true
+    return () => {
+      mountedRef.current = false
+      abortControllerRef.current?.abort()
+    }
+  }, [])
+
   const handleFileUpload = useCallback(
     async (file: File) => {
-      console.log("[v0] File uploaded:", file.name)
+      // Offline check
+      if (typeof navigator !== 'undefined' && !navigator.onLine) {
+        addSystemMessage(
+          `Cannot upload ${file.name} - you appear to be offline. Check your connection and try again.`,
+          () => handleFileUpload(file)
+        )
+        return
+      }
 
       if (!isAcceptedFileType(file)) {
-        const retryAction = () => {
-          chatInputRef.current?.focus()
-        }
-        addSystemMessage(
-          `${file.name} is not supported. Please upload Excel (.xlsx, .xls), CSV, PDF, images, or text files.`,
-          retryAction,
-        )
-        setTimeout(() => {
-          chatInputRef.current?.focus()
-        }, 100)
+        addSystemMessage(`${file.name} is not supported. Please upload Excel, CSV, PDF, images, or text files.`)
+        chatInputRef.current?.focus()
         return
       }
 
       const maxSize = LIMITS.FILE_SIZE_MB * 1024 * 1024
       if (file.size > maxSize) {
-        const retryAction = () => {
-          chatInputRef.current?.focus()
-        }
-        addSystemMessage(`${file.name} is too large. Maximum file size is ${LIMITS.FILE_SIZE_MB}MB.`, retryAction)
-        setTimeout(() => {
-          chatInputRef.current?.focus()
-        }, 100)
+        addSystemMessage(`${file.name} is too large. Maximum size is ${LIMITS.FILE_SIZE_MB}MB.`)
+        chatInputRef.current?.focus()
         return
       }
 
       const attachmentId = crypto.randomUUID()
-      const pendingAttachment: PendingAttachment = {
-        file,
-        id: attachmentId,
-      }
-      setPendingAttachments((prev) => [...prev, pendingAttachment])
+      setPendingAttachments((prev) => [...prev, { file, id: attachmentId }])
 
       try {
+        abortControllerRef.current = new AbortController()
         const formData = new FormData()
         formData.append("file", file)
 
         const response = await fetch(API_ENDPOINTS.UPLOAD, {
           method: "POST",
           body: formData,
+          signal: abortControllerRef.current.signal,
         })
+
+        if (!mountedRef.current) return
 
         if (!response.ok) {
           const error = await response.json()
           throw new Error(error.error || "Upload failed")
         }
 
-        const { id: fileId, url, name, type, size } = await response.json()
+        if (!mountedRef.current) return
 
-        console.log("[upload] ok", { name, type, size, url })
-
-        // Store uploaded file info - DON'T auto-send
+        const { id: fileId, url, name, type } = await response.json()
         setUploadedFiles((prev) => [...prev, { id: fileId, type, name, url }])
         setPendingAttachments((prev) => prev.filter((a) => a.id !== attachmentId))
-
-        console.log("[FileUpload] File uploaded successfully, waiting for user to send message", {
-          fileId,
-          name,
-          type
-        })
-
-        setTimeout(() => {
-          chatInputRef.current?.focus()
-        }, 100)
+        chatInputRef.current?.focus()
       } catch (error) {
-        console.error("[v0] File upload error:", error)
+        if (!mountedRef.current) return
+        if (error instanceof Error && error.name === 'AbortError') return
 
         setPendingAttachments((prev) => prev.map((a) => (a.id === attachmentId ? { ...a, isError: true } : a)))
-
-        const retryAction = () => {
-          handleRetryUpload(attachmentId)
-        }
-        addSystemMessage("Upload failed. Retry?", retryAction)
-        setTimeout(() => {
-          chatInputRef.current?.focus()
-        }, 100)
+        addSystemMessage("Upload failed. Retry?", () => handleRetryUpload(attachmentId))
       }
     },
-    [sendMessage, addSystemMessage, chatInputRef],
+    [addSystemMessage, chatInputRef],
   )
 
   const handleRetryUpload = useCallback(
@@ -128,134 +118,85 @@ export function useFileUpload({ sendMessage, addSystemMessage, chatInputRef }: U
 
   const handleMultipleFileUpload = useCallback(
     async (files: File[]) => {
-      console.log(
-        "[v0] Multiple files uploaded:",
-        files.map((f) => f.name),
-      )
+      if (typeof navigator !== 'undefined' && !navigator.onLine) {
+        addSystemMessage(`Cannot upload files - you appear to be offline.`)
+        return
+      }
 
       const validFiles = files.filter((file) => {
         if (!isAcceptedFileType(file)) {
           addSystemMessage(`${file.name} is not supported and will be skipped.`)
           return false
         }
-
-        const maxSize = LIMITS.FILE_SIZE_MB * 1024 * 1024
-        if (file.size > maxSize) {
+        if (file.size > LIMITS.FILE_SIZE_MB * 1024 * 1024) {
           addSystemMessage(`${file.name} is too large and will be skipped.`)
           return false
         }
-
         return true
       })
 
       if (validFiles.length === 0) {
-        setTimeout(() => {
-          chatInputRef.current?.focus()
-        }, 100)
+        chatInputRef.current?.focus()
         return
       }
 
-      const newPendingAttachments = validFiles.map((file) => ({
-        file,
-        id: crypto.randomUUID(),
-      }))
-      setPendingAttachments((prev) => [...prev, ...newPendingAttachments])
+      const newPending = validFiles.map((file) => ({ file, id: crypto.randomUUID() }))
+      setPendingAttachments((prev) => [...prev, ...newPending])
 
-      try {
-        const uploadPromises = newPendingAttachments.map(async (pendingAttachment) => {
-          try {
-            const formData = new FormData()
-            formData.append("file", pendingAttachment.file)
+      // Process with concurrency limit
+      let activeCount = 0
+      let index = 0
 
-            const response = await fetch(API_ENDPOINTS.UPLOAD, {
-              method: "POST",
-              body: formData,
-            })
+      const processNext = async (): Promise<void> => {
+        if (index >= newPending.length || !mountedRef.current) return
 
-            if (!response.ok) {
-              const error = await response.json()
-              throw new Error(error.error || "Upload failed")
-            }
+        const current = newPending[index++]
+        activeCount++
 
-            const result = await response.json()
-            console.log("[v0] File uploaded:", pendingAttachment.file.name, result.url)
+        try {
+          const formData = new FormData()
+          formData.append("file", current.file)
 
-            // Store uploaded file info
-            setUploadedFiles((prev) => [...prev, { 
-              id: result.id, 
-              type: result.type, 
-              name: result.name, 
-              url: result.url 
-            }])
+          const response = await fetch(API_ENDPOINTS.UPLOAD, { method: "POST", body: formData })
+          
+          if (!mountedRef.current) return
 
-            // Mark as successful
-            setPendingAttachments((prev) => 
-              prev.filter((a) => a.id !== pendingAttachment.id)
-            )
+          if (!response.ok) throw new Error("Upload failed")
 
-            return { success: true, result }
-          } catch (error) {
-            // Mark as error but don't throw - let Promise.allSettled handle it
-            setPendingAttachments((prev) =>
-              prev.map((a) => 
-                a.id === pendingAttachment.id 
-                  ? { ...a, isError: true, errorMessage: error instanceof Error ? error.message : 'Unknown error' } 
-                  : a
-              ),
-            )
-            return { 
-              success: false, 
-              error: error instanceof Error ? error.message : 'Unknown error' 
-            }
+          const result = await response.json()
+          
+          if (mountedRef.current) {
+            setUploadedFiles((prev) => [...prev, { id: result.id, type: result.type, name: result.name, url: result.url }])
+            setPendingAttachments((prev) => prev.filter((a) => a.id !== current.id))
           }
-        })
-
-        const results = await Promise.allSettled(uploadPromises)
-        const successfulResults = results
-          .filter((result): result is PromiseFulfilledResult<any> => result.status === "fulfilled" && result.value.success)
-          .map((result) => result.value.result)
-
-        if (successfulResults.length > 0) {
-          console.log("[FileUpload] Files uploaded successfully, waiting for user to send message", {
-            count: successfulResults.length
-          })
+        } catch {
+          if (mountedRef.current) {
+            setPendingAttachments((prev) => prev.map((a) => a.id === current.id ? { ...a, isError: true } : a))
+          }
+        } finally {
+          activeCount--
+          if (mountedRef.current) processNext()
         }
-
-        const failedCount = results.filter((result) => 
-          result.status === "rejected" || (result.status === "fulfilled" && !result.value.success)
-        ).length
-        if (failedCount > 0) {
-          addSystemMessage(`${failedCount} file(s) failed to upload. You can retry them.`)
-        }
-
-        setTimeout(() => {
-          chatInputRef.current?.focus()
-        }, 100)
-      } catch (error) {
-        console.error("[v0] Multiple file upload error:", error)
-        setTimeout(() => {
-          chatInputRef.current?.focus()
-        }, 100)
       }
+
+      // Start up to MAX_CONCURRENT_UPLOADS
+      const starters = []
+      for (let i = 0; i < Math.min(MAX_CONCURRENT_UPLOADS, validFiles.length); i++) {
+        starters.push(processNext())
+      }
+      await Promise.all(starters)
+
+      chatInputRef.current?.focus()
     },
-    [sendMessage, addSystemMessage, chatInputRef],
+    [addSystemMessage, chatInputRef],
   )
 
-  const clearUploadedFiles = useCallback(() => {
-    setUploadedFiles([])
-  }, [])
-
+  const clearUploadedFiles = useCallback(() => setUploadedFiles([]), [])
   const removeUploadedFile = useCallback((index: number) => {
     setUploadedFiles((prev) => prev.filter((_, i) => i !== index))
   }, [])
-
-  const getUploadedFileIds = useCallback(() => {
-    return uploadedFiles.map(f => f.id)
-  }, [uploadedFiles])
-
-  const getUploadedAttachments = useCallback(() => {
-    return uploadedFiles.map(f => ({ type: f.type, name: f.name, url: f.url }))
-  }, [uploadedFiles])
+  const getUploadedFileIds = useCallback(() => uploadedFiles.map(f => f.id), [uploadedFiles])
+  const getUploadedAttachments = useCallback(() => uploadedFiles.map(f => ({ type: f.type, name: f.name, url: f.url })), [uploadedFiles])
 
   return {
     pendingAttachments,

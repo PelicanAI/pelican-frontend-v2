@@ -6,6 +6,7 @@ import { ConversationSidebar } from "@/components/chat/conversation-sidebar"
 import { ChatContainer } from "@/components/chat/chat-container"
 import { ChatInput, type ChatInputRef } from "@/components/chat/chat-input"
 import { TradingContextPanel } from "@/components/chat/trading-context-panel"
+import { ChatErrorBoundary } from "@/components/chat/chat-error-boundary"
 import { useChat } from "@/hooks/use-chat"
 // import { useMarketData } from "@/hooks/use-market-data"
 import { useConversations } from "@/hooks/use-conversations"
@@ -179,6 +180,15 @@ export default function ChatPage() {
     chatInputRef,
   })
 
+  // Clear uploaded files when switching conversations
+  const prevConversationRef = useRef(conversationIdFromUrl)
+  useEffect(() => {
+    if (prevConversationRef.current !== conversationIdFromUrl) {
+      fileUpload.clearUploadedFiles()
+    }
+    prevConversationRef.current = conversationIdFromUrl
+  }, [conversationIdFromUrl, fileUpload])
+
   const handleQuickStart = (message: string) => {
     messageHandler.handleSendMessage(message)
   }
@@ -237,7 +247,8 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden relative chat-background-gradient">
+    <ChatErrorBoundary onReset={() => clearMessages()}>
+      <div className="flex h-screen overflow-hidden relative chat-background-gradient">
       {/* Futuristic background effects - only in dark mode */}
       {/* <div className="absolute inset-0 dark:block hidden pointer-events-none">
         <div className="absolute inset-0 bg-gradient-to-br from-purple-950/10 via-black to-violet-950/10" />
@@ -449,6 +460,7 @@ export default function ChatPage() {
       )}
 
       <SettingsModal open={settingsOpen} onOpenChange={setSettingsOpen} />
-    </div>
+      </div>
+    </ChatErrorBoundary>
   )
 }

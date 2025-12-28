@@ -25,13 +25,22 @@ export function useConversationRouter({
 }: UseConversationRouterOptions) {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const { conversations } = useConversations()
+  // FIX: Also get loading state to prevent race condition
+  const { conversations, loading: conversationsLoading } = useConversations()
 
   // SINGLE SOURCE OF TRUTH: Derive conversation ID from URL
   const currentConversationId = searchParams.get("conversation")
   
   const bootstrappedRef = useRef(false)
   const previousConversationIdRef = useRef<string | null>(null)
+
+  // FIX: Reset bootstrap ref when user logs out
+  // This ensures bootstrap runs again on next login
+  useEffect(() => {
+    if (!user) {
+      bootstrappedRef.current = false
+    }
+  }, [user])
 
   // Bootstrap: Select most recent conversation when no URL param
   // Do NOT create a new conversation - let that happen on first message
@@ -40,8 +49,16 @@ export function useConversationRouter({
     if (cid) return // Already has conversation in URL, do nothing
     if (bootstrappedRef.current) return
     if (!user) return // Wait for user to be authenticated
+    // FIX: Wait for conversations to finish loading before bootstrap
+    // This prevents the race condition where bootstrap runs with empty conversations
+    if (conversationsLoading) return
     
     bootstrappedRef.current = true
+    
+    logger.info("[ROUTER] Bootstrap: checking conversations", {
+      count: conversations.length,
+      loading: conversationsLoading,
+    })
     
     // If user has existing non-archived conversations, select the most recent one
     // If no conversations exist, stay at /chat with no param (truly new conversation)
@@ -55,12 +72,15 @@ export function useConversationRouter({
         )[0]
       
       if (mostRecent?.id) {
+        logger.info("[ROUTER] Bootstrap: selecting most recent conversation", {
+          conversationId: mostRecent.id,
+        })
         router.replace(`${ROUTES.CHAT}?conversation=${encodeURIComponent(mostRecent.id)}`, { scroll: false })
       }
       // If all conversations are archived or list is empty after filter, stay at /chat
     }
     // Do NOT call create() here - backend creates conversation on first message
-  }, [searchParams, user, router, conversations])
+  }, [searchParams, user, router, conversations, conversationsLoading])
 
   // Track conversation changes for cleanup (clear drafts for previous conversation)
   useEffect(() => {

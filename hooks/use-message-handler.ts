@@ -1,7 +1,13 @@
 "use client"
 
-import { useState, useCallback, useRef } from "react"
+import { useState, useCallback } from "react"
 import type { ChatInputRef } from "@/components/chat/chat-input"
+
+interface PendingMessage {
+  content: string
+  fileIds?: string[]
+  attachments?: any[]
+}
 
 interface UseMessageHandlerOptions {
   chatLoading: boolean
@@ -17,7 +23,7 @@ export function useMessageHandler({
   chatInputRef,
 }: UseMessageHandlerOptions) {
   const [isDraftWhileStreaming, setIsDraftWhileStreaming] = useState(false)
-  const [pendingDraft, setPendingDraft] = useState<string | null>(null)
+  const [pendingMessage, setPendingMessage] = useState<PendingMessage | null>(null)
   const [draftConversationId, setDraftConversationId] = useState<string | null>(null)
   const [isTypingDuringResponse, setIsTypingDuringResponse] = useState(false)
   const [isQueueingMessage, setIsQueueingMessage] = useState(false)
@@ -29,7 +35,11 @@ export function useMessageHandler({
   const handleSendMessage = useCallback(
     async (content: string, options?: { forceQueue?: boolean; fileIds?: string[]; attachments?: any[] }) => {
       if (chatLoading || options?.forceQueue) {
-        setPendingDraft(content)
+        setPendingMessage({
+          content,
+          fileIds: options?.fileIds,
+          attachments: options?.attachments,
+        })
         setDraftConversationId(currentConversationId)
         setIsQueueingMessage(true)
         return
@@ -39,9 +49,7 @@ export function useMessageHandler({
         fileIds: options?.fileIds, 
         attachments: options?.attachments 
       })
-      setTimeout(() => {
-        chatInputRef.current?.focus()
-      }, 100)
+      setTimeout(() => chatInputRef.current?.focus(), 100)
     },
     [chatLoading, currentConversationId, sendMessage, chatInputRef],
   )
@@ -55,8 +63,8 @@ export function useMessageHandler({
   }, [chatLoading, isDraftWhileStreaming, currentConversationId])
 
   const handleForceQueue = useCallback(
-    (content: string) => {
-      handleSendMessage(content, { forceQueue: true })
+    (content: string, options?: { fileIds?: string[]; attachments?: any[] }) => {
+      handleSendMessage(content, { forceQueue: true, ...options })
     },
     [handleSendMessage],
   )
@@ -64,21 +72,25 @@ export function useMessageHandler({
   const handleMessageFinish = useCallback(async () => {
     setIsDraftWhileStreaming(false)
     setIsTypingDuringResponse(false)
+    setIsQueueingMessage(false)
 
-    if (pendingDraft) {
-      const draftToSend = pendingDraft
-      setPendingDraft(null)
+    if (pendingMessage) {
+      const messageToSend = pendingMessage
+      setPendingMessage(null)
       setTimeout(async () => {
-        await sendMessage(draftToSend)
+        await sendMessage(messageToSend.content, {
+          fileIds: messageToSend.fileIds,
+          attachments: messageToSend.attachments,
+        })
         chatInputRef.current?.focus()
       }, 100)
     }
-  }, [pendingDraft, sendMessage, chatInputRef])
+  }, [pendingMessage, sendMessage, chatInputRef])
 
   const clearDraftForConversation = useCallback(
     (conversationId: string) => {
       if (draftConversationId !== conversationId) {
-        setPendingDraft(null)
+        setPendingMessage(null)
         setDraftConversationId(null)
         setIsDraftWhileStreaming(false)
         setIsQueueingMessage(false)
@@ -100,7 +112,7 @@ export function useMessageHandler({
     handleMessageFinish,
     clearDraftForConversation,
     resetDraftState,
-    pendingDraft,
+    pendingDraft: pendingMessage?.content || null,
     isDraftWhileStreaming,
     isTypingDuringResponse,
     isQueueingMessage,

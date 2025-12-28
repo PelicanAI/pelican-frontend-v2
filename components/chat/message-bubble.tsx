@@ -421,8 +421,22 @@ function MessageContent({
   // Defensive check - ensure content is always a string
   const safeContent = typeof content === 'string' ? content : String(content || '')
   
-  const parsedData = useMemo(() => (!isStreaming ? detectDataTable(safeContent) : null), [safeContent, isStreaming])
-  const segments = useMemo(() => parseContentSegments(safeContent), [safeContent])
+  // Only parse data table when NOT streaming (expensive operation)
+  const parsedData = useMemo(
+    () => (!isStreaming ? detectDataTable(safeContent) : null), 
+    [safeContent, isStreaming]
+  )
+  
+  // ⚡ PERFORMANCE FIX: Skip expensive parsing during streaming for large content
+  // Parsing 10KB of text 200 times (once per chunk) kills performance
+  const segments = useMemo(() => {
+    // During streaming with large content, skip segment parsing entirely
+    // Just treat the whole thing as one text segment
+    if (isStreaming && safeContent.length > 1000) {
+      return [{ type: "text" as const, content: safeContent }]
+    }
+    return parseContentSegments(safeContent)
+  }, [safeContent, isStreaming])
 
   if (showSkeleton && !safeContent) {
     return (
@@ -458,8 +472,6 @@ function MessageContent({
       />
     )
   }
-  
-  // Use safeContent for all remaining content rendering
 
   return (
     <motion.div
@@ -471,7 +483,7 @@ function MessageContent({
       <div className="space-y-2">
         {segments.map((segment, index) => {
           if (segment.type === "code") {
-    const sanitizedCode = DOMPurify.sanitize(segment.content)
+            const sanitizedCode = DOMPurify.sanitize(segment.content)
             return (
               <motion.div
                 key={`code-${index}`}
@@ -489,7 +501,6 @@ function MessageContent({
                     <code>{sanitizedCode}</code>
                   </div>
                   
-                  {/* Scroll gradient indicator (FIX 27) */}
                   <div 
                     className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-muted/30 via-muted/20 to-transparent pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity"
                     aria-hidden="true"
@@ -513,13 +524,27 @@ function MessageContent({
             )
           }
 
+          // ⚡ PERFORMANCE FIX: Skip expensive formatting during streaming for large content
+          // formatLine runs regex on every line - very expensive when done 200 times
+          if (isStreaming && safeContent.length > 2000) {
+            return (
+              <motion.div
+                key={`text-${index}`}
+                className="space-y-2 whitespace-pre-wrap"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+              >
+                {segment.content}
+              </motion.div>
+            )
+          }
+
+          // Normal path: format content (only when not streaming or content is small)
           const safeLines = segment.content
             .split("\n")
-            .map((line) => formatLine(line)) // <--- This already sanitizes!
+            .map((line) => formatLine(line))
             .join("<br />")
 
-          // safeLines is already sanitized by formatLine above.
-          // Running DOMPurify again here was stripping the purple classes.
           return (
             <motion.div
               key={`text-${index}`}
@@ -532,7 +557,6 @@ function MessageContent({
           )
         })}
       </div>
-
     </motion.div>
   )
 }

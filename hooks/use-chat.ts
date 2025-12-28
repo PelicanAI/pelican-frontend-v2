@@ -7,10 +7,10 @@
  * - Synchronous state/ref updates to prevent race conditions
  * - Proper conversation history capture before API calls
  * - Backend-handled message persistence (no dual persistence)
- * - Comprehensive logging for debugging
+ * - THROTTLED streaming updates to prevent UI crashes on large responses
  * 
  * @author Pelican Engineering
- * @version 3.0.0
+ * @version 3.1.0 - Added streaming throttle
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -27,6 +27,9 @@ const LIMITS = {
   MAX_MESSAGE_LENGTH: 50000,
   MIN_MESSAGE_LENGTH: 1,
 };
+
+// FIX: Throttle streaming UI updates to prevent crashes on large responses
+const STREAMING_THROTTLE_MS = 50; // Update UI max 20 times/second
 
 // =============================================================================
 // TYPES
@@ -75,7 +78,7 @@ function createUserMessage(content: string, attachments?: Attachment[]): Message
   return {
     id: createMessageId(),
     role: 'user',
-    content: content, // Store raw content (no trim) to preserve formatting
+    content: content,
     timestamp: new Date(),
     isStreaming: false,
     attachments: attachments,
@@ -146,6 +149,11 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
   const loadedConversationRef = useRef<string | null>(null);
   const lastSentMessageRef = useRef<string | null>(null);
   const loadingAbortRef = useRef<AbortController | null>(null);
+  
+  // FIX: Refs for streaming throttle
+  const lastStreamingUpdateRef = useRef<number>(0);
+  const pendingStreamingContentRef = useRef<string>('');
+  const streamingFlushTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // ---------------------------------------------------------------------------
   // STREAMING HOOK
@@ -218,7 +226,6 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
   // ---------------------------------------------------------------------------
 
   const loadMessages = useCallback(async (conversationId: string): Promise<boolean> => {
-    // Abort any in-flight load
     if (loadingAbortRef.current) {
       loadingAbortRef.current.abort();
     }
@@ -231,7 +238,6 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
     setError(null);
     setConversationNotFound(false);
     
-    // Clear existing messages immediately
     updateMessagesWithSync(() => []);
     
     try {
@@ -243,14 +249,12 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
         return false;
       }
       
-      // ✅ FIX: Treat 404 as empty conversation, not an error
-      // This happens for new conversations where memory_conversations doesn't exist yet
       if (response.status === 404) {
         logger.info('[CHAT-LOAD] No messages yet (new conversation)', { conversationId });
         updateMessagesWithSync(() => []);
         loadedConversationRef.current = conversationId;
         setConversationNotFound(false);
-        return true; // Success - empty conversation is valid
+        return true;
       }
       
       if (!response.ok) {
@@ -263,7 +267,6 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
         return false;
       }
       
-      // Transform API messages to our Message format
       const loadedMessages: Message[] = (data.messages || []).map((msg: any) => ({
         id: msg.id || createMessageId(),
         role: msg.role as 'user' | 'assistant' | 'system',
@@ -288,7 +291,6 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
       
       const error = err instanceof Error ? err : new Error(String(err));
       
-      // Don't log abort errors
       if (error.name !== 'AbortError') {
         logger.error('[CHAT-LOAD] Failed to load messages', error);
         setError(error);
@@ -306,7 +308,7 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
   }, [updateMessagesWithSync, onError]);
 
   // ---------------------------------------------------------------------------
-  // SEND MESSAGE - STREAMING
+  // SEND MESSAGE - STREAMING (with throttle fix)
   // ---------------------------------------------------------------------------
 
   const sendMessageStreaming = useCallback(
@@ -322,6 +324,14 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
       lastSentMessageRef.current = content;
       setError(null);
       setIsLoading(true);
+      
+      // FIX: Reset streaming throttle state
+      lastStreamingUpdateRef.current = 0;
+      pendingStreamingContentRef.current = '';
+      if (streamingFlushTimeoutRef.current) {
+        clearTimeout(streamingFlushTimeoutRef.current);
+        streamingFlushTimeoutRef.current = null;
+      }
 
       const userMessage = createUserMessage(content, sendOptions.attachments);
       const conversationHistory = captureConversationHistory();
@@ -333,17 +343,7 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
         isNewConversation: !currentConversationId,
       });
 
-      console.log('[CHAT-DEBUG] Payload construction:', {
-        stateLength: messages.length,
-        refLength: messagesRef.current.length,
-        historyLength: conversationHistory.length,
-        conversationId: currentConversationId,
-        isNewConversation: !currentConversationId,
-        firstMsgPreview: conversationHistory[0]?.content?.slice(0, 50),
-      });
-
       if (!sendOptions.skipUserMessage) {
-        console.log('Message being added:', userMessage);
         updateMessagesWithSync((prev) => [...prev, userMessage]);
         onMessageSent?.(userMessage);
       }
@@ -358,21 +358,65 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
           content,
           conversationHistory,
           {
+            // FIX: Throttled onChunk handler
             onChunk: (chunk: string) => {
-              updateMessagesWithSync((prev) =>
-                prev.map((msg) =>
-                  msg.id === assistantMessageId
-                    ? { ...msg, content: msg.content + chunk }
-                    : msg
-                )
-              );
+              const now = Date.now();
+              pendingStreamingContentRef.current += chunk;
+              
+              // Check if we should update the UI
+              const timeSinceLastUpdate = now - lastStreamingUpdateRef.current;
+              
+              if (timeSinceLastUpdate >= STREAMING_THROTTLE_MS) {
+                // Enough time has passed, update now
+                const contentToRender = pendingStreamingContentRef.current;
+                pendingStreamingContentRef.current = '';
+                lastStreamingUpdateRef.current = now;
+                
+                updateMessagesWithSync((prev) =>
+                  prev.map((msg) =>
+                    msg.id === assistantMessageId
+                      ? { ...msg, content: msg.content + contentToRender }
+                      : msg
+                  )
+                );
+              } else {
+                // Schedule a flush if not already scheduled
+                if (!streamingFlushTimeoutRef.current) {
+                  streamingFlushTimeoutRef.current = setTimeout(() => {
+                    streamingFlushTimeoutRef.current = null;
+                    if (pendingStreamingContentRef.current) {
+                      const contentToRender = pendingStreamingContentRef.current;
+                      pendingStreamingContentRef.current = '';
+                      lastStreamingUpdateRef.current = Date.now();
+                      
+                      updateMessagesWithSync((prev) =>
+                        prev.map((msg) =>
+                          msg.id === assistantMessageId
+                            ? { ...msg, content: msg.content + contentToRender }
+                            : msg
+                        )
+                      );
+                    }
+                  }, STREAMING_THROTTLE_MS - timeSinceLastUpdate);
+                }
+              }
             },
             onComplete: async (fullResponse: string, newConversationId?: string) => {
-              // Capture conversation ID from backend for new conversations
+              // FIX: Clear any pending flush timeout
+              if (streamingFlushTimeoutRef.current) {
+                clearTimeout(streamingFlushTimeoutRef.current);
+                streamingFlushTimeoutRef.current = null;
+              }
+              pendingStreamingContentRef.current = '';
+              
               if (!currentConversationId && newConversationId) {
                 logger.info('[CHAT-COMPLETE] Capturing conversation ID from backend', {
                   conversationId: newConversationId,
                 });
+                
+                // FIX: Prevent useEffect from refetching messages
+                loadedConversationRef.current = newConversationId;
+                
                 setCurrentConversationId(newConversationId);
                 onConversationCreated?.(newConversationId);
               }
@@ -395,6 +439,13 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
               });
             },
             onError: (err: Error) => {
+              // FIX: Clear streaming state on error
+              if (streamingFlushTimeoutRef.current) {
+                clearTimeout(streamingFlushTimeoutRef.current);
+                streamingFlushTimeoutRef.current = null;
+              }
+              pendingStreamingContentRef.current = '';
+              
               setError(err);
               onError?.(err);
               updateMessagesWithSync((prev) =>
@@ -421,11 +472,11 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
     [
       captureConversationHistory,
       currentConversationId,
-      messages.length,
       onError,
       onMessageSent,
       onResponseComplete,
       onFinish,
+      onConversationCreated,
       sendStreamingMessage,
       updateMessagesWithSync,
     ]
@@ -467,6 +518,14 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
   const stopGeneration = useCallback(() => {
     abortStream();
     setIsLoading(false);
+    
+    // FIX: Clear streaming throttle state on stop
+    if (streamingFlushTimeoutRef.current) {
+      clearTimeout(streamingFlushTimeoutRef.current);
+      streamingFlushTimeoutRef.current = null;
+    }
+    pendingStreamingContentRef.current = '';
+    
     updateMessagesWithSync((prev) =>
       prev.map((msg) => (msg.isStreaming ? { ...msg, isStreaming: false } : msg))
     );
@@ -492,17 +551,13 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
   // EFFECTS
   // ---------------------------------------------------------------------------
 
-  // Store loadMessages in a ref to avoid dependency issues
   const loadMessagesRef = useRef(loadMessages);
   loadMessagesRef.current = loadMessages;
 
-  // Load messages when conversation changes
   useEffect(() => {
     const conversationId = initialConversationId;
     
-    // Skip if no conversation ID
     if (!conversationId) {
-      // Only clear if we have messages (avoid unnecessary state updates)
       if (messagesRef.current.length > 0) {
         setMessages([]);
         messagesRef.current = [];
@@ -513,29 +568,32 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
       return;
     }
     
-    // Skip if already loaded this conversation
     if (loadedConversationRef.current === conversationId) {
       return;
     }
 
-    // Update current conversation ID
     setCurrentConversationId(conversationId);
-    
-    // Load messages using ref to avoid dependency loop
     loadMessagesRef.current(conversationId);
     
-    // Cleanup: abort loading on unmount or conversation change
     return () => {
       if (loadingAbortRef.current) {
         loadingAbortRef.current.abort();
       }
     };
-  }, [initialConversationId]); // Only depend on conversationId - use refs for functions
+  }, [initialConversationId]);
 
-  // Keep ref in sync with state
   useEffect(() => {
     messagesRef.current = messages;
   }, [messages]);
+
+  // FIX: Cleanup streaming timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (streamingFlushTimeoutRef.current) {
+        clearTimeout(streamingFlushTimeoutRef.current);
+      }
+    };
+  }, []);
 
   // ---------------------------------------------------------------------------
   // RETURN
