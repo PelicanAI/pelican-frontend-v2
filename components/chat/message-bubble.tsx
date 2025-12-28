@@ -309,7 +309,7 @@ export function MessageBubble({
           <div className="flex gap-4 sm:gap-6 items-start justify-end">
             {/* Message content */}
             <div className="max-w-[90%] sm:max-w-[80%] md:max-w-[70%] lg:max-w-[600px]">
-              <div className="text-[15px] sm:text-base leading-relaxed break-words text-white bg-gradient-to-br from-purple-600 to-violet-600 rounded-2xl px-4 py-3 shadow-sm">
+              <div className="text-[15px] sm:text-base leading-relaxed break-words text-foreground">
                 {renderAttachments(message.attachments)}
                 {message.content}
               </div>
