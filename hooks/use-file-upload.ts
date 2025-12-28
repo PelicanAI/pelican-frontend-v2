@@ -151,6 +151,8 @@ export function useFileUpload({ sendMessage, addSystemMessage, chatInputRef }: U
         if (index >= newPending.length || !mountedRef.current) return
 
         const current = newPending[index++]
+        if (!current) return // TypeScript safety check
+        
         activeCount++
 
         try {
