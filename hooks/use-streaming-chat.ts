@@ -27,8 +27,8 @@ import { createClient } from '@/lib/supabase/client';
 // =============================================================================
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://pelican-backend.fly.dev';
-const STREAM_TIMEOUT_MS = 300000; // 5 minutes
-const CHUNK_TIMEOUT_MS = 300000; // 5 minutes between chunks
+const STREAM_TIMEOUT_MS = 900000; // 15 minutes
+const CHUNK_TIMEOUT_MS = 900000; // 15 minutes between chunks
 
 // =============================================================================
 // TYPES

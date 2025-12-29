@@ -10,7 +10,7 @@ const DEFAULT_OPTIONS: Required<RetryOptions> = {
   maxRetries: 3,
   baseDelay: 1000,
   maxDelay: 10000,
-  timeout: 300000, // 5 minute default timeout
+  timeout: 900000, // 15 minute default timeout
   shouldRetry: (error: Error) => {
     if (error.name === "AbortError") return false
     if (error.message.includes("timeout")) return true // Retry on timeout
@@ -39,7 +39,7 @@ export async function fetchWithRetry(
   const isDirectBackendCall = url.includes('pelican-backend.fly.dev')
   
   // No timeout for direct backend calls - let them run as long as needed
-  const extendedTimeout = isDirectBackendCall ? undefined : (isPelicanResponse ? 300000 : undefined)
+  const extendedTimeout = isDirectBackendCall ? undefined : (isPelicanResponse ? 900000 : undefined)
   const { retryOptions, ...fetchOptions } = options
   const config = { 
     ...DEFAULT_OPTIONS, 
@@ -151,7 +151,7 @@ export async function streamWithRetry(
     retryOptions: {
       maxRetries: 2,
       baseDelay: 500,
-      timeout: 300000, // 5 minutes for streaming requests
+      timeout: 900000, // 15 minutes for streaming requests
       ...options.retryOptions,
     },
   })
