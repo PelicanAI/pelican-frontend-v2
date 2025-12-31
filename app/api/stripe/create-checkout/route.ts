@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
         limit: 1
       })
       
-      if (existingCustomers.data.length > 0) {
+      if (existingCustomers.data.length > 0 && existingCustomers.data[0]) {
         customerId = existingCustomers.data[0].id
       }
     }
