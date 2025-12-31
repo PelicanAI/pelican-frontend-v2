@@ -35,11 +35,16 @@ import {
   Download,
   Save,
   Loader2,
+  Zap,
+  Crown,
 } from "lucide-react"
 import Link from "next/link"
 import useSWR from "swr"
 import { createClient } from "@/lib/supabase/client"
 import { logger } from "@/lib/logger"
+import { CreditDisplay } from "@/components/credit-display"
+import { ManageSubscriptionButton } from "@/components/manage-subscription-button"
+import { useCreditsContext } from "@/providers/credits-provider"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -127,6 +132,7 @@ export default function SettingsPage() {
   const { user, loading: authLoading } = useAuth()
   const router = useRouter()
   const supabase = createClient()
+  const { credits, isSubscribed, isFounder } = useCreditsContext()
 
   const [settings, setSettings] = useState<UserSettings | null>(null)
   const [isSaving, setIsSaving] = useState(false)
@@ -631,6 +637,101 @@ export default function SettingsPage() {
 
                 {user && (
                   <>
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Subscription & Usage</CardTitle>
+                        <CardDescription>Manage your plan and monitor credit usage</CardDescription>
+                      </CardHeader>
+                      <CardContent className="space-y-6">
+                        {/* Plan Badge */}
+                        <div className="space-y-3">
+                          <Label>Current Plan</Label>
+                          {isFounder ? (
+                            <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-amber-500/10 to-yellow-500/10 border border-amber-500/20 rounded-lg">
+                              <Crown className="w-5 h-5 text-amber-500 flex-shrink-0" />
+                              <div>
+                                <p className="font-semibold text-amber-600 dark:text-amber-400">
+                                  Founder Account
+                                </p>
+                                <p className="text-sm text-amber-700/80 dark:text-amber-300/80">
+                                  Unlimited Access - Thank you for your support! 🎉
+                                </p>
+                              </div>
+                            </div>
+                          ) : credits?.plan && credits.plan !== 'none' ? (
+                            <div className="flex items-center gap-3 p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+                              <Zap className="w-5 h-5 text-blue-500 flex-shrink-0" />
+                              <div className="flex-1">
+                                <p className="font-semibold text-blue-600 dark:text-blue-400 capitalize">
+                                  {credits.plan === 'base' ? 'Base Plan' : `${credits.plan.charAt(0).toUpperCase() + credits.plan.slice(1)} Plan`}
+                                </p>
+                                <p className="text-sm text-blue-700/80 dark:text-blue-300/80">
+                                  {credits.monthlyAllocation.toLocaleString()} credits per month
+                                </p>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-3 p-4 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
+                              <div className="flex-1">
+                                <p className="font-semibold text-gray-700 dark:text-gray-300">
+                                  No Active Plan
+                                </p>
+                                <p className="text-sm text-gray-600 dark:text-gray-400">
+                                  Subscribe to start using Pelican AI
+                                </p>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        <Separator />
+
+                        {/* Credit Balance */}
+                        {!isFounder && isSubscribed && (
+                          <>
+                            <div className="space-y-3">
+                              <Label>Credit Balance</Label>
+                              <CreditDisplay variant="detailed" />
+                            </div>
+                            <Separator />
+                          </>
+                        )}
+
+                        {/* Action Buttons */}
+                        <div className="flex flex-col gap-3">
+                          {isSubscribed ? (
+                            <>
+                              <ManageSubscriptionButton className="w-full justify-center" />
+                              <Button asChild variant="outline" className="w-full">
+                                <Link href="/pricing">
+                                  <Zap className="h-4 w-4 mr-2" />
+                                  View All Plans
+                                </Link>
+                              </Button>
+                            </>
+                          ) : (
+                            <Button asChild className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800">
+                              <Link href="/pricing">
+                                <Zap className="h-4 w-4 mr-2" />
+                                View Plans & Subscribe
+                              </Link>
+                            </Button>
+                          )}
+                        </div>
+
+                        {isSubscribed && !isFounder && (
+                          <>
+                            <Separator />
+                            <div className="bg-blue-50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                              <p className="text-sm text-blue-700 dark:text-blue-300">
+                                <strong>💡 Credits reset monthly.</strong> Unused credits roll over up to 20% of your plan limit.
+                              </p>
+                            </div>
+                          </>
+                        )}
+                      </CardContent>
+                    </Card>
+
                     <Card>
                       <CardHeader>
                         <CardTitle>Change Password</CardTitle>

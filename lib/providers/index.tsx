@@ -7,6 +7,7 @@ import { SWRProvider } from "./swr-provider"
 import { ToastProvider } from "./toast-provider"
 import { TranslationProvider } from "./translation-provider"
 import { ThemeProvider } from "@/components/theme-provider"
+import { CreditsProvider } from "@/providers/credits-provider"
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
@@ -20,7 +21,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
       <TranslationProvider>
         <SWRProvider>
           <AuthProvider>
-            <ToastProvider>{children}</ToastProvider>
+            <CreditsProvider>
+              <ToastProvider>{children}</ToastProvider>
+            </CreditsProvider>
           </AuthProvider>
         </SWRProvider>
       </TranslationProvider>
