@@ -34,7 +34,7 @@ export default function SignUpPage() {
     }
 
     try {
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -44,7 +44,18 @@ export default function SignUpPage() {
           },
         },
       })
+      
       if (error) throw error
+
+      // If email confirmation is disabled, user is immediately logged in with a session
+      if (data.session) {
+        // User is logged in, redirect to pricing (new users need to subscribe)
+        router.push('/pricing')
+        return
+      }
+
+      // No session means email confirmation is required
+      // Redirect to confirmation screen
       router.push("/auth/signup-success")
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : "An error occurred")
