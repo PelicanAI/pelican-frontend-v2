@@ -85,9 +85,10 @@ export async function POST(request: NextRequest) {
       case 'invoice.paid': {
         const invoice = event.data.object as Stripe.Invoice
         
-        if (invoice.subscription && invoice.billing_reason === 'subscription_cycle') {
+        const subscriptionId = invoice.parent?.subscription_details?.subscription
+        if (subscriptionId && invoice.billing_reason === 'subscription_cycle') {
           const subscription = await stripe.subscriptions.retrieve(
-            invoice.subscription as string
+            subscriptionId as string
           )
           
           const userId = subscription.metadata?.user_id
@@ -114,9 +115,10 @@ export async function POST(request: NextRequest) {
       case 'invoice.payment_failed': {
         const invoice = event.data.object as Stripe.Invoice
         
-        if (invoice.subscription) {
+        const subscriptionId = invoice.parent?.subscription_details?.subscription
+        if (subscriptionId) {
           const subscription = await stripe.subscriptions.retrieve(
-            invoice.subscription as string
+            subscriptionId as string
           )
           
           const userId = subscription.metadata?.user_id
