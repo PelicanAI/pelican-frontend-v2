@@ -157,7 +157,8 @@ export async function POST(request: NextRequest) {
 
       case 'customer.subscription.updated': {
         const subscription = event.data.object as Stripe.Subscription
-        const previousAttributes = event.data.previous_attributes as any
+        // @ts-expect-error - Stripe types don't include previous_attributes
+        const previousAttributes = event.data.previous_attributes
         
         if (previousAttributes?.items) {
           const userId = subscription.metadata?.user_id
