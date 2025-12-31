@@ -22,9 +22,11 @@ import { LanguageSelector } from "@/components/language-selector"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
 import { SettingsModal } from "@/components/settings-modal"
+import { useCreditsContext } from "@/providers/credits-provider"
 
 export default function ChatPage() {
   const { user, loading: authLoading } = useAuth()
+  const { isSubscribed, isFounder, loading: creditsLoading } = useCreditsContext()
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -238,12 +240,20 @@ export default function ChatPage() {
     return null
   }
 
-  if (authLoading) {
+  if (authLoading || creditsLoading) {
     return (
       <div className="flex items-center justify-center h-screen bg-background">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     )
+  }
+
+  // Check subscription access - founders and subscribers can access
+  const hasAccess = isFounder || isSubscribed
+  
+  if (!hasAccess) {
+    router.push('/pricing')
+    return null
   }
 
   return (

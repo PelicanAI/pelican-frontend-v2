@@ -25,12 +25,32 @@ export default function LoginPage() {
     setError(null)
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { error, data } = await supabase.auth.signInWithPassword({
         email,
         password,
       })
       if (error) throw error
-      router.push("/chat")
+
+      // Check subscription status
+      if (data.user) {
+        const { data: userCredits } = await supabase
+          .from('user_credits')
+          .select('plan_type, is_founder')
+          .eq('user_id', data.user.id)
+          .single()
+
+        const hasSubscription = userCredits?.is_founder || 
+          (userCredits?.plan_type && userCredits.plan_type !== 'none')
+
+        // Redirect based on subscription status
+        if (hasSubscription) {
+          router.push("/chat")
+        } else {
+          router.push("/pricing")
+        }
+      } else {
+        router.push("/pricing")
+      }
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : "An error occurred")
     } finally {

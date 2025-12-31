@@ -1,9 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Check, Zap, Loader2 } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useCreditsContext } from '@/providers/credits-provider'
 
 const QUERY_COSTS = {
   conversation: { label: 'Chat / Education', cost: 2 },
@@ -84,8 +86,17 @@ const PLANS = [
 ]
 
 export default function PricingPage() {
+  const router = useRouter()
+  const { isSubscribed, isFounder, loading: creditsLoading } = useCreditsContext()
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+
+  // Redirect users who already have an active subscription to chat
+  useEffect(() => {
+    if (!creditsLoading && (isSubscribed || isFounder)) {
+      router.push('/chat')
+    }
+  }, [isSubscribed, isFounder, creditsLoading, router])
 
   const handleSelectPlan = async (plan: typeof PLANS[0]) => {
     setLoadingPlan(plan.id)
@@ -132,6 +143,17 @@ export default function PricingPage() {
     }
   }
 
+  // Show loading while checking subscription status
+  if (creditsLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-950">
+        <Loader2 className="h-8 w-8 animate-spin text-blue-400" />
+      </div>
+    )
+  }
+
+  // If user has subscription, they'll be redirected by useEffect
+  // Show pricing page for non-subscribed users
   return (
     <div className="min-h-screen bg-gray-950 py-12 px-4">
       <div className="max-w-6xl mx-auto">
