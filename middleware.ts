@@ -65,6 +65,12 @@ async function detectLocaleFromIP(req: NextRequest): Promise<string | null> {
 }
 
 export async function middleware(request: NextRequest) {
+  // CRITICAL: Stripe webhook must bypass ALL middleware (no auth, no redirects)
+  // Webhooks need raw request body and cannot have any interference
+  if (request.nextUrl.pathname === '/api/stripe/webhook') {
+    return NextResponse.next()
+  }
+
   // Skip API routes for locale detection, but still apply rate limiting
   const isApiRoute = request.nextUrl.pathname.startsWith('/api');
   

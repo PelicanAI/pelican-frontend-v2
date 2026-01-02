@@ -198,3 +198,8 @@ export async function POST(request: NextRequest) {
   }
 }
 
+// CRITICAL: Disable body parsing for Stripe webhooks
+// Stripe needs the raw request body to verify the signature
+export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
+
