@@ -152,7 +152,7 @@ export const QUERY_COSTS = {
   "userId": "uuid",
   "userEmail": "user@example.com",
   "planName": "starter",
-  "planCredits": 700
+  "planCredits": 1000
 }
 ```
 
@@ -177,9 +177,9 @@ Handles Stripe events:
 
 | Plan | Price | Credits | Use Case |
 |------|-------|---------|----------|
-| Starter | $29/mo | 700 | ~70 price checks, ~28 analyses |
-| Pro | $99/mo | 2,800 | ~280 price checks, ~112 analyses |
-| Power | $249/mo | 8,300 | ~830 price checks, ~332 analyses |
+| Base | $29/mo | 1,000 | ~100 price checks, ~40 analyses |
+| Pro | $99/mo | 3,500 | ~350 price checks, ~140 analyses |
+| Power | $249/mo | 10,000 | ~1,000 price checks, ~400 analyses |
 | Founder | - | Unlimited | Special access |
 
 ---

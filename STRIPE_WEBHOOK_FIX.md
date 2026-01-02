@@ -158,7 +158,7 @@ vercel logs --follow
 Look for:
 ```
 Processing Stripe event: checkout.session.completed
-✅ User abc123 subscribed to base with 700 credits
+✅ User abc123 subscribed to base with 1000 credits
 ```
 
 ### In Stripe Dashboard:

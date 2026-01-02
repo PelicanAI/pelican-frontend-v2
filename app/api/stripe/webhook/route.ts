@@ -12,9 +12,9 @@ const supabaseAdmin = createClient(
 )
 
 const PLAN_CREDITS: Record<string, number> = {
-  base: 700,
-  pro: 2800,
-  power: 8300
+  base: 1000,
+  pro: 3500,
+  power: 10000
 }
 
 export async function POST(request: NextRequest) {
