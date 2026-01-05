@@ -39,8 +39,10 @@ export default function LoginPage() {
           .eq('user_id', data.user.id)
           .single()
 
+        // Valid plan types that grant access
+        const validPlans = ['base', 'pro', 'power', 'founder', 'starter']
         const hasSubscription = userCredits?.is_founder || 
-          (userCredits?.plan_type && userCredits.plan_type !== 'none')
+          (userCredits?.plan_type && validPlans.includes(userCredits.plan_type))
 
         // Redirect based on subscription status
         if (hasSubscription) {
