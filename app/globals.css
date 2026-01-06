@@ -80,14 +80,14 @@
   /* Futuristic dark theme with purple accents - matches login page */
   /* Pure black base for maximum contrast */
   --background: oklch(0.05 0 0); /* Pure black background */
-  --foreground: oklch(0.98 0.002 280); /* Bright white text with subtle purple tint */
+  --foreground: oklch(0.95 0.002 280); /* Bright readable text with subtle purple tint */
   --muted: oklch(0.12 0.01 280); /* Dark purple-tinted muted background */
-  --muted-foreground: oklch(0.68 0 0); /* WCAG AA compliant - 4.8:1 contrast */
+  --muted-foreground: oklch(0.75 0 0); /* Brighter gray for better secondary text readability */
 
-  /* Layered surfaces with purple glow */
+  /* Layered surfaces with purple glow - optimized for readability */
   --surface-1: oklch(0.08 0.01 280); /* Sidebar - slightly purple-tinted black */
-  --surface-2: oklch(0.16 0.015 280); /* Cards - lighter for better readability */
-  --surface-3: oklch(0.18 0.02 280); /* Popovers - more visible purple */
+  --surface-2: oklch(0.18 0.015 280); /* Cards - lighter for better readability */
+  --surface-3: oklch(0.22 0.02 280); /* Popovers - lighter with more visible purple */
 
   /* Purple accent borders */
   --border: oklch(0.35 0.08 280); /* More visible purple-tinted borders */
@@ -111,8 +111,8 @@
   --chart-4: oklch(0.70 0.15 280); /* Muted purple */
   --chart-5: oklch(0.50 0.28 275); /* Deep purple */
 
-  /* Components with futuristic styling */
-  --card: var(--surface-2);
+  /* Components with futuristic styling - explicit card values for better contrast */
+  --card: oklch(0.18 0.015 280); /* Lighter card background for readability */
   --card-foreground: oklch(0.95 0.004 280);
   --popover: var(--surface-3);
   --popover-foreground: oklch(0.95 0.004 280);
