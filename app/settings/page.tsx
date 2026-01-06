@@ -506,7 +506,7 @@ export default function SettingsPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm border-b border-gray-200 dark:border-gray-800">
+      <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-sm border-b border-border">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -516,7 +516,7 @@ export default function SettingsPage() {
                   Back
                 </Link>
               </Button>
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Settings</h1>
+              <h1 className="text-2xl font-bold text-foreground">Settings</h1>
             </div>
             {user ? (
               <Button
@@ -567,7 +567,7 @@ export default function SettingsPage() {
                         className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                           activeSection === section.id
                             ? "bg-purple-100 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300"
-                            : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                            : "text-foreground hover:bg-muted"
                         }`}
                       >
                         <Icon className="h-4 w-4" />
@@ -634,7 +634,7 @@ export default function SettingsPage() {
                           <Upload className="h-4 w-4 mr-2" />
                           Upload Photo
                         </Button>
-                        <p className="text-sm text-gray-500">JPG, PNG or GIF. Max size 2MB.</p>
+                        <p className="text-sm text-muted-foreground">JPG, PNG or GIF. Max size 2MB.</p>
                       </div>
                     </div>
 
@@ -654,8 +654,8 @@ export default function SettingsPage() {
                     {/* Email */}
                     <div className="space-y-2">
                       <Label htmlFor="email">Email</Label>
-                      <Input id="email" value={settings.email} disabled className="bg-gray-50 dark:bg-gray-900" />
-                      <p className="text-sm text-gray-500">Contact support to change your email address</p>
+                      <Input id="email" value={settings.email} disabled className="bg-muted" />
+                      <p className="text-sm text-muted-foreground">Contact support to change your email address</p>
                     </div>
                   </CardContent>
                 </Card>
@@ -696,12 +696,12 @@ export default function SettingsPage() {
                               </div>
                             </div>
                           ) : (
-                            <div className="flex items-center gap-3 p-4 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
+                            <div className="flex items-center gap-3 p-4 bg-muted border border-border rounded-lg">
                               <div className="flex-1">
-                                <p className="font-semibold text-gray-700 dark:text-gray-300">
+                                <p className="font-semibold text-foreground">
                                   No Active Plan
                                 </p>
-                                <p className="text-sm text-gray-600 dark:text-gray-400">
+                                <p className="text-sm text-muted-foreground">
                                   Subscribe to start using Pelican AI
                                 </p>
                               </div>
@@ -953,7 +953,7 @@ export default function SettingsPage() {
                       ))}
                     </div>
                     <div>
-                      <p className="text-sm text-gray-500 mb-2">Popular tickers:</p>
+                      <p className="text-sm text-muted-foreground mb-2">Popular tickers:</p>
                       <div className="flex flex-wrap gap-2">
                         {POPULAR_TICKERS.filter((t) => !settings.favorite_tickers.includes(t))
                           .slice(0, 8)
@@ -963,7 +963,7 @@ export default function SettingsPage() {
                               onClick={() => {
                                 updateSetting("favorite_tickers", [...settings.favorite_tickers, ticker])
                               }}
-                              className="px-2 py-1 text-sm border border-gray-300 dark:border-gray-700 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
+                              className="px-2 py-1 text-sm border border-border rounded hover:bg-muted"
                             >
                               + {ticker}
                             </button>
@@ -986,7 +986,7 @@ export default function SettingsPage() {
                   <div className="flex items-center justify-between">
                     <div className="space-y-0.5">
                       <Label>Email Notifications</Label>
-                      <p className="text-sm text-gray-500">Receive updates via email</p>
+                      <p className="text-sm text-muted-foreground">Receive updates via email</p>
                     </div>
                     <Switch
                       checked={settings.email_notifications}
@@ -997,7 +997,7 @@ export default function SettingsPage() {
                   <div className="flex items-center justify-between">
                     <div className="space-y-0.5">
                       <Label>Market Alerts</Label>
-                      <p className="text-sm text-gray-500">Get notified of significant market movements</p>
+                      <p className="text-sm text-muted-foreground">Get notified of significant market movements</p>
                     </div>
                     <Switch
                       checked={settings.market_alerts}
@@ -1008,7 +1008,7 @@ export default function SettingsPage() {
                   <div className="flex items-center justify-between">
                     <div className="space-y-0.5">
                       <Label>Price Alerts</Label>
-                      <p className="text-sm text-gray-500">Alerts when your watchlist hits target prices</p>
+                      <p className="text-sm text-muted-foreground">Alerts when your watchlist hits target prices</p>
                     </div>
                     <Switch
                       checked={settings.price_alerts}
@@ -1019,7 +1019,7 @@ export default function SettingsPage() {
                   <div className="flex items-center justify-between">
                     <div className="space-y-0.5">
                       <Label>Trade Confirmations</Label>
-                      <p className="text-sm text-gray-500">Confirm trade execution notifications</p>
+                      <p className="text-sm text-muted-foreground">Confirm trade execution notifications</p>
                     </div>
                     <Switch
                       checked={settings.trade_confirmations}
@@ -1073,17 +1073,17 @@ export default function SettingsPage() {
                     <div className="flex items-center justify-between">
                       <div className="space-y-0.5">
                         <Label>Message Density</Label>
-                        <p className="text-sm text-gray-500">Compact mode shows more messages on screen</p>
+                        <p className="text-sm text-muted-foreground">Compact mode shows more messages on screen</p>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-sm text-gray-500">Comfortable</span>
+                        <span className="text-sm text-muted-foreground">Comfortable</span>
                         <Switch
                           checked={settings.message_density === "compact"}
                           onCheckedChange={(checked) =>
                             updateSetting("message_density", checked ? "compact" : "comfortable")
                           }
                         />
-                        <span className="text-sm text-gray-500">Compact</span>
+                        <span className="text-sm text-muted-foreground">Compact</span>
                       </div>
                     </div>
 
@@ -1092,7 +1092,7 @@ export default function SettingsPage() {
                     <div className="flex items-center justify-between">
                       <div className="space-y-0.5">
                         <Label>Show Timestamps</Label>
-                        <p className="text-sm text-gray-500">Display time on each message</p>
+                        <p className="text-sm text-muted-foreground">Display time on each message</p>
                       </div>
                       <Switch
                         checked={settings.show_timestamps}
@@ -1190,7 +1190,7 @@ export default function SettingsPage() {
                   <div className="flex items-center justify-between">
                     <div className="space-y-0.5">
                       <Label>Sidebar Collapsed by Default</Label>
-                      <p className="text-sm text-gray-500">Start with sidebar minimized</p>
+                      <p className="text-sm text-muted-foreground">Start with sidebar minimized</p>
                     </div>
                     <Switch
                       checked={settings.sidebar_collapsed_default}
@@ -1203,7 +1203,7 @@ export default function SettingsPage() {
                   <div className="flex items-center justify-between">
                     <div className="space-y-0.5">
                       <Label>Market Overview Panel Visible</Label>
-                      <p className="text-sm text-gray-500">Show market data panel on desktop</p>
+                      <p className="text-sm text-muted-foreground">Show market data panel on desktop</p>
                     </div>
                     <Switch
                       checked={settings.market_panel_visible}

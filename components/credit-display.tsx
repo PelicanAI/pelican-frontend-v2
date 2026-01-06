@@ -15,7 +15,7 @@ export function CreditDisplay({ variant = 'default', className = '' }: CreditDis
   if (loading) {
     return (
       <div className={`flex items-center gap-2 ${className}`}>
-        <div className="h-4 w-16 bg-gray-700 rounded animate-pulse" />
+        <div className="h-4 w-16 bg-muted rounded animate-pulse" />
       </div>
     )
   }
@@ -49,7 +49,7 @@ export function CreditDisplay({ variant = 'default', className = '' }: CreditDis
             <Zap className="w-4 h-4 text-amber-400" />
             <span className="text-sm font-semibold text-amber-400">Founder Account</span>
           </div>
-          <p className="text-xs text-gray-500">Unlimited access</p>
+          <p className="text-xs text-muted-foreground">Unlimited access</p>
         </div>
       )
     }
@@ -68,8 +68,8 @@ export function CreditDisplay({ variant = 'default', className = '' }: CreditDis
   if (variant === 'compact') {
     return (
       <div className={`flex items-center gap-1.5 ${className}`}>
-        <Zap className={`w-3.5 h-3.5 ${isCritical ? 'text-red-400' : isLow ? 'text-amber-400' : 'text-gray-400'}`} />
-        <span className={`text-sm font-medium ${isCritical ? 'text-red-400' : isLow ? 'text-amber-400' : 'text-gray-300'}`}>
+        <Zap className={`w-3.5 h-3.5 ${isCritical ? 'text-red-400' : isLow ? 'text-amber-400' : 'text-muted-foreground'}`} />
+        <span className={`text-sm font-medium ${isCritical ? 'text-red-400' : isLow ? 'text-amber-400' : 'text-foreground'}`}>
           {credits.balance.toLocaleString()}
         </span>
       </div>
@@ -80,13 +80,13 @@ export function CreditDisplay({ variant = 'default', className = '' }: CreditDis
     return (
       <div className={`space-y-2 ${className}`}>
         <div className="flex items-center justify-between">
-          <span className="text-xs text-gray-500 uppercase tracking-wide">Credits</span>
-          <span className={`text-sm font-semibold ${isCritical ? 'text-red-400' : isLow ? 'text-amber-400' : 'text-gray-200'}`}>
+          <span className="text-xs text-muted-foreground uppercase tracking-wide">Credits</span>
+          <span className={`text-sm font-semibold ${isCritical ? 'text-red-400' : isLow ? 'text-amber-400' : 'text-foreground'}`}>
             {credits.balance.toLocaleString()}
           </span>
         </div>
         
-        <div className="h-1.5 bg-gray-700 rounded-full overflow-hidden">
+        <div className="h-1.5 bg-muted rounded-full overflow-hidden">
           <div 
             className={`h-full rounded-full transition-all ${
               isCritical ? 'bg-red-500' : isLow ? 'bg-amber-500' : 'bg-blue-500'
@@ -97,7 +97,7 @@ export function CreditDisplay({ variant = 'default', className = '' }: CreditDis
           />
         </div>
 
-        <div className="flex items-center justify-between text-xs text-gray-500">
+        <div className="flex items-center justify-between text-xs text-muted-foreground">
           <span>{credits.usedThisMonth.toLocaleString()} used</span>
           <span>{credits.monthlyAllocation.toLocaleString()} / month</span>
         </div>
@@ -117,8 +117,8 @@ export function CreditDisplay({ variant = 'default', className = '' }: CreditDis
 
   return (
     <div className={`flex items-center gap-2 ${className}`}>
-      <Zap className={`w-4 h-4 ${isCritical ? 'text-red-400' : isLow ? 'text-amber-400' : 'text-gray-400'}`} />
-      <span className={`text-sm font-medium ${isCritical ? 'text-red-400' : isLow ? 'text-amber-400' : 'text-gray-300'}`}>
+      <Zap className={`w-4 h-4 ${isCritical ? 'text-red-400' : isLow ? 'text-amber-400' : 'text-muted-foreground'}`} />
+      <span className={`text-sm font-medium ${isCritical ? 'text-red-400' : isLow ? 'text-amber-400' : 'text-foreground'}`}>
         {credits.balance.toLocaleString()} credits
       </span>
       

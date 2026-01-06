@@ -15,7 +15,7 @@ export function PaywallGate({ children, fallback }: PaywallGateProps) {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-pulse text-gray-500">Loading...</div>
+        <div className="animate-pulse text-muted-foreground">Loading...</div>
       </div>
     )
   }
@@ -42,11 +42,11 @@ function DefaultPaywall() {
         <h1 className="text-2xl font-bold text-white mb-2">
           Subscribe to Access Pelican
         </h1>
-        <p className="text-gray-400 mb-8">
+        <p className="text-muted-foreground mb-8">
           Get AI-powered market analysis, backtesting, and trading intelligence.
         </p>
 
-        <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-4 mb-8 text-left">
+        <div className="bg-muted/50 border border-border rounded-lg p-4 mb-8 text-left">
           <div className="space-y-3">
             <Feature text="Real-time price checks and analysis" />
             <Feature text="Technical indicator breakdowns" />
@@ -64,7 +64,7 @@ function DefaultPaywall() {
           <ArrowRight className="w-4 h-4" />
         </Link>
 
-        <p className="text-gray-500 text-sm mt-4">
+        <p className="text-muted-foreground text-sm mt-4">
           Starting at $29/month
         </p>
       </div>
@@ -76,7 +76,7 @@ function Feature({ text }: { text: string }) {
   return (
     <div className="flex items-center gap-2">
       <Zap className="w-4 h-4 text-blue-400 flex-shrink-0" />
-      <span className="text-gray-300 text-sm">{text}</span>
+      <span className="text-foreground text-sm">{text}</span>
     </div>
   )
 }

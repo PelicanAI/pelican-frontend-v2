@@ -11,7 +11,7 @@ export function CreditCostBadge({ cost, className = '' }: CreditCostBadgeProps) 
   if (!cost || cost <= 0) return null
 
   return (
-    <div className={`flex items-center gap-1 text-xs text-gray-500 ${className}`}>
+    <div className={`flex items-center gap-1 text-xs text-muted-foreground ${className}`}>
       <Zap className="w-3 h-3" />
       <span>-{cost} credits</span>
     </div>
@@ -38,9 +38,9 @@ export function QueryCostPreview({ queryType, className = '' }: QueryCostPreview
 
   return (
     <div className={`flex items-center gap-2 text-xs ${className}`}>
-      <span className="text-gray-500">{label}</span>
-      <span className="text-gray-400">•</span>
-      <span className="text-gray-400 flex items-center gap-1">
+      <span className="text-muted-foreground">{label}</span>
+      <span className="text-muted-foreground">•</span>
+      <span className="text-muted-foreground flex items-center gap-1">
         <Zap className="w-3 h-3" />
         {cost} credits
       </span>
@@ -50,14 +50,14 @@ export function QueryCostPreview({ queryType, className = '' }: QueryCostPreview
 
 export function CostBreakdownTable() {
   return (
-    <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-4">
-      <h3 className="text-sm font-medium text-gray-400 mb-3 text-center">What things cost</h3>
+    <div className="bg-muted/50 border border-border rounded-lg p-4">
+      <h3 className="text-sm font-medium text-muted-foreground mb-3 text-center">What things cost</h3>
       <div className="space-y-2.5">
         {Object.entries(QUERY_COSTS).map(([key, { label, cost }]) => (
           <div key={key} className="flex justify-between items-center text-sm">
-            <span className="text-gray-300">{label}</span>
-            <span className="text-white font-medium flex items-center gap-1">
-              <Zap className="w-3 h-3 text-gray-500" />
+            <span className="text-foreground">{label}</span>
+            <span className="text-foreground font-medium flex items-center gap-1">
+              <Zap className="w-3 h-3 text-muted-foreground" />
               {cost}
             </span>
           </div>

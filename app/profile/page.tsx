@@ -59,8 +59,8 @@ export default async function ProfilePage() {
               <User className="w-8 h-8 text-white" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{profile?.display_name || "Trader"}</h1>
-              <p className="text-gray-600 dark:text-gray-400">{user.email}</p>
+              <h1 className="text-3xl font-bold text-foreground">{profile?.display_name || "Trader"}</h1>
+              <p className="text-muted-foreground">{user.email}</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -91,19 +91,19 @@ export default async function ProfilePage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Display Name</label>
+                  <label className="text-sm font-medium text-muted-foreground">Display Name</label>
                   <p className="text-lg font-semibold">{profile?.display_name || "Not set"}</p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Email</label>
+                  <label className="text-sm font-medium text-muted-foreground">Email</label>
                   <p className="text-lg">{user.email}</p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Member Since</label>
+                  <label className="text-sm font-medium text-muted-foreground">Member Since</label>
                   <p className="text-lg">{formatDate(profile?.created_at || user.created_at)}</p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Status</label>
+                  <label className="text-sm font-medium text-muted-foreground">Status</label>
                   <div className="mt-1">
                     <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
                       Active Trader
@@ -131,19 +131,19 @@ export default async function ProfilePage() {
                     <div className="text-3xl font-bold text-purple-600 dark:text-purple-400">
                       {analytics?.total_messages || 0}
                     </div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">Total Messages</p>
+                    <p className="text-sm text-muted-foreground">Total Messages</p>
                   </div>
                   <div className="text-center">
                     <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">
                       {analytics?.total_conversations || 0}
                     </div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">Conversations</p>
+                    <p className="text-sm text-muted-foreground">Conversations</p>
                   </div>
                   <div className="text-center">
                     <div className="text-3xl font-bold text-green-600 dark:text-green-400">
                       {analytics?.last_active ? formatDate(analytics.last_active) : "Never"}
                     </div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">Last Active</p>
+                    <p className="text-sm text-muted-foreground">Last Active</p>
                   </div>
                 </div>
               </CardContent>
@@ -164,13 +164,13 @@ export default async function ProfilePage() {
                     {conversations.map((conversation) => (
                       <div
                         key={conversation.id}
-                        className="flex items-center justify-between p-3 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                        className="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-muted transition-colors"
                       >
                         <div className="flex-1">
-                          <h4 className="font-medium text-gray-900 dark:text-white truncate">
+                          <h4 className="font-medium text-foreground truncate">
                             {conversation.title || "Untitled Conversation"}
                           </h4>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">
+                          <p className="text-sm text-muted-foreground">
                             {formatDateTime(conversation.updated_at)}
                           </p>
                         </div>
@@ -182,8 +182,8 @@ export default async function ProfilePage() {
                   </div>
                 ) : (
                   <div className="text-center py-8">
-                    <MessageSquare className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-600 dark:text-gray-400">No conversations yet</p>
+                    <MessageSquare className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                    <p className="text-muted-foreground">No conversations yet</p>
                     <Button asChild className="mt-4 bg-gradient-to-r from-purple-600 to-purple-700">
                       <Link href="/chat">Start Your First Chat</Link>
                     </Button>

@@ -347,9 +347,9 @@ export function MessageBubble({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* AI message - Purple Card Style */}
+      {/* AI message - Plain text style */}
       <div className="max-w-3xl mx-auto px-4 sm:px-8">
-        <div className="flex gap-3 sm:gap-6 items-start bg-[#13131f] border border-purple-500/20 rounded-2xl p-6 shadow-sm ring-1 ring-purple-500/10">
+        <div className="flex gap-3 sm:gap-6 items-start">
           {/* AI avatar */}
           <div className="flex-shrink-0">
             <img
@@ -507,13 +507,13 @@ function MessageContent({
                   />
                   
                   {segment.language && (
-                    <span className="absolute top-2 right-2 text-[10px] uppercase tracking-wide text-gray-400">
+                    <span className="absolute top-2 right-2 text-[10px] uppercase tracking-wide text-muted-foreground">
                       {segment.language}
                     </span>
                   )}
                   <button
                     type="button"
-                    className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-gray-200 h-11 w-11 sm:h-8 sm:w-8 min-h-[44px] min-w-[44px] sm:min-h-[36px] sm:min-w-[36px] flex items-center justify-center"
+                    className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-foreground h-11 w-11 sm:h-8 sm:w-8 min-h-[44px] min-w-[44px] sm:min-h-[36px] sm:min-w-[36px] flex items-center justify-center"
                     onClick={() => navigator.clipboard.writeText(segment.content)}
                     aria-label="Copy code"
                   >
