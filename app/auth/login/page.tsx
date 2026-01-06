@@ -35,14 +35,13 @@ export default function LoginPage() {
       if (data.user) {
         const { data: userCredits } = await supabase
           .from('user_credits')
-          .select('plan_type, is_founder')
+          .select('plan_type')
           .eq('user_id', data.user.id)
           .single()
 
         // Valid plan types that grant access
         const validPlans = ['base', 'pro', 'power', 'founder', 'starter']
-        const hasSubscription = userCredits?.is_founder || 
-          (userCredits?.plan_type && validPlans.includes(userCredits.plan_type))
+        const hasSubscription = userCredits?.plan_type && validPlans.includes(userCredits.plan_type)
 
         // Redirect based on subscription status
         if (hasSubscription) {
