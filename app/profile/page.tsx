@@ -50,7 +50,7 @@ export default async function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100" data-theme="light">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
@@ -105,7 +105,7 @@ export default async function ProfilePage() {
                 <div>
                   <label className="text-sm font-medium text-muted-foreground">Status</label>
                   <div className="mt-1">
-                    <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                    <Badge className="bg-green-100 text-green-800">
                       Active Trader
                     </Badge>
                   </div>
@@ -128,19 +128,19 @@ export default async function ProfilePage() {
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div className="text-center">
-                    <div className="text-3xl font-bold text-purple-600 dark:text-purple-400">
+                    <div className="text-3xl font-bold text-purple-600">
                       {analytics?.total_messages || 0}
                     </div>
                     <p className="text-sm text-muted-foreground">Total Messages</p>
                   </div>
                   <div className="text-center">
-                    <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">
+                    <div className="text-3xl font-bold text-blue-600">
                       {analytics?.total_conversations || 0}
                     </div>
                     <p className="text-sm text-muted-foreground">Conversations</p>
                   </div>
                   <div className="text-center">
-                    <div className="text-3xl font-bold text-green-600 dark:text-green-400">
+                    <div className="text-3xl font-bold text-green-600">
                       {analytics?.last_active ? formatDate(analytics.last_active) : "Never"}
                     </div>
                     <p className="text-sm text-muted-foreground">Last Active</p>

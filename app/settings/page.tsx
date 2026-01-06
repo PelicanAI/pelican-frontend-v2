@@ -504,7 +504,7 @@ export default function SettingsPage() {
   // ============================================================================
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100" data-theme="light">
       {/* Header */}
       <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-sm border-b border-border">
         <div className="container mx-auto px-4 py-4">
@@ -566,7 +566,7 @@ export default function SettingsPage() {
                         onClick={() => setActiveSection(section.id)}
                         className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                           activeSection === section.id
-                            ? "bg-purple-100 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300"
+                            ? "bg-purple-100 text-purple-700"
                             : "text-foreground hover:bg-muted"
                         }`}
                       >
@@ -586,17 +586,17 @@ export default function SettingsPage() {
             {activeSection === "account" && (
               <div className="space-y-6">
                 {!user && (
-                  <Card className="border-purple-200 dark:border-purple-800 bg-purple-50/50 dark:bg-purple-900/10">
+                  <Card className="border-purple-200 bg-purple-50/50">
                     <CardContent className="pt-6">
                       <div className="flex items-start gap-4">
                         <div className="flex-shrink-0">
-                          <User className="h-8 w-8 text-purple-600 dark:text-purple-400" />
+                          <User className="h-8 w-8 text-purple-600" />
                         </div>
                         <div className="flex-1">
-                          <h3 className="font-semibold text-purple-900 dark:text-purple-100 mb-2">
+                          <h3 className="font-semibold text-purple-900 mb-2">
                             Sign in to save your settings
                           </h3>
-                          <p className="text-sm text-purple-700 dark:text-purple-300 mb-4">
+                          <p className="text-sm text-purple-700 mb-4">
                             You&apos;re currently using Pelican AI in guest mode. Create an account to save your preferences and access additional features.
                           </p>
                           <div className="flex gap-3">
@@ -675,10 +675,10 @@ export default function SettingsPage() {
                             <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-amber-500/10 to-yellow-500/10 border border-amber-500/20 rounded-lg">
                               <Crown className="w-5 h-5 text-amber-500 flex-shrink-0" />
                               <div>
-                                <p className="font-semibold text-amber-600 dark:text-amber-400">
+                                <p className="font-semibold text-amber-600">
                                   Founder Account
                                 </p>
-                                <p className="text-sm text-amber-700/80 dark:text-amber-300/80">
+                                <p className="text-sm text-amber-700/80">
                                   Unlimited Access - Thank you for your support! 🎉
                                 </p>
                               </div>
@@ -687,10 +687,10 @@ export default function SettingsPage() {
                             <div className="flex items-center gap-3 p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
                               <Zap className="w-5 h-5 text-blue-500 flex-shrink-0" />
                               <div className="flex-1">
-                                <p className="font-semibold text-blue-600 dark:text-blue-400 capitalize">
+                                <p className="font-semibold text-blue-600 capitalize">
                                   {credits.plan === 'base' ? 'Base Plan' : `${credits.plan.charAt(0).toUpperCase() + credits.plan.slice(1)} Plan`}
                                 </p>
-                                <p className="text-sm text-blue-700/80 dark:text-blue-300/80">
+                                <p className="text-sm text-blue-700/80">
                                   {credits.monthlyAllocation.toLocaleString()} credits per month
                                 </p>
                               </div>
@@ -747,8 +747,8 @@ export default function SettingsPage() {
                         {isSubscribed && !isFounder && (
                           <>
                             <Separator />
-                            <div className="bg-blue-50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-                              <p className="text-sm text-blue-700 dark:text-blue-300">
+                            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                              <p className="text-sm text-blue-700">
                                 <strong>💡 Credits reset monthly.</strong> Unused credits roll over up to 20% of your plan limit.
                               </p>
                             </div>
@@ -796,9 +796,9 @@ export default function SettingsPage() {
                       </CardContent>
                     </Card>
 
-                    <Card className="border-red-200 dark:border-red-800">
+                    <Card className="border-red-200">
                       <CardHeader>
-                        <CardTitle className="text-red-600 dark:text-red-400">Danger Zone</CardTitle>
+                        <CardTitle className="text-red-600">Danger Zone</CardTitle>
                         <CardDescription>Irreversible actions</CardDescription>
                       </CardHeader>
                       <CardContent>
@@ -945,7 +945,7 @@ export default function SettingsPage() {
                           <span className="font-medium">{ticker}</span>
                           <button
                             onClick={() => removeTicker(ticker)}
-                            className="hover:text-purple-900 dark:hover:text-purple-100"
+                            className="hover:text-purple-900"
                           >
                             ×
                           </button>
@@ -1248,9 +1248,9 @@ export default function SettingsPage() {
                 </Card>
 
                 {user && (
-                  <Card className="border-red-200 dark:border-red-800">
+                  <Card className="border-red-200">
                     <CardHeader>
-                      <CardTitle className="text-red-600 dark:text-red-400">Sign Out</CardTitle>
+                      <CardTitle className="text-red-600">Sign Out</CardTitle>
                       <CardDescription>End your session and log out of your account</CardDescription>
                     </CardHeader>
                     <CardContent>
