@@ -9,9 +9,10 @@
  * @version 2.0.0 - UUID Migration Compatible
  */
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/lib/providers/auth-provider"
+import { useTheme } from "next-themes"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -134,6 +135,8 @@ export default function SettingsPage() {
   const router = useRouter()
   const supabase = createClient()
   const { credits, isSubscribed, isFounder } = useCreditsContext()
+  const { setTheme, theme } = useTheme()
+  const previousTheme = useRef(theme)
 
   const [settings, setSettings] = useState<UserSettings | null>(null)
   const [isSaving, setIsSaving] = useState(false)
@@ -199,6 +202,18 @@ export default function SettingsPage() {
       } as UserSettings)
     }
   }, [userSettings, user])
+
+  // Force light theme on this page
+  useEffect(() => {
+    previousTheme.current = theme
+    setTheme('light')
+    
+    return () => {
+      if (previousTheme.current) {
+        setTheme(previousTheme.current)
+      }
+    }
+  }, [setTheme, theme])
 
   const updateSetting = <K extends keyof UserSettings>(key: K, value: UserSettings[K]) => {
     if (settings) {

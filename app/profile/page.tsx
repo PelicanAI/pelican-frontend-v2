@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { MessageSquare, TrendingUp, User, LogOut } from "lucide-react"
 import Link from "next/link"
+import { ForceLightTheme } from "@/components/force-light-theme"
 
 export default async function ProfilePage() {
   const supabase = await createClient()
@@ -50,8 +51,9 @@ export default async function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100" data-theme="light">
-      <div className="container mx-auto px-4 py-8">
+    <ForceLightTheme>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+        <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
@@ -194,6 +196,6 @@ export default async function ProfilePage() {
           </div>
         </div>
       </div>
-    </div>
+    </ForceLightTheme>
   )
 }
