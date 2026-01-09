@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 
 export const dynamic = "force-dynamic"
+export const revalidate = 0
 
 const POLYGON_API_KEY = process.env.POLYGON_API_KEY
 
@@ -179,7 +180,7 @@ export async function GET() {
 
     return NextResponse.json(response, {
       headers: {
-        "Cache-Control": "public, s-maxage=30, stale-while-revalidate=60",
+        "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
       },
     })
   } catch (error) {
