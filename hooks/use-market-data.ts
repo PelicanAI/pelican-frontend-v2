@@ -70,26 +70,22 @@ export function useMarketData({
 }: UseMarketDataOptions = {}): MarketData & { refresh: () => void } {
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
 
-  // TODO: Uncomment when API endpoint is ready
-  // const { data, error, isLoading, mutate } = useSWR(
-  //   '/api/market-data',
-  //   async (url) => {
-  //     const response = await fetch(url, {
-  //       method: 'POST',
-  //       headers: { 'Content-Type': 'application/json' },
-  //       body: JSON.stringify({ watchlistSymbols })
-  //     })
-  //     if (!response.ok) throw new Error('Failed to fetch market data')
-  //     return response.json()
-  //   },
-  //   {
-  //     refreshInterval: autoRefresh ? refreshInterval : 0,
-  //     revalidateOnFocus: false,
-  //     dedupingInterval: 30000, // Cache for 30 seconds
-  //   }
-  // )
+  // Fetch market data from API
+  const { data, error, isLoading, mutate } = useSWR(
+    '/api/market-data',
+    async (url) => {
+      const response = await fetch(url)
+      if (!response.ok) throw new Error('Failed to fetch market data')
+      return response.json()
+    },
+    {
+      refreshInterval: autoRefresh ? refreshInterval : 0,
+      revalidateOnFocus: false,
+      dedupingInterval: 30000, // Cache for 30 seconds
+    }
+  )
 
-  // Placeholder data - replace with real data from API
+  // Placeholder data - fallback if API fails
   const placeholderData: MarketData = {
     indices: [
       { symbol: "SPX", name: "S&P 500", price: null, change: null, changePercent: null },
@@ -115,10 +111,9 @@ export function useMarketData({
   }
 
   const refresh = useCallback(() => {
-    // TODO: Uncomment when API is ready
-    // mutate()
+    mutate()
     setLastUpdated(new Date())
-  }, [])
+  }, [mutate])
 
   // Auto-refresh effect
   useEffect(() => {
@@ -129,11 +124,10 @@ export function useMarketData({
   }, [autoRefresh, refreshInterval, refresh])
 
   return {
-    ...placeholderData,
-    // TODO: Replace with real data when available
-    // ...data,
-    // error,
-    // isLoading,
+    ...(data || placeholderData),
+    error,
+    isLoading,
+    lastUpdated,
     refresh,
   }
 }

@@ -8,7 +8,7 @@ import { ChatInput, type ChatInputRef } from "@/components/chat/chat-input"
 import { TradingContextPanel } from "@/components/chat/trading-context-panel"
 import { ChatErrorBoundary } from "@/components/chat/chat-error-boundary"
 import { useChat } from "@/hooks/use-chat"
-// import { useMarketData } from "@/hooks/use-market-data"
+import { useMarketData } from "@/hooks/use-market-data"
 import { useConversations } from "@/hooks/use-conversations"
 import { useMessageHandler } from "@/hooks/use-message-handler"
 import { useFileUpload } from "@/hooks/use-file-upload"
@@ -62,12 +62,12 @@ export default function ChatPage() {
     localStorage.setItem('pelican_trading_panel_collapsed', newCollapsed.toString())
   }
 
-  // TODO: Uncomment when ready to add real market data
-  // const { indices, vix, vixChange, sectors, watchlist, isLoading: isLoadingMarketData, refresh: refreshMarketData } = useMarketData({
-  //   refreshInterval: 60000, // Refresh every 60 seconds
-  //   autoRefresh: true,
-  //   watchlistSymbols: ['AAPL', 'TSLA', 'NVDA', 'SPY'] // User's custom watchlist
-  // })
+  // Fetch real-time market data
+  const { indices, vix, vixChange, sectors, watchlist, isLoading: isLoadingMarketData, refresh: refreshMarketData } = useMarketData({
+    refreshInterval: 60000, // Refresh every 60 seconds
+    autoRefresh: true,
+    watchlistSymbols: ['AAPL', 'TSLA', 'NVDA', 'SPY'] // User's custom watchlist
+  })
 
   // Initialize after mount and monitor network status
   useEffect(() => {
@@ -440,13 +440,13 @@ export default function ChatPage() {
           <TradingContextPanel
             collapsed={tradingPanelCollapsed}
             onToggleCollapse={handleTradingPanelToggle}
-            // Future: Pass real data props here
-            // indices={marketIndices}
-            // vix={vixData}
-            // sectors={sectorData}
-            // watchlist={userWatchlist}
-            // isLoading={isLoadingMarketData}
-            // onRefresh={refreshMarketData}
+            indices={indices}
+            vix={vix}
+            vixChange={vixChange}
+            sectors={sectors}
+            watchlist={watchlist}
+            isLoading={isLoadingMarketData}
+            onRefresh={refreshMarketData}
           />
         </div>
       )}
