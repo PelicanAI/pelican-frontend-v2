@@ -12,8 +12,10 @@ const STOCKS_URL = `https://api.polygon.io/v2/snapshot/locale/us/markets/stocks/
 interface PolygonIndexSnapshot {
   ticker: string
   value?: number
-  change?: number
-  change_percent?: number
+  session?: {
+    change?: number
+    change_percent?: number
+  }
 }
 
 interface PolygonIndicesResponse {
@@ -100,7 +102,7 @@ export async function GET() {
         if (item.ticker === "I:VIX") {
           // Extract VIX separately
           vix = item.value ?? null
-          vixChange = item.change_percent ?? null
+          vixChange = item.session?.change_percent ?? null
         } else {
           // Map to indices array
           const mapping = indicesMap[item.ticker]
@@ -109,8 +111,8 @@ export async function GET() {
               symbol: mapping.symbol,
               name: mapping.name,
               price: item.value ?? null,
-              change: item.change ?? null,
-              changePercent: item.change_percent ?? null,
+              change: item.session?.change ?? null,
+              changePercent: item.session?.change_percent ?? null,
             })
           }
         }
