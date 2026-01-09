@@ -8,6 +8,32 @@ const POLYGON_API_KEY = process.env.POLYGON_API_KEY
 const INDICES_URL = `https://api.polygon.io/v3/snapshot/indices?ticker.any_of=I:SPX,I:COMP,I:DJI,I:VIX&apiKey=${POLYGON_API_KEY}`
 const STOCKS_URL = `https://api.polygon.io/v2/snapshot/locale/us/markets/stocks/tickers?tickers=XLK,XLF,XLV,XLE,AAPL,TSLA,NVDA,SPY&apiKey=${POLYGON_API_KEY}`
 
+// Polygon API response interfaces
+interface PolygonIndexSnapshot {
+  ticker: string
+  value?: number
+  change?: number
+  change_percent?: number
+}
+
+interface PolygonIndicesResponse {
+  results?: PolygonIndexSnapshot[]
+  status?: string
+}
+
+interface PolygonStockSnapshot {
+  ticker: string
+  todaysChangePerc?: number
+  lastTrade?: { p?: number }
+  day?: { c?: number }
+}
+
+interface PolygonStocksResponse {
+  tickers?: PolygonStockSnapshot[]
+  status?: string
+}
+
+// Our API response interfaces
 interface MarketIndex {
   symbol: string
   name: string
@@ -54,8 +80,8 @@ export async function GET() {
       throw new Error("Failed to fetch from Polygon.io")
     }
 
-    const indicesData = await indicesResponse.json()
-    const stocksData = await stocksResponse.json()
+    const indicesData: PolygonIndicesResponse = await indicesResponse.json()
+    const stocksData: PolygonStocksResponse = await stocksResponse.json()
 
     // Map indices data
     const indicesMap: Record<string, { name: string; symbol: string }> = {
@@ -70,20 +96,20 @@ export async function GET() {
 
     // Process indices from Polygon response
     if (indicesData.results && Array.isArray(indicesData.results)) {
-      indicesData.results.forEach((item: any) => {
+      indicesData.results.forEach((item: PolygonIndexSnapshot) => {
         if (item.ticker === "I:VIX") {
           // Extract VIX separately
-          vix = item.value || null
-          vixChange = item.change_percent || null
+          vix = item.value ?? null
+          vixChange = item.change_percent ?? null
         } else if (indicesMap[item.ticker]) {
           // Map to indices array
           const mapping = indicesMap[item.ticker]
           indices.push({
             symbol: mapping.symbol,
             name: mapping.name,
-            price: item.value || null,
-            change: item.change || null,
-            changePercent: item.change_percent || null,
+            price: item.value ?? null,
+            change: item.change ?? null,
+            changePercent: item.change_percent ?? null,
           })
         }
       })
@@ -102,22 +128,22 @@ export async function GET() {
 
     // Process stocks/ETFs from Polygon response
     if (stocksData.tickers && Array.isArray(stocksData.tickers)) {
-      stocksData.tickers.forEach((ticker: any) => {
+      stocksData.tickers.forEach((ticker: PolygonStockSnapshot) => {
         const symbol = ticker.ticker
 
         // Check if it's a sector ETF
         if (sectorMap[symbol]) {
           sectors.push({
             name: sectorMap[symbol],
-            changePercent: ticker.todaysChangePerc || null,
+            changePercent: ticker.todaysChangePerc ?? null,
           })
         }
         // Check if it's in watchlist
         else if (["AAPL", "TSLA", "NVDA", "SPY"].includes(symbol)) {
           watchlist.push({
             symbol,
-            price: ticker.lastTrade?.p || ticker.day?.c || null,
-            changePercent: ticker.todaysChangePerc || null,
+            price: ticker.lastTrade?.p ?? ticker.day?.c ?? null,
+            changePercent: ticker.todaysChangePerc ?? null,
           })
         }
       })

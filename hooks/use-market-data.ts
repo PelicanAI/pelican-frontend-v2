@@ -123,6 +123,11 @@ export function useMarketData({
     }
   }, [autoRefresh, refreshInterval, refresh])
 
+  // DEBUG: Log what we're returning
+  console.log('[useMarketData] data:', data)
+  console.log('[useMarketData] error:', error)
+  console.log('[useMarketData] isLoading:', isLoading)
+
   return {
     ...(data || placeholderData),
     error,

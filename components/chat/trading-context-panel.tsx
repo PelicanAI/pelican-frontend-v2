@@ -51,6 +51,12 @@ export function TradingContextPanel({
 }: TradingContextPanelProps) {
   const [isCollapsed, setIsCollapsed] = useState(collapsed)
 
+  // DEBUG: Log what props we're receiving
+  console.log('[TradingContextPanel] indices:', indices)
+  console.log('[TradingContextPanel] vix:', vix)
+  console.log('[TradingContextPanel] sectors:', sectors)
+  console.log('[TradingContextPanel] watchlist:', watchlist)
+
   // Placeholder data - will be replaced with real data from props
   const defaultIndices: MarketIndex[] = indices || [
     { symbol: "SPX", name: "S&P 500", price: null, change: null, changePercent: null },
