@@ -101,16 +101,18 @@ export async function GET() {
           // Extract VIX separately
           vix = item.value ?? null
           vixChange = item.change_percent ?? null
-        } else if (indicesMap[item.ticker]) {
+        } else {
           // Map to indices array
           const mapping = indicesMap[item.ticker]
-          indices.push({
-            symbol: mapping.symbol,
-            name: mapping.name,
-            price: item.value ?? null,
-            change: item.change ?? null,
-            changePercent: item.change_percent ?? null,
-          })
+          if (mapping) {
+            indices.push({
+              symbol: mapping.symbol,
+              name: mapping.name,
+              price: item.value ?? null,
+              change: item.change ?? null,
+              changePercent: item.change_percent ?? null,
+            })
+          }
         }
       })
     }
