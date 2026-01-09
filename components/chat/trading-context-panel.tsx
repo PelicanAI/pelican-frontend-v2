@@ -28,8 +28,8 @@ interface WatchlistTicker {
 interface TradingContextPanelProps {
   // Future props for real data
   indices?: MarketIndex[]
-  vix?: number
-  vixChange?: number
+  vix?: number | null
+  vixChange?: number | null
   sectors?: SectorData[]
   watchlist?: WatchlistTicker[]
   isLoading?: boolean
