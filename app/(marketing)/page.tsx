@@ -331,11 +331,6 @@ export default function HomePage() {
                 <div className="credit-type-example">{t.marketing.pricing.conversationExample}</div>
               </div>
               <div className="credit-type bracket-box">
-                <div className="credit-type-name">{t.marketing.pricing.priceCheck}</div>
-                <div className="credit-type-amount">{t.marketing.pricing.priceCheckCredits} <span>{t.marketing.pricing.credits}</span></div>
-                <div className="credit-type-example">{t.marketing.pricing.priceCheckExample}</div>
-              </div>
-              <div className="credit-type bracket-box">
                 <div className="credit-type-name">{t.marketing.pricing.basicAnalysis}</div>
                 <div className="credit-type-amount">{t.marketing.pricing.basicAnalysisCredits} <span>{t.marketing.pricing.credits}</span></div>
                 <div className="credit-type-example">{t.marketing.pricing.basicAnalysisExample}</div>

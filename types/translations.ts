@@ -128,9 +128,6 @@ export interface Translations {
       conversation: string;
       conversationCredits: string;
       conversationExample: string;
-      priceCheck: string;
-      priceCheckCredits: string;
-      priceCheckExample: string;
       basicAnalysis: string;
       basicAnalysisCredits: string;
       basicAnalysisExample: string;
