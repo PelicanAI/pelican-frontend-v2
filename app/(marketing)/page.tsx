@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/providers/auth-provider';
 import HelpChat from '@/components/marketing/HelpChat';
+import './styles/marketing.css';
 
 export default function HomePage() {
   const router = useRouter();
