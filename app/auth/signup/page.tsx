@@ -17,6 +17,7 @@ export default function SignUpPage() {
   const [password, setPassword] = useState("")
   const [displayName, setDisplayName] = useState("")
   const [repeatPassword, setRepeatPassword] = useState("")
+  const [agreedToTerms, setAgreedToTerms] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
@@ -40,6 +41,12 @@ export default function SignUpPage() {
 
     if (password !== repeatPassword) {
       setError("Passwords do not match")
+      setIsLoading(false)
+      return
+    }
+
+    if (!agreedToTerms) {
+      setError("You must agree to the Terms of Service to continue")
       setIsLoading(false)
       return
     }
@@ -155,6 +162,21 @@ export default function SignUpPage() {
                       value={repeatPassword}
                       onChange={(e) => setRepeatPassword(e.target.value)}
                     />
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <input
+                      id="terms"
+                      type="checkbox"
+                      checked={agreedToTerms}
+                      onChange={(e) => setAgreedToTerms(e.target.checked)}
+                      className="mt-1 h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                    />
+                    <Label htmlFor="terms" className="text-sm text-muted-foreground leading-tight">
+                      I agree to the{" "}
+                      <Link href="/terms" className="text-purple-600 hover:underline" target="_blank">
+                        Terms of Service
+                      </Link>
+                    </Label>
                   </div>
                   {error && <p className="text-sm text-red-500">{error}</p>}
                   <Button

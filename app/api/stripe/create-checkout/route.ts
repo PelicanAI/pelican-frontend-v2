@@ -57,6 +57,15 @@ export async function POST(request: NextRequest) {
       },
       allow_promotion_codes: true,
       billing_address_collection: 'auto',
+      // Stripe Terms of Service consent collection
+      consent_collection: {
+        terms_of_service: 'required'
+      },
+      custom_text: {
+        terms_of_service_acceptance: {
+          message: 'I agree to the [Terms of Service](https://pelican.ai/terms)'
+        }
+      }
     })
 
     return NextResponse.json({ url: session.url })

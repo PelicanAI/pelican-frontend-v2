@@ -284,6 +284,12 @@ export default function PricingPage() {
             Credits reset monthly. Unused credits roll over (up to 20%).
           </p>
           <p className="text-gray-500 text-sm">
+            By subscribing, you agree to our{' '}
+            <Link href="/terms" className="text-blue-400 hover:underline">
+              Terms of Service
+            </Link>
+          </p>
+          <p className="text-gray-500 text-sm">
             Questions?{' '}
             <a href="mailto:support@pelicanai.com" className="text-blue-400 hover:underline">
               Contact us
