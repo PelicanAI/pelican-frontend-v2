@@ -10,6 +10,7 @@
  */
 
 import { useState, useEffect, useMemo, useCallback } from "react"
+import { usePathname } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import type { User } from "@supabase/supabase-js"
 import * as Sentry from "@sentry/nextjs"
@@ -126,8 +127,31 @@ export function useConversations(): UseConversationsReturn {
   const [search, setSearch] = useState("")
 
   const debouncedSearch = useDebounce(search, 300)
+  const pathname = usePathname()
   const supabase = createClient()
   const effectiveUserId = user?.id || guestUserId
+
+  // --------------------------------------------------------------------------
+  // Load from database
+  // --------------------------------------------------------------------------
+  const loadFromDatabase = useCallback(async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from("conversations")
+        .select("*")
+        .eq("user_id", userId)
+        .is("deleted_at", null)
+        .order("updated_at", { ascending: false })
+
+      if (error) throw error
+      setConversations(data || [])
+    } catch (error) {
+      console.error("[Conversations] Load failed:", error)
+      setConversations([])
+    } finally {
+      setLoading(false)
+    }
+  }, [supabase])
 
   // --------------------------------------------------------------------------
   // Initialize guest user ID
@@ -190,7 +214,7 @@ export function useConversations(): UseConversationsReturn {
       cancelled = true
       subscription?.unsubscribe()
     }
-  }, [guestUserId])
+  }, [guestUserId, loadFromDatabase, supabase])
 
   // --------------------------------------------------------------------------
   // Real-time subscription
@@ -213,29 +237,17 @@ export function useConversations(): UseConversationsReturn {
       .subscribe()
 
     return () => { channel.unsubscribe() }
-  }, [user?.id])
+  }, [user?.id, loadFromDatabase])
 
   // --------------------------------------------------------------------------
-  // Load from database
+  // Refetch on route change to /chat
   // --------------------------------------------------------------------------
-  const loadFromDatabase = async (userId: string) => {
-    try {
-      const { data, error } = await supabase
-        .from("conversations")
-        .select("*")
-        .eq("user_id", userId)
-        .is("deleted_at", null)
-        .order("updated_at", { ascending: false })
-
-      if (error) throw error
-      setConversations(data || [])
-    } catch (error) {
-      console.error("[Conversations] Load failed:", error)
-      setConversations([])
-    } finally {
-      setLoading(false)
+  useEffect(() => {
+    // Refetch conversations when navigating to /chat
+    if (pathname === '/chat' && user?.id) {
+      loadFromDatabase(user.id)
     }
-  }
+  }, [pathname, user?.id, loadFromDatabase])
 
   // --------------------------------------------------------------------------
   // CREATE
@@ -298,7 +310,7 @@ export function useConversations(): UseConversationsReturn {
     setConversations(updated)
 
     return newConversation
-  }, [guestUserId, user, supabase])
+  }, [guestUserId, user, supabase, loadFromDatabase])
 
   // --------------------------------------------------------------------------
   // RENAME
