@@ -132,13 +132,79 @@ export function useConversations(): UseConversationsReturn {
   const effectiveUserId = user?.id || guestUserId
 
   // --------------------------------------------------------------------------
+  // Debug: Log user ID sources
+  // --------------------------------------------------------------------------
+  useEffect(() => {
+    console.log('[USER-ID-DEBUG] User ID sources:', {
+      'userState.id': user?.id || null,
+      'userState.email': user?.email || null,
+      guestUserId,
+      effectiveUserId,
+      pathname,
+      timestamp: new Date().toISOString()
+    });
+
+    // Check what supabase.auth.getUser() returns
+    supabase.auth.getUser().then(({ data: { user: currentUser }, error }) => {
+      console.log('[USER-ID-DEBUG] supabase.auth.getUser() returns:', {
+        'supabaseUser.id': currentUser?.id || null,
+        'supabaseUser.email': currentUser?.email || null,
+        'hookUser.id': user?.id || null,
+        'hookUser.email': user?.email || null,
+        'usersMatch': currentUser?.id === user?.id,
+        error,
+        timestamp: new Date().toISOString()
+      });
+
+      // Warn if there's a mismatch
+      if (currentUser?.id && user?.id && currentUser.id !== user.id) {
+        console.error('[USER-ID-DEBUG] ⚠️ MISMATCH DETECTED!', {
+          'supabase.auth.getUser()': currentUser.id,
+          'hook user state': user.id,
+          'difference': 'Hook has stale user ID!'
+        });
+      }
+
+      // Warn if guestUserId is being used for authenticated user
+      if (currentUser?.id && guestUserId && effectiveUserId === guestUserId) {
+        console.error('[USER-ID-DEBUG] ⚠️ GUEST USER ID FALLBACK!', {
+          'authenticatedUser.id': currentUser.id,
+          'guestUserId': guestUserId,
+          'effectiveUserId': effectiveUserId,
+          'problem': 'Using guestUserId instead of authenticated user ID!'
+        });
+      }
+    });
+  }, [user, guestUserId, effectiveUserId, pathname, supabase])
+
+  // --------------------------------------------------------------------------
   // Load from database
   // --------------------------------------------------------------------------
   const loadFromDatabase = useCallback(async (userId: string) => {
+    // Get fresh auth state to compare
+    const { data: { user: freshUser } } = await supabase.auth.getUser()
+    
     console.log('[CONVERSATIONS-DEBUG] loadFromDatabase called', {
-      userId,
+      'passedUserId': userId,
+      'hookUserState.id': user?.id || null,
+      'freshSupabaseUser.id': freshUser?.id || null,
+      'guestUserId': guestUserId,
+      'effectiveUserId': effectiveUserId,
+      'usingGuestId': userId === guestUserId && !freshUser?.id,
+      'userIdsMatch': userId === freshUser?.id,
+      'hookStateMatchesFresh': user?.id === freshUser?.id,
       timestamp: new Date().toISOString()
     });
+
+    // Warn if wrong user ID is being used
+    if (freshUser?.id && userId !== freshUser.id) {
+      console.error('[CONVERSATIONS-DEBUG] ⚠️ WRONG USER ID BEING QUERIED!', {
+        'expectedUserId': freshUser.id,
+        'actualUserId': userId,
+        'hookUserState.id': user?.id,
+        'problem': `Querying conversations for user ${userId} but authenticated user is ${freshUser.id}`
+      });
+    }
     
     try {
       const { data, error } = await supabase
@@ -147,16 +213,19 @@ export function useConversations(): UseConversationsReturn {
         .eq("user_id", userId)
         .is("deleted_at", null)
         .order("updated_at", { ascending: false })
+        .limit(1000)
       
       console.log('[CONVERSATIONS-DEBUG] Supabase response:', {
-        userId,
+        'queriedUserId': userId,
+        'freshSupabaseUser.id': freshUser?.id || null,
         dataCount: data?.length || 0,
         error,
         conversations: data?.slice(0, 5).map(c => ({
           id: c.id,
           title: c.title,
           created_at: c.created_at,
-          updated_at: c.updated_at
+          updated_at: c.updated_at,
+          user_id: c.user_id
         }))
       });
       
@@ -169,7 +238,7 @@ export function useConversations(): UseConversationsReturn {
     } finally {
       setLoading(false)
     }
-  }, [supabase])
+  }, [supabase, user, guestUserId, effectiveUserId])
 
   // --------------------------------------------------------------------------
   // Initialize guest user ID
@@ -177,10 +246,27 @@ export function useConversations(): UseConversationsReturn {
   useEffect(() => {
     const storedGuestId = localStorage.getItem(GUEST_USER_ID_KEY)
     
+    console.log('[USER-ID-DEBUG] Initializing guest user ID:', {
+      'storedGuestId': storedGuestId,
+      'isValidUUID': storedGuestId ? isValidUUID(storedGuestId) : false,
+      'willGenerateNew': !storedGuestId || !isValidUUID(storedGuestId),
+      timestamp: new Date().toISOString()
+    });
+    
     if (storedGuestId && isValidUUID(storedGuestId)) {
+      console.log('[USER-ID-DEBUG] Using stored guest user ID:', storedGuestId);
       setGuestUserId(storedGuestId)
+      
+      // Warn if stored guest ID looks like a real user ID (UUID v4 pattern)
+      if (storedGuestId === '6f182e43-0a80-4636-b147-90e2ff81e4a6') {
+        console.error('[USER-ID-DEBUG] ⚠️ SUSPICIOUS: Stored guest ID matches reported problematic ID!', {
+          storedGuestId,
+          'warning': 'This might be a real user ID stored as guest ID!'
+        });
+      }
     } else {
       const newGuestId = generateGuestUUID()
+      console.log('[USER-ID-DEBUG] Generating new guest user ID:', newGuestId);
       localStorage.setItem(GUEST_USER_ID_KEY, newGuestId)
       setGuestUserId(newGuestId)
     }
@@ -196,28 +282,50 @@ export function useConversations(): UseConversationsReturn {
     let subscription: { unsubscribe: () => void } | null = null
 
     const init = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
+      const { data: { user: fetchedUser }, error: authError } = await supabase.auth.getUser()
       if (cancelled) return
 
-      setUser(user)
+      console.log('[USER-ID-DEBUG] init() - supabase.auth.getUser() result:', {
+        'fetchedUser.id': fetchedUser?.id || null,
+        'fetchedUser.email': fetchedUser?.email || null,
+        'currentHookUser.id': user?.id || null,
+        'guestUserId': guestUserId,
+        authError,
+        timestamp: new Date().toISOString()
+      });
+
+      setUser(fetchedUser)
       
-      if (user?.id) {
-        await loadFromDatabase(user.id)
+      if (fetchedUser?.id) {
+        console.log('[USER-ID-DEBUG] init() - Loading conversations for authenticated user:', fetchedUser.id);
+        await loadFromDatabase(fetchedUser.id)
       } else {
+        console.log('[USER-ID-DEBUG] init() - No authenticated user, loading guest conversations');
         setConversations(loadGuestConversations())
         setLoading(false)
       }
     }
 
     const setupListener = () => {
-      const { data } = supabase.auth.onAuthStateChange((_, session) => {
+      const { data } = supabase.auth.onAuthStateChange((event, session) => {
         if (cancelled) return
+
+        console.log('[USER-ID-DEBUG] onAuthStateChange event:', {
+          event,
+          'sessionUser.id': session?.user?.id || null,
+          'sessionUser.email': session?.user?.email || null,
+          'previousHookUser.id': user?.id || null,
+          'guestUserId': guestUserId,
+          timestamp: new Date().toISOString()
+        });
 
         setUser(session?.user || null)
 
         if (session?.user?.id) {
+          console.log('[USER-ID-DEBUG] Auth change - Loading conversations for:', session.user.id);
           loadFromDatabase(session.user.id)
         } else {
+          console.log('[USER-ID-DEBUG] Auth change - No user, loading guest conversations');
           setConversations(loadGuestConversations())
           setLoading(false)
         }
@@ -262,10 +370,33 @@ export function useConversations(): UseConversationsReturn {
   // --------------------------------------------------------------------------
   useEffect(() => {
     // Refetch conversations when navigating to /chat
-    if (pathname === '/chat' && user?.id) {
-      loadFromDatabase(user.id)
+    if (pathname === '/chat') {
+      // Get fresh auth state instead of relying on potentially stale user state
+      supabase.auth.getUser().then(({ data: { user: freshUser } }) => {
+        console.log('[USER-ID-DEBUG] Pathname changed to /chat:', {
+          pathname,
+          'hookUserState.id': user?.id || null,
+          'freshSupabaseUser.id': freshUser?.id || null,
+          'guestUserId': guestUserId,
+          'effectiveUserId': effectiveUserId,
+          'willLoadWith': freshUser?.id || guestUserId,
+          timestamp: new Date().toISOString()
+        });
+
+        if (freshUser?.id) {
+          console.log('[USER-ID-DEBUG] Pathname /chat - Using fresh user ID:', freshUser.id);
+          loadFromDatabase(freshUser.id)
+        } else if (user?.id) {
+          console.log('[USER-ID-DEBUG] Pathname /chat - Using hook user state ID:', user.id);
+          loadFromDatabase(user.id)
+        } else {
+          console.log('[USER-ID-DEBUG] Pathname /chat - No user, loading guest conversations');
+          setConversations(loadGuestConversations())
+          setLoading(false)
+        }
+      })
     }
-  }, [pathname, user?.id, loadFromDatabase])
+  }, [pathname, user?.id, loadFromDatabase, supabase, guestUserId, effectiveUserId])
 
   // --------------------------------------------------------------------------
   // CREATE

@@ -4,12 +4,15 @@ import { useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/providers/auth-provider';
+import { useT } from '@/lib/providers/translation-provider';
+import { LanguageSelector } from '@/components/language-selector';
 import HelpChat from '@/components/marketing/HelpChat';
 import './styles/marketing.css';
 
 export default function HomePage() {
   const router = useRouter();
   const { user } = useAuth();
+  const t = useT();
 
   const handleLaunchApp = () => {
     if (user) {
@@ -66,11 +69,12 @@ export default function HomePage() {
             <span>Pelican</span>
           </Link>
           <div className="nav-links">
-            <a href="#features">Features</a>
-            <a href="#team">Team</a>
-            <a href="#pricing">Pricing</a>
-            <Link href="/faq">FAQ</Link>
-            <button onClick={handleLaunchApp} className="btn-primary">Launch App →</button>
+            <a href="#features">{t.marketing.nav.features}</a>
+            <a href="#team">{t.marketing.nav.team}</a>
+            <a href="#pricing">{t.marketing.nav.pricing}</a>
+            <Link href="/faq">{t.marketing.nav.faq}</Link>
+            <LanguageSelector />
+            <button onClick={handleLaunchApp} className="btn-primary">{t.marketing.nav.launchApp}</button>
           </div>
         </div>
       </nav>
@@ -78,32 +82,31 @@ export default function HomePage() {
       <section className="hero">
         <div className="hero-inner">
           <div className="hero-content">
-            <div className="hero-tag">Now in Beta</div>
+            <div className="hero-tag">{t.marketing.hero.betaTag}</div>
             <h1>
-              THE AI PLATFORM<br />
-              THAT <span className="highlight">THINKS</span><br />
-              LIKE YOU TRADE
+              {t.marketing.hero.title1}<br />
+              {t.marketing.hero.title2} <span className="highlight">{t.marketing.hero.titleHighlight}</span><br />
+              {t.marketing.hero.title3}
             </h1>
             <p className="hero-subtitle">
-              Institutional-grade market intelligence through natural conversation.
-              Backtest strategies, analyze patterns, and execute with precision—all in one interface.
+              {t.marketing.hero.subtitle}
             </p>
             <div className="hero-cta">
-              <button onClick={() => handleSignUp()} className="btn-primary">Start Trading →</button>
-              <a href="#features" className="btn-secondary">See Features</a>
+              <button onClick={() => handleSignUp()} className="btn-primary">{t.marketing.hero.startTrading}</button>
+              <a href="#features" className="btn-secondary">{t.marketing.hero.seeFeatures}</a>
             </div>
             <div className="stats-bar">
               <div className="stat">
-                <div className="stat-value">10K+</div>
-                <div className="stat-label">Tickers Covered</div>
+                <div className="stat-value">{t.marketing.stats.tickersCovered}</div>
+                <div className="stat-label">{t.marketing.stats.tickersCoveredLabel}</div>
               </div>
               <div className="stat">
-                <div className="stat-value">Plain English</div>
-                <div className="stat-label">No Code Required</div>
+                <div className="stat-value">{t.marketing.stats.plainEnglish}</div>
+                <div className="stat-label">{t.marketing.stats.noCodeRequired}</div>
               </div>
               <div className="stat">
-                <div className="stat-value">1-Click</div>
-                <div className="stat-label">Shareable Reports</div>
+                <div className="stat-value">{t.marketing.stats.oneClick}</div>
+                <div className="stat-label">{t.marketing.stats.shareableReports}</div>
               </div>
             </div>
           </div>
@@ -117,14 +120,12 @@ export default function HomePage() {
         <div className="section-inner">
           <div className="what-content">
             <div className="what-text animate-on-scroll">
-              <h2>CURSOR IS FOR DEVELOPERS.<br />PELICAN IS FOR TRADERS.</h2>
+              <h2>{t.marketing.what.title}</h2>
               <p>
-                Stop juggling between TradingView, spreadsheets, and ChatGPT. Pelican is the unified
-                AI platform that understands markets the way you do—through conversation.
+                {t.marketing.what.description1}
               </p>
               <p>
-                Ask complex questions. Get structured answers with real data. Share branded analysis
-                with one click. This is how trading intelligence should work.
+                {t.marketing.what.description2}
               </p>
             </div>
             <div className="what-platform bracket-box animate-on-scroll">
@@ -134,30 +135,30 @@ export default function HomePage() {
                 <div className="platform-dot green"></div>
               </div>
               <div className="platform-line">
-                <span className="platform-prompt">you:</span>{' '}
-                <span className="platform-command">backtest momentum strategy on SPY, last 6 months</span>
+                <span className="platform-prompt">{t.marketing.what.platformPrompt}</span>{' '}
+                <span className="platform-command">{t.marketing.what.platformCommand}</span>
               </div>
               <div className="platform-line">
-                <span className="platform-output">analyzing 126 trading sessions...</span>
+                <span className="platform-output">{t.marketing.what.platformAnalyzing}</span>
               </div>
               <div className="platform-line">
                 <span className="platform-success">✓</span>{' '}
-                <span className="platform-output">Win rate:</span>{' '}
+                <span className="platform-output">{t.marketing.what.platformWinRate}</span>{' '}
                 <span className="platform-value">67.4%</span>
               </div>
               <div className="platform-line">
                 <span className="platform-success">✓</span>{' '}
-                <span className="platform-output">Sharpe ratio:</span>{' '}
+                <span className="platform-output">{t.marketing.what.platformSharpe}</span>{' '}
                 <span className="platform-value">1.84</span>
               </div>
               <div className="platform-line">
                 <span className="platform-success">✓</span>{' '}
-                <span className="platform-output">Max drawdown:</span>{' '}
+                <span className="platform-output">{t.marketing.what.platformDrawdown}</span>{' '}
                 <span className="platform-value">-8.2%</span>
               </div>
               <div className="platform-line">
-                <span className="platform-prompt">pelican:</span>{' '}
-                <span className="platform-command">generating shareable report...<span className="cursor-blink">_</span></span>
+                <span className="platform-prompt">{t.marketing.what.platformResponse}</span>{' '}
+                <span className="platform-command">{t.marketing.what.platformGenerating}<span className="cursor-blink">_</span></span>
               </div>
             </div>
           </div>
@@ -167,39 +168,39 @@ export default function HomePage() {
       <section id="features">
         <div className="section-inner">
           <div className="section-header animate-on-scroll">
-            <div className="section-tag">{'//'} What You Get</div>
-            <h2 className="section-title">TRADING INTELLIGENCE, NOT ANOTHER TOOL TO LEARN</h2>
+            <div className="section-tag">{t.marketing.features.sectionTag}</div>
+            <h2 className="section-title">{t.marketing.features.title}</h2>
           </div>
           <div className="features-grid">
             <div className="feature-card bracket-box">
               <div className="feature-icon">💬</div>
-              <h3>JUST ASK</h3>
-              <p>Type questions like you&apos;d ask a trading buddy. &quot;What&apos;s moving in semis today?&quot; &quot;Show me SPY&apos;s worst drawdowns.&quot; No syntax, no learning curve.</p>
+              <h3>{t.marketing.features.justAsk}</h3>
+              <p>{t.marketing.features.justAskDesc}</p>
             </div>
             <div className="feature-card bracket-box">
               <div className="feature-icon">🧪</div>
-              <h3>TEST IDEAS IN SECONDS</h3>
-              <p>Describe any strategy in plain English and see if it actually works. Win rates, drawdowns, Sharpe ratios—without writing a single line of code.</p>
+              <h3>{t.marketing.features.testIdeas}</h3>
+              <p>{t.marketing.features.testIdeasDesc}</p>
             </div>
             <div className="feature-card bracket-box">
               <div className="feature-icon">🧠</div>
-              <h3>KNOWS YOUR STYLE</h3>
-              <p>Pelican remembers your positions, your watchlist, and how you like to trade. Every conversation picks up where you left off.</p>
+              <h3>{t.marketing.features.knowsStyle}</h3>
+              <p>{t.marketing.features.knowsStyleDesc}</p>
             </div>
             <div className="feature-card bracket-box">
               <div className="feature-icon">🔍</div>
-              <h3>FINDS WHAT YOU&apos;D MISS</h3>
-              <p>Surface unusual volume, divergences, and setups across thousands of tickers. Let AI do the scanning while you focus on decisions.</p>
+              <h3>{t.marketing.features.findsWhat}</h3>
+              <p>{t.marketing.features.findsWhatDesc}</p>
             </div>
             <div className="feature-card bracket-box">
               <div className="feature-icon">📤</div>
-              <h3>SHARE &amp; LOOK PRO</h3>
-              <p>Generate branded tables and analysis ready for Twitter, Discord, or clients. One click from insight to shareable content.</p>
+              <h3>{t.marketing.features.sharePro}</h3>
+              <p>{t.marketing.features.shareProDesc}</p>
             </div>
             <div className="feature-card bracket-box">
               <div className="feature-icon">🚫</div>
-              <h3>KILL THE TAB CHAOS</h3>
-              <p>Stop bouncing between TradingView, spreadsheets, and ChatGPT. One interface for research, analysis, and idea generation.</p>
+              <h3>{t.marketing.features.killChaos}</h3>
+              <p>{t.marketing.features.killChaosDesc}</p>
             </div>
           </div>
         </div>
@@ -208,14 +209,14 @@ export default function HomePage() {
       <section className="every-trader-section">
         <div className="section-inner">
           <div className="section-header animate-on-scroll">
-            <div className="section-tag">{'//'} For Everyone</div>
-            <h2 className="section-title">PELICAN FOR EVERY TRADER</h2>
-            <p style={{ color: 'var(--text-secondary)', marginTop: '1rem', fontSize: '1.1rem' }}>Whether you&apos;re just starting or managing millions, Pelican speaks your language</p>
+            <div className="section-tag">{t.marketing.traders.sectionTag}</div>
+            <h2 className="section-title">{t.marketing.traders.title}</h2>
+            <p style={{ color: 'var(--text-secondary)', marginTop: '1rem', fontSize: '1.1rem' }}>{t.marketing.traders.subtitle}</p>
           </div>
           <div className="trader-comparison">
             <div className="trader-card bracket-box animate-on-scroll">
-              <div className="trader-card-title">New to Trading</div>
-              <div className="trader-question">Is this TSLA dip worth buying?</div>
+              <div className="trader-card-title">{t.marketing.traders.newTrader}</div>
+              <div className="trader-question">{t.marketing.traders.newTraderQuestion}</div>
               <div className="trader-response">
                 <p>Maybe—but only if buyers keep defending today&apos;s levels. As of 12:04 ET, TSLA is $425.21 (+2.8%) after bouncing from a low of $419.70, so dips are getting bought intraday.</p>
                 <p>Simple plans for a new trader:</p>
@@ -225,8 +226,8 @@ export default function HomePage() {
               </div>
             </div>
             <div className="trader-card bracket-box animate-on-scroll">
-              <div className="trader-card-title">Experienced Trader</div>
-              <div className="trader-question">The QQQ&apos;s closed down over -3% today. Using QQQ data for 2025, find every instance the QQQ&apos;s closed down -3% in a single day, and give me the 2 week return of the QQQ&apos;s following that event.</div>
+              <div className="trader-card-title">{t.marketing.traders.experiencedTrader}</div>
+              <div className="trader-question">{t.marketing.traders.experiencedTraderQuestion}</div>
               <div className="trader-response">
                 <p>QQQ closed down at least -3% and the 2-week (10 trading days) return that followed:</p>
                 <div className="response-item">- 2025-03-07: -3.88% day, next 2 weeks: -2.2%</div>
@@ -249,26 +250,22 @@ export default function HomePage() {
       <section id="team">
         <div className="section-inner">
           <div className="section-header animate-on-scroll">
-            <div className="section-tag">{'//'} The Team</div>
-            <h2 className="section-title">BUILT BY TRADERS, FOR TRADERS</h2>
+            <div className="section-tag">{t.marketing.team.sectionTag}</div>
+            <h2 className="section-title">{t.marketing.team.title}</h2>
           </div>
           <div className="team-grid">
             <div className="team-card bracket-box animate-on-scroll">
-              <div className="team-name">NICK GROVES</div>
-              <div className="team-role">Founder &amp; CEO</div>
+              <div className="team-name">{t.marketing.team.nickName}</div>
+              <div className="team-role">{t.marketing.team.nickRole}</div>
               <p className="team-bio">
-                Eight years across futures, FX, and digital assets. Former crypto arbitrage systems architect turned
-                systems-driven strategist. Founded Pelican to challenge the industry&apos;s dependence on opaque tools
-                and build an AI that thinks the way real traders operate—structured, contextual, and brutally honest.
+                {t.marketing.team.nickBio}
               </p>
             </div>
             <div className="team-card bracket-box animate-on-scroll">
-              <div className="team-name">RAYMOND CAMPBELL</div>
-              <div className="team-role">Senior Architect</div>
+              <div className="team-name">{t.marketing.team.rayName}</div>
+              <div className="team-role">{t.marketing.team.rayRole}</div>
               <p className="team-bio">
-                Two decades building mission-critical financial infrastructure. Led NYSE&apos;s transition to electronic
-                trading at Labranche, architecting ultra-low latency systems across 800+ symbols. Deep expertise
-                in C++ high-performance systems, exchange connectivity, and modern crypto infrastructure.
+                {t.marketing.team.rayBio}
               </p>
             </div>
           </div>
@@ -278,9 +275,9 @@ export default function HomePage() {
       <section className="languages-section">
         <div className="section-inner">
           <div className="section-header animate-on-scroll">
-            <div className="section-tag">{'//'} Global</div>
-            <h2 className="section-title">AVAILABLE IN 30+ LANGUAGES</h2>
-            <p style={{ color: 'var(--text-secondary)', marginTop: '1rem', fontSize: '1.1rem' }}>Pelican speaks your language, wherever you trade</p>
+            <div className="section-tag">{t.marketing.languages.sectionTag}</div>
+            <h2 className="section-title">{t.marketing.languages.title}</h2>
+            <p style={{ color: 'var(--text-secondary)', marginTop: '1rem', fontSize: '1.1rem' }}>{t.marketing.languages.subtitle}</p>
           </div>
           <div className="languages-grid animate-on-scroll">
             <div className="language-tag">Chinese</div>
@@ -319,39 +316,39 @@ export default function HomePage() {
       <section id="pricing" className="pricing-section">
         <div className="section-inner">
           <div className="section-header animate-on-scroll">
-            <div className="section-tag">{'//'} Pricing</div>
-            <h2 className="section-title">CREDIT-BASED PRICING THAT SCALES WITH YOU</h2>
+            <div className="section-tag">{t.marketing.pricing.sectionTag}</div>
+            <h2 className="section-title">{t.marketing.pricing.title}</h2>
           </div>
 
           {/* Credits Explainer */}
           <div className="credits-explainer animate-on-scroll">
-            <h3>HOW CREDITS WORK</h3>
-            <p>Credits represent analytical workload, not raw API calls. Simple questions cost less. Complex analysis costs more. You always know what you&apos;re spending.</p>
+            <h3>{t.marketing.pricing.howCreditsWork}</h3>
+            <p>{t.marketing.pricing.creditsExplainer}</p>
             <div className="credit-types-grid">
               <div className="credit-type bracket-box">
-                <div className="credit-type-name">Conversation</div>
-                <div className="credit-type-amount">2 <span>credits</span></div>
-                <div className="credit-type-example">&quot;What&apos;s a moving average?&quot;</div>
+                <div className="credit-type-name">{t.marketing.pricing.conversation}</div>
+                <div className="credit-type-amount">{t.marketing.pricing.conversationCredits} <span>{t.marketing.pricing.credits}</span></div>
+                <div className="credit-type-example">{t.marketing.pricing.conversationExample}</div>
               </div>
               <div className="credit-type bracket-box">
-                <div className="credit-type-name">Price Check</div>
-                <div className="credit-type-amount">10 <span>credits</span></div>
-                <div className="credit-type-example">&quot;What&apos;s AAPL trading at?&quot;</div>
+                <div className="credit-type-name">{t.marketing.pricing.priceCheck}</div>
+                <div className="credit-type-amount">{t.marketing.pricing.priceCheckCredits} <span>{t.marketing.pricing.credits}</span></div>
+                <div className="credit-type-example">{t.marketing.pricing.priceCheckExample}</div>
               </div>
               <div className="credit-type bracket-box">
-                <div className="credit-type-name">Basic Analysis</div>
-                <div className="credit-type-amount">25 <span>credits</span></div>
-                <div className="credit-type-example">&quot;Is NVDA overbought?&quot;</div>
+                <div className="credit-type-name">{t.marketing.pricing.basicAnalysis}</div>
+                <div className="credit-type-amount">{t.marketing.pricing.basicAnalysisCredits} <span>{t.marketing.pricing.credits}</span></div>
+                <div className="credit-type-example">{t.marketing.pricing.basicAnalysisExample}</div>
               </div>
               <div className="credit-type bracket-box">
-                <div className="credit-type-name">Event Study</div>
-                <div className="credit-type-amount">75 <span>credits</span></div>
-                <div className="credit-type-example">&quot;How does SPY react after CPI?&quot;</div>
+                <div className="credit-type-name">{t.marketing.pricing.eventStudy}</div>
+                <div className="credit-type-amount">{t.marketing.pricing.eventStudyCredits} <span>{t.marketing.pricing.credits}</span></div>
+                <div className="credit-type-example">{t.marketing.pricing.eventStudyExample}</div>
               </div>
               <div className="credit-type bracket-box">
-                <div className="credit-type-name">Deep Analysis</div>
-                <div className="credit-type-amount">200 <span>credits</span></div>
-                <div className="credit-type-example">&quot;Backtest this strategy 1 year&quot;</div>
+                <div className="credit-type-name">{t.marketing.pricing.deepAnalysis}</div>
+                <div className="credit-type-amount">{t.marketing.pricing.deepAnalysisCredits} <span>{t.marketing.pricing.credits}</span></div>
+                <div className="credit-type-example">{t.marketing.pricing.deepAnalysisExample}</div>
               </div>
             </div>
           </div>
@@ -360,152 +357,152 @@ export default function HomePage() {
           <div className="pricing-tiers">
             {/* Starter Tier */}
             <div className="pricing-card bracket-box animate-on-scroll">
-              <div className="pricing-tier-name">STARTER</div>
-              <div className="pricing-for">Exploration &amp; Learning</div>
-              <div className="pricing-amount">$29<span>/mo</span></div>
-              <div className="pricing-period">Cancel anytime</div>
+              <div className="pricing-tier-name">{t.marketing.pricing.starter}</div>
+              <div className="pricing-for">{t.marketing.pricing.starterFor}</div>
+              <div className="pricing-amount">{t.marketing.pricing.starterPrice}<span>{t.marketing.pricing.starterPeriod}</span></div>
+              <div className="pricing-period">{t.marketing.pricing.cancelAnytime}</div>
               <div className="pricing-credits">
-                <div className="pricing-credits-amount">1,000</div>
-                <div className="pricing-credits-label">credits / month</div>
+                <div className="pricing-credits-amount">{t.marketing.pricing.starterCredits}</div>
+                <div className="pricing-credits-label">{t.marketing.pricing.starterCreditsLabel}</div>
               </div>
-              <div className="pricing-effective">~$0.029 per credit</div>
+              <div className="pricing-effective">{t.marketing.pricing.starterEffective}</div>
               <div className="pricing-features">
                 <div className="pricing-feature">
                   <span className="pricing-check">✓</span>
-                  Full AI assistant access
+                  {t.marketing.pricing.starterFeature1}
                 </div>
                 <div className="pricing-feature">
                   <span className="pricing-check">✓</span>
-                  Live data on 10,000+ tickers
+                  {t.marketing.pricing.starterFeature2}
                 </div>
                 <div className="pricing-feature">
                   <span className="pricing-check">✓</span>
-                  Trading education &amp; coaching
+                  {t.marketing.pricing.starterFeature3}
                 </div>
                 <div className="pricing-feature">
                   <span className="pricing-check">✓</span>
-                  Basic technical analysis
+                  {t.marketing.pricing.starterFeature4}
                 </div>
               </div>
               <button onClick={() => handleSignUp('starter')} className="btn-secondary" style={{ width: '100%', justifyContent: 'center' }}>
-                Get Started →
+                {t.marketing.pricing.starterButton}
               </button>
             </div>
 
             {/* Pro Tier */}
             <div className="pricing-card bracket-box featured animate-on-scroll">
-              <div className="pricing-badge">Most Popular</div>
-              <div className="pricing-tier-name">PRO</div>
-              <div className="pricing-for">Active Traders</div>
-              <div className="pricing-amount">$99<span>/mo</span></div>
-              <div className="pricing-period">Cancel anytime</div>
+              <div className="pricing-badge">{t.marketing.pricing.mostPopular}</div>
+              <div className="pricing-tier-name">{t.marketing.pricing.pro}</div>
+              <div className="pricing-for">{t.marketing.pricing.proFor}</div>
+              <div className="pricing-amount">{t.marketing.pricing.proPrice}<span>{t.marketing.pricing.proPeriod}</span></div>
+              <div className="pricing-period">{t.marketing.pricing.cancelAnytime}</div>
               <div className="pricing-credits">
-                <div className="pricing-credits-amount">3,500</div>
-                <div className="pricing-credits-label">credits / month</div>
+                <div className="pricing-credits-amount">{t.marketing.pricing.proCredits}</div>
+                <div className="pricing-credits-label">{t.marketing.pricing.proCreditsLabel}</div>
               </div>
-              <div className="pricing-effective">~$0.028 per credit</div>
+              <div className="pricing-effective">{t.marketing.pricing.proEffective}</div>
               <div className="pricing-features">
                 <div className="pricing-feature">
                   <span className="pricing-check">✓</span>
-                  Everything in Starter
+                  {t.marketing.pricing.proFeature1}
                 </div>
                 <div className="pricing-feature">
                   <span className="pricing-check">✓</span>
-                  Plain-English backtesting
+                  {t.marketing.pricing.proFeature2}
                 </div>
                 <div className="pricing-feature">
                   <span className="pricing-check">✓</span>
-                  Event studies &amp; correlation
+                  {t.marketing.pricing.proFeature3}
                 </div>
                 <div className="pricing-feature">
                   <span className="pricing-check">✓</span>
-                  One-click shareable reports
+                  {t.marketing.pricing.proFeature4}
                 </div>
                 <div className="pricing-feature">
                   <span className="pricing-check">✓</span>
-                  Remembers your trading context
+                  {t.marketing.pricing.proFeature5}
                 </div>
               </div>
               <button onClick={() => handleSignUp('pro')} className="btn-primary" style={{ width: '100%', justifyContent: 'center' }}>
-                Start Trading →
+                {t.marketing.pricing.proButton}
               </button>
             </div>
 
             {/* Power Tier */}
             <div className="pricing-card bracket-box animate-on-scroll">
-              <div className="pricing-tier-name">POWER</div>
-              <div className="pricing-for">Heavy &amp; Professional Users</div>
-              <div className="pricing-amount">$249<span>/mo</span></div>
-              <div className="pricing-period">Cancel anytime</div>
+              <div className="pricing-tier-name">{t.marketing.pricing.power}</div>
+              <div className="pricing-for">{t.marketing.pricing.powerFor}</div>
+              <div className="pricing-amount">{t.marketing.pricing.powerPrice}<span>{t.marketing.pricing.powerPeriod}</span></div>
+              <div className="pricing-period">{t.marketing.pricing.cancelAnytime}</div>
               <div className="pricing-credits">
-                <div className="pricing-credits-amount">10,000</div>
-                <div className="pricing-credits-label">credits / month</div>
+                <div className="pricing-credits-amount">{t.marketing.pricing.powerCredits}</div>
+                <div className="pricing-credits-label">{t.marketing.pricing.powerCreditsLabel}</div>
               </div>
-              <div className="pricing-effective">~$0.025 per credit</div>
+              <div className="pricing-effective">{t.marketing.pricing.powerEffective}</div>
               <div className="pricing-features">
                 <div className="pricing-feature">
                   <span className="pricing-check">✓</span>
-                  Everything in Pro
+                  {t.marketing.pricing.powerFeature1}
                 </div>
                 <div className="pricing-feature">
                   <span className="pricing-check">✓</span>
-                  Multi-day tick analysis
+                  {t.marketing.pricing.powerFeature2}
                 </div>
                 <div className="pricing-feature">
                   <span className="pricing-check">✓</span>
-                  Institutional flow detection
+                  {t.marketing.pricing.powerFeature3}
                 </div>
                 <div className="pricing-feature">
                   <span className="pricing-check">✓</span>
-                  Extended backtest periods
+                  {t.marketing.pricing.powerFeature4}
                 </div>
                 <div className="pricing-feature">
                   <span className="pricing-check">✓</span>
-                  Priority support
+                  {t.marketing.pricing.powerFeature5}
                 </div>
               </div>
               <button onClick={() => handleSignUp('power')} className="btn-secondary" style={{ width: '100%', justifyContent: 'center' }}>
-                Go Power →
+                {t.marketing.pricing.powerButton}
               </button>
             </div>
           </div>
 
           {/* Market Comparison */}
           <div className="market-comparison animate-on-scroll">
-            <h3>INSTITUTIONAL INTELLIGENCE. RETAIL PRICING.</h3>
-            <p>Pelican delivers the analysis power of institutional terminals at a fraction of the cost.</p>
+            <h3>{t.marketing.pricing.marketComparison}</h3>
+            <p>{t.marketing.pricing.marketComparisonDesc}</p>
             <div className="market-grid">
               <div className="market-item">
-                <div className="market-item-name">Bloomberg</div>
+                <div className="market-item-name">{t.marketing.pricing.bloomberg}</div>
                 <div className="market-item-price">~$24,000</div>
-                <div className="market-item-annual">per year</div>
+                <div className="market-item-annual">{t.marketing.pricing.perYear}</div>
               </div>
               <div className="market-item">
-                <div className="market-item-name">Refinitiv Eikon</div>
+                <div className="market-item-name">{t.marketing.pricing.refinitiv}</div>
                 <div className="market-item-price">~$22,000</div>
-                <div className="market-item-annual">per year</div>
+                <div className="market-item-annual">{t.marketing.pricing.perYear}</div>
               </div>
               <div className="market-item">
-                <div className="market-item-name">FactSet</div>
+                <div className="market-item-name">{t.marketing.pricing.factset}</div>
                 <div className="market-item-price">~$12,000</div>
-                <div className="market-item-annual">per year</div>
+                <div className="market-item-annual">{t.marketing.pricing.perYear}</div>
               </div>
               <div className="market-item pelican-item">
-                <div className="market-item-name">Pelican</div>
+                <div className="market-item-name">{t.marketing.pricing.pelican}</div>
                 <div className="market-item-price">$348 – $2,988</div>
-                <div className="market-item-annual">per year</div>
+                <div className="market-item-annual">{t.marketing.pricing.perYear}</div>
               </div>
             </div>
-            <div className="savings-badge">~99% CHEAPER THAN INSTITUTIONAL TERMINALS</div>
+            <div className="savings-badge">{t.marketing.pricing.savingsBadge}</div>
           </div>
         </div>
       </section>
 
       <section className="cta-section">
         <div className="section-inner animate-on-scroll">
-          <h2>STOP SEARCHING.<br />START <span style={{ color: 'var(--accent-purple)' }}>ASKING.</span></h2>
-          <p>Join traders who&apos;ve upgraded from scattered tools to unified intelligence.</p>
-          <button onClick={() => handleSignUp()} className="btn-primary">Launch Pelican →</button>
+          <h2>{t.marketing.cta.title1}<br />{t.marketing.cta.title2} <span style={{ color: 'var(--accent-purple)' }}>{t.marketing.cta.titleHighlight}</span></h2>
+          <p>{t.marketing.cta.subtitle}</p>
+          <button onClick={() => handleSignUp()} className="btn-primary">{t.marketing.cta.button}</button>
         </div>
       </section>
 
@@ -516,7 +513,7 @@ export default function HomePage() {
             <span>Pelican Trading</span>
           </div>
           <div className="footer-copy">
-            © 2025 Pelican Trading. All rights reserved.
+            {t.marketing.footer.copyright}
           </div>
         </div>
       </footer>

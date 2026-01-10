@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/providers/auth-provider';
+import { useT } from '@/lib/providers/translation-provider';
+import { LanguageSelector } from '@/components/language-selector';
 import HelpChat from '@/components/marketing/HelpChat';
 import '../styles/marketing.css';
 import '../styles/faq.css';
@@ -194,6 +196,7 @@ export default function FAQ() {
   const [openItems, setOpenItems] = useState<Set<string>>(new Set());
   const router = useRouter();
   const { user } = useAuth();
+  const t = useT();
 
   const handleGetStarted = () => {
     if (user) {
@@ -230,10 +233,11 @@ export default function FAQ() {
             <span>Pelican</span>
           </Link>
           <div className="nav-links">
-            <Link href="/#features">Features</Link>
-            <Link href="/#pricing">Pricing</Link>
-            <Link href="/faq" className="active">FAQ</Link>
-            <button onClick={handleGetStarted} className="btn-primary">Get Started →</button>
+            <Link href="/#features">{t.marketing.nav.features}</Link>
+            <Link href="/#pricing">{t.marketing.nav.pricing}</Link>
+            <Link href="/faq" className="active">{t.marketing.nav.faq}</Link>
+            <LanguageSelector />
+            <button onClick={handleGetStarted} className="btn-primary">{t.marketing.nav.getStarted}</button>
           </div>
         </div>
       </nav>
@@ -241,13 +245,12 @@ export default function FAQ() {
       <main className="faq-page">
         <div className="faq-container">
           <header className="faq-header">
-            <div className="faq-tag">Help Center</div>
+            <div className="faq-tag">{t.marketing.faq.helpCenter}</div>
             <h1>
-              Frequently Asked <span className="highlight">Questions</span>
+              {t.marketing.faq.title} <span className="highlight">{t.marketing.faq.titleHighlight}</span>
             </h1>
             <p>
-              Everything you need to know about Pelican Trading. Can&apos;t find what you&apos;re looking for? Use the
-              chat widget or contact our support team.
+              {t.marketing.faq.subtitle}
             </p>
           </header>
 
@@ -272,14 +275,14 @@ export default function FAQ() {
           ))}
 
           <div className="faq-cta">
-            <h3>Still Have Questions?</h3>
-            <p>Our team is here to help. Reach out anytime.</p>
+            <h3>{t.marketing.faq.stillHaveQuestions}</h3>
+            <p>{t.marketing.faq.teamHere}</p>
             <div className="faq-cta-buttons">
               <a href="mailto:support@pelicantrading.ai" className="btn-secondary">
-                Email Support
+                {t.marketing.faq.emailSupport}
               </a>
               <button onClick={handleSignUp} className="btn-primary">
-                Start Trading Now →
+                {t.marketing.faq.startTradingNow}
               </button>
             </div>
           </div>
@@ -288,7 +291,7 @@ export default function FAQ() {
 
       <footer className="faq-footer">
         <p>
-          © 2024 Pelican Trading. <Link href="/">Back to Home</Link>
+          {t.marketing.footer.copyright} <Link href="/">{t.marketing.nav.backToHome}</Link>
         </p>
       </footer>
 
