@@ -135,6 +135,11 @@ export function useConversations(): UseConversationsReturn {
   // Load from database
   // --------------------------------------------------------------------------
   const loadFromDatabase = useCallback(async (userId: string) => {
+    console.log('[CONVERSATIONS-DEBUG] loadFromDatabase called', {
+      userId,
+      timestamp: new Date().toISOString()
+    });
+    
     try {
       const { data, error } = await supabase
         .from("conversations")
@@ -142,8 +147,21 @@ export function useConversations(): UseConversationsReturn {
         .eq("user_id", userId)
         .is("deleted_at", null)
         .order("updated_at", { ascending: false })
-
+      
+      console.log('[CONVERSATIONS-DEBUG] Supabase response:', {
+        userId,
+        dataCount: data?.length || 0,
+        error,
+        conversations: data?.slice(0, 5).map(c => ({
+          id: c.id,
+          title: c.title,
+          created_at: c.created_at,
+          updated_at: c.updated_at
+        }))
+      });
+      
       if (error) throw error
+      
       setConversations(data || [])
     } catch (error) {
       console.error("[Conversations] Load failed:", error)
