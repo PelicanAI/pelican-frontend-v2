@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Check, Zap, Loader2 } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useCreditsContext } from '@/providers/credits-provider'
 
 const QUERY_COSTS = {
@@ -87,9 +87,22 @@ const PLANS = [
 
 export default function PricingPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const preselectedPlan = searchParams.get('plan')
   const { isSubscribed, isFounder, loading: creditsLoading } = useCreditsContext()
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [user, setUser] = useState<any>(null)
+
+  // Get current user
+  useEffect(() => {
+    const getUser = async () => {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      setUser(user)
+    }
+    getUser()
+  }, [])
 
   // Redirect users who already have an active subscription to chat
   useEffect(() => {
@@ -97,6 +110,21 @@ export default function PricingPage() {
       router.push('/chat')
     }
   }, [isSubscribed, isFounder, creditsLoading, router])
+
+  // Auto-select plan if arriving with ?plan= parameter
+  useEffect(() => {
+    if (preselectedPlan && user && !loadingPlan && !isSubscribed && !isFounder) {
+      const plan = PLANS.find(p => p.id === preselectedPlan)
+      if (plan) {
+        // Small delay to ensure component is fully mounted
+        setTimeout(() => {
+          handleSelectPlan(plan)
+        }, 100)
+      }
+      // Clear from sessionStorage after use
+      sessionStorage.removeItem('intended_plan')
+    }
+  }, [preselectedPlan, user, loadingPlan, isSubscribed, isFounder])
 
   const handleSelectPlan = async (plan: typeof PLANS[0]) => {
     setLoadingPlan(plan.id)

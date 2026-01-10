@@ -8,8 +8,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { useState } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
+import { useState, useEffect } from "react"
 import Image from "next/image"
 
 export default function SignUpPage() {
@@ -20,6 +20,17 @@ export default function SignUpPage() {
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const planParam = searchParams.get('plan')
+
+  // Store the plan parameter in sessionStorage for use after signup
+  useEffect(() => {
+    if (planParam) {
+      // Map 'starter' from marketing site to 'base' used by pricing page
+      const mappedPlan = planParam === 'starter' ? 'base' : planParam
+      sessionStorage.setItem('intended_plan', mappedPlan)
+    }
+  }, [planParam])
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -50,7 +61,13 @@ export default function SignUpPage() {
       // If email confirmation is disabled, user is immediately logged in with a session
       if (data.session) {
         // User is logged in, redirect to pricing (new users need to subscribe)
-        router.push('/pricing')
+        // Check if there's a pre-selected plan from the marketing site
+        const storedPlan = sessionStorage.getItem('intended_plan')
+        if (storedPlan) {
+          router.push(`/pricing?plan=${storedPlan}`)
+        } else {
+          router.push('/pricing')
+        }
         return
       }
 

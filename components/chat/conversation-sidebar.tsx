@@ -256,7 +256,7 @@ export function ConversationSidebar({
       <div className="px-4 py-4 border-b border-sidebar-border/30">
         <div className="flex items-center justify-between mb-6">
           <Link
-            href="/marketing"
+            href="/"
             className="flex items-center gap-2 group transition-opacity hover:opacity-80"
           >
             <Image
