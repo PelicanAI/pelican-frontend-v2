@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
 
 interface CreditInfo {
@@ -23,9 +23,9 @@ export function useCredits(): UseCreditsReturn {
   const [credits, setCredits] = useState<CreditInfo | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const supabase = useMemo(() => createClient(), [])
 
   const fetchCredits = useCallback(async () => {
-    const supabase = createClient()
     
     try {
       const { data: { user } } = await supabase.auth.getUser()
@@ -84,7 +84,7 @@ export function useCredits(): UseCreditsReturn {
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [supabase])
 
   const updateBalance = useCallback((newBalance: number) => {
     setCredits(prev => prev ? { ...prev, balance: newBalance } : null)
@@ -95,8 +95,6 @@ export function useCredits(): UseCreditsReturn {
   }, [fetchCredits])
 
   useEffect(() => {
-    const supabase = createClient()
-    
     const setupSubscription = async () => {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
@@ -130,7 +128,7 @@ export function useCredits(): UseCreditsReturn {
     }
 
     setupSubscription()
-  }, [])
+  }, [supabase])
 
   return { 
     credits, 

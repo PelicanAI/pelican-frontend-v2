@@ -24,6 +24,21 @@ import { cn } from "@/lib/utils"
 import { SettingsModal } from "@/components/settings-modal"
 import { useCreditsContext } from "@/providers/credits-provider"
 
+// Loading screen component for chat page
+function ChatLoadingScreen() {
+  return (
+    <div className="flex h-screen items-center justify-center bg-gradient-to-br from-purple-950/20 via-black to-violet-950/20">
+      <div className="flex flex-col items-center gap-4">
+        <div className="relative">
+          <div className="animate-spin h-12 w-12 border-4 border-purple-500 border-t-transparent rounded-full" />
+          <div className="absolute inset-0 animate-ping h-12 w-12 border-4 border-purple-500 border-t-transparent rounded-full opacity-20" />
+        </div>
+        <span className="text-gray-400 text-sm font-medium">Loading Pelican AI...</span>
+      </div>
+    </div>
+  )
+}
+
 export default function ChatPage() {
   const { user, loading: authLoading } = useAuth()
   const { isSubscribed, isFounder, loading: creditsLoading } = useCreditsContext()
@@ -144,21 +159,6 @@ export default function ChatPage() {
     messageHandler.setDraftConversationId(conversationRouter.currentConversationId || null)
   }, [conversationRouter.currentConversationId, messageHandler])
 
-  // Clear any old guest data from localStorage
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('pelican_guest_mode')
-      localStorage.removeItem('pelican_guest_user_id')
-      localStorage.removeItem('pelican_guest_conversations')
-      // Remove all guest message keys
-      Object.keys(localStorage).forEach(key => {
-        if (key.startsWith('pelican_guest_messages_')) {
-          localStorage.removeItem(key)
-        }
-      })
-    }
-  }, [])
-
   // Clear guest conversation IDs from URL when user loads page
   useEffect(() => {
     if (conversationIdFromUrl && conversationIdFromUrl.startsWith('guest-')) {
@@ -229,23 +229,15 @@ export default function ChatPage() {
     setSettingsOpen(true)
   }
 
-  // Require authentication - no guest mode
+  // Show loading screen while checking auth/credits
+  if (!mounted || authLoading || creditsLoading) {
+    return <ChatLoadingScreen />
+  }
+
+  // Require authentication - redirect to login if no user
   if (!user) {
     router.push('/auth/login')
-    return null
-  }
-
-  // Don't render anything until mounted (avoids hydration mismatch)
-  if (!mounted) {
-    return null
-  }
-
-  if (authLoading || creditsLoading) {
-    return (
-      <div className="flex items-center justify-center h-screen bg-background">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
-    )
+    return <ChatLoadingScreen />
   }
 
   // Check subscription access - founders and subscribers can access
@@ -253,7 +245,7 @@ export default function ChatPage() {
   
   if (!hasAccess) {
     router.push('/pricing')
-    return null
+    return <ChatLoadingScreen />
   }
 
   return (

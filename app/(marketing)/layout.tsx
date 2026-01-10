@@ -24,7 +24,9 @@ export default function MarketingLayout({
           rel="stylesheet"
         />
       </head>
-      {children}
+      <div className="marketing-page">
+        {children}
+      </div>
     </>
   );
 }

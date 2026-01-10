@@ -56,16 +56,45 @@ export function TranslationProvider({ children }: { children: ReactNode }) {
         : 'en';
 
     import(`@/messages/${translationLocale}.json`)
-      .then(module => {
-        setTranslations(module.default);
-        setIsLoading(false);
+      .then(async (localeModule) => {
+        // Always load English as base
+        const enModule = await import('@/messages/en.json')
+        const en = enModule.default
+        const locale = localeModule.default
+
+        // Deep merge: English base + locale overrides
+        // Missing keys in locale fall back to English
+        setTranslations({
+          ...en,
+          ...locale,
+          common: { ...en.common, ...(locale.common || {}) },
+          chat: { ...en.chat, ...(locale.chat || {}) },
+          market: { ...en.market, ...(locale.market || {}) },
+          marketing: {
+            ...en.marketing,
+            ...(locale.marketing || {}),
+            nav: { ...(en.marketing?.nav || {}), ...(locale.marketing?.nav || {}) },
+            hero: { ...(en.marketing?.hero || {}), ...(locale.marketing?.hero || {}) },
+            stats: { ...(en.marketing?.stats || {}), ...(locale.marketing?.stats || {}) },
+            what: { ...(en.marketing?.what || {}), ...(locale.marketing?.what || {}) },
+            features: { ...(en.marketing?.features || {}), ...(locale.marketing?.features || {}) },
+            traders: { ...(en.marketing?.traders || {}), ...(locale.marketing?.traders || {}) },
+            languages: { ...(en.marketing?.languages || {}), ...(locale.marketing?.languages || {}) },
+            team: { ...(en.marketing?.team || {}), ...(locale.marketing?.team || {}) },
+            pricing: { ...(en.marketing?.pricing || {}), ...(locale.marketing?.pricing || {}) },
+            cta: { ...(en.marketing?.cta || {}), ...(locale.marketing?.cta || {}) },
+            footer: { ...(en.marketing?.footer || {}), ...(locale.marketing?.footer || {}) },
+            faq: { ...(en.marketing?.faq || {}), ...(locale.marketing?.faq || {}) },
+          },
+        })
+        setIsLoading(false)
       })
       .catch(() => {
-        // Fallback to English if something goes wrong
+        // Complete fallback to English if locale file doesn't exist at all
         import('@/messages/en.json').then(module => {
-          setTranslations(module.default);
-          setIsLoading(false);
-        });
+          setTranslations(module.default)
+          setIsLoading(false)
+        })
       });
   }, [locale]);
 

@@ -128,7 +128,7 @@ export function useConversations(): UseConversationsReturn {
 
   const debouncedSearch = useDebounce(search, 300)
   const pathname = usePathname()
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
   const effectiveUserId = user?.id || guestUserId
 
   // --------------------------------------------------------------------------
@@ -175,7 +175,7 @@ export function useConversations(): UseConversationsReturn {
         });
       }
     });
-  }, [user, guestUserId, effectiveUserId, pathname, supabase])
+  }, [user, guestUserId, effectiveUserId, pathname])
 
   // --------------------------------------------------------------------------
   // Load from database
@@ -238,7 +238,7 @@ export function useConversations(): UseConversationsReturn {
     } finally {
       setLoading(false)
     }
-  }, [supabase, user, guestUserId, effectiveUserId])
+  }, [user, guestUserId, effectiveUserId])
 
   // --------------------------------------------------------------------------
   // Initialize guest user ID
@@ -340,7 +340,7 @@ export function useConversations(): UseConversationsReturn {
       cancelled = true
       subscription?.unsubscribe()
     }
-  }, [guestUserId, loadFromDatabase, supabase])
+  }, [guestUserId, loadFromDatabase])
 
   // --------------------------------------------------------------------------
   // Real-time subscription
@@ -396,7 +396,7 @@ export function useConversations(): UseConversationsReturn {
         }
       })
     }
-  }, [pathname, user?.id, loadFromDatabase, supabase, guestUserId, effectiveUserId])
+  }, [pathname, user?.id, loadFromDatabase, guestUserId, effectiveUserId])
 
   // --------------------------------------------------------------------------
   // CREATE
@@ -459,7 +459,7 @@ export function useConversations(): UseConversationsReturn {
     setConversations(updated)
 
     return newConversation
-  }, [guestUserId, user, supabase, loadFromDatabase])
+  }, [guestUserId, user, loadFromDatabase])
 
   // --------------------------------------------------------------------------
   // RENAME
@@ -549,7 +549,7 @@ export function useConversations(): UseConversationsReturn {
       setConversations(previous) // Rollback
       return false
     }
-  }, [conversations, effectiveUserId, user?.id, supabase])
+  }, [conversations, effectiveUserId, user?.id])
 
   // --------------------------------------------------------------------------
   // REMOVE (hard delete)
@@ -585,7 +585,7 @@ export function useConversations(): UseConversationsReturn {
       setConversations(previous) // Rollback
       return false
     }
-  }, [conversations, effectiveUserId, user?.id, supabase])
+  }, [conversations, effectiveUserId, user?.id])
 
   // --------------------------------------------------------------------------
   // Guest-specific utilities

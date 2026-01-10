@@ -9,7 +9,7 @@
  * @version 2.0.0 - UUID Migration Compatible
  */
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/lib/providers/auth-provider"
 import { useTheme } from "next-themes"
@@ -133,7 +133,7 @@ const POPULAR_TICKERS = [
 export default function SettingsPage() {
   const { user, loading: authLoading } = useAuth()
   const router = useRouter()
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
   const { credits, isSubscribed, isFounder } = useCreditsContext()
   const { setTheme, theme } = useTheme()
   const previousTheme = useRef(theme)

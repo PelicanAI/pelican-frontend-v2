@@ -9,7 +9,7 @@
  */
 
 import type React from "react"
-import { createContext, useContext, useEffect, useState, useCallback } from "react"
+import { createContext, useContext, useEffect, useState, useCallback, useMemo } from "react"
 import { createClient } from "@/lib/supabase/client"
 import type { User } from "@supabase/supabase-js"
 import { bulkInsertWithRLSCheck, isValidUUID } from "@/lib/supabase/helpers"
@@ -41,7 +41,7 @@ const GUEST_MODE_KEY = "pelican_guest_mode"
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
 
   // --------------------------------------------------------------------------
   // Guest Migration
@@ -182,6 +182,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Clear guest mode if set
     if (typeof window !== "undefined") {
       localStorage.removeItem(GUEST_MODE_KEY)
+      localStorage.removeItem('pelican_guest_user_id')
+      localStorage.removeItem('pelican_guest_conversations')
+      Object.keys(localStorage).forEach(key => {
+        if (key.startsWith('pelican_guest_messages_')) {
+          localStorage.removeItem(key)
+        }
+      })
     }
   }
 

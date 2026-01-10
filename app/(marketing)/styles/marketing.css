@@ -1,7 +1,8 @@
 /* Pelican Trading Homepage Styles */
 /* Design System Variables */
 
-:root {
+/* Marketing-specific CSS variables - scoped to .marketing-page */
+.marketing-page {
   --bg-primary: #0a0b0f;
   --bg-secondary: #12141a;
   --bg-tertiary: #1a1d24;
@@ -16,22 +17,21 @@
   --grid-color: rgba(148, 163, 184, 0.03);
 }
 
-* {
+/* Scoped reset - only affects marketing pages */
+.marketing-page * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-html {
-  scroll-behavior: smooth;
-}
-
-body {
+.marketing-page {
   font-family: 'IBM Plex Sans', sans-serif;
   background-color: var(--bg-primary);
   color: var(--text-primary);
   line-height: 1.6;
   overflow-x: hidden;
+  scroll-behavior: smooth;
+  min-height: 100vh;
 }
 
 .grid-bg {
@@ -85,8 +85,8 @@ body {
   border-width: 0 2px 2px 0;
 }
 
-/* Navigation */
-nav {
+/* Navigation - scoped to marketing page */
+.marketing-page nav {
   position: fixed;
   top: 0;
   left: 0;
@@ -311,8 +311,8 @@ nav {
   margin-top: 0.25rem;
 }
 
-/* Sections */
-section {
+/* Sections - scoped to marketing page */
+.marketing-page section {
   position: relative;
   z-index: 1;
   padding: 6rem 2rem;
@@ -901,8 +901,8 @@ section {
   margin: 0 auto 2.5rem;
 }
 
-/* Footer */
-footer {
+/* Footer - scoped to marketing page */
+.marketing-page footer {
   position: relative;
   z-index: 1;
   padding: 3rem 2rem;
@@ -1076,24 +1076,24 @@ footer {
 }
 
 @media (max-width: 640px) {
-  nav {
+  .marketing-page nav {
     padding: 1rem;
   }
 
-  .nav-links {
+  .marketing-page .nav-links {
     display: none;
   }
 
-  .hero {
+  .marketing-page .hero {
     padding: 6rem 1rem 3rem;
   }
 
-  .stats-bar {
+  .marketing-page .stats-bar {
     flex-wrap: wrap;
     gap: 2rem;
   }
 
-  section {
+  .marketing-page section {
     padding: 4rem 1rem;
   }
 
