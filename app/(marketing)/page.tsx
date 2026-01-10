@@ -167,7 +167,7 @@ export default function HomePage() {
       <section id="features">
         <div className="section-inner">
           <div className="section-header animate-on-scroll">
-            <div className="section-tag">// What You Get</div>
+            <div className="section-tag">{'//'} What You Get</div>
             <h2 className="section-title">TRADING INTELLIGENCE, NOT ANOTHER TOOL TO LEARN</h2>
           </div>
           <div className="features-grid">
@@ -208,7 +208,7 @@ export default function HomePage() {
       <section className="every-trader-section">
         <div className="section-inner">
           <div className="section-header animate-on-scroll">
-            <div className="section-tag">// For Everyone</div>
+            <div className="section-tag">{'//'} For Everyone</div>
             <h2 className="section-title">PELICAN FOR EVERY TRADER</h2>
             <p style={{ color: 'var(--text-secondary)', marginTop: '1rem', fontSize: '1.1rem' }}>Whether you&apos;re just starting or managing millions, Pelican speaks your language</p>
           </div>
@@ -249,7 +249,7 @@ export default function HomePage() {
       <section id="team">
         <div className="section-inner">
           <div className="section-header animate-on-scroll">
-            <div className="section-tag">// The Team</div>
+            <div className="section-tag">{'//'} The Team</div>
             <h2 className="section-title">BUILT BY TRADERS, FOR TRADERS</h2>
           </div>
           <div className="team-grid">
@@ -278,7 +278,7 @@ export default function HomePage() {
       <section className="languages-section">
         <div className="section-inner">
           <div className="section-header animate-on-scroll">
-            <div className="section-tag">// Global</div>
+            <div className="section-tag">{'//'} Global</div>
             <h2 className="section-title">AVAILABLE IN 30+ LANGUAGES</h2>
             <p style={{ color: 'var(--text-secondary)', marginTop: '1rem', fontSize: '1.1rem' }}>Pelican speaks your language, wherever you trade</p>
           </div>
@@ -319,7 +319,7 @@ export default function HomePage() {
       <section id="pricing" className="pricing-section">
         <div className="section-inner">
           <div className="section-header animate-on-scroll">
-            <div className="section-tag">// Pricing</div>
+            <div className="section-tag">{'//'} Pricing</div>
             <h2 className="section-title">CREDIT-BASED PRICING THAT SCALES WITH YOU</h2>
           </div>
 

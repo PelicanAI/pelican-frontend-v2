@@ -30,7 +30,7 @@ const faqData: FAQCategory[] = [
       },
       {
         question: 'Who is Pelican for?',
-        answer: 'Pelican is designed for traders of all levels who want institutional-grade market intelligence without the complexity. Whether you\'re a day trader, swing trader, or long-term investor, Pelican helps you make more informed decisions faster.',
+        answer: 'Pelican is designed for traders of all levels who want institutional-grade market intelligence without the complexity. Whether you&apos;re a day trader, swing trader, or long-term investor, Pelican helps you make more informed decisions faster.',
       },
       {
         question: 'What makes Pelican different from other trading tools?',
@@ -56,11 +56,11 @@ const faqData: FAQCategory[] = [
       },
       {
         question: 'What is Context Memory?',
-        answer: 'Pelican remembers your trading style, preferences, and past conversations. This means responses get more personalized over time, and you don\'t have to repeat yourself. It\'s like having an assistant who truly knows how you trade.',
+        answer: 'Pelican remembers your trading style, preferences, and past conversations. This means responses get more personalized over time, and you don&apos;t have to repeat yourself. It&apos;s like having an assistant who truly knows how you trade.',
       },
       {
         question: 'How does Pattern Detection work?',
-        answer: 'Pelican\'s AI continuously analyzes market data to find patterns and anomalies you might miss. It can identify trends, correlations, and unusual activity across thousands of tickers, giving you an edge in spotting opportunities.',
+        answer: 'Pelican&apos;s AI continuously analyzes market data to find patterns and anomalies you might miss. It can identify trends, correlations, and unusual activity across thousands of tickers, giving you an edge in spotting opportunities.',
       },
       {
         question: 'What are One-Click Reports?',
@@ -78,7 +78,7 @@ const faqData: FAQCategory[] = [
       },
       {
         question: 'What asset classes are supported?',
-        answer: 'Pelican covers equities (stocks), futures, cryptocurrency, and foreign exchange (FX). Whether you trade stocks, crypto, or forex, we\'ve got you covered.',
+        answer: 'Pelican covers equities (stocks), futures, cryptocurrency, and foreign exchange (FX). Whether you trade stocks, crypto, or forex, we&apos;ve got you covered.',
       },
       {
         question: 'Is the data real-time or delayed?',
@@ -91,7 +91,7 @@ const faqData: FAQCategory[] = [
     icon: '💰',
     items: [
       {
-        question: 'How does Pelican\'s pricing work?',
+        question: 'How does Pelican&apos;s pricing work?',
         answer: 'Pelican uses a credit-based pricing system. Credits represent analytical workload—simple queries cost fewer credits, complex analyses cost more. Credits reset monthly and do not roll over.',
       },
       {
@@ -103,7 +103,7 @@ const faqData: FAQCategory[] = [
         answer: 'It depends on complexity: Conversation/Mentoring costs 2 credits, Simple Price Checks cost 10 credits, Basic Analysis (RSI, MACD, comparisons) costs 25 credits, Event Studies cost 75 credits, and Multi-Day Tick Analysis or backtests cost 200 credits.',
       },
       {
-        question: 'What\'s included in all tiers?',
+        question: 'What&apos;s included in all tiers?',
         answer: 'All tiers include: live data on 10,000+ tickers, plain-English backtesting, context memory across sessions, one-click shareable reports, and all new features as they ship. The only difference is credit allotment.',
       },
       {
@@ -246,7 +246,7 @@ export default function FAQ() {
               Frequently Asked <span className="highlight">Questions</span>
             </h1>
             <p>
-              Everything you need to know about Pelican Trading. Can't find what you're looking for? Use the
+              Everything you need to know about Pelican Trading. Can&apos;t find what you&apos;re looking for? Use the
               chat widget or contact our support team.
             </p>
           </header>

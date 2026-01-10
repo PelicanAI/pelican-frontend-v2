@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { User } from '@supabase/supabase-js'
 import { Check, Zap, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -92,7 +93,7 @@ export default function PricingPage() {
   const { isSubscribed, isFounder, loading: creditsLoading } = useCreditsContext()
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const [user, setUser] = useState<any>(null)
+  const [user, setUser] = useState<User | null>(null)
 
   // Get current user
   useEffect(() => {
