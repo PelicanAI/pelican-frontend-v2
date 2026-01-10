@@ -291,7 +291,7 @@ export default function FAQ() {
 
       <footer className="faq-footer">
         <p>
-          {t.marketing.footer.copyright} <Link href="/">{t.marketing.nav.backToHome}</Link>
+          {t.marketing.footer.copyright} <Link href="/">{t.marketing.nav.backToHome}</Link> | <Link href="/terms">Terms of Use</Link>
         </p>
       </footer>
 

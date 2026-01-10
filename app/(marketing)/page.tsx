@@ -512,6 +512,10 @@ export default function HomePage() {
             <img src="/pelican-logo.png" alt="Pelican" />
             <span>Pelican Trading</span>
           </div>
+          <div className="footer-links">
+            <Link href="/terms">Terms of Use</Link>
+            <Link href="/faq">FAQ</Link>
+          </div>
           <div className="footer-copy">
             {t.marketing.footer.copyright}
           </div>

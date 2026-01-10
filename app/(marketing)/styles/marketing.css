@@ -936,6 +936,23 @@ footer {
   letter-spacing: 0.1em;
 }
 
+.footer-links {
+  display: flex;
+  gap: 2rem;
+}
+
+.footer-links a {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.footer-links a:hover {
+  color: var(--accent-purple);
+}
+
 .footer-copy {
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.75rem;
