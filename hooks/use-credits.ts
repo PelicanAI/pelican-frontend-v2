@@ -94,6 +94,28 @@ export function useCredits(): UseCreditsReturn {
     fetchCredits()
   }, [fetchCredits])
 
+  // Listen for auth state changes and refetch credits when user signs in
+  // This fixes the race condition where initial fetch runs before auth state propagates
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' && session?.user) {
+        // User just signed in - refetch credits with their ID
+        console.log('[CREDITS] Auth state changed to SIGNED_IN, refetching credits')
+        setLoading(true)
+        fetchCredits()
+      } else if (event === 'SIGNED_OUT') {
+        // User signed out - clear credits
+        console.log('[CREDITS] Auth state changed to SIGNED_OUT, clearing credits')
+        setCredits(null)
+        setLoading(false)
+      }
+    })
+
+    return () => {
+      subscription.unsubscribe()
+    }
+  }, [supabase, fetchCredits])
+
   useEffect(() => {
     const setupSubscription = async () => {
       const { data: { user } } = await supabase.auth.getUser()
