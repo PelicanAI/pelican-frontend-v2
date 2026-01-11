@@ -22,7 +22,6 @@ import { LanguageSelector } from "@/components/language-selector"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
 import { SettingsModal } from "@/components/settings-modal"
-import { useCreditsContext } from "@/providers/credits-provider"
 
 // Loading screen component for chat page
 function ChatLoadingScreen() {
@@ -41,7 +40,6 @@ function ChatLoadingScreen() {
 
 export default function ChatPage() {
   const { user, loading: authLoading } = useAuth()
-  const { isSubscribed, isFounder, loading: creditsLoading } = useCreditsContext()
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -229,22 +227,14 @@ export default function ChatPage() {
     setSettingsOpen(true)
   }
 
-  // Show loading screen while checking auth/credits
-  if (!mounted || authLoading || creditsLoading) {
+  // Show loading screen while checking auth
+  if (!mounted || authLoading) {
     return <ChatLoadingScreen />
   }
 
   // Require authentication - redirect to login if no user
   if (!user) {
     router.push('/auth/login')
-    return <ChatLoadingScreen />
-  }
-
-  // Check subscription access - founders and subscribers can access
-  const hasAccess = isFounder || isSubscribed
-  
-  if (!hasAccess) {
-    router.push('/pricing')
     return <ChatLoadingScreen />
   }
 
