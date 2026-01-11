@@ -11,5 +11,5 @@ export async function POST(request: NextRequest) {
     return NextResponse.redirect(new URL("/auth/error", request.url))
   }
 
-  return NextResponse.redirect(new URL("/auth/login", request.url))
+  return NextResponse.redirect(new URL("/", request.url), 303)
 }
