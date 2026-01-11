@@ -92,7 +92,7 @@ export function CreditDisplay({ variant = 'default', className = '' }: CreditDis
               isCritical ? 'bg-red-500' : isLow ? 'bg-amber-500' : 'bg-blue-500'
             }`}
             style={{ 
-              width: `${Math.min(100, (credits.balance / credits.monthlyAllocation) * 100)}%` 
+              width: `${Math.min(100, (credits.usedThisMonth / credits.monthlyAllocation) * 100)}%` 
             }}
           />
         </div>
