@@ -236,7 +236,7 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
       const files: File[] = []
       for (let i = 0; i < items.length; i++) {
         const item = items[i]
-        if (item.type.startsWith('image/')) {
+        if (item && item.type.startsWith('image/')) {
           const file = item.getAsFile()
           if (file) files.push(file)
         }
