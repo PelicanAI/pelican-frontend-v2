@@ -475,7 +475,8 @@ export default function HomePage() {
             <span>Pelican Trading</span>
           </div>
           <div className="footer-links">
-            <Link href="/terms">Terms of Use</Link>
+            <Link href="/terms">Terms of Service</Link>
+            <Link href="/privacy">Privacy Policy</Link>
             <Link href="/faq">FAQ</Link>
           </div>
           <div className="footer-copy">
