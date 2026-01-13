@@ -353,7 +353,7 @@ export function MessageBubble({
           {/* AI avatar */}
           <div className="flex-shrink-0">
             <img
-              src="/pelican-logo-transparent.png"
+              src="/pelican-logo.png"
               alt="Pelican AI"
               className="w-7 h-7 sm:w-8 sm:h-8 object-contain"
             />

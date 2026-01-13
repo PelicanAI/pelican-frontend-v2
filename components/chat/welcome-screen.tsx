@@ -21,7 +21,7 @@ export function WelcomeScreen({ onQuickStart }: WelcomeScreenProps) {
       <div className="max-w-2xl mx-auto text-center space-y-6 sm:space-y-8 px-2">
         <div className="flex justify-center h-24 sm:h-32">
           <img 
-            src="/pelican-logo-transparent.png" 
+            src="/pelican-logo.png" 
             alt={t.common.appName} 
             className="w-24 h-24 sm:w-32 sm:h-32 object-contain" 
             width="128"

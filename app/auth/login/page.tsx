@@ -82,7 +82,7 @@ export default function LoginPage() {
             {/* Logo - clean and visible */}
             <div className="relative group">
               <Image
-                src="/pelican-logo-transparent.png"
+                src="/pelican-logo.png"
                 alt="Pelican AI"
                 width={80}
                 height={80}

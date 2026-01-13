@@ -76,7 +76,7 @@ export function ChatSidebar({
       <div className="p-3 sm:p-3 border-b">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <img src="/pelican-logo-transparent.png" alt="PelicanAI" className="w-6 h-6 sm:w-6 sm:h-6 object-contain" />
+            <img src="/pelican-logo.png" alt="PelicanAI" className="w-6 h-6 sm:w-6 sm:h-6 object-contain" />
             <span className="font-semibold text-sm">PelicanAI</span>
           </div>
           <Button variant="ghost" size="icon" onClick={onToggleCollapse} className="w-11 h-11 sm:w-6 sm:h-6 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0">

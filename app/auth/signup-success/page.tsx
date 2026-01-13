@@ -11,7 +11,7 @@ export default function SignUpSuccessPage() {
           <div className="flex flex-col items-center gap-2">
             <div className="w-12 h-12 bg-gradient-to-br from-purple-600 to-purple-700 rounded-xl flex items-center justify-center p-2">
               <Image
-                src="/pelican-logo-transparent.png"
+                src="/pelican-logo.png"
                 alt="Pelican AI"
                 width={32}
                 height={32}
