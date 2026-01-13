@@ -98,7 +98,7 @@ export function DataTable({ data, columns, title = "Market Data", query, summary
       {/* LARGE PROMINENT WATERMARK - 30% opacity, no blur */}
       <div className="absolute inset-0 flex items-center justify-center opacity-30 pointer-events-none overflow-hidden">
         <img
-          src="/pelican-logo.png"
+          src="/pelican-logo-transparent.png"
           alt=""
           className="w-96 h-96 object-contain"
           aria-hidden="true"
@@ -110,7 +110,7 @@ export function DataTable({ data, columns, title = "Market Data", query, summary
 
         {/* Header with logo and branding */}
         <div className="mb-6 flex items-center gap-3">
-          <img src="/pelican-logo.png" alt="Pelican" className="h-12 w-12" />
+          <img src="/pelican-logo-transparent.png" alt="Pelican" className="h-12 w-12" />
           <span className="text-2xl font-bold text-foreground">Pelican</span>
         </div>
 

@@ -65,7 +65,7 @@ export default function HomePage() {
       <nav>
         <div className="nav-inner">
           <Link href="/" className="nav-logo">
-            <img src="/pelican-logo.png" alt="Pelican" />
+            <img src="/pelican-logo-transparent.png" alt="Pelican" />
             <span>Pelican</span>
           </Link>
           <div className="nav-links">
@@ -111,7 +111,7 @@ export default function HomePage() {
             </div>
           </div>
           <div className="hero-visual">
-            <img src="/pelican-logo.png" alt="Pelican Logo" className="hero-logo-large" />
+            <img src="/pelican-logo-transparent.png" alt="Pelican Logo" className="hero-logo-large" />
           </div>
         </div>
       </section>
@@ -471,7 +471,7 @@ export default function HomePage() {
       <footer>
         <div className="footer-inner">
           <div className="footer-logo">
-            <img src="/pelican-logo.png" alt="Pelican" />
+            <img src="/pelican-logo-transparent.png" alt="Pelican" />
             <span>Pelican Trading</span>
           </div>
           <div className="footer-links">
@@ -485,7 +485,7 @@ export default function HomePage() {
       </footer>
 
       {/* Help Chat Widget */}
-      <HelpChat logoUrl="/pelican-logo.png" />
+      <HelpChat logoUrl="/pelican-logo-transparent.png" />
     </>
   );
 }

@@ -23,7 +23,7 @@ export function ChatHeader({ onSettingsClick, onMenuClick, isOnline = true }: Ch
           <ThemeToggle />
 
           <div className="relative">
-            <Image src="/pelican-logo.png" alt="Pelican AI" width={32} height={32} className="rounded-lg" />
+            <Image src="/pelican-logo-transparent.png" alt="Pelican AI" width={32} height={32} className="rounded-lg" />
             <div
               className={`absolute -bottom-1 -right-1 w-3 h-3 rounded-full border-2 border-background ${
                 isOnline ? "bg-green-500" : "bg-gray-400"

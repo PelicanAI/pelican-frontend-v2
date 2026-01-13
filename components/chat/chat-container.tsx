@@ -438,7 +438,7 @@ export function ChatContainer({
           {isLoading && messages.length > 0 && (messages[messages.length - 1]?.role === 'user' || (messages[messages.length - 1]?.role === 'assistant' && !messages[messages.length - 1]?.content)) && (
             <div className="flex items-center gap-3 py-4 px-4 sm:px-8 max-w-3xl mx-auto">
               <img
-                src="/pelican-logo.png"
+                src="/pelican-logo-transparent.png"
                 alt="Pelican AI"
                 className="w-7 h-7 sm:w-8 sm:h-8 object-contain opacity-80"
               />
