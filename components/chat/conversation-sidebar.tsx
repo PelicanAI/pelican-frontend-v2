@@ -444,7 +444,7 @@ export function ConversationSidebar({
 
       {/* Sign Out Confirmation Dialog */}
       <AlertDialog open={showSignOutDialog} onOpenChange={setShowSignOutDialog}>
-        <AlertDialogContent className="sm:max-w-[425px]">
+        <AlertDialogContent className="sm:max-w-[425px] border-border/50 shadow-xl bg-background/95 backdrop-blur-md antialiased">
           <AlertDialogHeader>
             <AlertDialogTitle>Sign out</AlertDialogTitle>
             <AlertDialogDescription>
