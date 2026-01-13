@@ -377,7 +377,7 @@ export default function ChatPage() {
                 disabled={isLoadingMessages}
                 disabledSend={(chatLoading || isLoadingMessages) && !messageHandler.isQueueingMessage}
                 canSend={(!chatLoading && !isLoadingMessages) || messageHandler.isQueueingMessage}
-                placeholder="Find me a bullish strategy"
+                placeholder="Ask Pelican anything..."
                 onTypingDuringResponse={messageHandler.handleTypingDuringResponse}
                 isAIResponding={chatLoading}
                 pendingDraft={messageHandler.pendingDraft}

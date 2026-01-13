@@ -274,41 +274,8 @@ export default function HomePage() {
 
       <section className="languages-section">
         <div className="section-inner">
-          <div className="section-header animate-on-scroll">
-            <div className="section-tag">{t.marketing.languages.sectionTag}</div>
-            <h2 className="section-title">{t.marketing.languages.title}</h2>
-            <p style={{ color: 'var(--text-secondary)', marginTop: '1rem', fontSize: '1.1rem' }}>{t.marketing.languages.subtitle}</p>
-          </div>
-          <div className="languages-grid animate-on-scroll">
-            <div className="language-tag">Chinese</div>
-            <div className="language-tag">Spanish</div>
-            <div className="language-tag">Japanese</div>
-            <div className="language-tag">Korean</div>
-            <div className="language-tag">French</div>
-            <div className="language-tag">German</div>
-            <div className="language-tag">Portuguese</div>
-            <div className="language-tag">Italian</div>
-            <div className="language-tag">Dutch</div>
-            <div className="language-tag">Russian</div>
-            <div className="language-tag">Turkish</div>
-            <div className="language-tag">Arabic</div>
-            <div className="language-tag">Polish</div>
-            <div className="language-tag">Czech</div>
-            <div className="language-tag">Slovak</div>
-            <div className="language-tag">Hungarian</div>
-            <div className="language-tag">Romanian</div>
-            <div className="language-tag">Greek</div>
-            <div className="language-tag">Swedish</div>
-            <div className="language-tag">Danish</div>
-            <div className="language-tag">Norwegian</div>
-            <div className="language-tag">Finnish</div>
-            <div className="language-tag">Ukrainian</div>
-            <div className="language-tag">Hebrew</div>
-            <div className="language-tag">Indonesian</div>
-            <div className="language-tag">Malay</div>
-            <div className="language-tag">Vietnamese</div>
-            <div className="language-tag">Thai</div>
-            <div className="language-tag">Filipino/Tagalog</div>
+          <div className="section-header animate-on-scroll" style={{ textAlign: 'center', marginBottom: '0' }}>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem' }}>{t.marketing.languages.subtitle}</p>
           </div>
         </div>
       </section>

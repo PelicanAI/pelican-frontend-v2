@@ -116,7 +116,7 @@
       "nickName": "NICK GROVES",
       "nickRole": "創業者兼CEO",
       "nickBio": "先物、FX、デジタル資産で8年の経験。元暗号アービトラージシステムアーキテクトから、システム駆動型ストラテジストへ転身。Pelicanを設立し、業界の不透明なツールへの依存に挑戦し、実際のトレーダーが運用する方法で考えるAIを構築—構造化され、文脈化され、徹底的に正直に。",
-      "rayName": "RAYMOND CAMPBELL",
+      "rayName": "RAY CAMPBELL",
       "rayRole": "シニアアーキテクト",
       "rayBio": "ミッションクリティカルな金融インフラストラクチャの構築に20年。LabrancheでNYSEの電子取引への移行を主導し、800以上のシンボルで超低レイテンシシステムを設計。C++高性能システム、取引所接続、現代の暗号インフラストラクチャの深い専門知識。"
     },
@@ -127,16 +127,16 @@
       "creditsExplainer": "クレジットは、生のAPIコールではなく、分析作業量を表します。簡単な質問はコストが低くなります。複雑な分析はコストが高くなります。常に何を支払っているかがわかります。",
       "conversation": "会話",
       "conversationCredits": "2",
-      "conversationExample": "「AAPLの取引価格は？」または「移動平均とは何ですか？」",
+      "conversationExample": "「AAPLはいくらですか？」/「RSIとは何ですか？」",
       "basicAnalysis": "基本分析",
       "basicAnalysisCredits": "25",
-      "basicAnalysisExample": "「NVDAは買われすぎですか？」",
+      "basicAnalysisExample": "「NVDAは買われすぎですか？」/「AAPLの移動平均を表示」",
       "eventStudy": "イベント研究",
       "eventStudyCredits": "75",
-      "eventStudyExample": "「CPI後にSPYはどう反応しますか？」",
+      "eventStudyExample": "「CPI後にSPYはどう反応しますか？」/「AAPLとMSFTを比較」",
       "deepAnalysis": "深い分析",
       "deepAnalysisCredits": "200",
-      "deepAnalysisExample": "「この戦略を1年間バックテスト」",
+      "deepAnalysisExample": "「この戦略を1年間バックテスト」/「SPYの機関投資家フローを表示」",
       "credits": "クレジット",
       "starter": "スターター",
       "starterFor": "探索と学習",
@@ -195,7 +195,7 @@
       "button": "Pelicanを起動 →"
     },
     "footer": {
-      "copyright": "© 2025 Pelican Trading。全著作権所有。"
+      "copyright": "© 2026 Pelican Trading, LLC。全著作権所有。"
     },
     "faq": {
       "helpCenter": "ヘルプセンター",

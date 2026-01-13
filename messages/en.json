@@ -116,7 +116,7 @@
       "nickName": "NICK GROVES",
       "nickRole": "Founder & CEO",
       "nickBio": "Eight years across futures, FX, and digital assets. Former crypto arbitrage systems architect turned systems-driven strategist. Founded Pelican to challenge the industry's dependence on opaque tools and build an AI that thinks the way real traders operate—structured, contextual, and brutally honest.",
-      "rayName": "RAYMOND CAMPBELL",
+      "rayName": "RAY CAMPBELL",
       "rayRole": "Senior Architect",
       "rayBio": "Two decades building mission-critical financial infrastructure. Led NYSE's transition to electronic trading at Labranche, architecting ultra-low latency systems across 800+ symbols. Deep expertise in C++ high-performance systems, exchange connectivity, and modern crypto infrastructure."
     },
@@ -127,16 +127,16 @@
       "creditsExplainer": "Credits represent analytical workload, not raw API calls. Simple questions cost less. Complex analysis costs more. You always know what you're spending.",
       "conversation": "Conversation",
       "conversationCredits": "2",
-      "conversationExample": "\"What's AAPL trading at?\" or \"What's a moving average?\"",
+      "conversationExample": "\"What's AAPL at?\" / \"What's RSI?\"",
       "basicAnalysis": "Basic Analysis",
       "basicAnalysisCredits": "25",
-      "basicAnalysisExample": "\"Is NVDA overbought?\"",
+      "basicAnalysisExample": "\"Is NVDA overbought?\" / \"Show me AAPL's moving averages\"",
       "eventStudy": "Event Study",
       "eventStudyCredits": "75",
-      "eventStudyExample": "\"How does SPY react after CPI?\"",
+      "eventStudyExample": "\"How does SPY react after CPI?\" / \"Compare AAPL vs MSFT\"",
       "deepAnalysis": "Deep Analysis",
       "deepAnalysisCredits": "200",
-      "deepAnalysisExample": "\"Backtest this strategy 1 year\"",
+      "deepAnalysisExample": "\"Backtest this strategy 1 year\" / \"Show institutional flow on SPY\"",
       "credits": "credits",
       "starter": "STARTER",
       "starterFor": "Exploration & Learning",
@@ -195,7 +195,7 @@
       "button": "Launch Pelican →"
     },
     "footer": {
-      "copyright": "© 2025 Pelican Trading. All rights reserved."
+      "copyright": "© 2026 Pelican Trading, LLC. All rights reserved."
     },
     "faq": {
       "helpCenter": "Help Center",

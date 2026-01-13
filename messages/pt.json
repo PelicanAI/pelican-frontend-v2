@@ -116,7 +116,7 @@
       "nickName": "NICK GROVES",
       "nickRole": "Fundador e CEO",
       "nickBio": "Oito anos em futuros, FX e ativos digitais. Ex-arquiteto de sistemas de arbitragem de cripto transformado em estrategista orientado por sistemas. Fundou a Pelican para desafiar a dependência da indústria em ferramentas opacas e construir uma IA que pensa como os traders reais operam—estruturada, contextual e brutalmente honesta.",
-      "rayName": "RAYMOND CAMPBELL",
+      "rayName": "RAY CAMPBELL",
       "rayRole": "Arquiteto Sênior",
       "rayBio": "Duas décadas construindo infraestrutura financeira de missão crítica. Liderou a transição da NYSE para negociação eletrônica na Labranche, arquitetando sistemas de latência ultra-baixa em mais de 800 símbolos. Profunda expertise em sistemas de alto desempenho C++, conectividade de bolsa e infraestrutura moderna de cripto."
     },
@@ -127,16 +127,16 @@
       "creditsExplainer": "Os créditos representam carga de trabalho analítica, não chamadas de API brutas. Perguntas simples custam menos. Análises complexas custam mais. Você sempre sabe o que está gastando.",
       "conversation": "Conversa",
       "conversationCredits": "2",
-      "conversationExample": "\"A que preço está negociando a AAPL?\" ou \"O que é uma média móvel?\"",
+      "conversationExample": "\"Qual é o preço de AAPL?\" / \"O que é RSI?\"",
       "basicAnalysis": "Análise Básica",
       "basicAnalysisCredits": "25",
-      "basicAnalysisExample": "\"A NVDA está sobrecomprada?\"",
+      "basicAnalysisExample": "\"A NVDA está sobrecomprada?\" / \"Mostre as médias móveis de AAPL\"",
       "eventStudy": "Estudo de Evento",
       "eventStudyCredits": "75",
-      "eventStudyExample": "\"Como o SPY reage após o CPI?\"",
+      "eventStudyExample": "\"Como o SPY reage após o CPI?\" / \"Compare AAPL vs MSFT\"",
       "deepAnalysis": "Análise Profunda",
       "deepAnalysisCredits": "200",
-      "deepAnalysisExample": "\"Faça backtest desta estratégia por 1 ano\"",
+      "deepAnalysisExample": "\"Faça backtest desta estratégia por 1 ano\" / \"Mostre o fluxo institucional em SPY\"",
       "credits": "créditos",
       "starter": "INICIANTE",
       "starterFor": "Exploração e Aprendizado",
@@ -195,7 +195,7 @@
       "button": "Lançar Pelican →"
     },
     "footer": {
-      "copyright": "© 2025 Pelican Trading. Todos os direitos reservados."
+      "copyright": "© 2026 Pelican Trading, LLC. Todos os direitos reservados."
     },
     "faq": {
       "helpCenter": "Centro de Ajuda",
