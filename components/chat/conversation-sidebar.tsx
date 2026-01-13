@@ -33,6 +33,7 @@ import Image from "next/image"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { LanguageSelector } from "@/components/language-selector"
 import { useT } from "@/lib/providers/translation-provider"
+import { useAuth } from "@/lib/providers/auth-provider"
 
 interface Conversation {
   id: string
@@ -82,6 +83,7 @@ export function ConversationSidebar({
   navigatingToId,
 }: ConversationSidebarProps) {
   const t = useT()
+  const { signOut } = useAuth()
   const [searchQuery, setSearchQuery] = useState("")
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editTitle, setEditTitle] = useState("")
@@ -420,16 +422,14 @@ export function ConversationSidebar({
               <Settings className="h-4 w-4" />
             </Link>
           </Button>
-          <form action="/auth/signout" method="post">
-            <Button
-              variant="ghost"
-              size="icon"
-              type="submit"
-              className="h-10 w-10 hover:bg-sidebar-accent/50"
-            >
-              <LogOut className="h-4 w-4" />
-            </Button>
-          </form>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => signOut()}
+            className="h-10 w-10 hover:bg-sidebar-accent/50"
+          >
+            <LogOut className="h-4 w-4" />
+          </Button>
         </div>
       </div>
 

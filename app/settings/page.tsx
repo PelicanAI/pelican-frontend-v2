@@ -9,7 +9,7 @@
  * @version 2.0.0 - UUID Migration Compatible
  */
 
-import { useState, useEffect, useRef, useMemo } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/lib/providers/auth-provider"
 import { useTheme } from "next-themes"
@@ -136,7 +136,6 @@ export default function SettingsPage() {
   const supabase = useMemo(() => createClient(), [])
   const { credits, isSubscribed, isFounder } = useCreditsContext()
   const { setTheme, theme } = useTheme()
-  const previousTheme = useRef(theme)
 
   const [settings, setSettings] = useState<UserSettings | null>(null)
   const [isSaving, setIsSaving] = useState(false)
@@ -203,17 +202,7 @@ export default function SettingsPage() {
     }
   }, [userSettings, user])
 
-  // Force light theme on this page
-  useEffect(() => {
-    previousTheme.current = theme
-    setTheme('light')
-    
-    return () => {
-      if (previousTheme.current) {
-        setTheme(previousTheme.current)
-      }
-    }
-  }, [setTheme, theme])
+  // Theme is managed globally by ThemeProvider - no need to force light mode
 
   const updateSetting = <K extends keyof UserSettings>(key: K, value: UserSettings[K]) => {
     if (settings) {
@@ -519,7 +508,7 @@ export default function SettingsPage() {
   // ============================================================================
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100" data-theme="light">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
       {/* Header */}
       <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-sm border-b border-border">
         <div className="container mx-auto px-4 py-4">
