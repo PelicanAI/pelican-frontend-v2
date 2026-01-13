@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { MessageSquare, TrendingUp, User, LogOut } from "lucide-react"
+import { MessageSquare, User, LogOut } from "lucide-react"
 import Link from "next/link"
 
 export default async function ProfilePage() {
@@ -19,9 +19,6 @@ export default async function ProfilePage() {
 
   // Get user profile
   const { data: profile } = await supabase.from("profiles").select("*").eq("id", user.id).single()
-
-  // Get user analytics
-  const { data: analytics } = await supabase.from("user_analytics").select("*").eq("user_id", user.id).single()
 
   // Get recent conversations
   const { data: conversations } = await supabase
@@ -116,39 +113,6 @@ export default async function ProfilePage() {
 
           {/* Analytics & Activity */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Usage Statistics */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5" />
-                  Usage Statistics
-                </CardTitle>
-                <CardDescription>Your trading assistant activity overview</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className="text-center">
-                    <div className="text-3xl font-bold text-purple-600">
-                      {analytics?.total_messages || 0}
-                    </div>
-                    <p className="text-sm text-muted-foreground">Total Messages</p>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-3xl font-bold text-blue-600">
-                      {analytics?.total_conversations || 0}
-                    </div>
-                    <p className="text-sm text-muted-foreground">Conversations</p>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-3xl font-bold text-green-600">
-                      {analytics?.last_active ? formatDate(analytics.last_active) : "Never"}
-                    </div>
-                    <p className="text-sm text-muted-foreground">Last Active</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
             {/* Recent Conversations */}
             <Card>
               <CardHeader>

@@ -229,6 +229,25 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
       }
     }
 
+    const handlePaste = (e: React.ClipboardEvent) => {
+      const items = e.clipboardData?.items
+      if (!items) return
+      
+      const files: File[] = []
+      for (let i = 0; i < items.length; i++) {
+        const item = items[i]
+        if (item.type.startsWith('image/')) {
+          const file = item.getAsFile()
+          if (file) files.push(file)
+        }
+      }
+      
+      if (files.length > 0 && onFileUpload) {
+        e.preventDefault()
+        onFileUpload(files)
+      }
+    }
+
     const handleSuggestionClick = (suggestionText: string) => {
       setMessage(suggestionText + " ")
       textareaRef.current?.focus()
@@ -301,6 +320,7 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
               value={message}
               onChange={handleInputChange}
               onKeyDown={handleKeyDown}
+              onPaste={handlePaste}
               onFocus={() => setIsFocused(true)}
               onBlur={() => {
                 setIsFocused(false)
