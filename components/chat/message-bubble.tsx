@@ -297,8 +297,6 @@ export function MessageBubble({
         aria-label="Your message"
         data-message-id={message.id}
         data-message-role="user"
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
       >
         {/* User message - clean, no bubble, right-aligned */}
         <div className="max-w-3xl mx-auto px-4 sm:px-8">
@@ -340,8 +338,6 @@ export function MessageBubble({
       aria-label="Assistant message"
       data-message-id={message.id}
       data-message-role="assistant"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
     >
       {/* AI message - Plain text style */}
       <div className="max-w-3xl mx-auto px-4 sm:px-8">
