@@ -35,7 +35,7 @@ export function LanguageSelector() {
 
   return (
     <Select value={locale} onValueChange={handleLanguageChange}>
-      <SelectTrigger className="w-[72px] h-10 px-2 bg-background border-border hover:bg-accent/50 transition-colors">
+      <SelectTrigger className="w-[72px] h-10 px-2 bg-background border-border hover:bg-accent/50 transition-colors gap-1">
         <span className="font-mono text-sm text-muted-foreground">
           {selectedLanguage.toUpperCase()}
         </span>
