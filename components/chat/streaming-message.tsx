@@ -25,6 +25,7 @@ export function StreamingMessage({
   onEdit,
   onDelete,
   onPin,
+  isDarkMode,
 }: StreamingMessageProps) {
   // Defensive check - ensure content is always a string
   const safeContent = typeof message.content === 'string' ? message.content : String(message.content || '')
