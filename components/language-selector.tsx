@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Globe } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import { languages, type Locale } from '@/lib/languages';
 import {
   Select,
@@ -32,10 +32,15 @@ export function LanguageSelector() {
     router.refresh();
   };
 
+  const selectedLanguage = locale;
+
   return (
     <Select value={locale} onValueChange={handleLanguageChange}>
-      <SelectTrigger className="w-[52px] h-10 px-2 bg-background border-border hover:bg-accent/50 transition-colors">
-        <Globe className="h-4 w-4 text-muted-foreground" />
+      <SelectTrigger className="w-[72px] h-10 px-2 bg-background border-border hover:bg-accent/50 transition-colors">
+        <span className="font-mono text-sm text-muted-foreground">
+          {selectedLanguage.toUpperCase()}
+        </span>
+        <ChevronDown className="h-3 w-3 ml-1 text-muted-foreground" />
       </SelectTrigger>
       <SelectContent className="max-h-[400px] z-dropdown">
         {languages.map((lang) => (
@@ -44,12 +49,9 @@ export function LanguageSelector() {
             value={lang.code}
             className="py-2"
           >
-            <div className="flex items-center gap-2 min-w-[180px]">
-              <span className="text-lg">{lang.flag}</span>
-              <div className="flex-1">
-                <div className="text-sm font-medium">{lang.name}</div>
-                <div className="text-xs text-muted-foreground">{lang.nativeName}</div>
-              </div>
+            <div className="flex items-center gap-3 min-w-[160px]">
+              <span className="font-mono text-xs text-muted-foreground w-6">{lang.code.toUpperCase()}</span>
+              <span className="text-sm">{lang.name}</span>
             </div>
           </SelectItem>
         ))}
