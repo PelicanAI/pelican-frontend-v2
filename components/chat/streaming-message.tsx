@@ -4,7 +4,6 @@ import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
 import { MessageBubble } from "./message-bubble"
 import type { Message } from "@/lib/chat-utils"
-import { LIMITS } from "@/lib/constants"
 
 interface StreamingMessageProps {
   message: Message
@@ -26,8 +25,6 @@ export function StreamingMessage({
   onEdit,
   onDelete,
   onPin,
-  showActions = true,
-  isDarkMode = false,
 }: StreamingMessageProps) {
   // Defensive check - ensure content is always a string
   const safeContent = typeof message.content === 'string' ? message.content : String(message.content || '')

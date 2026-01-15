@@ -29,10 +29,9 @@ function ErrorFallback({ error, reset }: { error: unknown; reset: () => void }) 
       console.error('Error boundary caught:', error);
     }
   }, [error]);
-  
-  const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
+
   const errorStack = error instanceof Error ? error.stack : String(error);
-  
+
   return (
     <div className="flex flex-col items-center justify-center min-h-[400px] p-4">
       <div className="text-center max-w-md">

@@ -114,7 +114,7 @@ export function MessageActions({
         title: "Copied to clipboard",
         description: "Message content has been copied with formatting.",
       })
-    } catch (error) {
+    } catch {
       toast({
         title: "Failed to copy",
         description: "Could not copy message to clipboard.",
@@ -130,7 +130,7 @@ export function MessageActions({
           title: "Pelican AI Chat",
           text: safeContent,
         })
-      } catch (error) {
+      } catch {
         // User cancelled or error occurred
       }
     } else {
@@ -156,7 +156,7 @@ export function MessageActions({
           description: "Started a new conversation from this message.",
         })
       }
-    } catch (error) {
+    } catch {
       toast({
         title: "Failed to branch chat",
         description: "Could not create a new conversation.",

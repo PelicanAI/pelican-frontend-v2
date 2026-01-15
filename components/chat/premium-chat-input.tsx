@@ -81,10 +81,8 @@ export const PremiumChatInput = forwardRef<PremiumChatInputRef, PremiumChatInput
       onQueueMessage,
       queueEnabled = false,
       placeholder = "Message Pelican...",
-      isDarkMode = false,
       onTypingDuringResponse,
       isAIResponding = false,
-      onThemeChange,
       attachments = [],
       onRemoveAttachment,
       pendingAttachments = [],
@@ -292,7 +290,7 @@ export const PremiumChatInput = forwardRef<PremiumChatInputRef, PremiumChatInput
         }
 
         mediaRecorder.onstop = () => {
-          const audioBlob = new Blob(audioChunks, { type: "audio/wav" })
+          new Blob(audioChunks, { type: "audio/wav" })
           // Convert to text via speech recognition API (would be implemented)
           stream.getTracks().forEach((track) => track.stop())
         }
@@ -311,25 +309,6 @@ export const PremiumChatInput = forwardRef<PremiumChatInputRef, PremiumChatInput
       }
     }
 
-    const handleRateLimit = (seconds: number) => {
-      setInputState("rate-limited")
-      setRateLimitCountdown(seconds)
-      const interval = setInterval(() => {
-        setRateLimitCountdown((prev) => {
-          if (prev <= 1) {
-            clearInterval(interval)
-            setInputState("default")
-            return 0
-          }
-          return prev - 1
-        })
-      }, 1000)
-    }
-
-    const handleError = () => {
-      setInputState("error")
-      setTimeout(() => setInputState("default"), UI.ERROR_DISPLAY_DURATION_MS)
-    }
 
     const isSendDisabled = disabled || !message.trim() || !canSend || disabledSend
     const characterCount = message.length

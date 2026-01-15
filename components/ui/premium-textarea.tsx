@@ -9,7 +9,7 @@ export interface PremiumTextareaProps extends React.ComponentProps<"textarea"> {
 }
 
 const PremiumTextarea = React.forwardRef<HTMLTextAreaElement, PremiumTextareaProps>(
-  ({ className, isDarkMode = false, onHeightChange, onChange, onFocus, onBlur, ...props }, ref) => {
+  ({ className, onHeightChange, onChange, onFocus, onBlur, ...props }, ref) => {
     const [isFocused, setIsFocused] = React.useState(false)
     const [isHovered, setIsHovered] = React.useState(false)
     const textareaRef = React.useRef<HTMLTextAreaElement>(null)

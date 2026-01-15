@@ -40,15 +40,11 @@ export async function updateSession(request: NextRequest) {
 
   // Redirect unauthenticated users to login for protected routes
   const protectedRoutes = ["/profile", "/chat", "/settings"]
-  const publicRoutes = ["/pricing", "/auth", "/"]
-  
-  const isProtectedRoute = protectedRoutes.some(route => 
+
+  const isProtectedRoute = protectedRoutes.some(route =>
     request.nextUrl.pathname.startsWith(route)
   )
-  const isPublicRoute = publicRoutes.some(route => 
-    request.nextUrl.pathname.startsWith(route) || request.nextUrl.pathname === route
-  )
-  
+
   if (!user && isProtectedRoute) {
     const url = request.nextUrl.clone()
     url.pathname = "/auth/login"

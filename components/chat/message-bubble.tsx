@@ -4,13 +4,11 @@ import type React from "react"
 
 import { cn, safeTrim } from "@/lib/utils"
 import type { Message } from "@/lib/chat-utils"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { RelativeTimestamp } from "@/components/ui/relative-timestamp"
 import { AttachmentChip } from "./attachment-chip"
 import { MessageActions } from "./message-actions"
 import { EnhancedTypingDots } from "./enhanced-typing-dots"
 import { TableImageDisplay } from "./table-image-display"
-import { motion, AnimatePresence } from "framer-motion"
+import { motion } from "framer-motion"
 import { useState, useCallback, useMemo } from "react"
 import { Copy, Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -167,11 +165,9 @@ export function MessageBubble({
   onDelete,
   onPin,
 }: MessageBubbleProps) {
-  const [isHovered, setIsHovered] = useState(false)
   const [copied, setCopied] = useState(false)
   const { toast } = useToast()
   const isUser = message.role === "user"
-  const isAssistant = message.role === "assistant"
 
   const triggerHapticFeedback = useCallback(() => {
     if ("vibrate" in navigator) {
@@ -196,7 +192,7 @@ export function MessageBubble({
           description: "Message copied to clipboard",
           duration: 2000,
         })
-      } catch (error) {
+      } catch {
         toast({
           title: "Copy failed",
           description: "Could not copy message",
@@ -409,12 +405,10 @@ function MessageContent({
   content,
   isStreaming,
   showSkeleton,
-  isDarkMode,
 }: {
   content: string
   isStreaming: boolean
   showSkeleton?: boolean
-  isDarkMode?: boolean
 }) {
   const [showRawText, setShowRawText] = useState(false)
   

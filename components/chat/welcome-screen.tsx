@@ -7,7 +7,7 @@ interface WelcomeScreenProps {
   onSettingsClick?: () => void
 }
 
-export function WelcomeScreen({ onQuickStart }: WelcomeScreenProps) {
+export function WelcomeScreen({}: WelcomeScreenProps) {
   const t = useT()
 
   return (
