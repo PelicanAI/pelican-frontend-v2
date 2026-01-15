@@ -213,7 +213,7 @@ export function ChatContainer({
     const currentLastMessageId = lastMessage?.id
     
     const messageWasAdded = messages.length > prevMessagesLengthRef.current
-    
+
     // ⚡ CRITICAL PERFORMANCE FIX:
     // During streaming, the messages array reference changes on every chunk
     // but no NEW messages are added - only content updates.
@@ -227,30 +227,23 @@ export function ChatContainer({
     }
 
     // From here, we KNOW a new message was added (not just content update)
-    
+
     // Find if a user message was added (could be last or second-to-last due to
     // simultaneous user message + assistant placeholder addition)
     let userMessageToScrollTo: Message | undefined = undefined
     let isUserMessage = false
-    
+
     const recentUserMessage = [...messages].reverse().find(m => m.role === 'user')
-    
+
     if (recentUserMessage) {
       const wasInPreviousState = messages.slice(0, prevMessagesLengthRef.current)
         .some(m => m.id === recentUserMessage.id)
-      
+
       if (!wasInPreviousState) {
         userMessageToScrollTo = recentUserMessage
         isUserMessage = true
       }
     }
-
-    console.log('[Chat Container] ✅ NEW MESSAGE(S) detected:', {
-      messageCount: messages.length,
-      prevCount: prevMessagesLengthRef.current,
-      messagesAdded: messages.length - prevMessagesLengthRef.current,
-      userMessageFound: userMessageToScrollTo ? '✅ YES' : '❌ No',
-    })
 
     // Handle new messages pill visibility
     if (!state.isNearBottom && !isStreaming) {
@@ -263,10 +256,8 @@ export function ChatContainer({
 
     // Trigger scroll based on message type
     if (isUserMessage && userMessageToScrollTo) {
-      console.log('[Chat Container] 📨 NEW USER MESSAGE detected, triggering scroll!')
       handleNewMessage(false, true, userMessageToScrollTo.id)
     } else {
-      console.log('[Chat Container] 📨 New assistant message added')
       handleNewMessage(isStreaming, false, lastMessage?.id)
     }
 

@@ -131,41 +131,31 @@ export function useSmartScroll(options: SmartScrollOptions = {}) {
   // Scroll to show user message at top when they send a message
   const scrollToUserMessage = useCallback((messageId?: string) => {
     if (!messageId) {
-      console.log('[Scroll] ❌ No message ID provided')
       return
     }
 
-    console.log('[Scroll] 🎯 Scrolling to message:', messageId)
-    
     // Simple, reliable approach: let scrollIntoView handle everything
     createTimeout(() => {
       const messageElement = document.querySelector(`[data-message-id="${messageId}"]`)
-      
+
       if (messageElement) {
-        console.log('[Scroll] ✅ Found message element, scrolling...')
-        messageElement.scrollIntoView({ 
-          behavior: 'smooth', 
+        messageElement.scrollIntoView({
+          behavior: 'smooth',
           block: 'start',
           inline: 'nearest'
         })
-        
+
         // Add offset to position message with proper spacing from top
         createTimeout(() => {
           const container = containerRef.current
           if (container && container.scrollHeight > container.clientHeight) {
             // Container is scrollable - scroll container
             container.scrollBy({ top: -100, behavior: 'smooth' })
-            console.log('[Scroll] 📏 Adjusted scroll position by -100px (container)')
           } else {
             // Window is scrollable - scroll window
             window.scrollBy({ top: -100, behavior: 'smooth' })
-            console.log('[Scroll] 📏 Adjusted scroll position by -100px (window)')
           }
-          
-          console.log('[Scroll] ✅ Scroll complete')
         }, 200)
-      } else {
-        console.log('[Scroll] ❌ Message element not found in DOM')
       }
     }, 100)
   }, [createTimeout])
@@ -188,15 +178,12 @@ export function useSmartScroll(options: SmartScrollOptions = {}) {
 
       // SCENARIO 1: When user sends a message
       if (isUserMessage) {
-        console.log('[Scroll] ⚡ User message detected! Message ID:', messageId)
-        console.log('[Scroll] Triggering scroll in 50ms...')
         // Always scroll to show the user message at top of viewport
         // This mimics Claude's behavior: you see your message + thinking indicator
         createTimeout(() => {
-          console.log('[Scroll] ⏰ Executing scrollToUserMessage now')
           scrollToUserMessage(messageId)
         }, 50) // Very short delay - the scroll function has retry logic built in
-        
+
         // Reset auto-scroll state
         shouldAutoScrollRef.current = true
       }
