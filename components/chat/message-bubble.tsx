@@ -359,7 +359,6 @@ export function MessageBubble({
                 content={message.content}
                 isStreaming={isStreaming}
                 showSkeleton={showSkeleton}
-                isDarkMode={isDarkMode}
               />
             </div>
 
