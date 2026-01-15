@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ChevronDown } from 'lucide-react';
 import { languages, type Locale } from '@/lib/languages';
 import {
   Select,
@@ -40,7 +39,6 @@ export function LanguageSelector() {
         <span className="font-mono text-sm text-muted-foreground">
           {selectedLanguage.toUpperCase()}
         </span>
-        <ChevronDown className="h-3 w-3 ml-1 text-muted-foreground" />
       </SelectTrigger>
       <SelectContent className="max-h-[400px] z-dropdown">
         {languages.map((lang) => (

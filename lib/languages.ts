@@ -36,7 +36,14 @@ export const languages = [
 export type Locale = typeof languages[number]['code'];
 
 // Languages that have translation files
-export const translatedLocales = ['en', 'es', 'zh', 'ja', 'pt'] as const;
+export const translatedLocales = [
+  'en', 'zh', 'es', 'hi', 'ar', 
+  'cs', 'da', 'nl', 'fi', 'fr', 
+  'de', 'el', 'he', 'hu', 'id', 
+  'it', 'ja', 'ko', 'ms', 'no', 
+  'pl', 'pt', 'ro', 'ru', 'sk', 
+  'sv', 'th', 'tr', 'uk', 'vi'
+] as const;
 
 export const countryToLocale: Record<string, Locale> = {
   'CN': 'zh', 'TW': 'zh', 'HK': 'zh', 'SG': 'zh',
