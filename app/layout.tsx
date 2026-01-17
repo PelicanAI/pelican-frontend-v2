@@ -32,8 +32,8 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`font-sans antialiased bg-background ${inter.variable} ${GeistMono.variable}`}>
+    <html lang="en" suppressHydrationWarning className="dark:bg-[#0a0a0f]">
+      <body className={`font-sans antialiased bg-background dark:bg-[#0a0a0f] ${inter.variable} ${GeistMono.variable}`}>
         <SentryErrorBoundary>
           <Suspense fallback={null}>
             <Providers>{children}</Providers>
