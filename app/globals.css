@@ -79,7 +79,7 @@
 .dark {
   /* Futuristic dark theme with purple accents - matches login page */
   /* Pure black base for maximum contrast */
-  --background: oklch(0.05 0 0); /* Pure black background */
+  --background: #0a0a0f; /* Dark background matching design system */
   --foreground: oklch(0.95 0.002 280); /* Bright readable text with subtle purple tint */
   --muted: oklch(0.12 0.01 280); /* Dark purple-tinted muted background */
   --muted-foreground: oklch(0.75 0 0); /* Brighter gray for better secondary text readability */

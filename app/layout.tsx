@@ -33,7 +33,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`font-sans antialiased ${inter.variable} ${GeistMono.variable}`}>
+      <body className={`font-sans antialiased bg-background ${inter.variable} ${GeistMono.variable}`}>
         <SentryErrorBoundary>
           <Suspense fallback={null}>
             <Providers>{children}</Providers>
