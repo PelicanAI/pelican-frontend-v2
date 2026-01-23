@@ -123,6 +123,8 @@ export interface Translations {
     pricing: {
       sectionTag: string;
       title: string;
+      sameFeaturesTitle: string;
+      sameFeaturesDesc: string;
       howCreditsWork: string;
       creditsExplainer: string;
       conversation: string;
