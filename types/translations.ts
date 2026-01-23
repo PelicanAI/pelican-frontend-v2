@@ -147,10 +147,6 @@ export interface Translations {
       starterCredits: string;
       starterCreditsLabel: string;
       starterEffective: string;
-      starterFeature1: string;
-      starterFeature2: string;
-      starterFeature3: string;
-      starterFeature4: string;
       starterButton: string;
       pro: string;
       proFor: string;
@@ -159,11 +155,6 @@ export interface Translations {
       proCredits: string;
       proCreditsLabel: string;
       proEffective: string;
-      proFeature1: string;
-      proFeature2: string;
-      proFeature3: string;
-      proFeature4: string;
-      proFeature5: string;
       proButton: string;
       power: string;
       powerFor: string;
@@ -172,11 +163,6 @@ export interface Translations {
       powerCredits: string;
       powerCreditsLabel: string;
       powerEffective: string;
-      powerFeature1: string;
-      powerFeature2: string;
-      powerFeature3: string;
-      powerFeature4: string;
-      powerFeature5: string;
       powerButton: string;
       mostPopular: string;
       cancelAnytime: string;
