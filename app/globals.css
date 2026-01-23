@@ -215,6 +215,7 @@
     width: 100%;
     max-width: 100%;
     overflow-x: hidden;
+    overflow-y: auto;
   }
 
   * {
@@ -233,6 +234,7 @@
     width: 100%;
     max-width: 100%;
     overflow-x: hidden;
+    overflow-y: auto;
   }
 
   img,
@@ -301,9 +303,9 @@
     border-color: oklch(0.70 0.15 290);
   }
 
-  /* Prevent iOS Safari bounce (FIX 25) */
+  /* Prevent scroll chaining without blocking wheel scrolling */
   body {
-    overscroll-behavior-y: none;
+    overscroll-behavior-y: auto;
   }
 }
 
