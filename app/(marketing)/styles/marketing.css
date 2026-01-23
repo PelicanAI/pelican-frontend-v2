@@ -1114,6 +1114,29 @@
   }
 }
 
+@media (min-width: 1400px) {
+  .section-inner {
+    max-width: 1200px;
+  }
+
+  .hero-inner {
+    max-width: 1200px;
+  }
+
+  .features-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    max-width: 1100px;
+    margin: 0 auto;
+    gap: 2.5rem 4rem;
+  }
+
+  .section-header {
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
 @media (max-width: 1024px) {
   .hero-inner {
     grid-template-columns: 1fr;
