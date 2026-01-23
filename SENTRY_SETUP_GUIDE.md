@@ -279,7 +279,7 @@ After stress test:
 
 ## 🎉 You're Ready!
 
-Your frontend now has production-grade error tracking and performance monitoring. All errors from `pelicantrading.org` will be captured with full context, while protecting sensitive trading data.
+Your frontend now has production-grade error tracking and performance monitoring. All errors from `pelicantrading.ai` will be captured with full context, while protecting sensitive trading data.
 
 **During your stress test, you'll see:**
 - Every error, grouped intelligently

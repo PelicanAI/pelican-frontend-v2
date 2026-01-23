@@ -29,7 +29,7 @@ function formatValue(value: unknown, type?: string): string {
 
 // Helper: Get cell styling based on type and value
 function getCellClass(value: unknown, type?: string, isFirstColumn?: boolean): string {
-  const base = "px-4 py-3 text-sm"
+  const base = "px-3 sm:px-4 py-2 sm:py-3 text-sm"
   const sticky = isFirstColumn ? "sticky left-0 bg-inherit" : ""
 
   if (type === 'percentage' && value !== null && value !== undefined && value !== '—') {
@@ -93,14 +93,14 @@ export function DataTable({ data, columns, title = "Market Data", query, summary
   }, [data])
 
   return (
-    <div className="my-6 rounded-xl border border-border bg-card p-8 shadow-xl relative overflow-hidden">
+    <div className="my-6 rounded-xl border border-border bg-card p-4 sm:p-8 shadow-xl relative overflow-hidden">
 
       {/* LARGE PROMINENT WATERMARK - 30% opacity, no blur */}
       <div className="absolute inset-0 flex items-center justify-center opacity-30 pointer-events-none overflow-hidden">
         <img
           src="/pelican-logo.png"
           alt=""
-          className="w-96 h-96 object-contain"
+          className="w-[min(60vw,20rem)] h-auto object-contain"
           aria-hidden="true"
         />
       </div>
@@ -110,32 +110,32 @@ export function DataTable({ data, columns, title = "Market Data", query, summary
 
         {/* Header with logo and branding */}
         <div className="mb-6 flex items-center gap-3">
-          <img src="/pelican-logo.png" alt="Pelican" className="h-12 w-12" />
-          <span className="text-2xl font-bold text-foreground">Pelican</span>
+          <img src="/pelican-logo.png" alt="Pelican" className="h-10 w-10 sm:h-12 sm:w-12" />
+          <span className="text-xl sm:text-2xl font-bold text-foreground">Pelican</span>
         </div>
 
         {/* User's query (if provided by AI) */}
         {query && (
-          <p className="mb-6 text-lg font-medium text-foreground leading-relaxed">
+          <p className="mb-6 text-base sm:text-lg font-medium text-foreground leading-relaxed">
             {query}
           </p>
         )}
 
         {/* Title (if different from query) */}
         {title && title !== query && (
-          <h3 className="mb-4 text-lg font-semibold text-foreground">{title}</h3>
+          <h3 className="mb-4 text-base sm:text-lg font-semibold text-foreground">{title}</h3>
         )}
 
         {/* Table */}
         <div className="overflow-x-auto rounded-lg">
-          <table className="w-full border-collapse" aria-label="Market data visualization">
+          <table className="min-w-[640px] w-full border-collapse" aria-label="Market data visualization">
             <thead>
               <tr className="border-b-2 border-border">
                 {displayColumns.map((col, i) => (
                   <th
                     key={col.key}
                     className={cn(
-                      "px-4 py-3 text-base font-semibold text-foreground",
+                      "px-3 sm:px-4 py-3 text-sm sm:text-base font-semibold text-foreground",
                       i === 0 && "sticky left-0 bg-transparent",
                       col.align === 'center' ? 'text-center' :
                       col.align === 'right' ? 'text-right' : 'text-left'
@@ -163,7 +163,7 @@ export function DataTable({ data, columns, title = "Market Data", query, summary
                       const returnValue = (row as DataPoint).forwardReturn
                       const isPositive = parseFloat(returnValue.replace(/[–-]/g, '-').replace(/%/g, '').replace(/\+/g, '')) >= 0
                       return (
-                        <td key={col.key} className="px-4 py-3 text-center text-lg">
+                        <td key={col.key} className="px-3 sm:px-4 py-3 text-center text-base sm:text-lg">
                           {isPositive ? (
                             <span className="text-green-600 dark:text-green-400">✓</span>
                           ) : (
@@ -196,7 +196,7 @@ export function DataTable({ data, columns, title = "Market Data", query, summary
                       <td
                         key={col.key}
                         className={cn(
-                          "px-4 py-4 text-sm font-bold text-foreground",
+                          "px-3 sm:px-4 py-4 text-sm font-bold text-foreground",
                           i === 0 && "sticky left-0 bg-inherit"
                         )}
                       >
@@ -205,8 +205,8 @@ export function DataTable({ data, columns, title = "Market Data", query, summary
                     ))
                   ) : stats ? (
                     // Legacy format stats
-                    <td colSpan={displayColumns.length} className="px-4 py-4">
-                      <div className="flex gap-6 text-sm font-bold text-foreground">
+                    <td colSpan={displayColumns.length} className="px-3 sm:px-4 py-4">
+                      <div className="flex flex-wrap gap-4 text-sm font-bold text-foreground">
                         <span>Avg Return: <span className="text-primary">{stats.avgReturn}</span></span>
                         <span>Positive: <span className="text-primary">{stats.percentPositive}</span></span>
                       </div>

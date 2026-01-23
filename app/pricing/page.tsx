@@ -184,13 +184,13 @@ export default function PricingPage() {
   // If user has subscription, they'll be redirected by useEffect
   // Show pricing page for non-subscribed users
   return (
-    <div className="min-h-screen bg-gray-950 py-12 px-4">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-[100svh] bg-gray-950 py-12">
+      <div className="page-container-wide">
         <div className="text-center mb-12">
           <Link href="/chat" className="text-gray-500 hover:text-gray-400 text-sm mb-4 inline-block">
             ← Back to chat
           </Link>
-          <h1 className="text-4xl font-bold text-white mb-4">
+          <h1 className="text-3xl sm:text-4xl font-bold text-white mb-4">
             Simple, Credit-Based Pricing
           </h1>
           <p className="text-gray-400 text-lg max-w-xl mx-auto">

@@ -4,11 +4,11 @@
   position: relative;
   z-index: 1;
   min-height: 100vh;
-  padding: 8rem 2rem 4rem;
+  padding: clamp(6rem, 10vw, 8rem) var(--page-gutter) var(--section-padding-y-tight);
 }
 
 .faq-container {
-  max-width: 900px;
+  max-width: min(var(--page-max-width), 900px);
   margin: 0 auto;
 }
 
@@ -52,7 +52,7 @@
 .faq-header p {
   font-size: 1.1rem;
   color: var(--text-secondary);
-  max-width: 600px;
+  max-width: var(--content-max-width);
   margin: 0 auto;
 }
 
@@ -190,7 +190,7 @@
 
 @media (max-width: 768px) {
   .faq-page {
-    padding: 6rem 1rem 2rem;
+    padding: 5rem var(--page-gutter) 2rem;
   }
 
   .faq-question {

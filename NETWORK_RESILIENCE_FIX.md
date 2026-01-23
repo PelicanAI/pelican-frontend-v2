@@ -17,9 +17,9 @@ Users experienced intermittent "Failed to fetch" errors when the frontend tried 
 ### Investigation Results ✅
 
 1. **Backend is Online**: ✅ `pelican-trading-api.fly.dev` is responding to health checks
-2. **CORS Configured Correctly**: ✅ Backend allows requests from `www.pelicantrading.org`
+2. **CORS Configured Correctly**: ✅ Backend allows requests from `www.pelicantrading.ai`
    ```
-   access-control-allow-origin: https://www.pelicantrading.org
+  access-control-allow-origin: https://www.pelicantrading.ai
    access-control-allow-methods: DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT
    access-control-allow-credentials: true
    access-control-allow-headers: Authorization,Content-Type

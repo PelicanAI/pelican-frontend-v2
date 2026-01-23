@@ -7,6 +7,7 @@ import { Providers } from "@/lib/providers"
 import { Suspense } from "react"
 import * as Sentry from '@sentry/nextjs'
 import SentryErrorBoundary from "@/components/sentry-error-boundary"
+import { BreakpointBadge } from "@/components/dev/breakpoint-badge"
 import "./globals.css"
 
 const inter = Inter({
@@ -36,7 +37,12 @@ export default function RootLayout({
       <body className={`font-sans antialiased bg-background dark:bg-[#0a0a0f] ${inter.variable} ${GeistMono.variable}`}>
         <SentryErrorBoundary>
           <Suspense fallback={null}>
-            <Providers>{children}</Providers>
+            <Providers>
+              <>
+                {children}
+                {process.env.NODE_ENV !== "production" && <BreakpointBadge />}
+              </>
+            </Providers>
           </Suspense>
         </SentryErrorBoundary>
         <Analytics />

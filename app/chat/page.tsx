@@ -240,7 +240,7 @@ export default function ChatPage() {
 
   return (
     <ChatErrorBoundary onReset={() => clearMessages()}>
-      <div className="flex h-screen overflow-hidden relative chat-background-gradient">
+      <div className="flex h-[100svh] min-h-[100svh] overflow-hidden relative chat-background-gradient">
       {/* Futuristic background effects - only in dark mode */}
       {/* <div className="absolute inset-0 dark:block hidden pointer-events-none">
         <div className="absolute inset-0 bg-gradient-to-br from-purple-950/10 via-black to-violet-950/10" />
@@ -308,7 +308,12 @@ export default function ChatPage() {
         <div className="xl:hidden border-b p-4 flex items-center justify-between bg-background border-border">
           <Sheet open={mobileSheetOpen} onOpenChange={setMobileSheetOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="sm" className="h-11 w-11 min-h-[44px] min-w-[44px] glow-button glow-ghost">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-11 w-11 min-h-[44px] min-w-[44px] glow-button glow-ghost"
+                aria-label="Open sidebar"
+              >
                 <Menu className="h-5 w-5 text-foreground" />
               </Button>
             </SheetTrigger>
@@ -317,7 +322,7 @@ export default function ChatPage() {
             <img src="/pelican-logo.png" alt="PelicanAI" className="w-6 h-6 object-contain" />
             <span className="font-semibold text-foreground">Pelican AI</span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="hidden sm:flex items-center gap-2">
             <LanguageSelector />
             <ThemeToggle />
           </div>
@@ -348,7 +353,7 @@ export default function ChatPage() {
 
         <div className="flex-1 flex flex-col overflow-hidden">
           <div className="flex-1 overflow-y-auto pb-[120px] md:pb-0">
-            <div className="max-w-5xl mx-auto w-full">
+            <div className="max-w-5xl mx-auto w-full px-4 sm:px-6">
               <ChatContainer
                 messages={messages}
                 isLoading={chatLoading}
@@ -365,10 +370,10 @@ export default function ChatPage() {
           <div className={cn(
             "bg-background border-t border-border",
             "fixed bottom-0 left-0 right-0 md:relative md:bottom-auto",
-            "pb-[env(safe-area-inset-bottom,16px)] md:pb-4",
+            "safe-bottom md:pb-4",
             "z-40"
           )}>
-            <div className="max-w-5xl mx-auto w-full px-3 py-3">
+            <div className="max-w-5xl mx-auto w-full px-4 sm:px-6 py-3">
               <ChatInput
                 ref={chatInputRef}
                 onSendMessage={handleSendMessageWithFiles}

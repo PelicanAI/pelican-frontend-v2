@@ -4,11 +4,11 @@
   position: relative;
   z-index: 1;
   min-height: 100vh;
-  padding: 8rem 2rem 4rem;
+  padding: clamp(6rem, 10vw, 8rem) var(--page-gutter) var(--section-padding-y-tight);
 }
 
 .privacy-container {
-  max-width: 900px;
+  max-width: min(var(--page-max-width), 900px);
   margin: 0 auto;
 }
 
@@ -272,7 +272,7 @@
 /* Responsive */
 @media (max-width: 768px) {
   .privacy-page {
-    padding: 6rem 1rem 2rem;
+    padding: 5rem var(--page-gutter) 2rem;
   }
 
   .privacy-meta span {

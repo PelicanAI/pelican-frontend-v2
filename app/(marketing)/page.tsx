@@ -1,8 +1,16 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import {
+  Brain,
+  FlaskConical,
+  MessageCircle,
+  Search,
+  Share2,
+  XSquare,
+} from 'lucide-react';
 import { useAuth } from '@/lib/providers/auth-provider';
 import { useT } from '@/lib/providers/translation-provider';
 import { LanguageSelector } from '@/components/language-selector';
@@ -13,6 +21,7 @@ export default function HomePage() {
   const router = useRouter();
   const { user } = useAuth();
   const t = useT();
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   const handleLaunchApp = () => {
     if (user) {
@@ -58,6 +67,16 @@ export default function HomePage() {
     return () => observer.disconnect();
   }, []);
 
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) {
+        setMobileNavOpen(false);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   return (
     <>
       <div className="grid-bg"></div>
@@ -75,6 +94,33 @@ export default function HomePage() {
             <Link href="/faq">{t.marketing.nav.faq}</Link>
             <LanguageSelector />
             <button onClick={handleLaunchApp} className="btn-primary">{t.marketing.nav.launchApp}</button>
+          </div>
+          <button
+            type="button"
+            className="nav-toggle"
+            aria-label="Open menu"
+            aria-expanded={mobileNavOpen}
+            aria-controls="marketing-mobile-nav"
+            onClick={() => setMobileNavOpen((open) => !open)}
+          >
+            <span className="nav-toggle-line" />
+            <span className="nav-toggle-line" />
+            <span className="nav-toggle-line" />
+          </button>
+        </div>
+        <div
+          id="marketing-mobile-nav"
+          className={`nav-mobile ${mobileNavOpen ? 'open' : ''}`}
+        >
+          <div className="nav-mobile-inner">
+            <a href="#features" onClick={() => setMobileNavOpen(false)}>{t.marketing.nav.features}</a>
+            <a href="#team" onClick={() => setMobileNavOpen(false)}>{t.marketing.nav.team}</a>
+            <a href="#pricing" onClick={() => setMobileNavOpen(false)}>{t.marketing.nav.pricing}</a>
+            <Link href="/faq" onClick={() => setMobileNavOpen(false)}>{t.marketing.nav.faq}</Link>
+            <LanguageSelector />
+            <button onClick={() => { setMobileNavOpen(false); handleLaunchApp(); }} className="btn-primary">
+              {t.marketing.nav.launchApp}
+            </button>
           </div>
         </div>
       </nav>
@@ -104,63 +150,10 @@ export default function HomePage() {
                 <div className="stat-value">{t.marketing.stats.plainEnglish}</div>
                 <div className="stat-label">{t.marketing.stats.noCodeRequired}</div>
               </div>
-              <div className="stat">
-                <div className="stat-value">{t.marketing.stats.oneClick}</div>
-                <div className="stat-label">{t.marketing.stats.shareableReports}</div>
-              </div>
             </div>
           </div>
           <div className="hero-visual">
             <img src="/pelican-logo.png" alt="Pelican Logo" className="hero-logo-large" />
-          </div>
-        </div>
-      </section>
-
-      <section className="what-section">
-        <div className="section-inner">
-          <div className="what-content">
-            <div className="what-text animate-on-scroll">
-              <h2>{t.marketing.what.title}</h2>
-              <p>
-                {t.marketing.what.description1}
-              </p>
-              <p>
-                {t.marketing.what.description2}
-              </p>
-            </div>
-            <div className="what-platform bracket-box animate-on-scroll">
-              <div className="platform-header">
-                <div className="platform-dot red"></div>
-                <div className="platform-dot yellow"></div>
-                <div className="platform-dot green"></div>
-              </div>
-              <div className="platform-line">
-                <span className="platform-prompt">{t.marketing.what.platformPrompt}</span>{' '}
-                <span className="platform-command">{t.marketing.what.platformCommand}</span>
-              </div>
-              <div className="platform-line">
-                <span className="platform-output">{t.marketing.what.platformAnalyzing}</span>
-              </div>
-              <div className="platform-line">
-                <span className="platform-success">✓</span>{' '}
-                <span className="platform-output">{t.marketing.what.platformWinRate}</span>{' '}
-                <span className="platform-value">67.4%</span>
-              </div>
-              <div className="platform-line">
-                <span className="platform-success">✓</span>{' '}
-                <span className="platform-output">{t.marketing.what.platformSharpe}</span>{' '}
-                <span className="platform-value">1.84</span>
-              </div>
-              <div className="platform-line">
-                <span className="platform-success">✓</span>{' '}
-                <span className="platform-output">{t.marketing.what.platformDrawdown}</span>{' '}
-                <span className="platform-value">-8.2%</span>
-              </div>
-              <div className="platform-line">
-                <span className="platform-prompt">{t.marketing.what.platformResponse}</span>{' '}
-                <span className="platform-command">{t.marketing.what.platformGenerating}<span className="cursor-blink">_</span></span>
-              </div>
-            </div>
           </div>
         </div>
       </section>
@@ -172,35 +165,41 @@ export default function HomePage() {
             <h2 className="section-title">{t.marketing.features.title}</h2>
           </div>
           <div className="features-grid">
-            <div className="feature-card bracket-box">
-              <div className="feature-icon">💬</div>
-              <h3>{t.marketing.features.justAsk}</h3>
-              <p>{t.marketing.features.justAskDesc}</p>
+            <div className="feature-card">
+              <div className="feature-icon">
+                <MessageCircle />
+              </div>
+              <div className="feature-card-content">
+                <h3>{t.marketing.features.justAsk}</h3>
+                <p>{t.marketing.features.justAskDesc}</p>
+              </div>
             </div>
-            <div className="feature-card bracket-box">
-              <div className="feature-icon">🧪</div>
-              <h3>{t.marketing.features.testIdeas}</h3>
-              <p>{t.marketing.features.testIdeasDesc}</p>
+            <div className="feature-card">
+              <div className="feature-icon">
+                <FlaskConical />
+              </div>
+              <div className="feature-card-content">
+                <h3>{t.marketing.features.testIdeas}</h3>
+                <p>{t.marketing.features.testIdeasDesc}</p>
+              </div>
             </div>
-            <div className="feature-card bracket-box">
-              <div className="feature-icon">🧠</div>
-              <h3>{t.marketing.features.knowsStyle}</h3>
-              <p>{t.marketing.features.knowsStyleDesc}</p>
+            <div className="feature-card">
+              <div className="feature-icon">
+                <Search />
+              </div>
+              <div className="feature-card-content">
+                <h3>{t.marketing.features.findsWhat}</h3>
+                <p>{t.marketing.features.findsWhatDesc}</p>
+              </div>
             </div>
-            <div className="feature-card bracket-box">
-              <div className="feature-icon">🔍</div>
-              <h3>{t.marketing.features.findsWhat}</h3>
-              <p>{t.marketing.features.findsWhatDesc}</p>
-            </div>
-            <div className="feature-card bracket-box">
-              <div className="feature-icon">📤</div>
-              <h3>{t.marketing.features.sharePro}</h3>
-              <p>{t.marketing.features.shareProDesc}</p>
-            </div>
-            <div className="feature-card bracket-box">
-              <div className="feature-icon">🚫</div>
-              <h3>{t.marketing.features.killChaos}</h3>
-              <p>{t.marketing.features.killChaosDesc}</p>
+            <div className="feature-card">
+              <div className="feature-icon">
+                <XSquare />
+              </div>
+              <div className="feature-card-content">
+                <h3>{t.marketing.features.killChaos}</h3>
+                <p>{t.marketing.features.killChaosDesc}</p>
+              </div>
             </div>
           </div>
         </div>
@@ -275,7 +274,56 @@ export default function HomePage() {
       <section className="languages-section">
         <div className="section-inner">
           <div className="section-header animate-on-scroll" style={{ textAlign: 'center', marginBottom: '0' }}>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem' }}>{t.marketing.languages.subtitle}</p>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>{t.marketing.languages.subtitle}</p>
+          </div>
+        </div>
+      </section>
+
+      <section className="what-section">
+        <div className="section-inner">
+          <div className="what-content">
+            <div className="what-text animate-on-scroll">
+              <h2>{t.marketing.what.title}</h2>
+              <p>
+                {t.marketing.what.description1}
+              </p>
+              <p>
+                {t.marketing.what.description2}
+              </p>
+            </div>
+            <div className="what-platform bracket-box animate-on-scroll">
+              <div className="platform-header">
+                <div className="platform-dot red"></div>
+                <div className="platform-dot yellow"></div>
+                <div className="platform-dot green"></div>
+              </div>
+              <div className="platform-line">
+                <span className="platform-prompt">{t.marketing.what.platformPrompt}</span>{' '}
+                <span className="platform-command">{t.marketing.what.platformCommand}</span>
+              </div>
+              <div className="platform-line">
+                <span className="platform-output">{t.marketing.what.platformAnalyzing}</span>
+              </div>
+              <div className="platform-line">
+                <span className="platform-success">✓</span>{' '}
+                <span className="platform-output">{t.marketing.what.platformWinRate}</span>{' '}
+                <span className="platform-value">67.4%</span>
+              </div>
+              <div className="platform-line">
+                <span className="platform-success">✓</span>{' '}
+                <span className="platform-output">{t.marketing.what.platformSharpe}</span>{' '}
+                <span className="platform-value">1.84</span>
+              </div>
+              <div className="platform-line">
+                <span className="platform-success">✓</span>{' '}
+                <span className="platform-output">{t.marketing.what.platformDrawdown}</span>{' '}
+                <span className="platform-value">-8.2%</span>
+              </div>
+              <div className="platform-line">
+                <span className="platform-prompt">{t.marketing.what.platformResponse}</span>{' '}
+                <span className="platform-command">{t.marketing.what.platformGenerating}<span className="cursor-blink">_</span></span>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -285,6 +333,7 @@ export default function HomePage() {
           <div className="section-header animate-on-scroll">
             <div className="section-tag">{t.marketing.pricing.sectionTag}</div>
             <h2 className="section-title">{t.marketing.pricing.title}</h2>
+            <p className="pricing-unified">{t.marketing.pricing.sameFeaturesDesc}</p>
           </div>
 
           {/* Credits Explainer */}
@@ -322,30 +371,11 @@ export default function HomePage() {
               <div className="pricing-tier-name">{t.marketing.pricing.starter}</div>
               <div className="pricing-for">{t.marketing.pricing.starterFor}</div>
               <div className="pricing-amount">{t.marketing.pricing.starterPrice}<span>{t.marketing.pricing.starterPeriod}</span></div>
-              <div className="pricing-period">{t.marketing.pricing.cancelAnytime}</div>
               <div className="pricing-credits">
                 <div className="pricing-credits-amount">{t.marketing.pricing.starterCredits}</div>
                 <div className="pricing-credits-label">{t.marketing.pricing.starterCreditsLabel}</div>
               </div>
               <div className="pricing-effective">{t.marketing.pricing.starterEffective}</div>
-              <div className="pricing-features">
-                <div className="pricing-feature">
-                  <span className="pricing-check">✓</span>
-                  {t.marketing.pricing.starterFeature1}
-                </div>
-                <div className="pricing-feature">
-                  <span className="pricing-check">✓</span>
-                  {t.marketing.pricing.starterFeature2}
-                </div>
-                <div className="pricing-feature">
-                  <span className="pricing-check">✓</span>
-                  {t.marketing.pricing.starterFeature3}
-                </div>
-                <div className="pricing-feature">
-                  <span className="pricing-check">✓</span>
-                  {t.marketing.pricing.starterFeature4}
-                </div>
-              </div>
               <button onClick={() => handleSignUp('starter')} className="btn-secondary" style={{ width: '100%', justifyContent: 'center' }}>
                 {t.marketing.pricing.starterButton}
               </button>
@@ -357,34 +387,11 @@ export default function HomePage() {
               <div className="pricing-tier-name">{t.marketing.pricing.pro}</div>
               <div className="pricing-for">{t.marketing.pricing.proFor}</div>
               <div className="pricing-amount">{t.marketing.pricing.proPrice}<span>{t.marketing.pricing.proPeriod}</span></div>
-              <div className="pricing-period">{t.marketing.pricing.cancelAnytime}</div>
               <div className="pricing-credits">
                 <div className="pricing-credits-amount">{t.marketing.pricing.proCredits}</div>
                 <div className="pricing-credits-label">{t.marketing.pricing.proCreditsLabel}</div>
               </div>
               <div className="pricing-effective">{t.marketing.pricing.proEffective}</div>
-              <div className="pricing-features">
-                <div className="pricing-feature">
-                  <span className="pricing-check">✓</span>
-                  {t.marketing.pricing.proFeature1}
-                </div>
-                <div className="pricing-feature">
-                  <span className="pricing-check">✓</span>
-                  {t.marketing.pricing.proFeature2}
-                </div>
-                <div className="pricing-feature">
-                  <span className="pricing-check">✓</span>
-                  {t.marketing.pricing.proFeature3}
-                </div>
-                <div className="pricing-feature">
-                  <span className="pricing-check">✓</span>
-                  {t.marketing.pricing.proFeature4}
-                </div>
-                <div className="pricing-feature">
-                  <span className="pricing-check">✓</span>
-                  {t.marketing.pricing.proFeature5}
-                </div>
-              </div>
               <button onClick={() => handleSignUp('pro')} className="btn-primary" style={{ width: '100%', justifyContent: 'center' }}>
                 {t.marketing.pricing.proButton}
               </button>
@@ -395,34 +402,11 @@ export default function HomePage() {
               <div className="pricing-tier-name">{t.marketing.pricing.power}</div>
               <div className="pricing-for">{t.marketing.pricing.powerFor}</div>
               <div className="pricing-amount">{t.marketing.pricing.powerPrice}<span>{t.marketing.pricing.powerPeriod}</span></div>
-              <div className="pricing-period">{t.marketing.pricing.cancelAnytime}</div>
               <div className="pricing-credits">
                 <div className="pricing-credits-amount">{t.marketing.pricing.powerCredits}</div>
                 <div className="pricing-credits-label">{t.marketing.pricing.powerCreditsLabel}</div>
               </div>
               <div className="pricing-effective">{t.marketing.pricing.powerEffective}</div>
-              <div className="pricing-features">
-                <div className="pricing-feature">
-                  <span className="pricing-check">✓</span>
-                  {t.marketing.pricing.powerFeature1}
-                </div>
-                <div className="pricing-feature">
-                  <span className="pricing-check">✓</span>
-                  {t.marketing.pricing.powerFeature2}
-                </div>
-                <div className="pricing-feature">
-                  <span className="pricing-check">✓</span>
-                  {t.marketing.pricing.powerFeature3}
-                </div>
-                <div className="pricing-feature">
-                  <span className="pricing-check">✓</span>
-                  {t.marketing.pricing.powerFeature4}
-                </div>
-                <div className="pricing-feature">
-                  <span className="pricing-check">✓</span>
-                  {t.marketing.pricing.powerFeature5}
-                </div>
-              </div>
               <button onClick={() => handleSignUp('power')} className="btn-secondary" style={{ width: '100%', justifyContent: 'center' }}>
                 {t.marketing.pricing.powerButton}
               </button>

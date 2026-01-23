@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/providers/auth-provider';
 import { useT } from '@/lib/providers/translation-provider';
@@ -24,7 +24,7 @@ interface FAQCategory {
 const faqData: FAQCategory[] = [
   {
     title: 'About Pelican',
-    icon: '🦅',
+    icon: '',
     items: [
       {
         question: 'What is Pelican Trading?',
@@ -32,7 +32,7 @@ const faqData: FAQCategory[] = [
       },
       {
         question: 'Who is Pelican for?',
-        answer: 'Pelican is designed for traders of all levels who want institutional-grade market intelligence without the complexity. Whether you&apos;re a day trader, swing trader, or long-term investor, Pelican helps you make more informed decisions faster.',
+        answer: 'Pelican is designed for traders of all levels who want institutional-grade market intelligence without the complexity. Whether you\'re a day trader, swing trader, or long-term investor, Pelican helps you make more informed decisions faster.',
       },
       {
         question: 'What makes Pelican different from other trading tools?',
@@ -46,7 +46,7 @@ const faqData: FAQCategory[] = [
   },
   {
     title: 'Features',
-    icon: '⚡',
+    icon: '',
     items: [
       {
         question: 'What are Natural Language Queries?',
@@ -58,21 +58,17 @@ const faqData: FAQCategory[] = [
       },
       {
         question: 'What is Context Memory?',
-        answer: 'Pelican remembers your trading style, preferences, and past conversations. This means responses get more personalized over time, and you don&apos;t have to repeat yourself. It&apos;s like having an assistant who truly knows how you trade.',
+        answer: 'Pelican remembers your trading style, preferences, and past conversations. This means responses get more personalized over time, and you don\'t have to repeat yourself. It\'s like having an assistant who truly knows how you trade.',
       },
       {
         question: 'How does Pattern Detection work?',
-        answer: 'Pelican&apos;s AI continuously analyzes market data to find patterns and anomalies you might miss. It can identify trends, correlations, and unusual activity across thousands of tickers, giving you an edge in spotting opportunities.',
-      },
-      {
-        question: 'What are One-Click Reports?',
-        answer: 'Generate professional, shareable reports instantly. Whether you need to document your analysis, share insights with a team, or keep records of your research, Pelican creates polished reports with a single click.',
+        answer: 'Pelican\'s AI continuously analyzes market data to find patterns and anomalies you might miss. It can identify trends, correlations, and unusual activity across thousands of tickers, giving you an edge in spotting opportunities.',
       },
     ],
   },
   {
     title: 'Data & Coverage',
-    icon: '📊',
+    icon: '',
     items: [
       {
         question: 'How many tickers does Pelican cover?',
@@ -80,7 +76,7 @@ const faqData: FAQCategory[] = [
       },
       {
         question: 'What asset classes are supported?',
-        answer: 'Pelican covers equities (stocks), futures, cryptocurrency, and foreign exchange (FX). Whether you trade stocks, crypto, or forex, we&apos;ve got you covered.',
+        answer: 'Pelican supports US stocks, Foreign Exchange (FX), and cryptocurrencies. Whether you trade stocks, FX, or crypto, we\'ve got you covered.',
       },
       {
         question: 'Is the data real-time or delayed?',
@@ -90,10 +86,10 @@ const faqData: FAQCategory[] = [
   },
   {
     title: 'Pricing',
-    icon: '💰',
+    icon: '',
     items: [
       {
-        question: 'How does Pelican&apos;s pricing work?',
+        question: 'How does Pelican\'s pricing work?',
         answer: 'Pelican uses a credit-based pricing system. Credits represent analytical workload—simple queries cost fewer credits, complex analyses cost more. Credits reset monthly and do not roll over.',
       },
       {
@@ -105,7 +101,7 @@ const faqData: FAQCategory[] = [
         answer: 'It depends on complexity: Conversation/Mentoring costs 2 credits, Simple Price Checks cost 10 credits, Basic Analysis (RSI, MACD, comparisons) costs 25 credits, Event Studies cost 75 credits, and Multi-Day Tick Analysis or backtests cost 200 credits.',
       },
       {
-        question: 'What&apos;s included in all tiers?',
+        question: 'What\'s included in all tiers?',
         answer: 'All tiers include: live data on 10,000+ tickers, plain-English backtesting, context memory across sessions, one-click shareable reports, and all new features as they ship. The only difference is credit allotment.',
       },
       {
@@ -124,7 +120,7 @@ const faqData: FAQCategory[] = [
   },
   {
     title: 'Languages & Accessibility',
-    icon: '🌍',
+    icon: '',
     items: [
       {
         question: 'What languages does Pelican support?',
@@ -134,7 +130,7 @@ const faqData: FAQCategory[] = [
   },
   {
     title: 'Team & Company',
-    icon: '👥',
+    icon: '',
     items: [
       {
         question: 'Who founded Pelican?',
@@ -148,7 +144,7 @@ const faqData: FAQCategory[] = [
   },
   {
     title: 'Support',
-    icon: '🛟',
+    icon: '',
     items: [
       {
         question: 'How do I get help?',
@@ -197,6 +193,7 @@ export default function FAQ() {
   const router = useRouter();
   const { user } = useAuth();
   const t = useT();
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   const handleGetStarted = () => {
     if (user) {
@@ -222,6 +219,16 @@ export default function FAQ() {
     });
   };
 
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) {
+        setMobileNavOpen(false);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   return (
     <>
       <div className="grid-bg"></div>
@@ -238,6 +245,32 @@ export default function FAQ() {
             <Link href="/faq" className="active">{t.marketing.nav.faq}</Link>
             <LanguageSelector />
             <button onClick={handleGetStarted} className="btn-primary">{t.marketing.nav.getStarted}</button>
+          </div>
+          <button
+            type="button"
+            className="nav-toggle"
+            aria-label="Open menu"
+            aria-expanded={mobileNavOpen}
+            aria-controls="faq-mobile-nav"
+            onClick={() => setMobileNavOpen((open) => !open)}
+          >
+            <span className="nav-toggle-line" />
+            <span className="nav-toggle-line" />
+            <span className="nav-toggle-line" />
+          </button>
+        </div>
+        <div
+          id="faq-mobile-nav"
+          className={`nav-mobile ${mobileNavOpen ? 'open' : ''}`}
+        >
+          <div className="nav-mobile-inner">
+            <Link href="/#features" onClick={() => setMobileNavOpen(false)}>{t.marketing.nav.features}</Link>
+            <Link href="/#pricing" onClick={() => setMobileNavOpen(false)}>{t.marketing.nav.pricing}</Link>
+            <Link href="/faq" onClick={() => setMobileNavOpen(false)}>{t.marketing.nav.faq}</Link>
+            <LanguageSelector />
+            <button onClick={() => { setMobileNavOpen(false); handleGetStarted(); }} className="btn-primary">
+              {t.marketing.nav.getStarted}
+            </button>
           </div>
         </div>
       </nav>
@@ -256,10 +289,10 @@ export default function FAQ() {
 
           {faqData.map((category, catIndex) => (
             <section key={catIndex} className="faq-category">
-              <div className="faq-category-header">
-                <span className="faq-category-icon">{category.icon}</span>
-                <h2 className="faq-category-title">{category.title}</h2>
-              </div>
+            <div className="faq-category-header">
+              {category.icon && <span className="faq-category-icon">{category.icon}</span>}
+              <h2 className="faq-category-title">{category.title}</h2>
+            </div>
               {category.items.map((item, itemIndex) => {
                 const key = `${catIndex}-${itemIndex}`;
                 return (

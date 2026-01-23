@@ -32,6 +32,16 @@
   --spacing-xl: 2rem;     /* 32px */
   --spacing-2xl: 3rem;    /* 48px */
 
+  /* Responsive layout system */
+  --page-gutter: clamp(1rem, 4vw, 2rem);
+  --page-gutter-lg: clamp(1.25rem, 5vw, 3rem);
+  --page-max-width: 1280px;
+  --page-max-width-wide: 1440px;
+  --content-max-width: 72ch;
+  --content-max-width-wide: 90ch;
+  --section-padding-y: clamp(3rem, 7vw, 6rem);
+  --section-padding-y-tight: clamp(2rem, 5vw, 4rem);
+
   /* Dark neutral color scheme - professional and sleek */
   --background: oklch(0.98 0.002 240); /* Light background with subtle neutral tint */
   --foreground: oklch(0.15 0.005 240); /* Dark text */
@@ -193,6 +203,20 @@
 }
 
 @layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    min-width: 0;
+  }
+
+  html {
+    font-size: clamp(15px, 1.1vw, 18px);
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
   * {
     @apply border-border outline-ring/50;
   }
@@ -203,6 +227,29 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     line-height: var(--leading-normal);
+  }
+
+  body {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  img,
+  video,
+  canvas,
+  svg {
+    max-width: 100%;
+    height: auto;
+  }
+
+  table {
+    max-width: 100%;
+  }
+
+  pre {
+    max-width: 100%;
+    overflow-x: auto;
   }
 
   /* Typography scale application */
@@ -292,6 +339,51 @@
     background: #4b5563 !important;
     color: #ffffff !important;
     border-color: #4b5563 !important;
+  }
+
+  /* Responsive container utilities */
+  .page-container {
+    width: 100%;
+    max-width: var(--page-max-width);
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: var(--page-gutter);
+    padding-right: var(--page-gutter);
+  }
+
+  .page-container-wide {
+    width: 100%;
+    max-width: var(--page-max-width-wide);
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: var(--page-gutter);
+    padding-right: var(--page-gutter);
+  }
+
+  .page-section {
+    padding-top: var(--section-padding-y);
+    padding-bottom: var(--section-padding-y);
+  }
+
+  .page-section-tight {
+    padding-top: var(--section-padding-y-tight);
+    padding-bottom: var(--section-padding-y-tight);
+  }
+
+  .content-prose {
+    max-width: var(--content-max-width);
+  }
+
+  .content-wide {
+    max-width: var(--content-max-width-wide);
+  }
+
+  .safe-bottom {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+
+  .no-horizontal-scroll {
+    overflow-x: hidden;
   }
 
   /* Glow animation utilities */

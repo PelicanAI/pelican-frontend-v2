@@ -47,10 +47,10 @@ export default async function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
-      <div className="container mx-auto px-4 py-8">
+    <div className="min-h-[100svh] bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
+      <div className="page-container-wide py-8">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-8">
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 bg-gradient-to-br from-purple-600 to-purple-700 rounded-xl flex items-center justify-center">
               <User className="w-8 h-8 text-white" />
@@ -60,7 +60,7 @@ export default async function ProfilePage() {
               <p className="text-muted-foreground">{user.email}</p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             <Button asChild variant="outline">
               <Link href="/chat">
                 <MessageSquare className="w-4 h-4 mr-2" />

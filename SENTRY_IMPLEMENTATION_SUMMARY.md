@@ -139,7 +139,7 @@ npm run dev
 2. Backend: http://localhost:3000/api/sentry-example-api
 
 ### Production Testing:
-After deploying to pelicantrading.org:
+After deploying to pelicantrading.ai:
 
 1. **Test Auth Error:**
    - Logout
@@ -280,7 +280,7 @@ Your PelicanAI frontend now has:
 - ✅ Minimal performance overhead
 - ✅ Production-ready configuration
 
-**You can now track all errors from pelicantrading.org during stress testing!**
+**You can now track all errors from pelicantrading.ai during stress testing!**
 
 For questions or issues, refer to:
 1. `SENTRY_SETUP_GUIDE.md` - Detailed setup guide

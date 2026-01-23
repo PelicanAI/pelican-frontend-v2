@@ -60,7 +60,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen w-full items-center justify-center p-6 md:p-10 bg-black relative overflow-hidden">
+    <div className="flex min-h-[100svh] w-full items-center justify-center p-6 md:p-10 bg-black relative overflow-hidden">
       {/* Futuristic gradient background */}
       <div className="absolute inset-0 bg-gradient-to-br from-purple-950/20 via-black to-violet-950/20" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(124,58,237,0.1),transparent_50%)]" />
@@ -90,7 +90,7 @@ export default function LoginPage() {
               />
             </div>
 
-            <h1 className="text-4xl font-bold text-center bg-gradient-to-r from-white via-purple-200 to-white bg-clip-text text-transparent">
+            <h1 className="text-3xl sm:text-4xl font-bold text-center bg-gradient-to-r from-white via-purple-200 to-white bg-clip-text text-transparent">
               Pelican AI
             </h1>
             <p className="text-gray-400 text-center">Sign in to continue your trading journey</p>

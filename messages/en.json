@@ -51,11 +51,11 @@
     },
     "hero": {
       "betaTag": "Now in Beta",
-      "title1": "THE AI PLATFORM",
-      "title2": "THAT",
-      "titleHighlight": "THINKS",
-      "title3": "LIKE YOU TRADE",
-      "subtitle": "Institutional-grade market intelligence through natural conversation. Backtest strategies, analyze patterns, and execute with precision—all in one interface.",
+      "title1": "THE ONLY",
+      "title2": "CONVERSATIONAL",
+      "titleHighlight": "AI",
+      "title3": "FOR TRADERS & INVESTORS",
+      "subtitle": "Pelican replaces scanners, spreadsheets, and half-answers with real market intelligence.\nAsk questions in plain English to scan thousands of stocks, analyze price and macro context, and backtest strategies — all from a single interface.",
       "startTrading": "Start Trading →",
       "seeFeatures": "See Features"
     },
@@ -78,7 +78,7 @@
       "platformSharpe": "Sharpe ratio:",
       "platformDrawdown": "Max drawdown:",
       "platformResponse": "pelican:",
-      "platformGenerating": "generating shareable report..."
+      "platformGenerating": "Here’s a concise backtest summary with key trades, performance, and takeaways..."
     },
     "features": {
       "sectionTag": "// What You Get",
@@ -89,8 +89,8 @@
       "testIdeasDesc": "Describe any strategy in plain English and see if it actually works. Win rates, drawdowns, Sharpe ratios—without writing a single line of code.",
       "knowsStyle": "KNOWS YOUR STYLE",
       "knowsStyleDesc": "Pelican remembers your positions, your watchlist, and how you like to trade. Every conversation picks up where you left off.",
-      "findsWhat": "FINDS WHAT YOU'D MISS",
-      "findsWhatDesc": "Surface unusual volume, divergences, and setups across thousands of tickers. Let AI do the scanning while you focus on decisions.",
+      "findsWhat": "SCAN THE MARKET",
+      "findsWhatDesc": "Ask the market exactly what you want to see. \"Show me stocks trading above $200 that gapped up today.\" No filters, no dashboards. Just answers.",
       "sharePro": "SHARE & LOOK PRO",
       "shareProDesc": "Generate branded tables and analysis ready for Twitter, Discord, or clients. One click from insight to shareable content.",
       "killChaos": "KILL THE TAB CHAOS",
@@ -99,32 +99,34 @@
     "traders": {
       "sectionTag": "// For Everyone",
       "title": "PELICAN FOR EVERY TRADER",
-      "subtitle": "Whether you're just starting or managing millions, Pelican speaks your language",
+        "subtitle": "Whether you’re just starting or running size, Pelican speaks your language.",
       "newTrader": "New to Trading",
-      "newTraderQuestion": "Is this TSLA dip worth buying?",
+        "newTraderQuestion": "Is this dip worth buying or should I wait?",
       "experiencedTrader": "Experienced Trader",
-      "experiencedTraderQuestion": "The QQQ's closed down over -3% today. Using QQQ data for 2025, find every instance the QQQ's closed down -3% in a single day, and give me the 2 week return of the QQQ's following that event."
+        "experiencedTraderQuestion": "Using historical data, how does QQQ usually perform in the two weeks after a −3% day?"
     },
     "languages": {
       "sectionTag": "// Global",
       "title": "AVAILABLE IN 30+ LANGUAGES",
-      "subtitle": "Pelican speaks your language, wherever you trade"
+      "subtitle": "Pelican speaks your language, wherever you trade - available in 30+ languages"
     },
     "team": {
       "sectionTag": "// The Team",
       "title": "BUILT BY TRADERS, FOR TRADERS",
       "nickName": "NICK GROVES",
       "nickRole": "Founder & CEO",
-      "nickBio": "Eight years across futures, FX, and digital assets. Former crypto arbitrage systems architect turned systems-driven strategist. Founded Pelican to challenge the industry's dependence on opaque tools and build an AI that thinks the way real traders operate—structured, contextual, and brutally honest.",
+      "nickBio": "Nick Groves is a systems-driven trader and market analyst with eight years of experience across futures, FX, equities, and digital assets.\n\nHe began his career in cryptocurrency arbitrage, building early crypto auto-spreading systems with support from Trading Technologies in Chicago. These systems connected seven major global exchanges and helped shape his core belief that markets reward structure, discipline, and context over prediction.\n\nSince 2020, Nick has focused on discretionary trading in equity index futures and currencies, using cross-market analysis and central bank policy to identify high-probability inflection points. His work blends macroeconomic insight with technical execution, emphasizing risk control, process, and emotional discipline.\n\nBeyond trading, Nick is an active market educator and builder. He co-hosts daily market calls, produces institutional-style analysis across platforms, and founded Pelican after years of watching traders overpay for shallow tools and false authority, with a mission to make institutional-grade insight accessible and honest.",
       "rayName": "RAY CAMPBELL",
       "rayRole": "Senior Architect",
-      "rayBio": "Two decades building mission-critical financial infrastructure. Led NYSE's transition to electronic trading at Labranche, architecting ultra-low latency systems across 800+ symbols. Deep expertise in C++ high-performance systems, exchange connectivity, and modern crypto infrastructure."
+      "rayBio": "Ray Campbell is a rare systems architect who has helped build the infrastructure behind multiple generations of global markets.\n\nAt LaBranche & Co. Inc., he played a critical role in the NYSE’s transition to electronic trading, designing ultra-low-latency systems that continuously quoted and executed trades across hundreds of stocks at once. This work powered institutional market-making during one of the most important structural shifts in modern market history.\n\nBeyond U.S. equities, Ray worked extensively in Asia, helping design and deploy trading systems for the Shanghai Futures Exchange and Korean derivatives markets. In partnership with CITIC Bank, he contributed to the launch of China’s first commodity ETF, operating at the intersection of regulation, exchange infrastructure, and high-performance execution.\n\nOver the last decade, Ray has applied that same rigor to modern markets, architecting exchange-grade platforms across equities, futures, options, and crypto. His work spans matching engines, market data pipelines, exchange connectivity, and high-performance C++ systems built for environments where speed, reliability, and precision are non-negotiable."
     },
     "pricing": {
       "sectionTag": "// Pricing",
       "title": "CREDIT-BASED PRICING THAT SCALES WITH YOU",
+      "sameFeaturesTitle": "Same platform in every plan",
+      "sameFeaturesDesc": "Access to the same tools in every plan. All tiers include everything Pelican has to offer. The only difference is how many credits you get each month. Compatible with US stocks, Foreign Exchange (FX), and Cryptocurrencies.",
       "howCreditsWork": "HOW CREDITS WORK",
-      "creditsExplainer": "Credits represent analytical workload, not raw API calls. Simple questions cost less. Complex analysis costs more. You always know what you're spending.",
+      "creditsExplainer": "Credits are like points you spend when you ask for help. Easy questions use a few points. Bigger questions use more. You can always see how many points you have left.",
       "conversation": "Conversation",
       "conversationCredits": "2",
       "conversationExample": "\"What's AAPL at?\" / \"What's RSI?\"",
@@ -145,10 +147,6 @@
       "starterCredits": "1,000",
       "starterCreditsLabel": "credits / month",
       "starterEffective": "~$0.029 per credit",
-      "starterFeature1": "Full AI assistant access",
-      "starterFeature2": "Live data on 10,000+ tickers",
-      "starterFeature3": "Trading education & coaching",
-      "starterFeature4": "Basic technical analysis",
       "starterButton": "Get Started →",
       "pro": "PRO",
       "proFor": "Active Traders",
@@ -157,11 +155,6 @@
       "proCredits": "3,500",
       "proCreditsLabel": "credits / month",
       "proEffective": "~$0.028 per credit",
-      "proFeature1": "Everything in Starter",
-      "proFeature2": "Plain-English backtesting",
-      "proFeature3": "Event studies & correlation",
-      "proFeature4": "One-click shareable reports",
-      "proFeature5": "Remembers your trading context",
       "proButton": "Start Trading →",
       "power": "POWER",
       "powerFor": "Heavy & Professional Users",
@@ -170,11 +163,6 @@
       "powerCredits": "10,000",
       "powerCreditsLabel": "credits / month",
       "powerEffective": "~$0.025 per credit",
-      "powerFeature1": "Everything in Pro",
-      "powerFeature2": "Multi-day tick analysis",
-      "powerFeature3": "Institutional flow detection",
-      "powerFeature4": "Extended backtest periods",
-      "powerFeature5": "Priority support",
       "powerButton": "Go Power →",
       "mostPopular": "Most Popular",
       "cancelAnytime": "Cancel anytime",

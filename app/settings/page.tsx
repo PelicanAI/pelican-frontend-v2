@@ -511,8 +511,8 @@ export default function SettingsPage() {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-sm border-b border-border">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
+        <div className="page-container-wide py-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-4">
               <Button asChild variant="ghost" size="sm">
                 <Link href="/chat">
@@ -526,7 +526,7 @@ export default function SettingsPage() {
               <Button
                 onClick={handleSave}
                 disabled={!hasUnsavedChanges || isSaving}
-                className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800"
+                className="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800"
               >
                 {isSaving ? (
                   <>
@@ -543,7 +543,7 @@ export default function SettingsPage() {
             ) : (
               <Button
                 asChild
-                className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800"
+                className="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800"
               >
                 <Link href="/auth/signup">
                   <User className="h-4 w-4 mr-2" />
@@ -555,11 +555,11 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-8 dark:bg-[#0a0a0f]">
+      <div className="page-container-wide py-8 dark:bg-[#0a0a0f]">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Sidebar Navigation */}
           <div className="lg:col-span-1">
-            <Card className="sticky top-24">
+            <Card className="lg:sticky lg:top-24">
               <CardContent className="p-4">
                 <nav className="space-y-1">
                   {sections.map((section) => {
@@ -568,7 +568,7 @@ export default function SettingsPage() {
                       <button
                         key={section.id}
                         onClick={() => setActiveSection(section.id)}
-                        className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                        className={`w-full flex items-center gap-3 px-3 py-2 min-h-[44px] rounded-lg text-sm font-medium transition-colors ${
                           activeSection === section.id
                             ? "bg-purple-500/15 text-purple-400 dark:bg-purple-500/20 dark:text-purple-300"
                             : "text-muted-foreground hover:bg-muted hover:text-foreground"
