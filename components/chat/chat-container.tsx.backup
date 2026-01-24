@@ -446,7 +446,7 @@ export function ChatContainer({
                   <div className="flex gap-6 items-start">
                     <div className="flex-shrink-0">
                       <motion.img
-                        src="/pelican-logo.png"
+                        src="/pelican-logo-transparent.png"
                         alt="PelicanAI"
                         className="w-8 h-8 object-contain rounded-full"
                         animate={{ rotate: [0, 5, -5, 0] }}

@@ -267,7 +267,7 @@ Replace `<img>` with `<Image>` from `next/image`:
 import Image from 'next/image'
 
 <Image
-  src="/pelican-logo.png"
+  src="/pelican-logo-transparent.png"
   alt="Pelican"
   width={128}
   height={128}

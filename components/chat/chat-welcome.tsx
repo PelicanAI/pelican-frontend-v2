@@ -36,7 +36,7 @@ export function ChatWelcome({ onQuickStart }: ChatWelcomeProps) {
         {/* Logo */}
         <div className="flex justify-center mb-4 sm:mb-6 h-10 sm:h-12">
           <img 
-            src="/pelican-logo.png" 
+            src="/pelican-logo-transparent.png" 
             alt="PelicanAI" 
             className="w-10 h-10 sm:w-12 sm:h-12 object-contain"
             width="48"

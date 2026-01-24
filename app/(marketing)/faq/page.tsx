@@ -236,7 +236,7 @@ export default function FAQ() {
       <nav>
         <div className="nav-inner">
           <Link href="/" className="nav-logo">
-            <img src="/pelican-logo.png" alt="Pelican" />
+            <img src="/pelican-logo-transparent.png" alt="Pelican" />
             <span>Pelican</span>
           </Link>
           <div className="nav-links">
@@ -328,7 +328,7 @@ export default function FAQ() {
         </p>
       </footer>
 
-      <HelpChat logoUrl="/pelican-logo.png" />
+      <HelpChat logoUrl="/pelican-logo-transparent.png" />
     </>
   );
 }

@@ -319,7 +319,7 @@ export default function ChatPage() {
             </SheetTrigger>
           </Sheet>
           <div className="flex items-center gap-2">
-            <img src="/pelican-logo.png" alt="PelicanAI" className="w-6 h-6 object-contain" />
+            <img src="/pelican-logo-transparent.png" alt="PelicanAI" className="w-6 h-6 object-contain" />
             <span className="font-semibold text-foreground">Pelican AI</span>
           </div>
           <div className="hidden sm:flex items-center gap-2">
@@ -341,7 +341,7 @@ export default function ChatPage() {
               <span className="text-sm font-medium">Show Sidebar</span>
             </Button>
             <div className="flex items-center gap-2">
-              <img src="/pelican-logo.png" alt="PelicanAI" className="w-6 h-6 object-contain" />
+              <img src="/pelican-logo-transparent.png" alt="PelicanAI" className="w-6 h-6 object-contain" />
               <span className="font-semibold text-foreground">Pelican AI</span>
             </div>
             <div className="flex items-center gap-2">
