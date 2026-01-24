@@ -86,15 +86,15 @@ export default function SignUpPage() {
       <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_0%,_#1e1b4b_0%,_transparent_50%)] opacity-20 pointer-events-none" />
 
       <div className="absolute top-6 left-6 z-30 pointer-events-auto">
-        <a href="/" className="flex items-center text-gray-400 hover:text-white transition-colors text-sm">
+        <Link href="/" className="flex items-center text-gray-400 hover:text-white transition-colors text-sm">
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Home
-        </a>
+        </Link>
       </div>
 
-      <div className="w-full h-screen bg-[#12141c] rounded-none shadow-none overflow-hidden flex flex-col md:flex-row border-0 z-10">
+      <div className="w-full min-h-screen bg-[#12141c] rounded-none shadow-none overflow-hidden flex flex-col md:flex-row border-0 z-10">
         {/* LEFT SIDE: Visual & Branding (CSS-Only Version) */}
-        <div className="hidden md:flex w-1/2 relative flex-col justify-between p-12 overflow-hidden bg-[#050505]">
+        <div className="flex w-full md:w-1/2 relative flex-col justify-between p-8 md:p-12 overflow-hidden bg-[#050505] min-h-[320px] md:min-h-full">
             {/* BACKGROUND: Glowing Data Landscape (CSS Only) */}
             <div className="absolute inset-0 z-0 overflow-hidden">
                {/* 1. The Dark Base */}
@@ -124,8 +124,8 @@ export default function SignUpPage() {
             </div>
 
             {/* Logo */}
-            <div className="relative z-10 mb-12">
-              <div className="w-72 h-72 relative">
+            <div className="relative z-10 mb-6 md:mb-12">
+              <div className="w-40 h-40 md:w-72 md:h-72 relative">
                  <Image 
                    src="/pelican-logo-transparent.png" 
                    alt="Pelican Logo" 
@@ -138,11 +138,11 @@ export default function SignUpPage() {
 
             {/* Hero Text */}
             <div className="relative z-10 mt-auto mb-6">
-              <h1 className="text-5xl font-bold leading-tight mb-4 tracking-tight text-white drop-shadow-lg">
+              <h1 className="text-3xl md:text-5xl font-bold leading-tight mb-4 tracking-tight text-white drop-shadow-lg">
                 Unlock Your Trading <br />
                 Potential.
               </h1>
-              <p className="text-gray-300 text-lg font-light max-w-sm leading-relaxed drop-shadow-md">
+              <p className="text-gray-300 text-base md:text-lg font-light max-w-sm leading-relaxed drop-shadow-md">
                 Join thousands using AI to find their next big opportunity.
               </p>
             </div>
@@ -226,9 +226,9 @@ export default function SignUpPage() {
               <div className="text-center pt-4 pointer-events-auto">
                 <p className="text-sm text-gray-500">
                   Already have an account?{" "}
-                  <a href="/auth/login" className="text-purple-400 hover:text-purple-300 font-medium transition-colors">
+                  <Link href="/auth/login" className="text-purple-400 hover:text-purple-300 font-medium transition-colors">
                     Sign in
-                  </a>
+                  </Link>
                 </p>
               </div>
             </form>
