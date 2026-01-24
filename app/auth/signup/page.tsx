@@ -86,9 +86,12 @@ export default function SignUpPage() {
       <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_0%,_#1e1b4b_0%,_transparent_50%)] opacity-20 pointer-events-none" />
 
       <div className="absolute top-6 left-6 z-30 pointer-events-auto">
-        <Link href="/" className="flex items-center text-gray-400 hover:text-white transition-colors text-sm">
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to Home
+        <Link
+          href="/"
+          aria-label="Back to home"
+          className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 text-gray-300 transition-colors hover:text-white hover:border-white/20 hover:bg-white/5"
+        >
+          <ArrowLeft className="h-4 w-4" />
         </Link>
       </div>
 
