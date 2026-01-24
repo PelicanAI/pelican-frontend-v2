@@ -3,15 +3,11 @@
 import type React from "react"
 
 import { createClient } from "@/lib/supabase/client"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useState, useEffect } from "react"
 import Image from "next/image"
-import { Lock, Mail } from "lucide-react"
+import { Lock, Mail, ArrowLeft } from "lucide-react"
 
 export default function SignUpPage() {
   const [email, setEmail] = useState("")
@@ -86,147 +82,156 @@ export default function SignUpPage() {
   }
 
   return (
-    <div className="min-h-svh bg-[#0b0f1a] p-6 md:p-10">
-      <div className="mx-auto w-full max-w-6xl">
-        <div className="mb-6">
-          <Button variant="ghost" asChild className="text-muted-foreground hover:text-purple-200">
-            <Link href="/" className="flex items-center gap-2">
-              ← Back to Home
-            </Link>
-          </Button>
-        </div>
+    <div className="min-h-screen w-full bg-[#0a0a0c] flex flex-col items-center justify-center relative overflow-hidden font-sans text-white">
+      <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_0%,_#1e1b4b_0%,_transparent_50%)] opacity-20 pointer-events-none" />
 
-        <div className="grid overflow-hidden rounded-3xl border border-white/10 bg-[#0d111c] shadow-2xl lg:grid-cols-2">
-          {/* Left marketing panel */}
-          <div className="relative hidden min-h-[560px] flex-col justify-between overflow-hidden bg-[#0a0d16] px-10 py-12 lg:flex">
-            <div className="absolute inset-0">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(124,58,237,0.18),_transparent_55%)]" />
-              <div className="absolute inset-x-0 bottom-0 h-64 bg-[radial-gradient(circle_at_30%_30%,_rgba(168,85,247,0.25),_transparent_60%)]" />
-              <div className="absolute bottom-0 left-0 right-0 h-72 bg-[linear-gradient(120deg,_rgba(91,33,182,0.35),_rgba(37,99,235,0.18))]" />
-              <div className="absolute bottom-0 left-0 right-0 h-72 opacity-60"
-                style={{
-                  backgroundImage:
-                    "linear-gradient(transparent 55%, rgba(17,24,39,0.8)), linear-gradient(120deg, rgba(168,85,247,0.55), rgba(59,130,246,0.35)), repeating-linear-gradient(90deg, rgba(255,255,255,0.08) 0 1px, transparent 1px 40px), repeating-linear-gradient(180deg, rgba(255,255,255,0.08) 0 1px, transparent 1px 40px)",
-                }}
-              />
+      <div className="absolute top-6 left-6 z-30 pointer-events-auto">
+        <a href="/" className="flex items-center text-gray-400 hover:text-white transition-colors text-sm">
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Back to Home
+        </a>
+      </div>
+
+      <div className="w-full h-screen bg-[#12141c] rounded-none shadow-none overflow-hidden flex flex-col md:flex-row border-0 z-10">
+        {/* LEFT SIDE: Visual & Branding (CSS-Only Version) */}
+        <div className="hidden md:flex w-1/2 relative flex-col justify-between p-12 overflow-hidden bg-[#050505]">
+            {/* BACKGROUND: Glowing Data Landscape (CSS Only) */}
+            <div className="absolute inset-0 z-0 overflow-hidden">
+               {/* 1. The Dark Base */}
+               <div className="absolute inset-0 bg-[#020205]"></div>
+               
+               {/* 2. The "Mountain" Glows */}
+               <div className="absolute bottom-[-10%] left-[-10%] w-[80%] h-[60%] bg-purple-900/40 blur-[80px] rounded-full mix-blend-screen"></div>
+               <div className="absolute bottom-[-10%] right-[-10%] w-[80%] h-[60%] bg-blue-900/30 blur-[80px] rounded-full mix-blend-screen"></div>
+               
+               {/* 3. The Grid Floor (Perspective) */}
+               <div 
+                 className="absolute inset-0 opacity-30" 
+                 style={{
+                    backgroundImage: 'linear-gradient(rgba(124, 58, 237, 0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(124, 58, 237, 0.3) 1px, transparent 1px)',
+                    backgroundSize: '40px 40px',
+                    transform: 'perspective(500px) rotateX(60deg) translateY(100px) scale(2)',
+                    transformOrigin: 'bottom center',
+                    maskImage: 'linear-gradient(to top, black 0%, transparent 100%)'
+                 }} 
+               />
+               
+               {/* 4. Rising "Candlestick" Bars (Simulated with spans) */}
+               <div className="absolute bottom-0 left-10 w-4 h-32 bg-gradient-to-t from-purple-600 to-transparent opacity-50 blur-sm"></div>
+               <div className="absolute bottom-0 left-20 w-4 h-48 bg-gradient-to-t from-purple-500 to-transparent opacity-60 blur-sm"></div>
+               <div className="absolute bottom-0 left-32 w-4 h-24 bg-gradient-to-t from-blue-600 to-transparent opacity-40 blur-sm"></div>
+               <div className="absolute bottom-0 right-20 w-4 h-56 bg-gradient-to-t from-purple-400 to-transparent opacity-50 blur-sm"></div>
             </div>
 
-            <div className="relative z-10">
-              <Image
-                src="/pelican-logo-transparent.png"
-                alt="Pelican AI"
-                width={44}
-                height={44}
-                className="h-11 w-11 object-contain"
-                priority
-              />
+            {/* Logo */}
+            <div className="relative z-10 mb-12">
+              <div className="w-72 h-72 relative">
+                 <Image 
+                   src="/pelican-logo-transparent.png" 
+                   alt="Pelican Logo" 
+                   width={288} 
+                   height={288} 
+                   className="object-contain" 
+                 />
+              </div>
             </div>
 
-            <div className="relative z-10 space-y-4">
-              <h1 className="text-4xl font-semibold text-white">
-                Unlock Your Trading
-                <br />
+            {/* Hero Text */}
+            <div className="relative z-10 mt-auto mb-6">
+              <h1 className="text-5xl font-bold leading-tight mb-4 tracking-tight text-white drop-shadow-lg">
+                Unlock Your Trading <br />
                 Potential.
               </h1>
-              <p className="max-w-sm text-base text-white/70">
+              <p className="text-gray-300 text-lg font-light max-w-sm leading-relaxed drop-shadow-md">
                 Join thousands using AI to find their next big opportunity.
               </p>
             </div>
-          </div>
+        </div>
 
-          {/* Right form panel */}
-          <div className="bg-[#0f121b] px-8 py-10 md:px-10">
-            <div className="space-y-6">
-              <div className="space-y-2">
-                <h2 className="text-2xl font-semibold text-white">Create your account</h2>
-                <p className="text-sm text-white/60">Start trading smarter in minutes.</p>
+        <div className="w-full md:w-1/2 bg-[#12141c] p-10 md:p-14 flex flex-col justify-center relative z-10 pointer-events-auto">
+          <div className="max-w-md w-full mx-auto">
+            <h2 className="text-3xl font-semibold mb-2 text-white">Create your account</h2>
+            <p className="text-gray-400 mb-8">Start trading smarter in minutes.</p>
+
+            <form onSubmit={handleSignUp} className="space-y-5">
+              <div className="space-y-1.5">
+                <label htmlFor="email" className="text-sm font-medium text-gray-300 ml-1">Email</label>
+                <div className="relative group">
+                  <Mail className="absolute left-3.5 top-3.5 h-5 w-5 text-gray-500 group-focus-within:text-purple-400 transition-colors" />
+                  <input
+                    type="email"
+                    id="email"
+                    placeholder="trader@example.com"
+                    className="w-full bg-[#1b1f2b] border border-[#2d3240] rounded-xl py-3 pl-11 pr-4 text-white placeholder-gray-600 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+                </div>
               </div>
 
-              <Card className="border-white/10 bg-white/5 text-white shadow-none">
-                <CardHeader>
-                  <CardTitle className="text-xl">Sign up</CardTitle>
-                  <CardDescription className="text-white/60">Create a new account to get started</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <form onSubmit={handleSignUp}>
-                    <div className="flex flex-col gap-6">
-                      <div className="grid gap-2">
-                        <Label htmlFor="email" className="text-white/80">Email</Label>
-                        <div className="relative">
-                          <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/40" />
-                          <Input
-                            id="email"
-                            type="email"
-                            placeholder="trader@example.com"
-                            required
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            className="h-11 border-white/10 bg-[#151a26] pl-10 text-white placeholder:text-white/40"
-                          />
-                        </div>
-                      </div>
-                      <div className="grid gap-2">
-                        <Label htmlFor="password" className="text-white/80">Password</Label>
-                        <div className="relative">
-                          <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/40" />
-                          <Input
-                            id="password"
-                            type="password"
-                            required
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            className="h-11 border-white/10 bg-[#151a26] pl-10 text-white placeholder:text-white/40"
-                          />
-                        </div>
-                      </div>
-                      <div className="grid gap-2">
-                        <Label htmlFor="repeat-password" className="text-white/80">Repeat Password</Label>
-                        <div className="relative">
-                          <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/40" />
-                          <Input
-                            id="repeat-password"
-                            type="password"
-                            required
-                            value={repeatPassword}
-                            onChange={(e) => setRepeatPassword(e.target.value)}
-                            className="h-11 border-white/10 bg-[#151a26] pl-10 text-white placeholder:text-white/40"
-                          />
-                        </div>
-                      </div>
-                      <div className="flex items-start gap-2">
-                        <input
-                          id="terms"
-                          type="checkbox"
-                          checked={agreedToTerms}
-                          onChange={(e) => setAgreedToTerms(e.target.checked)}
-                          className="mt-1 h-4 w-4 rounded border-white/30 bg-transparent text-purple-500 focus:ring-purple-500"
-                        />
-                        <Label htmlFor="terms" className="text-sm text-white/60 leading-tight">
-                          I agree to the{" "}
-                          <Link href="/terms" className="text-purple-400 hover:underline" target="_blank">
-                            Terms of Service
-                          </Link>
-                        </Label>
-                      </div>
-                      {error && <p className="text-sm text-red-400">{error}</p>}
-                      <Button
-                        type="submit"
-                        className="h-11 w-full rounded-full bg-gradient-to-r from-purple-500 to-blue-500 text-white"
-                        disabled={isLoading}
-                      >
-                        {isLoading ? "Creating account..." : "Create account"}
-                      </Button>
-                    </div>
-                    <div className="mt-4 text-center text-sm text-white/60">
-                      Already have an account?{" "}
-                      <Link href="/auth/login" className="text-purple-400 hover:underline">
-                        Sign in
-                      </Link>
-                    </div>
-                  </form>
-                </CardContent>
-              </Card>
-            </div>
+              <div className="space-y-1.5">
+                <label htmlFor="password" className="text-sm font-medium text-gray-300 ml-1">Password</label>
+                <div className="relative group">
+                  <Lock className="absolute left-3.5 top-3.5 h-5 w-5 text-gray-500 group-focus-within:text-purple-400 transition-colors" />
+                  <input
+                    type="password"
+                    id="password"
+                    className="w-full bg-[#1b1f2b] border border-[#2d3240] rounded-xl py-3 pl-11 pr-4 text-white placeholder-gray-600 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all"
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <label htmlFor="repeat-password" className="text-sm font-medium text-gray-300 ml-1">Repeat Password</label>
+                <div className="relative group">
+                  <Lock className="absolute left-3.5 top-3.5 h-5 w-5 text-gray-500 group-focus-within:text-purple-400 transition-colors" />
+                  <input
+                    type="password"
+                    id="repeat-password"
+                    className="w-full bg-[#1b1f2b] border border-[#2d3240] rounded-xl py-3 pl-11 pr-4 text-white placeholder-gray-600 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all"
+                    required
+                    value={repeatPassword}
+                    onChange={(e) => setRepeatPassword(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center pt-2">
+                <input
+                  id="terms"
+                  type="checkbox"
+                  className="w-5 h-5 bg-[#1b1f2b] border-[#2d3240] rounded text-purple-600 focus:ring-purple-500 focus:ring-offset-0 focus:ring-offset-transparent cursor-pointer accent-purple-600"
+                  checked={agreedToTerms}
+                  onChange={(e) => setAgreedToTerms(e.target.checked)}
+                />
+                <label htmlFor="terms" className="ml-3 text-sm text-gray-400">
+                  I agree to the <Link href="/terms" className="text-purple-400 hover:text-purple-300 transition-colors">Terms of Service</Link>
+                </label>
+              </div>
+
+              {error && <p className="text-sm text-red-400">{error}</p>}
+
+              <button
+                type="submit"
+                className="w-full mt-4 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-semibold py-3.5 rounded-full transition-all shadow-[0_0_20px_rgba(124,58,237,0.3)] hover:shadow-[0_0_30px_rgba(124,58,237,0.5)] active:scale-[0.98]"
+                disabled={isLoading}
+              >
+                {isLoading ? "Creating account..." : "Create account"}
+              </button>
+
+              <div className="text-center pt-4 pointer-events-auto">
+                <p className="text-sm text-gray-500">
+                  Already have an account?{" "}
+                  <a href="/auth/login" className="text-purple-400 hover:text-purple-300 font-medium transition-colors">
+                    Sign in
+                  </a>
+                </p>
+              </div>
+            </form>
           </div>
         </div>
       </div>

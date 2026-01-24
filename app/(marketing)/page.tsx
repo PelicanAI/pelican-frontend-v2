@@ -24,11 +24,7 @@ export default function HomePage() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   const handleLaunchApp = () => {
-    if (user) {
-      router.push('/chat');
-    } else {
-      router.push('/auth/login');
-    }
+    router.push('/auth/login');
   };
 
   const handleSignUp = (plan?: string) => {
