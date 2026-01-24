@@ -15,7 +15,6 @@ import Image from "next/image"
 export default function SignUpPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [displayName, setDisplayName] = useState("")
   const [repeatPassword, setRepeatPassword] = useState("")
   const [agreedToTerms, setAgreedToTerms] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -57,9 +56,6 @@ export default function SignUpPage() {
         password,
         options: {
           emailRedirectTo: `${window.location.origin}/auth/callback`,
-          data: {
-            display_name: displayName,
-          },
         },
       })
       
@@ -89,8 +85,8 @@ export default function SignUpPage() {
   }
 
   return (
-    <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
-      <div className="w-full max-w-sm">
+    <div className="flex min-h-svh w-full items-center justify-center bg-background p-6 md:p-10">
+      <div className="w-full max-w-md">
         <div className="flex flex-col gap-6">
           <div className="flex justify-start">
             <Button variant="ghost" asChild className="text-muted-foreground hover:text-purple-600">
@@ -100,20 +96,20 @@ export default function SignUpPage() {
             </Button>
           </div>
 
-          <div className="flex flex-col items-center gap-2">
-            <div className="w-12 h-12 bg-gradient-to-br from-purple-600 to-purple-700 rounded-xl flex items-center justify-center p-2">
-              <Image
-                src="/pelican-logo.png"
-                alt="Pelican AI"
-                width={32}
-                height={32}
-                className="w-full h-full object-contain brightness-110 saturate-125"
-              />
+          <div className="flex flex-col items-center gap-3 text-center">
+            <Image
+              src="/pelican-logo-transparent.png"
+              alt="Pelican AI"
+              width={56}
+              height={56}
+              className="h-14 w-14 object-contain"
+            />
+            <div className="space-y-1">
+              <h1 className="text-2xl font-semibold text-foreground">Join Pelican AI</h1>
+              <p className="text-sm text-muted-foreground">Create your account to start trading smarter</p>
             </div>
-            <h1 className="text-2xl font-bold">Join Pelican AI</h1>
-            <p className="text-muted-foreground text-center">Create your account to start trading smarter</p>
           </div>
-          <Card>
+          <Card className="border-border/60 shadow-sm">
             <CardHeader>
               <CardTitle className="text-2xl">Sign up</CardTitle>
               <CardDescription>Create a new account to get started</CardDescription>
@@ -121,17 +117,6 @@ export default function SignUpPage() {
             <CardContent>
               <form onSubmit={handleSignUp}>
                 <div className="flex flex-col gap-6">
-                  <div className="grid gap-2">
-                    <Label htmlFor="displayName">Display Name</Label>
-                    <Input
-                      id="displayName"
-                      type="text"
-                      placeholder="Your trading name"
-                      required
-                      value={displayName}
-                      onChange={(e) => setDisplayName(e.target.value)}
-                    />
-                  </div>
                   <div className="grid gap-2">
                     <Label htmlFor="email">Email</Label>
                     <Input
