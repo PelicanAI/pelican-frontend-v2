@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { MessageSquare, User, LogOut } from "lucide-react"
+import { MessageSquare, LogOut } from "lucide-react"
 import Link from "next/link"
 
 export default async function ProfilePage() {
@@ -51,14 +51,9 @@ export default async function ProfilePage() {
       <div className="page-container-wide py-8">
         {/* Header */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-8">
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 bg-gradient-to-br from-purple-600 to-purple-700 rounded-xl flex items-center justify-center">
-              <User className="w-8 h-8 text-white" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold text-foreground">{profile?.display_name || "Trader"}</h1>
-              <p className="text-muted-foreground">{user.email}</p>
-            </div>
+          <div>
+            <h1 className="text-3xl font-bold text-foreground">Account</h1>
+            <p className="text-muted-foreground">{user.email}</p>
           </div>
           <div className="flex flex-wrap items-center gap-3">
             <Button asChild variant="outline">
@@ -81,16 +76,9 @@ export default async function ProfilePage() {
           <div className="lg:col-span-1">
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <User className="w-5 h-5" />
-                  Profile Information
-                </CardTitle>
+                <CardTitle>Account Information</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground">Display Name</label>
-                  <p className="text-lg font-semibold">{profile?.display_name || "Not set"}</p>
-                </div>
                 <div>
                   <label className="text-sm font-medium text-muted-foreground">Email</label>
                   <p className="text-lg">{user.email}</p>
