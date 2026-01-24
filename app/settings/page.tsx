@@ -12,28 +12,20 @@
 import { useState, useEffect, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/lib/providers/auth-provider"
-import { useTheme } from "next-themes"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Switch } from "@/components/ui/switch"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Separator } from "@/components/ui/separator"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { toast } from "sonner"
 import {
   ArrowLeft,
   User,
   TrendingUp,
-  Bell,
-  MessageSquare,
-  Palette,
   Shield,
-  Upload,
   Trash2,
-  Download,
   Save,
   Loader2,
   Zap,
@@ -70,9 +62,7 @@ import {
 
 interface UserSettings {
   // Account
-  display_name: string
   email: string
-  avatar_url?: string
 
   // Trading Preferences
   default_timeframes: string[]
@@ -80,23 +70,6 @@ interface UserSettings {
   risk_tolerance: "conservative" | "moderate" | "aggressive"
   default_position_size?: number
   favorite_tickers: string[]
-
-  // Notifications
-  email_notifications: boolean
-  market_alerts: boolean
-  price_alerts: boolean
-  trade_confirmations: boolean
-
-  // Chat Settings
-  auto_scroll: "always" | "when_at_bottom" | "never"
-  message_density: "comfortable" | "compact"
-  show_timestamps: boolean
-
-  // Display Settings
-  theme: "light" | "dark" | "system"
-  sidebar_collapsed_default: boolean
-  market_panel_visible: boolean
-  font_size: "small" | "medium" | "large"
 }
 
 // ============================================================================
@@ -108,17 +81,6 @@ const DEFAULT_SETTINGS: Partial<UserSettings> = {
   preferred_markets: ["stocks"],
   risk_tolerance: "moderate",
   favorite_tickers: [],
-  email_notifications: true,
-  market_alerts: true,
-  price_alerts: true,
-  trade_confirmations: true,
-  auto_scroll: "when_at_bottom",
-  message_density: "comfortable",
-  show_timestamps: true,
-  theme: "system",
-  sidebar_collapsed_default: false,
-  market_panel_visible: true,
-  font_size: "medium",
 }
 
 const POPULAR_TICKERS = [
@@ -135,7 +97,6 @@ export default function SettingsPage() {
   const router = useRouter()
   const supabase = useMemo(() => createClient(), [])
   const { credits, isSubscribed, isFounder } = useCreditsContext()
-  const { setTheme, theme } = useTheme()
 
   const [settings, setSettings] = useState<UserSettings | null>(null)
   const [isSaving, setIsSaving] = useState(false)
@@ -179,23 +140,18 @@ export default function SettingsPage() {
   useEffect(() => {
     if (userSettings) {
       setSettings({
-        display_name: user?.user_metadata?.display_name || "",
         email: user?.email || "",
-        avatar_url: user?.user_metadata?.avatar_url,
         ...DEFAULT_SETTINGS,
         ...userSettings,
       } as UserSettings)
     } else if (user) {
       setSettings({
-        display_name: user.user_metadata?.display_name || "",
         email: user.email || "",
-        avatar_url: user.user_metadata?.avatar_url,
         ...DEFAULT_SETTINGS,
       } as UserSettings)
     } else {
       // Guest mode - use default settings
       setSettings({
-        display_name: "",
         email: "",
         ...DEFAULT_SETTINGS,
       } as UserSettings)
@@ -253,6 +209,11 @@ export default function SettingsPage() {
   const handlePasswordChange = async () => {
     if (!user) return
 
+    if (!currentPassword) {
+      toast.error("Enter your current password")
+      return
+    }
+
     if (newPassword !== confirmPassword) {
       toast.error("Passwords do not match")
       return
@@ -263,7 +224,21 @@ export default function SettingsPage() {
       return
     }
 
+    if (!user.email) {
+      toast.error("Missing account email. Please sign in again.")
+      return
+    }
+
     try {
+      const { error: reauthError } = await supabase.auth.signInWithPassword({
+        email: user.email,
+        password: currentPassword,
+      })
+
+      if (reauthError) {
+        throw reauthError
+      }
+
       const { error } = await supabase.auth.updateUser({
         password: newPassword,
       })
@@ -402,61 +377,6 @@ export default function SettingsPage() {
   }
 
   // ============================================================================
-  // Export Data
-  // ============================================================================
-
-  const handleExportData = async () => {
-    try {
-      let exportData: {
-        settings: typeof settings
-        exported_at: string
-        profile?: Record<string, unknown>
-        user?: { email: string | undefined; created_at: string }
-        conversations?: unknown
-        note?: string
-      } = {
-        settings,
-        exported_at: new Date().toISOString(),
-      }
-
-      if (user) {
-        const { data: conversations } = await supabase
-          .from("conversations")
-          .select("*, messages(*)")
-          .eq("user_id", user.id)
-          .is("deleted_at", null)
-
-        exportData = {
-          ...exportData,
-          user: {
-            email: user.email,
-            created_at: user.created_at,
-          },
-          conversations,
-        }
-      } else {
-        exportData.note = "Guest mode - only settings exported. Sign in to export conversation history."
-      }
-
-      const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" })
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement("a")
-      a.href = url
-      a.download = `pelican-ai-${user ? "data" : "settings"}-${new Date().toISOString().split("T")[0]}.json`
-      document.body.appendChild(a)
-      a.click()
-      document.body.removeChild(a)
-      URL.revokeObjectURL(url)
-
-      toast.success(user ? "Data exported successfully" : "Settings exported successfully")
-      logger.info("Data exported", { userId: user?.id || "guest" })
-    } catch (error) {
-      logger.error("Failed to export data", error instanceof Error ? error : new Error(String(error)))
-      toast.error("Failed to export data. Please try again.")
-    }
-  }
-
-  // ============================================================================
   // Ticker Management
   // ============================================================================
 
@@ -497,9 +417,6 @@ export default function SettingsPage() {
   const sections = [
     { id: "account", label: "Account", icon: User },
     { id: "trading", label: "Trading Preferences", icon: TrendingUp },
-    { id: "notifications", label: "Notifications", icon: Bell },
-    { id: "chat", label: "Chat Settings", icon: MessageSquare },
-    { id: "display", label: "Display", icon: Palette },
     { id: "privacy", label: "Data & Privacy", icon: Shield },
   ]
 
@@ -619,48 +536,20 @@ export default function SettingsPage() {
 
                 <Card>
                   <CardHeader>
-                    <CardTitle>Profile Information</CardTitle>
+                    <CardTitle>Account Information</CardTitle>
                     <CardDescription>
-                      {user ? "Update your account details and profile picture" : "View and customize your profile (sign in to save)"}
+                      {user ? "Review your account email" : "Sign in to view account details"}
                     </CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-6">
-                    {/* Avatar */}
-                    <div className="flex items-center gap-6">
-                      <Avatar className="h-20 w-20">
-                        <AvatarImage src={settings.avatar_url} />
-                        <AvatarFallback className="bg-gradient-to-br from-purple-600 to-purple-700 text-white text-2xl">
-                          {settings.display_name?.charAt(0).toUpperCase() || "U"}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="space-y-2">
-                        <Button variant="outline" size="sm">
-                          <Upload className="h-4 w-4 mr-2" />
-                          Upload Photo
-                        </Button>
-                        <p className="text-sm text-muted-foreground">JPG, PNG or GIF. Max size 2MB.</p>
-                      </div>
-                    </div>
-
-                    <Separator />
-
-                    {/* Display Name */}
-                    <div className="space-y-2">
-                      <Label htmlFor="display_name">Display Name</Label>
-                      <Input
-                        id="display_name"
-                        value={settings.display_name}
-                        onChange={(e) => updateSetting("display_name", e.target.value)}
-                        placeholder="Enter your display name"
-                      />
-                    </div>
-
-                    {/* Email */}
-                    <div className="space-y-2">
-                      <Label htmlFor="email">Email</Label>
-                      <Input id="email" value={settings.email} disabled className="bg-muted dark:bg-[#0a0a0f] dark:border dark:border-white/5" />
-                      <p className="text-sm text-muted-foreground">Contact support to change your email address</p>
-                    </div>
+                  <CardContent className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      value={settings.email}
+                      disabled
+                      className="bg-muted dark:bg-[#0a0a0f] dark:border dark:border-white/5"
+                    />
+                    <p className="text-sm text-muted-foreground">Contact support to change your email address</p>
                   </CardContent>
                 </Card>
 
@@ -796,6 +685,23 @@ export default function SettingsPage() {
                         </div>
                         <Button onClick={handlePasswordChange} variant="outline">
                           Update Password
+                        </Button>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Conversation History</CardTitle>
+                        <CardDescription>Manage your conversation data</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <Button
+                          variant="outline"
+                          onClick={() => setShowClearHistoryDialog(true)}
+                          className="w-full"
+                        >
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          Clear All Conversations
                         </Button>
                       </CardContent>
                     </Card>
@@ -979,245 +885,6 @@ export default function SettingsPage() {
               </div>
             )}
 
-            {/* Notification Settings */}
-            {activeSection === "notifications" && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Notification Preferences</CardTitle>
-                  <CardDescription>Manage how and when you receive notifications</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <Label>Email Notifications</Label>
-                      <p className="text-sm text-muted-foreground">Receive updates via email</p>
-                    </div>
-                    <Switch
-                      checked={settings.email_notifications}
-                      onCheckedChange={(checked) => updateSetting("email_notifications", checked)}
-                    />
-                  </div>
-                  <Separator />
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <Label>Market Alerts</Label>
-                      <p className="text-sm text-muted-foreground">Get notified of significant market movements</p>
-                    </div>
-                    <Switch
-                      checked={settings.market_alerts}
-                      onCheckedChange={(checked) => updateSetting("market_alerts", checked)}
-                    />
-                  </div>
-                  <Separator />
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <Label>Price Alerts</Label>
-                      <p className="text-sm text-muted-foreground">Alerts when your watchlist hits target prices</p>
-                    </div>
-                    <Switch
-                      checked={settings.price_alerts}
-                      onCheckedChange={(checked) => updateSetting("price_alerts", checked)}
-                    />
-                  </div>
-                  <Separator />
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <Label>Trade Confirmations</Label>
-                      <p className="text-sm text-muted-foreground">Confirm trade execution notifications</p>
-                    </div>
-                    <Switch
-                      checked={settings.trade_confirmations}
-                      onCheckedChange={(checked) => updateSetting("trade_confirmations", checked)}
-                    />
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Chat Settings */}
-            {activeSection === "chat" && (
-              <div className="space-y-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Chat Behavior</CardTitle>
-                    <CardDescription>Customize your chat experience</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-6">
-                    <div>
-                      <Label className="mb-3 block">Auto-scroll Behavior</Label>
-                      <RadioGroup
-                        value={settings.auto_scroll}
-                        onValueChange={(value) =>
-                          updateSetting("auto_scroll", value as "always" | "when_at_bottom" | "never")
-                        }
-                      >
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="always" id="scroll-always" />
-                          <Label htmlFor="scroll-always" className="cursor-pointer">
-                            Always - Auto-scroll to new messages
-                          </Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="when_at_bottom" id="scroll-bottom" />
-                          <Label htmlFor="scroll-bottom" className="cursor-pointer">
-                            When at bottom - Only scroll if already at bottom
-                          </Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="never" id="scroll-never" />
-                          <Label htmlFor="scroll-never" className="cursor-pointer">
-                            Never - Manual scrolling only
-                          </Label>
-                        </div>
-                      </RadioGroup>
-                    </div>
-
-                    <Separator />
-
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-0.5">
-                        <Label>Message Density</Label>
-                        <p className="text-sm text-muted-foreground">Compact mode shows more messages on screen</p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm text-muted-foreground">Comfortable</span>
-                        <Switch
-                          checked={settings.message_density === "compact"}
-                          onCheckedChange={(checked) =>
-                            updateSetting("message_density", checked ? "compact" : "comfortable")
-                          }
-                        />
-                        <span className="text-sm text-muted-foreground">Compact</span>
-                      </div>
-                    </div>
-
-                    <Separator />
-
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-0.5">
-                        <Label>Show Timestamps</Label>
-                        <p className="text-sm text-muted-foreground">Display time on each message</p>
-                      </div>
-                      <Switch
-                        checked={settings.show_timestamps}
-                        onCheckedChange={(checked) => updateSetting("show_timestamps", checked)}
-                      />
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Chat History</CardTitle>
-                    <CardDescription>Manage your conversation data</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <Button variant="outline" onClick={() => setShowClearHistoryDialog(true)} className="w-full">
-                      <Trash2 className="h-4 w-4 mr-2" />
-                      Clear All Conversations
-                    </Button>
-                    <Button variant="outline" onClick={handleExportData} className="w-full">
-                      <Download className="h-4 w-4 mr-2" />
-                      Export Chat History
-                    </Button>
-                  </CardContent>
-                </Card>
-              </div>
-            )}
-
-            {/* Display Settings */}
-            {activeSection === "display" && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Display Preferences</CardTitle>
-                  <CardDescription>Customize the appearance of the app</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div>
-                    <Label className="mb-3 block">Theme</Label>
-                    <RadioGroup
-                      value={settings.theme}
-                      onValueChange={(value) => updateSetting("theme", value as "light" | "dark" | "system")}
-                    >
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="light" id="theme-light" />
-                        <Label htmlFor="theme-light" className="cursor-pointer">
-                          Light
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="dark" id="theme-dark" />
-                        <Label htmlFor="theme-dark" className="cursor-pointer">
-                          Dark
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="system" id="theme-system" />
-                        <Label htmlFor="theme-system" className="cursor-pointer">
-                          System (Auto)
-                        </Label>
-                      </div>
-                    </RadioGroup>
-                  </div>
-
-                  <Separator />
-
-                  <div>
-                    <Label className="mb-3 block">Font Size</Label>
-                    <RadioGroup
-                      value={settings.font_size}
-                      onValueChange={(value) => updateSetting("font_size", value as "small" | "medium" | "large")}
-                    >
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="small" id="font-small" />
-                        <Label htmlFor="font-small" className="cursor-pointer text-sm">
-                          Small
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="medium" id="font-medium" />
-                        <Label htmlFor="font-medium" className="cursor-pointer">
-                          Medium
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="large" id="font-large" />
-                        <Label htmlFor="font-large" className="cursor-pointer text-lg">
-                          Large
-                        </Label>
-                      </div>
-                    </RadioGroup>
-                  </div>
-
-                  <Separator />
-
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <Label>Sidebar Collapsed by Default</Label>
-                      <p className="text-sm text-muted-foreground">Start with sidebar minimized</p>
-                    </div>
-                    <Switch
-                      checked={settings.sidebar_collapsed_default}
-                      onCheckedChange={(checked) => updateSetting("sidebar_collapsed_default", checked)}
-                    />
-                  </div>
-
-                  <Separator />
-
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <Label>Market Overview Panel Visible</Label>
-                      <p className="text-sm text-muted-foreground">Show market data panel on desktop</p>
-                    </div>
-                    <Switch
-                      checked={settings.market_panel_visible}
-                      onCheckedChange={(checked) => updateSetting("market_panel_visible", checked)}
-                    />
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
             {/* Data & Privacy */}
             {activeSection === "privacy" && (
               <div className="space-y-6">
@@ -1227,11 +894,6 @@ export default function SettingsPage() {
                     <CardDescription>Manage your data and privacy settings</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <Button variant="outline" onClick={handleExportData} className="w-full justify-start">
-                      <Download className="h-4 w-4 mr-2" />
-                      Download My Data
-                    </Button>
-                    <Separator />
                     <div className="space-y-2">
                       <h4 className="font-medium">Legal</h4>
                       <div className="space-y-1">
