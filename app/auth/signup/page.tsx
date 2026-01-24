@@ -81,6 +81,16 @@ export default function SignUpPage() {
     }
   }
 
+  const signInWithGoogle = async () => {
+    const supabase = createClient()
+    await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    })
+  }
+
   return (
     <div className="min-h-screen w-full bg-[#0a0a0c] flex flex-col items-center justify-center relative overflow-hidden font-sans text-white">
       <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_0%,_#1e1b4b_0%,_transparent_50%)] opacity-20 pointer-events-none" />
@@ -235,6 +245,26 @@ export default function SignUpPage() {
                 </p>
               </div>
             </form>
+
+            <div className="my-6 flex items-center gap-4 text-xs text-gray-500">
+              <div className="h-px flex-1 bg-white/10" />
+              <span>or continue with</span>
+              <div className="h-px flex-1 bg-white/10" />
+            </div>
+
+            <button
+              type="button"
+              onClick={signInWithGoogle}
+              className="w-full rounded-xl border border-white/10 bg-white px-4 py-3 text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100 flex items-center justify-center gap-3"
+            >
+              <svg className="h-5 w-5" viewBox="0 0 48 48" aria-hidden="true">
+                <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303C33.655 32.657 29.196 36 24 36c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.272 4 24 4 12.954 4 4 12.954 4 24s8.954 20 20 20 20-8.954 20-20c0-1.341-.138-2.65-.389-3.917Z"/>
+                <path fill="#FF3D00" d="M6.306 14.691 12.18 19.01C13.772 15.087 18.569 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.272 4 24 4 16.318 4 9.656 8.356 6.306 14.691Z"/>
+                <path fill="#4CAF50" d="M24 44c5.091 0 9.771-1.947 13.313-5.118l-6.149-5.207C29.14 35.091 26.715 36 24 36c-5.172 0-9.612-3.322-11.282-7.946l-6.05 4.66C9.999 39.556 16.505 44 24 44Z"/>
+                <path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303c-1.004 2.78-3.077 5.111-5.99 6.487l.001-.001 6.149 5.207C34.013 41.091 40 36 40 24c0-1.341-.138-2.65-.389-3.917Z"/>
+              </svg>
+              Sign in with Google
+            </button>
           </div>
         </div>
       </div>
