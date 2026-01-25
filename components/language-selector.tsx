@@ -10,7 +10,11 @@ import {
   SelectTrigger,
 } from '@/components/ui/select';
 
-export function LanguageSelector() {
+export function LanguageSelector({
+  triggerClassName,
+}: {
+  triggerClassName?: string;
+}) {
   const [locale, setLocale] = useState<Locale>('en');
   const router = useRouter();
 
@@ -35,7 +39,9 @@ export function LanguageSelector() {
 
   return (
     <Select value={locale} onValueChange={handleLanguageChange}>
-      <SelectTrigger className="w-[60px] h-9 px-2 bg-background border-border hover:bg-accent/50 transition-colors gap-0.5">
+      <SelectTrigger
+        className={`w-[60px] h-9 px-2 bg-background border-border hover:bg-accent/50 transition-colors gap-0.5 ${triggerClassName ?? ""}`}
+      >
         <span className="font-mono text-xs text-muted-foreground">
           {selectedLanguage.toUpperCase()}
         </span>

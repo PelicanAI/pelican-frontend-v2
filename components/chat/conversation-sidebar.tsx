@@ -393,9 +393,6 @@ export function ConversationSidebar({
 
       {/* Footer */}
       <div className="px-3 py-3 border-t border-sidebar-border/30">
-        <div className="flex items-center justify-between px-1 pb-2">
-          <LanguageSelector />
-        </div>
         <div className="flex items-center gap-2">
           <Button
             variant="ghost"
@@ -416,6 +413,7 @@ export function ConversationSidebar({
               </div>
             </Link>
           </Button>
+          <LanguageSelector triggerClassName="w-[48px] h-8 px-1 text-[11px]" />
           <Button
             variant="ghost"
             size="icon"
