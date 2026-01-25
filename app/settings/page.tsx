@@ -39,6 +39,7 @@ import { logger } from "@/lib/logger"
 import { CreditDisplay } from "@/components/credit-display"
 import { ManageSubscriptionButton } from "@/components/manage-subscription-button"
 import { useCreditsContext } from "@/providers/credits-provider"
+import { LanguageSelector } from "@/components/language-selector"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -439,35 +440,38 @@ export default function SettingsPage() {
               </Button>
               <h1 className="text-2xl font-bold text-foreground">Settings</h1>
             </div>
-            {user ? (
-              <Button
-                onClick={handleSave}
-                disabled={!hasUnsavedChanges || isSaving}
-                className="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800"
-              >
-                {isSaving ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Saving...
-                  </>
-                ) : (
-                  <>
-                    <Save className="h-4 w-4 mr-2" />
-                    Save Changes
-                  </>
-                )}
-              </Button>
-            ) : (
-              <Button
-                asChild
-                className="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800"
-              >
-                <Link href="/auth/signup">
-                  <User className="h-4 w-4 mr-2" />
-                  Sign Up to Save
-                </Link>
-              </Button>
-            )}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
+              <LanguageSelector />
+              {user ? (
+                <Button
+                  onClick={handleSave}
+                  disabled={!hasUnsavedChanges || isSaving}
+                  className="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800"
+                >
+                  {isSaving ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="h-4 w-4 mr-2" />
+                      Save Changes
+                    </>
+                  )}
+                </Button>
+              ) : (
+                <Button
+                  asChild
+                  className="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800"
+                >
+                  <Link href="/auth/signup">
+                    <User className="h-4 w-4 mr-2" />
+                    Sign Up to Save
+                  </Link>
+                </Button>
+              )}
+            </div>
           </div>
         </div>
       </div>
