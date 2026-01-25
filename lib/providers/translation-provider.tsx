@@ -18,25 +18,41 @@ export function TranslationProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Get locale from cookie
+    // Get locale from cookie (default to English if missing/invalid)
     const cookieLocale = document.cookie
       .split('; ')
       .find(row => row.startsWith('locale='))
-      ?.split('=')[1] as Locale;
-    
-    if (cookieLocale) {
-      setLocale(cookieLocale);
+      ?.split('=')[1] as Locale | undefined;
+
+    const isValidLocale =
+      !!cookieLocale &&
+      (translatedLocales as readonly string[]).includes(cookieLocale);
+    const initialLocale = (isValidLocale ? cookieLocale : 'en') as Locale;
+
+    if (!cookieLocale || !isValidLocale) {
+      document.cookie = `locale=en; path=/; max-age=31536000; SameSite=Lax`;
     }
+
+    setLocale(initialLocale);
 
     // Listen for locale changes (when user selects new language)
     const checkLocaleChange = () => {
       const newLocale = document.cookie
         .split('; ')
         .find(row => row.startsWith('locale='))
-        ?.split('=')[1] as Locale;
-      
-      if (newLocale && newLocale !== locale) {
-        setLocale(newLocale);
+        ?.split('=')[1] as Locale | undefined;
+
+      const isValidNewLocale =
+        !!newLocale &&
+        (translatedLocales as readonly string[]).includes(newLocale);
+      const resolvedLocale = (isValidNewLocale ? newLocale : 'en') as Locale;
+
+      if (!newLocale || !isValidNewLocale) {
+        document.cookie = `locale=en; path=/; max-age=31536000; SameSite=Lax`;
+      }
+
+      if (resolvedLocale !== locale) {
+        setLocale(resolvedLocale);
       }
     };
 
