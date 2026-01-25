@@ -56,6 +56,7 @@ interface MessageActionsProps {
   onPin?: (id: string) => void
   isRegenerating?: boolean
   canDelete?: boolean
+  variant?: "full" | "minimal"
 }
 
 export function MessageActions({
@@ -68,6 +69,7 @@ export function MessageActions({
   onPin,
   isRegenerating = false,
   canDelete = true,
+  variant = "full",
 }: MessageActionsProps) {
   // Defensive check - ensure content is always a string
   const safeContent = typeof message.content === 'string' ? message.content : String(message.content || '')
@@ -220,6 +222,42 @@ export function MessageActions({
           </Button>
         </div>
       </div>
+    )
+  }
+
+  if (variant === "minimal") {
+    return (
+      <TooltipProvider>
+        <div className="flex items-center gap-1 min-h-[28px]">
+          {message.isStreaming && onStop && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="sm" onClick={onStop} className="h-7 w-7 p-0">
+                  <Square className="w-3 h-3" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Stop generation</TooltipContent>
+            </Tooltip>
+          )}
+
+          {message.role === "assistant" && onRegenerate && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={onRegenerate}
+                  disabled={isRegenerating || message.isStreaming}
+                  className="h-7 w-7 p-0"
+                >
+                  {isRegenerating ? <Loader2 className="w-3 h-3 animate-spin" /> : <RotateCcw className="w-3 h-3" />}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>{isRegenerating ? "Regenerating..." : "Regenerate response"}</TooltipContent>
+            </Tooltip>
+          )}
+        </div>
+      </TooltipProvider>
     )
   }
 

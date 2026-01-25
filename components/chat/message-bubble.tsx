@@ -386,6 +386,7 @@ export function MessageBubble({
                   onPin={onPin}
                   isRegenerating={false}
                   canDelete={true}
+                  variant="minimal"
                 />
               )}
             </div>

@@ -22,6 +22,7 @@ export default function HomePage() {
   const { user } = useAuth();
   const t = useT();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const hasHeroTitle1 = t.marketing.hero.title1.trim().length > 0;
 
   const handleLaunchApp = () => {
     router.push('/auth/login');
@@ -126,7 +127,11 @@ export default function HomePage() {
           <div className="hero-content">
             <div className="hero-tag">{t.marketing.hero.betaTag}</div>
             <h1>
-              {t.marketing.hero.title1}<br />
+              {hasHeroTitle1 && (
+                <>
+                  {t.marketing.hero.title1}<br />
+                </>
+              )}
               {t.marketing.hero.title2} <span className="highlight">{t.marketing.hero.titleHighlight}</span><br />
               {t.marketing.hero.title3}
             </h1>

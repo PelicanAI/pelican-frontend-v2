@@ -275,7 +275,6 @@ export function ConversationSidebar({
             </span>
           </Link>
           <div className="flex items-center gap-1">
-            <LanguageSelector />
             <ThemeToggle />
             {onToggleCollapse && !isMobileSheet && (
               <Button
@@ -394,6 +393,9 @@ export function ConversationSidebar({
 
       {/* Footer */}
       <div className="px-3 py-3 border-t border-sidebar-border/30">
+        <div className="flex items-center justify-between px-1 pb-2">
+          <LanguageSelector />
+        </div>
         <div className="flex items-center gap-2">
           <Button
             variant="ghost"
