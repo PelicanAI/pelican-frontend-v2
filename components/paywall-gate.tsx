@@ -10,7 +10,7 @@ interface PaywallGateProps {
 }
 
 export function PaywallGate({ children, fallback }: PaywallGateProps) {
-  const { isSubscribed, loading } = useCreditsContext()
+  const { isSubscribed, isFounder, loading } = useCreditsContext()
 
   if (loading) {
     return (
@@ -20,7 +20,7 @@ export function PaywallGate({ children, fallback }: PaywallGateProps) {
     )
   }
 
-  if (!isSubscribed) {
+  if (!isSubscribed && !isFounder) {
     if (fallback) {
       return <>{fallback}</>
     }

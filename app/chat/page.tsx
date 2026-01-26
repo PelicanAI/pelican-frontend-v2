@@ -21,6 +21,7 @@ import { ThemeToggle } from "@/components/theme-toggle"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
 import { SettingsModal } from "@/components/settings-modal"
+import { PaywallGate } from "@/components/paywall-gate"
 
 // Loading screen component for chat page
 function ChatLoadingScreen() {
@@ -238,8 +239,9 @@ export default function ChatPage() {
   }
 
   return (
-    <ChatErrorBoundary onReset={() => clearMessages()}>
-      <div className="flex h-[100svh] min-h-[100svh] overflow-hidden relative chat-background-gradient">
+    <PaywallGate>
+      <ChatErrorBoundary onReset={() => clearMessages()}>
+        <div className="flex h-[100svh] min-h-[100svh] overflow-hidden relative chat-background-gradient">
       {/* Futuristic background effects - only in dark mode */}
       {/* <div className="absolute inset-0 dark:block hidden pointer-events-none">
         <div className="absolute inset-0 bg-gradient-to-br from-purple-950/10 via-black to-violet-950/10" />
@@ -454,7 +456,8 @@ export default function ChatPage() {
       )}
 
       <SettingsModal open={settingsOpen} onOpenChange={setSettingsOpen} />
-      </div>
-    </ChatErrorBoundary>
+        </div>
+      </ChatErrorBoundary>
+    </PaywallGate>
   )
 }
