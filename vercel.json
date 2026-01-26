@@ -13,6 +13,15 @@
   },
   "headers": [
     {
+      "source": "/demos/how-to-use/(.*)",
+      "headers": [
+        {
+          "key": "X-Frame-Options",
+          "value": "SAMEORIGIN"
+        }
+      ]
+    },
+    {
       "source": "/(.*)",
       "headers": [
         {
