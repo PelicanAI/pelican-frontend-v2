@@ -82,6 +82,8 @@ export default function HowToUsePage() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'traders' | 'investors'>('traders');
   const topRef = useRef<HTMLDivElement>(null);
+  const pendingScrollRestoreRef = useRef(false);
+  const lastScrollTopRef = useRef(0);
 
   const handleLaunchApp = () => {
     router.push('/auth/login');
@@ -122,6 +124,26 @@ export default function HowToUsePage() {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  // Preserve scroll position when switching tabs (iframes can trigger jumps)
+  useLayoutEffect(() => {
+    if (!pendingScrollRestoreRef.current) return;
+
+    const marketingPage = document.querySelector('.marketing-page') as HTMLElement | null;
+    const restore = () => {
+      window.scrollTo({ top: lastScrollTopRef.current, left: 0, behavior: 'instant' });
+      document.documentElement.scrollTop = lastScrollTopRef.current;
+      document.body.scrollTop = lastScrollTopRef.current;
+      if (marketingPage) {
+        marketingPage.scrollTop = lastScrollTopRef.current;
+      }
+    };
+
+    restore();
+    const timers = [0, 50, 150].map((delay) => setTimeout(restore, delay));
+    pendingScrollRestoreRef.current = false;
+    return () => timers.forEach(clearTimeout);
+  }, [activeTab]);
 
   // Force scroll to top on page load - must run before paint
   useLayoutEffect(() => {
@@ -171,6 +193,12 @@ export default function HowToUsePage() {
   }, []);
 
   const currentDemos = activeTab === 'traders' ? traderDemos : investorDemos;
+  const handleTabChange = (tab: 'traders' | 'investors') => {
+    if (tab === activeTab) return;
+    lastScrollTopRef.current = window.scrollY;
+    pendingScrollRestoreRef.current = true;
+    setActiveTab(tab);
+  };
 
   return (
     <div className="how-to-use-page">
@@ -274,13 +302,13 @@ export default function HowToUsePage() {
           <div className="tabs-container animate-on-scroll">
             <button
               className={`tab-button ${activeTab === 'traders' ? 'active' : ''}`}
-              onClick={() => setActiveTab('traders')}
+              onClick={() => handleTabChange('traders')}
             >
               For Traders
             </button>
             <button
               className={`tab-button ${activeTab === 'investors' ? 'active' : ''}`}
-              onClick={() => setActiveTab('investors')}
+              onClick={() => handleTabChange('investors')}
             >
               For Investors
             </button>

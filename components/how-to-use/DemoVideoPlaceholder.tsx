@@ -21,7 +21,7 @@ export default function DemoVideoPlaceholder({ demoSrc }: DemoVideoProps) {
     return (
       <div
         style={{
-          height: '600px',
+          height: 'clamp(240px, 70vw, 600px)',
           background: 'var(--bg-primary)',
           border: '1px solid var(--border-color)',
           display: 'flex',
@@ -58,22 +58,12 @@ export default function DemoVideoPlaceholder({ demoSrc }: DemoVideoProps) {
   }
 
   return (
-    <div
-      style={{
-        position: 'relative',
-        height: '600px',
-        background: '#0a0b0f',
-      }}
-    >
+    <div className="demo-video">
       <iframe
         key={key}
         ref={iframeRef}
         src={demoSrc}
-        style={{
-          width: '100%',
-          height: '100%',
-          border: 'none',
-        }}
+        className="demo-video-iframe"
         allow="autoplay"
         title="Demo video"
       />
