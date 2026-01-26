@@ -2,25 +2,8 @@
 
 interface SkillBadgeProps {
   level: 'beginner' | 'intermediate' | 'advanced';
+  audience?: 'trader' | 'investor';
 }
-
-const levelStyles = {
-  beginner: {
-    background: 'rgba(34, 197, 94, 0.15)',
-    color: '#4ade80',
-    borderColor: 'rgba(34, 197, 94, 0.3)',
-  },
-  intermediate: {
-    background: 'rgba(245, 158, 11, 0.15)',
-    color: '#fbbf24',
-    borderColor: 'rgba(245, 158, 11, 0.3)',
-  },
-  advanced: {
-    background: 'rgba(239, 68, 68, 0.15)',
-    color: '#f87171',
-    borderColor: 'rgba(239, 68, 68, 0.3)',
-  },
-};
 
 const levelLabels = {
   beginner: 'Beginner',
@@ -28,8 +11,8 @@ const levelLabels = {
   advanced: 'Advanced',
 };
 
-export default function SkillBadge({ level }: SkillBadgeProps) {
-  const styles = levelStyles[level];
+export default function SkillBadge({ level, audience }: SkillBadgeProps) {
+  const label = audience ? `${levelLabels[level]} ${audience}` : levelLabels[level];
 
   return (
     <span
@@ -37,9 +20,9 @@ export default function SkillBadge({ level }: SkillBadgeProps) {
         display: 'inline-flex',
         alignItems: 'center',
         padding: '0.35rem 0.75rem',
-        background: styles.background,
-        color: styles.color,
-        border: `1px solid ${styles.borderColor}`,
+        background: 'rgba(168, 85, 247, 0.15)',
+        color: '#c4b5fd',
+        border: '1px solid rgba(168, 85, 247, 0.35)',
         fontFamily: "'JetBrains Mono', monospace",
         fontSize: '0.7rem',
         fontWeight: 500,
@@ -47,7 +30,7 @@ export default function SkillBadge({ level }: SkillBadgeProps) {
         letterSpacing: '0.1em',
       }}
     >
-      {levelLabels[level]}
+      {label}
     </span>
   );
 }

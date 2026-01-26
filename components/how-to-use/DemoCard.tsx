@@ -11,6 +11,7 @@ interface DemoCardProps {
   features: string[];
   demoSrc?: string;
   reverse?: boolean;
+  audience?: 'trader' | 'investor';
 }
 
 export default function DemoCard({
@@ -21,6 +22,7 @@ export default function DemoCard({
   features,
   demoSrc,
   reverse = false,
+  audience,
 }: DemoCardProps) {
   return (
     <div className="demo-card animate-on-scroll">
@@ -36,7 +38,7 @@ export default function DemoCard({
       <div className="demo-card-content" style={{ order: reverse ? 1 : 2 }}>
         {/* Skill badge */}
         <div className="demo-card-skill">
-          <SkillBadge level={skillLevel} />
+          <SkillBadge level={skillLevel} audience={audience} />
         </div>
 
         {/* Title */}

@@ -330,6 +330,7 @@ export default function HowToUsePage() {
                 features={demo.features}
                 demoSrc={demo.demoSrc}
                 reverse={index % 2 === 1}
+                audience={activeTab === 'traders' ? 'trader' : 'investor'}
               />
             ))}
           </div>
