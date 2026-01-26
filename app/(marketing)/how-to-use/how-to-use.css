@@ -254,9 +254,9 @@
   }
 
   .demo-video {
-    height: auto;
-    min-height: 220px;
-    aspect-ratio: 16 / 9;
+    height: min(80vh, 700px);
+    min-height: 520px;
+    aspect-ratio: auto;
   }
 
   .tab-button {
