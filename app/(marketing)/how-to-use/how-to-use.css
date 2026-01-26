@@ -1,0 +1,148 @@
+/* How to Use Page Styles */
+
+/* Override smooth scroll for this page to prevent scroll-on-load issues */
+.marketing-page.no-smooth-scroll,
+.marketing-page.no-smooth-scroll * {
+  scroll-behavior: auto !important;
+}
+
+/* Hero Section - tight spacing */
+.how-to-use-hero {
+  padding-top: clamp(5rem, 8vw, 6rem);
+  padding-bottom: 0.75rem !important;
+}
+
+.how-to-use-hero .section-title {
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  margin-bottom: 0.5rem;
+}
+
+.how-to-use-hero .hero-content p {
+  margin-top: 0.75rem !important;
+  margin-bottom: 0 !important;
+}
+
+/* Tab Navigation - minimal spacing */
+.tabs-section {
+  padding-top: 1rem !important;
+  padding-bottom: 1rem !important;
+}
+
+.tabs-container {
+  display: flex;
+  justify-content: center;
+  gap: 0;
+  max-width: 400px;
+  margin: 0 auto;
+  border: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+}
+
+.tab-button {
+  flex: 1;
+  padding: 1rem 2rem;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.tab-button:hover {
+  color: var(--text-primary);
+  background: var(--bg-tertiary);
+}
+
+.tab-button.active {
+  color: var(--accent-purple);
+  background: var(--bg-primary);
+}
+
+.tab-button.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--accent-purple);
+}
+
+/* Demos Section - tight top spacing */
+.demos-section {
+  padding-top: 0.5rem !important;
+}
+
+.demos-container {
+  display: flex;
+  flex-direction: column;
+  gap: 4rem;
+}
+
+/* Demo Card Responsive Styles */
+.demo-card {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  align-items: center;
+}
+
+/* Responsive: Stack on tablet and mobile */
+@media (max-width: 1024px) {
+  .demo-card {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .demo-card-video {
+    order: 1 !important;
+  }
+
+  .demo-card-content {
+    order: 2 !important;
+  }
+
+  .tabs-container {
+    max-width: 100%;
+  }
+
+  .tab-button {
+    padding: 0.875rem 1.5rem;
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .how-to-use-hero {
+    padding-top: 5rem;
+    padding-bottom: 0.5rem !important;
+  }
+
+  .tabs-section {
+    padding-top: 0.75rem !important;
+    padding-bottom: 0.75rem !important;
+  }
+
+  .demos-section {
+    padding-top: 0.25rem !important;
+  }
+
+  .demos-container {
+    gap: 2.5rem;
+  }
+
+  .demo-card {
+    gap: 1.5rem;
+  }
+
+  .tab-button {
+    padding: 0.75rem 1rem;
+    font-size: 0.75rem;
+  }
+}

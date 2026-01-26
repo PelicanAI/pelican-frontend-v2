@@ -69,8 +69,8 @@
     },
     "what": {
       "title": "CURSOR IS FOR DEVELOPERS. PELICAN IS FOR TRADERS.",
-      "description1": "Stop juggling between TradingView, spreadsheets, and ChatGPT. Pelican is the unified AI platform that understands markets the way you do—through conversation.",
-      "description2": "Ask complex questions. Get structured answers with real data. Share branded analysis with one click. This is how trading intelligence should work.",
+      "description1": "Leave the tabs behind. Pelican brings charts, data, and AI together so you can ask market questions in plain English.",
+      "description2": "Turn ideas into clear, data-backed answers - fast, focused, and built for trading decisions.",
       "platformPrompt": "you:",
       "platformCommand": "backtest momentum strategy on SPY, last 6 months",
       "platformAnalyzing": "analyzing 126 trading sessions...",

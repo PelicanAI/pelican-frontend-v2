@@ -86,6 +86,7 @@ export default function HomePage() {
           </Link>
           <div className="nav-links">
             <a href="#features">{t.marketing.nav.features}</a>
+            <Link href="/how-to-use">How to Use</Link>
             <a href="#team">{t.marketing.nav.team}</a>
             <a href="#pricing">{t.marketing.nav.pricing}</a>
             <Link href="/faq">{t.marketing.nav.faq}</Link>
@@ -111,6 +112,7 @@ export default function HomePage() {
         >
           <div className="nav-mobile-inner">
             <a href="#features" onClick={() => setMobileNavOpen(false)}>{t.marketing.nav.features}</a>
+            <Link href="/how-to-use" onClick={() => setMobileNavOpen(false)}>How to Use</Link>
             <a href="#team" onClick={() => setMobileNavOpen(false)}>{t.marketing.nav.team}</a>
             <a href="#pricing" onClick={() => setMobileNavOpen(false)}>{t.marketing.nav.pricing}</a>
             <Link href="/faq" onClick={() => setMobileNavOpen(false)}>{t.marketing.nav.faq}</Link>
@@ -141,6 +143,7 @@ export default function HomePage() {
             <div className="hero-cta">
               <button onClick={() => handleSignUp()} className="btn-primary">{t.marketing.hero.startTrading}</button>
               <a href="#features" className="btn-secondary">{t.marketing.hero.seeFeatures}</a>
+              <Link href="/how-to-use" className="btn-secondary">Pelican in Action</Link>
             </div>
             <div className="stats-bar">
               <div className="stat">

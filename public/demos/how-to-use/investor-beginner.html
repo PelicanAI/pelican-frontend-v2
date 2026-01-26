@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pelican AI - Investor Beginner Demo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg-primary: #0a0b0f;
+      --bg-container: rgba(16, 16, 22, 0.95);
+      --bg-surface: rgba(20, 20, 28, 0.9);
+      --bg-input: rgba(24, 24, 32, 0.95);
+      --text-primary: rgba(255, 255, 255, 0.95);
+      --text-secondary: rgba(255, 255, 255, 0.7);
+      --text-muted: rgba(255, 255, 255, 0.4);
+      --border-color: rgba(168, 85, 247, 0.2);
+      --purple-primary: #a855f7;
+      --purple-secondary: #8b5cf6;
+      --green-online: #22c55e;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      overflow: hidden;
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding-top: 0;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .corner-bracket { position: absolute; width: 20px; height: 20px; border-color: var(--purple-primary); border-style: solid; opacity: 0.6; }
+    .corner-bracket.top-left { top: -1px; left: -1px; border-width: 2px 0 0 2px; }
+    .corner-bracket.top-right { top: -1px; right: -1px; border-width: 2px 2px 0 0; }
+    .corner-bracket.bottom-left { bottom: -1px; left: -1px; border-width: 0 0 2px 2px; }
+    .corner-bracket.bottom-right { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; }
+
+    .chat-container {
+      width: 100%; max-width: 600px; height: 580px;
+      background: var(--bg-container);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      display: flex; flex-direction: column;
+      position: relative; overflow: hidden;
+      opacity: 0; transform: scale(0.98);
+      transition: all 0.5s ease;
+    }
+    .chat-container.visible { opacity: 1; transform: scale(1); }
+
+    .chat-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border-color);
+      background: rgba(10, 10, 15, 0.5);
+    }
+    .header-left { display: flex; align-items: center; gap: 12px; }
+    .header-logo { width: 28px; height: 28px; object-fit: contain; filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.4)); }
+    .header-title { font-size: 16px; font-weight: 600; color: var(--text-primary); }
+    .header-status { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-secondary); }
+    .status-dot { width: 8px; height: 8px; background: var(--green-online); border-radius: 50%; animation: pulse 2s ease-in-out infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+    .messages-area { flex: 1; overflow-y: auto; padding: 24px 20px 20px 20px; display: flex; flex-direction: column; gap: 16px; scroll-behavior: smooth; }
+    .message { display: flex; gap: 10px; opacity: 0; transform: translateY(15px); transition: all 0.5s ease; max-width: 85%; }
+    .message.visible { opacity: 1; transform: translateY(0); }
+    .message.user { align-self: flex-end; flex-direction: row-reverse; }
+    .message.assistant { align-self: flex-start; }
+
+    .avatar { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .avatar.user { background: linear-gradient(135deg, var(--purple-primary), var(--purple-secondary)); font-size: 14px; font-weight: 600; color: white; }
+    .avatar.assistant { background: var(--bg-surface); border: 1px solid var(--border-color); padding: 4px; overflow: hidden; }
+    .avatar.assistant img { width: 100%; height: 100%; object-fit: contain; }
+
+    .message-bubble { padding: 12px 16px; border-radius: 16px; font-size: 14px; line-height: 1.6; }
+    .message.user .message-bubble { background: linear-gradient(135deg, var(--purple-primary), var(--purple-secondary)); color: white; border-bottom-right-radius: 4px; }
+    .message.assistant .message-bubble { background: var(--bg-surface); color: var(--text-primary); border: 1px solid var(--border-color); border-bottom-left-radius: 4px; }
+    .message-text { white-space: pre-wrap; word-break: break-word; }
+    .message-text strong { color: var(--purple-primary); font-weight: 600; }
+
+    .typing-indicator { display: flex; gap: 4px; padding: 4px 0; }
+    .typing-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--purple-primary); animation: typingBounce 0.6s ease-in-out infinite; }
+    .typing-dot:nth-child(1) { animation-delay: 0s; }
+    .typing-dot:nth-child(2) { animation-delay: 0.15s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.3s; }
+    @keyframes typingBounce { 0%, 60%, 100% { transform: translateY(0); opacity: 0.4; } 30% { transform: translateY(-6px); opacity: 1; } }
+
+    .input-bar { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-top: 1px solid var(--border-color); background: rgba(10, 10, 15, 0.5); }
+    .input-wrapper { flex: 1; display: flex; align-items: center; gap: 10px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 24px; padding: 8px 12px; transition: all 0.3s ease; }
+    .input-wrapper.focused { border-color: var(--purple-primary); box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.1); }
+    .attach-btn { width: 32px; height: 32px; background: transparent; border: none; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
+    .chat-input { flex: 1; background: transparent; border: none; color: var(--text-primary); font-family: inherit; font-size: 14px; outline: none; min-height: 24px; }
+    .chat-input::placeholder { color: var(--text-muted); }
+    .send-btn { width: 36px; height: 36px; background: var(--purple-primary); border: none; border-radius: 50%; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 10px rgba(168, 85, 247, 0.3); }
+
+    .demo-cursor { position: fixed; width: 20px; height: 20px; pointer-events: none; z-index: 9999; opacity: 0; transition: transform 0.15s ease; }
+    .demo-cursor.visible { opacity: 1; }
+    .demo-cursor.clicking { transform: scale(0.85); }
+    .cursor-svg { width: 100%; height: 100%; filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.4)); }
+
+    .messages-area::-webkit-scrollbar { width: 5px; }
+    .messages-area::-webkit-scrollbar-track { background: transparent; }
+    .messages-area::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.2); border-radius: 3px; }
+  </style>
+</head>
+<body>
+  <div class="demo-cursor" id="demoCursor">
+    <svg class="cursor-svg" viewBox="0 0 24 24" fill="none">
+      <path d="M5.5 3.21V20.8c0 .45.54.67.85.35l4.86-5.12h8.29c.38 0 .57-.46.3-.74L6.35 2.94a.5.5 0 00-.85.27z" fill="white" stroke="black" stroke-width="1"/>
+    </svg>
+  </div>
+
+  <div class="chat-container" id="chatContainer">
+    <div class="corner-bracket top-left"></div>
+    <div class="corner-bracket top-right"></div>
+    <div class="corner-bracket bottom-left"></div>
+    <div class="corner-bracket bottom-right"></div>
+
+    <div class="chat-header">
+      <div class="header-left">
+        <img src="./pelican-logo-transparent.png" alt="Pelican" class="header-logo" id="headerLogo">
+        <span class="header-title">Pelican AI</span>
+      </div>
+      <div class="header-status"><span class="status-dot"></span><span>Online</span></div>
+    </div>
+
+    <div class="messages-area" id="messagesArea"></div>
+
+    <div class="input-bar">
+      <div class="input-wrapper" id="inputWrapper">
+        <button class="attach-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg></button>
+        <input type="text" class="chat-input" id="chatInput" placeholder="Ask Pelican anything...">
+      </div>
+      <button class="send-btn" id="sendBtn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+    </div>
+  </div>
+
+  <script>
+    const CONFIG = {
+      prompt: "What does NVIDIA do and why is everyone talking about it?",
+      response: `Great question! Let me break it down simply:
+
+**What NVIDIA Does:**
+NVIDIA designs and sells graphics processing units (GPUs) - specialized chips originally made for rendering video game graphics. But here's where it gets interesting...
+
+**Why Everyone's Talking About It:**
+
+1. **AI Boom:** NVIDIA's GPUs turned out to be perfect for training artificial intelligence. ChatGPT, image generators, self-driving cars - they all run on NVIDIA chips. The company basically powers the AI revolution.
+
+2. **Data Center Dominance:** Their data center revenue exploded from $3B to $47B in just two years. Companies like Microsoft, Google, and Amazon are buying NVIDIA chips by the truckload.
+
+3. **Stock Performance:** NVDA went from $15 to over $140 in 5 years. Early investors made life-changing returns.
+
+**The Bull Case:** AI is just getting started, and NVIDIA has an 80%+ market share in AI chips.
+
+**The Bear Case:** At $3.5T market cap, high expectations are already priced in. Competition from AMD and custom chips from big tech could pressure margins.
+
+Want me to show you NVIDIA's financials or compare it to competitors?`,
+
+      typingSpeed: 50,
+      streamingSpeed: 30,
+      holdDuration: 2500,
+      logoPath: "./pelican-logo-transparent.png"
+    };
+
+    const cursor = document.getElementById('demoCursor');
+    const chatContainer = document.getElementById('chatContainer');
+    const messagesArea = document.getElementById('messagesArea');
+    const chatInput = document.getElementById('chatInput');
+    const inputWrapper = document.getElementById('inputWrapper');
+    const sendBtn = document.getElementById('sendBtn');
+
+    let cursorX = window.innerWidth / 2, cursorY = window.innerHeight / 2;
+
+    function delay(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
+    function updateCursor() { cursor.style.left = cursorX + 'px'; cursor.style.top = cursorY + 'px'; }
+
+    async function moveCursor(targetX, targetY, duration = 900) {
+      return new Promise(resolve => {
+        const startX = cursorX, startY = cursorY, startTime = performance.now();
+        function animate(currentTime) {
+          const elapsed = currentTime - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+          const easeProgress = 1 - Math.pow(1 - progress, 3);
+          cursorX = startX + (targetX - startX) * easeProgress;
+          cursorY = startY + (targetY - startY) * easeProgress;
+          updateCursor();
+          if (progress < 1) requestAnimationFrame(animate); else resolve();
+        }
+        requestAnimationFrame(animate);
+      });
+    }
+
+    async function clickAnimation() { cursor.classList.add('clicking'); await delay(150); cursor.classList.remove('clicking'); await delay(150); }
+    async function typeText(el, text, speed = 50) { for (let i = 0; i < text.length; i++) { el.value = text.substring(0, i + 1); await delay(speed); } }
+
+    async function streamText(el, text, speed = 30) {
+      const words = text.split(' '); let currentText = '';
+      for (let i = 0; i < words.length; i++) {
+        currentText += (i > 0 ? ' ' : '') + words[i];
+        el.innerHTML = currentText.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+        messagesArea.scrollTop = messagesArea.scrollHeight;
+        await delay(speed);
+      }
+    }
+
+    function addUserMessage(text) {
+      const div = document.createElement('div'); div.className = 'message user';
+      div.innerHTML = `<div class="message-bubble"><div class="message-text">${text}</div></div><div class="avatar user">U</div>`;
+      messagesArea.appendChild(div); setTimeout(() => div.classList.add('visible'), 50);
+      // Don't auto-scroll - keep user message visible
+      return div;
+    }
+
+    function addTypingIndicator() {
+      const div = document.createElement('div'); div.className = 'message assistant visible'; div.id = 'typingIndicator';
+      div.innerHTML = `<div class="avatar assistant"><img src="${CONFIG.logoPath}" alt="AI" onerror="this.parentElement.innerHTML='P'"></div><div class="message-bubble"><div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div>`;
+      messagesArea.appendChild(div);
+      // Don't auto-scroll - keep user message visible
+      return div;
+    }
+
+    function removeTypingIndicator() { const el = document.getElementById('typingIndicator'); if (el) el.remove(); }
+
+    function addAssistantMessage() {
+      const div = document.createElement('div'); div.className = 'message assistant';
+      div.innerHTML = `<div class="avatar assistant"><img src="${CONFIG.logoPath}" alt="AI" onerror="this.parentElement.innerHTML='P'"></div><div class="message-bubble"><div class="message-text" id="streamingText"></div></div>`;
+      messagesArea.appendChild(div); setTimeout(() => div.classList.add('visible'), 50);
+      // Don't auto-scroll - let streamText handle scrolling
+      return div;
+    }
+
+    async function runDemo() {
+      await delay(500); chatContainer.classList.add('visible'); await delay(500);
+      cursor.classList.add('visible'); await delay(500);
+      const inputRect = chatInput.getBoundingClientRect();
+      await moveCursor(inputRect.left + 100, inputRect.top + 12, 750);
+      await clickAnimation(); inputWrapper.classList.add('focused'); chatInput.focus(); await delay(500);
+      await typeText(chatInput, CONFIG.prompt, CONFIG.typingSpeed); await delay(400);
+      const sendRect = sendBtn.getBoundingClientRect();
+      await moveCursor(sendRect.left + 18, sendRect.top + 18, 450); await delay(200); await clickAnimation();
+      cursor.classList.remove('visible');
+      addUserMessage(CONFIG.prompt); chatInput.value = ''; inputWrapper.classList.remove('focused');
+      await delay(800); addTypingIndicator(); await delay(800);
+      removeTypingIndicator();
+      const msg = addAssistantMessage();
+      await streamText(msg.querySelector('#streamingText'), CONFIG.response, CONFIG.streamingSpeed);
+      await delay(CONFIG.holdDuration);
+    }
+
+    window.addEventListener('load', () => { document.getElementById('headerLogo').onerror = function() { this.style.display = 'none'; }; runDemo(); });
+  </script>
+</body>
+</html>
