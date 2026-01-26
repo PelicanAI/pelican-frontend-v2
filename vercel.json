@@ -22,7 +22,7 @@
       ]
     },
     {
-      "source": "/(.*)",
+      "source": "/((?!demos/how-to-use/).*)",
       "headers": [
         {
           "key": "X-Content-Type-Options",
