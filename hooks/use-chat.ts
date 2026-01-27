@@ -140,6 +140,8 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(
     initialConversationId ?? null
   );
+  const failedConversationsRef = useRef<Set<string>>(new Set());
+  const previousConversationIdRef = useRef<string | null>(null);
 
   // ---------------------------------------------------------------------------
   // SESSION BACKUP HELPERS
@@ -313,6 +315,11 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
   // ---------------------------------------------------------------------------
 
   const loadMessages = useCallback(async (conversationId: string): Promise<boolean> => {
+    if (failedConversationsRef.current.has(conversationId)) {
+      setConversationNotFound(true);
+      return false;
+    }
+
     if (loadingAbortRef.current) {
       loadingAbortRef.current.abort();
     }
@@ -356,7 +363,9 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
       }
       
       if (!response.ok) {
-        throw new Error(`Failed to load messages: ${response.status}`);
+        failedConversationsRef.current.add(conversationId);
+        setConversationNotFound(true);
+        return false;
       }
       
       const data = await response.json();
@@ -723,6 +732,12 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
     
     if (loadedConversationRef.current === conversationId) {
       return;
+    }
+
+    if (previousConversationIdRef.current !== conversationId) {
+      // New conversation selected - clear failed cache
+      failedConversationsRef.current.clear();
+      previousConversationIdRef.current = conversationId;
     }
 
     setCurrentConversationId(conversationId);
