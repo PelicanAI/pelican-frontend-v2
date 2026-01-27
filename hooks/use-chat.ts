@@ -152,6 +152,33 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
     return `${STORAGE_PREFIX}${conversationId}`;
   }, []);
 
+  const safeSessionStorageGet = useCallback((key: string): string | null => {
+    if (typeof window === 'undefined') return null;
+    try {
+      return sessionStorage.getItem(key);
+    } catch {
+      return null;
+    }
+  }, []);
+
+  const safeSessionStorageSet = useCallback((key: string, value: string) => {
+    if (typeof window === 'undefined') return;
+    try {
+      sessionStorage.setItem(key, value);
+    } catch {
+      // Ignore storage failures (private mode, disabled storage, quota, etc.)
+    }
+  }, []);
+
+  const safeSessionStorageRemove = useCallback((key: string) => {
+    if (typeof window === 'undefined') return;
+    try {
+      sessionStorage.removeItem(key);
+    } catch {
+      // Ignore storage failures
+    }
+  }, []);
+
   const serializeMessages = useCallback((messagesToStore: Message[]) => {
     return messagesToStore.map((msg) => ({
       ...msg,
@@ -162,8 +189,7 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
 
   const loadBackupMessages = useCallback(
     (conversationId: string): Message[] | null => {
-      if (typeof window === 'undefined') return null;
-      const raw = sessionStorage.getItem(getBackupKey(conversationId));
+      const raw = safeSessionStorageGet(getBackupKey(conversationId));
       if (!raw) return null;
       try {
         const parsed = JSON.parse(raw);
@@ -181,25 +207,23 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
 
   const persistBackupMessages = useCallback(
     (conversationId: string, nextMessages: Message[]) => {
-      if (typeof window === 'undefined') return;
       const payload = JSON.stringify(serializeMessages(nextMessages));
-      sessionStorage.setItem(getBackupKey(conversationId), payload);
-      sessionStorage.setItem(LAST_CONVERSATION_KEY, conversationId);
+      safeSessionStorageSet(getBackupKey(conversationId), payload);
+      safeSessionStorageSet(LAST_CONVERSATION_KEY, conversationId);
     },
-    [getBackupKey, serializeMessages]
+    [getBackupKey, serializeMessages, safeSessionStorageSet]
   );
 
   const moveBackupMessages = useCallback(
     (fromId: string, toId: string) => {
-      if (typeof window === 'undefined') return;
-      const raw = sessionStorage.getItem(getBackupKey(fromId));
+      const raw = safeSessionStorageGet(getBackupKey(fromId));
       if (raw) {
-        sessionStorage.setItem(getBackupKey(toId), raw);
-        sessionStorage.removeItem(getBackupKey(fromId));
+        safeSessionStorageSet(getBackupKey(toId), raw);
+        safeSessionStorageRemove(getBackupKey(fromId));
       }
-      sessionStorage.setItem(LAST_CONVERSATION_KEY, toId);
+      safeSessionStorageSet(LAST_CONVERSATION_KEY, toId);
     },
-    [getBackupKey]
+    [getBackupKey, safeSessionStorageGet, safeSessionStorageRemove, safeSessionStorageSet]
   );
 
   // ---------------------------------------------------------------------------
@@ -671,21 +695,19 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
     const conversationId = initialConversationId;
     
     if (!conversationId) {
-      if (typeof window !== 'undefined') {
-        const lastConversationId = sessionStorage.getItem(LAST_CONVERSATION_KEY);
-        if (lastConversationId) {
-          const backup = loadBackupMessages(lastConversationId);
-          if (backup && backup.length > 0) {
-            logger.info('[CHAT-LOAD] Restoring messages from session backup (no URL param)', {
-              conversationId: lastConversationId,
-              count: backup.length,
-            });
-            updateMessagesWithSync(() => backup);
-            loadedConversationRef.current = lastConversationId;
-            setCurrentConversationId(lastConversationId);
-            onConversationCreated?.(lastConversationId);
-            return;
-          }
+      const lastConversationId = safeSessionStorageGet(LAST_CONVERSATION_KEY);
+      if (lastConversationId) {
+        const backup = loadBackupMessages(lastConversationId);
+        if (backup && backup.length > 0) {
+          logger.info('[CHAT-LOAD] Restoring messages from session backup (no URL param)', {
+            conversationId: lastConversationId,
+            count: backup.length,
+          });
+          updateMessagesWithSync(() => backup);
+          loadedConversationRef.current = lastConversationId;
+          setCurrentConversationId(lastConversationId);
+          onConversationCreated?.(lastConversationId);
+          return;
         }
       }
 
@@ -711,7 +733,7 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
         loadingAbortRef.current.abort();
       }
     };
-  }, [initialConversationId, loadBackupMessages, onConversationCreated, updateMessagesWithSync]);
+  }, [initialConversationId, loadBackupMessages, onConversationCreated, updateMessagesWithSync, safeSessionStorageGet]);
 
   useEffect(() => {
     currentConversationIdRef.current = currentConversationId;
