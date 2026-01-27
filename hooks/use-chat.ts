@@ -142,6 +142,67 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
   );
 
   // ---------------------------------------------------------------------------
+  // SESSION BACKUP HELPERS
+  // ---------------------------------------------------------------------------
+
+  const STORAGE_PREFIX = 'pelican_chat_backup_';
+  const LAST_CONVERSATION_KEY = 'pelican_last_conversation_id';
+
+  const getBackupKey = useCallback((conversationId: string) => {
+    return `${STORAGE_PREFIX}${conversationId}`;
+  }, []);
+
+  const serializeMessages = useCallback((messagesToStore: Message[]) => {
+    return messagesToStore.map((msg) => ({
+      ...msg,
+      timestamp:
+        msg.timestamp instanceof Date ? msg.timestamp.toISOString() : msg.timestamp,
+    }));
+  }, []);
+
+  const loadBackupMessages = useCallback(
+    (conversationId: string): Message[] | null => {
+      if (typeof window === 'undefined') return null;
+      const raw = sessionStorage.getItem(getBackupKey(conversationId));
+      if (!raw) return null;
+      try {
+        const parsed = JSON.parse(raw);
+        if (!Array.isArray(parsed)) return null;
+        return parsed.map((msg) => ({
+          ...msg,
+          timestamp: msg.timestamp ? new Date(msg.timestamp) : new Date(),
+        }));
+      } catch {
+        return null;
+      }
+    },
+    [getBackupKey]
+  );
+
+  const persistBackupMessages = useCallback(
+    (conversationId: string, nextMessages: Message[]) => {
+      if (typeof window === 'undefined') return;
+      const payload = JSON.stringify(serializeMessages(nextMessages));
+      sessionStorage.setItem(getBackupKey(conversationId), payload);
+      sessionStorage.setItem(LAST_CONVERSATION_KEY, conversationId);
+    },
+    [getBackupKey, serializeMessages]
+  );
+
+  const moveBackupMessages = useCallback(
+    (fromId: string, toId: string) => {
+      if (typeof window === 'undefined') return;
+      const raw = sessionStorage.getItem(getBackupKey(fromId));
+      if (raw) {
+        sessionStorage.setItem(getBackupKey(toId), raw);
+        sessionStorage.removeItem(getBackupKey(fromId));
+      }
+      sessionStorage.setItem(LAST_CONVERSATION_KEY, toId);
+    },
+    [getBackupKey]
+  );
+
+  // ---------------------------------------------------------------------------
   // REFS
   // ---------------------------------------------------------------------------
 
@@ -149,6 +210,8 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
   const loadedConversationRef = useRef<string | null>(null);
   const lastSentMessageRef = useRef<string | null>(null);
   const loadingAbortRef = useRef<AbortController | null>(null);
+  const currentConversationIdRef = useRef<string | null>(currentConversationId);
+  const tempConversationIdRef = useRef<string | null>(null);
   
   // FIX: Refs for streaming throttle
   const lastStreamingUpdateRef = useRef<number>(0);
@@ -251,6 +314,17 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
       
       if (response.status === 404) {
         logger.info('[CHAT-LOAD] No messages yet (new conversation)', { conversationId });
+        const backup = loadBackupMessages(conversationId);
+        if (backup && backup.length > 0) {
+          logger.info('[CHAT-LOAD] Restoring messages from session backup', {
+            conversationId,
+            count: backup.length,
+          });
+          updateMessagesWithSync(() => backup);
+          loadedConversationRef.current = conversationId;
+          setConversationNotFound(false);
+          return true;
+        }
         updateMessagesWithSync(() => []);
         loadedConversationRef.current = conversationId;
         setConversationNotFound(false);
@@ -275,9 +349,22 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
         isStreaming: false,
       }));
       
-      logger.info('[CHAT-LOAD] Loaded messages', { 
-        conversationId, 
-        count: loadedMessages.length 
+      if (loadedMessages.length === 0) {
+        const backup = loadBackupMessages(conversationId);
+        if (backup && backup.length > 0) {
+          logger.info('[CHAT-LOAD] Restoring messages from session backup', {
+            conversationId,
+            count: backup.length,
+          });
+          updateMessagesWithSync(() => backup);
+          loadedConversationRef.current = conversationId;
+          return true;
+        }
+      }
+
+      logger.info('[CHAT-LOAD] Loaded messages', {
+        conversationId,
+        count: loadedMessages.length,
       });
       
       updateMessagesWithSync(() => loadedMessages);
@@ -293,6 +380,16 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
       
       if (error.name !== 'AbortError') {
         logger.error('[CHAT-LOAD] Failed to load messages', error);
+        const backup = loadBackupMessages(conversationId);
+        if (backup && backup.length > 0) {
+          logger.info('[CHAT-LOAD] Restoring messages from session backup after error', {
+            conversationId,
+            count: backup.length,
+          });
+          updateMessagesWithSync(() => backup);
+          loadedConversationRef.current = conversationId;
+          return true;
+        }
         setError(error);
         onError?.(error);
       }
@@ -305,7 +402,7 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
         loadingAbortRef.current = null;
       }
     }
-  }, [updateMessagesWithSync, onError]);
+  }, [updateMessagesWithSync, onError, loadBackupMessages]);
 
   // ---------------------------------------------------------------------------
   // SEND MESSAGE - STREAMING (with throttle fix)
@@ -335,12 +432,22 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
 
       const userMessage = createUserMessage(content, sendOptions.attachments);
       const conversationHistory = captureConversationHistory();
+      let conversationIdForSend = currentConversationIdRef.current;
+
+      if (!conversationIdForSend) {
+        const tempId = `temp_${typeof crypto !== 'undefined' && 'randomUUID' in crypto ? crypto.randomUUID() : createMessageId()}`;
+        tempConversationIdRef.current = tempId;
+        conversationIdForSend = tempId;
+        loadedConversationRef.current = tempId;
+        setCurrentConversationId(tempId);
+        onConversationCreated?.(tempId);
+      }
 
       logger.info('[CHAT-SEND] Preparing to send message', {
         messageLength: content.length,
         historyLength: conversationHistory.length,
-        conversationId: currentConversationId,
-        isNewConversation: !currentConversationId,
+        conversationId: conversationIdForSend,
+        isNewConversation: !currentConversationIdRef.current,
       });
 
       if (!sendOptions.skipUserMessage) {
@@ -409,14 +516,19 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
               }
               pendingStreamingContentRef.current = '';
               
-              if (!currentConversationId && newConversationId) {
+              if (newConversationId && newConversationId !== conversationIdForSend) {
                 logger.info('[CHAT-COMPLETE] Capturing conversation ID from backend', {
                   conversationId: newConversationId,
                 });
                 
                 // FIX: Prevent useEffect from refetching messages
                 loadedConversationRef.current = newConversationId;
-                
+
+                if (tempConversationIdRef.current) {
+                  moveBackupMessages(tempConversationIdRef.current, newConversationId);
+                  tempConversationIdRef.current = null;
+                }
+
                 setCurrentConversationId(newConversationId);
                 onConversationCreated?.(newConversationId);
               }
@@ -454,7 +566,7 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
               logger.error('[CHAT-ERROR] Streaming error', err);
             },
           },
-          currentConversationId,
+          conversationIdForSend,
           sendOptions.fileIds || []
         );
       } catch (err) {
@@ -479,6 +591,7 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
       onConversationCreated,
       sendStreamingMessage,
       updateMessagesWithSync,
+      moveBackupMessages,
     ]
   );
 
@@ -558,6 +671,24 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
     const conversationId = initialConversationId;
     
     if (!conversationId) {
+      if (typeof window !== 'undefined') {
+        const lastConversationId = sessionStorage.getItem(LAST_CONVERSATION_KEY);
+        if (lastConversationId) {
+          const backup = loadBackupMessages(lastConversationId);
+          if (backup && backup.length > 0) {
+            logger.info('[CHAT-LOAD] Restoring messages from session backup (no URL param)', {
+              conversationId: lastConversationId,
+              count: backup.length,
+            });
+            updateMessagesWithSync(() => backup);
+            loadedConversationRef.current = lastConversationId;
+            setCurrentConversationId(lastConversationId);
+            onConversationCreated?.(lastConversationId);
+            return;
+          }
+        }
+      }
+
       if (messagesRef.current.length > 0) {
         setMessages([]);
         messagesRef.current = [];
@@ -580,7 +711,17 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
         loadingAbortRef.current.abort();
       }
     };
-  }, [initialConversationId]);
+  }, [initialConversationId, loadBackupMessages, onConversationCreated, updateMessagesWithSync]);
+
+  useEffect(() => {
+    currentConversationIdRef.current = currentConversationId;
+  }, [currentConversationId]);
+
+  useEffect(() => {
+    if (currentConversationId) {
+      persistBackupMessages(currentConversationId, messages);
+    }
+  }, [currentConversationId, messages, persistBackupMessages]);
 
   useEffect(() => {
     messagesRef.current = messages;
