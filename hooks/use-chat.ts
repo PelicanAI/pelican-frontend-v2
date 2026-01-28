@@ -234,6 +234,7 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
 
   const messagesRef = useRef<Message[]>([]);
   const loadedConversationRef = useRef<string | null>(null);
+  const loadingConversationRef = useRef<string | null>(null);
   const lastSentMessageRef = useRef<string | null>(null);
   const loadingAbortRef = useRef<AbortController | null>(null);
   const currentConversationIdRef = useRef<string | null>(currentConversationId);
@@ -436,6 +437,9 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
       }
       return false;
     } finally {
+      // Clear loading lock (always, success or failure)
+      loadingConversationRef.current = null;
+      
       if (!abortController.signal.aborted) {
         setIsLoadingMessages(false);
       }
@@ -753,12 +757,12 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
     if (loadedConversationRef.current === conversationId) {
       return;
     }
-
-    // FIX: Set ref IMMEDIATELY to prevent re-render loops
-    // loadMessages triggers state updates (setIsLoadingMessages, etc.) which cause
-    // React to re-run this effect. Without setting the ref first, the guard above
-    // fails repeatedly, causing infinite "[CHAT-LOAD] Loading conversation" loops.
-    loadedConversationRef.current = conversationId;
+    
+    // Loading lock - prevents re-render loops during async fetch
+    if (loadingConversationRef.current === conversationId) {
+      return;
+    }
+    loadingConversationRef.current = conversationId;
 
     if (previousConversationIdRef.current !== conversationId) {
       failedConversationsRef.current.clear();
