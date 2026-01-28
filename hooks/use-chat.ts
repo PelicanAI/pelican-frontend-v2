@@ -754,6 +754,12 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
       return;
     }
 
+    // FIX: Set ref IMMEDIATELY to prevent re-render loops
+    // loadMessages triggers state updates (setIsLoadingMessages, etc.) which cause
+    // React to re-run this effect. Without setting the ref first, the guard above
+    // fails repeatedly, causing infinite "[CHAT-LOAD] Loading conversation" loops.
+    loadedConversationRef.current = conversationId;
+
     if (previousConversationIdRef.current !== conversationId) {
       failedConversationsRef.current.clear();
       previousConversationIdRef.current = conversationId;
