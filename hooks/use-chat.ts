@@ -315,6 +315,12 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
   // ---------------------------------------------------------------------------
 
   const loadMessages = useCallback(async (conversationId: string): Promise<boolean> => {
+    // Don't try to load temp_ IDs from API
+    if (conversationId.startsWith('temp_')) {
+      logger.warn('[CHAT-LOAD] Skipping API fetch for temp ID', { conversationId });
+      return false;
+    }
+
     if (failedConversationsRef.current.has(conversationId)) {
       setConversationNotFound(true);
       return false;
@@ -705,7 +711,12 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
     
     if (!conversationId) {
       const lastConversationId = safeSessionStorageGet(LAST_CONVERSATION_KEY);
-      if (lastConversationId) {
+      
+      // Don't restore temp_ IDs - they're client-side only and will 403
+      if (lastConversationId && lastConversationId.startsWith('temp_')) {
+        safeSessionStorageRemove(LAST_CONVERSATION_KEY);
+        // Don't restore, start fresh
+      } else if (lastConversationId) {
         const backup = loadBackupMessages(lastConversationId);
         if (backup && backup.length > 0) {
           logger.info('[CHAT-LOAD] Restoring messages from session backup (no URL param)', {
@@ -715,7 +726,8 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
           updateMessagesWithSync(() => backup);
           loadedConversationRef.current = lastConversationId;
           setCurrentConversationId(lastConversationId);
-          onConversationCreated?.(lastConversationId);
+          // DON'T call onConversationCreated here - it triggers fetches before auth is ready
+          // The URL will update naturally when user sends next message
           return;
         }
       }
@@ -730,12 +742,17 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
       return;
     }
     
+    // Also guard against temp_ IDs in the URL (shouldn't happen but defensive)
+    if (conversationId.startsWith('temp_')) {
+      setConversationNotFound(true);
+      return;
+    }
+    
     if (loadedConversationRef.current === conversationId) {
       return;
     }
 
     if (previousConversationIdRef.current !== conversationId) {
-      // New conversation selected - clear failed cache
       failedConversationsRef.current.clear();
       previousConversationIdRef.current = conversationId;
     }
@@ -748,7 +765,7 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
         loadingAbortRef.current.abort();
       }
     };
-  }, [initialConversationId, loadBackupMessages, onConversationCreated, updateMessagesWithSync, safeSessionStorageGet]);
+  }, [initialConversationId, loadBackupMessages, onConversationCreated, updateMessagesWithSync, safeSessionStorageGet, safeSessionStorageRemove]);
 
   useEffect(() => {
     currentConversationIdRef.current = currentConversationId;
