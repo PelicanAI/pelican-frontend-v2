@@ -97,8 +97,17 @@ export function useCredits(): UseCreditsReturn {
   // Listen for auth state changes and refetch credits when user signs in
   // This fixes the race condition where initial fetch runs before auth state propagates
   useEffect(() => {
+    let hasInitialized = false
+    
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' && session?.user) {
+        // Skip refetch on tab focus - only fetch on actual sign-in
+        if (hasInitialized) {
+          console.log('[CREDITS] Ignoring SIGNED_IN (tab focus/token refresh)')
+          return
+        }
+        hasInitialized = true
+        
         // User just signed in - refetch credits with their ID
         console.log('[CREDITS] Auth state changed to SIGNED_IN, refetching credits')
         setLoading(true)
@@ -106,6 +115,7 @@ export function useCredits(): UseCreditsReturn {
       } else if (event === 'SIGNED_OUT') {
         // User signed out - clear credits
         console.log('[CREDITS] Auth state changed to SIGNED_OUT, clearing credits')
+        hasInitialized = false
         setCredits(null)
         setLoading(false)
       }
