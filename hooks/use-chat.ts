@@ -7,10 +7,10 @@
  * - Synchronous state/ref updates to prevent race conditions
  * - Proper conversation history capture before API calls
  * - Backend-handled message persistence (no dual persistence)
- * - THROTTLED streaming updates to prevent UI crashes on large responses
+ * - Comprehensive logging for debugging
  * 
  * @author Pelican Engineering
- * @version 3.1.0 - Added streaming throttle
+ * @version 3.0.0
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -27,9 +27,6 @@ const LIMITS = {
   MAX_MESSAGE_LENGTH: 50000,
   MIN_MESSAGE_LENGTH: 1,
 };
-
-// FIX: Throttle streaming UI updates to prevent crashes on large responses
-const STREAMING_THROTTLE_MS = 50; // Update UI max 20 times/second
 
 // =============================================================================
 // TYPES
@@ -78,7 +75,7 @@ function createUserMessage(content: string, attachments?: Attachment[]): Message
   return {
     id: createMessageId(),
     role: 'user',
-    content: content,
+    content: content, // Store raw content (no trim) to preserve formatting
     timestamp: new Date(),
     isStreaming: false,
     attachments: attachments,
@@ -140,93 +137,6 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(
     initialConversationId ?? null
   );
-  const failedConversationsRef = useRef<Set<string>>(new Set());
-  const previousConversationIdRef = useRef<string | null>(null);
-
-  // ---------------------------------------------------------------------------
-  // SESSION BACKUP HELPERS
-  // ---------------------------------------------------------------------------
-
-  const STORAGE_PREFIX = 'pelican_chat_backup_';
-  const LAST_CONVERSATION_KEY = 'pelican_last_conversation_id';
-
-  const getBackupKey = useCallback((conversationId: string) => {
-    return `${STORAGE_PREFIX}${conversationId}`;
-  }, []);
-
-  const safeSessionStorageGet = useCallback((key: string): string | null => {
-    if (typeof window === 'undefined') return null;
-    try {
-      return sessionStorage.getItem(key);
-    } catch {
-      return null;
-    }
-  }, []);
-
-  const safeSessionStorageSet = useCallback((key: string, value: string) => {
-    if (typeof window === 'undefined') return;
-    try {
-      sessionStorage.setItem(key, value);
-    } catch {
-      // Ignore storage failures (private mode, disabled storage, quota, etc.)
-    }
-  }, []);
-
-  const safeSessionStorageRemove = useCallback((key: string) => {
-    if (typeof window === 'undefined') return;
-    try {
-      sessionStorage.removeItem(key);
-    } catch {
-      // Ignore storage failures
-    }
-  }, []);
-
-  const serializeMessages = useCallback((messagesToStore: Message[]) => {
-    return messagesToStore.map((msg) => ({
-      ...msg,
-      timestamp:
-        msg.timestamp instanceof Date ? msg.timestamp.toISOString() : msg.timestamp,
-    }));
-  }, []);
-
-  const loadBackupMessages = useCallback(
-    (conversationId: string): Message[] | null => {
-      const raw = safeSessionStorageGet(getBackupKey(conversationId));
-      if (!raw) return null;
-      try {
-        const parsed = JSON.parse(raw);
-        if (!Array.isArray(parsed)) return null;
-        return parsed.map((msg) => ({
-          ...msg,
-          timestamp: msg.timestamp ? new Date(msg.timestamp) : new Date(),
-        }));
-      } catch {
-        return null;
-      }
-    },
-    [getBackupKey]
-  );
-
-  const persistBackupMessages = useCallback(
-    (conversationId: string, nextMessages: Message[]) => {
-      const payload = JSON.stringify(serializeMessages(nextMessages));
-      safeSessionStorageSet(getBackupKey(conversationId), payload);
-      safeSessionStorageSet(LAST_CONVERSATION_KEY, conversationId);
-    },
-    [getBackupKey, serializeMessages, safeSessionStorageSet]
-  );
-
-  const moveBackupMessages = useCallback(
-    (fromId: string, toId: string) => {
-      const raw = safeSessionStorageGet(getBackupKey(fromId));
-      if (raw) {
-        safeSessionStorageSet(getBackupKey(toId), raw);
-        safeSessionStorageRemove(getBackupKey(fromId));
-      }
-      safeSessionStorageSet(LAST_CONVERSATION_KEY, toId);
-    },
-    [getBackupKey, safeSessionStorageGet, safeSessionStorageRemove, safeSessionStorageSet]
-  );
 
   // ---------------------------------------------------------------------------
   // REFS
@@ -234,16 +144,8 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
 
   const messagesRef = useRef<Message[]>([]);
   const loadedConversationRef = useRef<string | null>(null);
-  const loadingConversationRef = useRef<string | null>(null);
   const lastSentMessageRef = useRef<string | null>(null);
   const loadingAbortRef = useRef<AbortController | null>(null);
-  const currentConversationIdRef = useRef<string | null>(currentConversationId);
-  const tempConversationIdRef = useRef<string | null>(null);
-  
-  // FIX: Refs for streaming throttle
-  const lastStreamingUpdateRef = useRef<number>(0);
-  const pendingStreamingContentRef = useRef<string>('');
-  const streamingFlushTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // ---------------------------------------------------------------------------
   // STREAMING HOOK
@@ -316,18 +218,7 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
   // ---------------------------------------------------------------------------
 
   const loadMessages = useCallback(async (conversationId: string): Promise<boolean> => {
-    // Don't try to load temp_ IDs from API
-    if (conversationId.startsWith('temp_')) {
-      logger.warn('[CHAT-LOAD] Skipping API fetch for temp ID', { conversationId });
-      return false;
-    }
-
-    if (failedConversationsRef.current.has(conversationId)) {
-      setConversationNotFound(true);
-      loadedConversationRef.current = conversationId;
-      return false;
-    }
-
+    // Abort any in-flight load
     if (loadingAbortRef.current) {
       loadingAbortRef.current.abort();
     }
@@ -340,6 +231,7 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
     setError(null);
     setConversationNotFound(false);
     
+    // Clear existing messages immediately
     updateMessagesWithSync(() => []);
     
     try {
@@ -351,30 +243,18 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
         return false;
       }
       
+      // ✅ FIX: Treat 404 as empty conversation, not an error
+      // This happens for new conversations where memory_conversations doesn't exist yet
       if (response.status === 404) {
         logger.info('[CHAT-LOAD] No messages yet (new conversation)', { conversationId });
-        const backup = loadBackupMessages(conversationId);
-        if (backup && backup.length > 0) {
-          logger.info('[CHAT-LOAD] Restoring messages from session backup', {
-            conversationId,
-            count: backup.length,
-          });
-          updateMessagesWithSync(() => backup);
-          loadedConversationRef.current = conversationId;
-          setConversationNotFound(false);
-          return true;
-        }
         updateMessagesWithSync(() => []);
         loadedConversationRef.current = conversationId;
         setConversationNotFound(false);
-        return true;
+        return true; // Success - empty conversation is valid
       }
       
       if (!response.ok) {
-        failedConversationsRef.current.add(conversationId);
-        setConversationNotFound(true);
-        loadedConversationRef.current = conversationId;
-        return false;
+        throw new Error(`Failed to load messages: ${response.status}`);
       }
       
       const data = await response.json();
@@ -383,6 +263,7 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
         return false;
       }
       
+      // Transform API messages to our Message format
       const loadedMessages: Message[] = (data.messages || []).map((msg: any) => ({
         id: msg.id || createMessageId(),
         role: msg.role as 'user' | 'assistant' | 'system',
@@ -391,22 +272,9 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
         isStreaming: false,
       }));
       
-      if (loadedMessages.length === 0) {
-        const backup = loadBackupMessages(conversationId);
-        if (backup && backup.length > 0) {
-          logger.info('[CHAT-LOAD] Restoring messages from session backup', {
-            conversationId,
-            count: backup.length,
-          });
-          updateMessagesWithSync(() => backup);
-          loadedConversationRef.current = conversationId;
-          return true;
-        }
-      }
-
-      logger.info('[CHAT-LOAD] Loaded messages', {
-        conversationId,
-        count: loadedMessages.length,
+      logger.info('[CHAT-LOAD] Loaded messages', { 
+        conversationId, 
+        count: loadedMessages.length 
       });
       
       updateMessagesWithSync(() => loadedMessages);
@@ -420,26 +288,14 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
       
       const error = err instanceof Error ? err : new Error(String(err));
       
+      // Don't log abort errors
       if (error.name !== 'AbortError') {
         logger.error('[CHAT-LOAD] Failed to load messages', error);
-        const backup = loadBackupMessages(conversationId);
-        if (backup && backup.length > 0) {
-          logger.info('[CHAT-LOAD] Restoring messages from session backup after error', {
-            conversationId,
-            count: backup.length,
-          });
-          updateMessagesWithSync(() => backup);
-          loadedConversationRef.current = conversationId;
-          return true;
-        }
         setError(error);
         onError?.(error);
       }
       return false;
     } finally {
-      // Clear loading lock (always, success or failure)
-      loadingConversationRef.current = null;
-      
       if (!abortController.signal.aborted) {
         setIsLoadingMessages(false);
       }
@@ -447,10 +303,10 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
         loadingAbortRef.current = null;
       }
     }
-  }, [updateMessagesWithSync, onError, loadBackupMessages]);
+  }, [updateMessagesWithSync, onError]);
 
   // ---------------------------------------------------------------------------
-  // SEND MESSAGE - STREAMING (with throttle fix)
+  // SEND MESSAGE - STREAMING
   // ---------------------------------------------------------------------------
 
   const sendMessageStreaming = useCallback(
@@ -466,36 +322,28 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
       lastSentMessageRef.current = content;
       setError(null);
       setIsLoading(true);
-      
-      // FIX: Reset streaming throttle state
-      lastStreamingUpdateRef.current = 0;
-      pendingStreamingContentRef.current = '';
-      if (streamingFlushTimeoutRef.current) {
-        clearTimeout(streamingFlushTimeoutRef.current);
-        streamingFlushTimeoutRef.current = null;
-      }
 
       const userMessage = createUserMessage(content, sendOptions.attachments);
       const conversationHistory = captureConversationHistory();
-      let conversationIdForSend = currentConversationIdRef.current;
-
-      if (!conversationIdForSend) {
-        const tempId = `temp_${typeof crypto !== 'undefined' && 'randomUUID' in crypto ? crypto.randomUUID() : createMessageId()}`;
-        tempConversationIdRef.current = tempId;
-        conversationIdForSend = tempId;
-        loadedConversationRef.current = tempId;
-        setCurrentConversationId(tempId);
-        onConversationCreated?.(tempId);
-      }
 
       logger.info('[CHAT-SEND] Preparing to send message', {
         messageLength: content.length,
         historyLength: conversationHistory.length,
-        conversationId: conversationIdForSend,
-        isNewConversation: !currentConversationIdRef.current,
+        conversationId: currentConversationId,
+        isNewConversation: !currentConversationId,
+      });
+
+      console.log('[CHAT-DEBUG] Payload construction:', {
+        stateLength: messages.length,
+        refLength: messagesRef.current.length,
+        historyLength: conversationHistory.length,
+        conversationId: currentConversationId,
+        isNewConversation: !currentConversationId,
+        firstMsgPreview: conversationHistory[0]?.content?.slice(0, 50),
       });
 
       if (!sendOptions.skipUserMessage) {
+        console.log('Message being added:', userMessage);
         updateMessagesWithSync((prev) => [...prev, userMessage]);
         onMessageSent?.(userMessage);
       }
@@ -510,70 +358,21 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
           content,
           conversationHistory,
           {
-            // FIX: Throttled onChunk handler
             onChunk: (chunk: string) => {
-              const now = Date.now();
-              pendingStreamingContentRef.current += chunk;
-              
-              // Check if we should update the UI
-              const timeSinceLastUpdate = now - lastStreamingUpdateRef.current;
-              
-              if (timeSinceLastUpdate >= STREAMING_THROTTLE_MS) {
-                // Enough time has passed, update now
-                const contentToRender = pendingStreamingContentRef.current;
-                pendingStreamingContentRef.current = '';
-                lastStreamingUpdateRef.current = now;
-                
-                updateMessagesWithSync((prev) =>
-                  prev.map((msg) =>
-                    msg.id === assistantMessageId
-                      ? { ...msg, content: msg.content + contentToRender }
-                      : msg
-                  )
-                );
-              } else {
-                // Schedule a flush if not already scheduled
-                if (!streamingFlushTimeoutRef.current) {
-                  streamingFlushTimeoutRef.current = setTimeout(() => {
-                    streamingFlushTimeoutRef.current = null;
-                    if (pendingStreamingContentRef.current) {
-                      const contentToRender = pendingStreamingContentRef.current;
-                      pendingStreamingContentRef.current = '';
-                      lastStreamingUpdateRef.current = Date.now();
-                      
-                      updateMessagesWithSync((prev) =>
-                        prev.map((msg) =>
-                          msg.id === assistantMessageId
-                            ? { ...msg, content: msg.content + contentToRender }
-                            : msg
-                        )
-                      );
-                    }
-                  }, STREAMING_THROTTLE_MS - timeSinceLastUpdate);
-                }
-              }
+              updateMessagesWithSync((prev) =>
+                prev.map((msg) =>
+                  msg.id === assistantMessageId
+                    ? { ...msg, content: msg.content + chunk }
+                    : msg
+                )
+              );
             },
             onComplete: async (fullResponse: string, newConversationId?: string) => {
-              // FIX: Clear any pending flush timeout
-              if (streamingFlushTimeoutRef.current) {
-                clearTimeout(streamingFlushTimeoutRef.current);
-                streamingFlushTimeoutRef.current = null;
-              }
-              pendingStreamingContentRef.current = '';
-              
-              if (newConversationId && newConversationId !== conversationIdForSend) {
+              // Capture conversation ID from backend for new conversations
+              if (!currentConversationId && newConversationId) {
                 logger.info('[CHAT-COMPLETE] Capturing conversation ID from backend', {
                   conversationId: newConversationId,
                 });
-                
-                // FIX: Prevent useEffect from refetching messages
-                loadedConversationRef.current = newConversationId;
-
-                if (tempConversationIdRef.current) {
-                  moveBackupMessages(tempConversationIdRef.current, newConversationId);
-                  tempConversationIdRef.current = null;
-                }
-
                 setCurrentConversationId(newConversationId);
                 onConversationCreated?.(newConversationId);
               }
@@ -596,13 +395,6 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
               });
             },
             onError: (err: Error) => {
-              // FIX: Clear streaming state on error
-              if (streamingFlushTimeoutRef.current) {
-                clearTimeout(streamingFlushTimeoutRef.current);
-                streamingFlushTimeoutRef.current = null;
-              }
-              pendingStreamingContentRef.current = '';
-              
               setError(err);
               onError?.(err);
               updateMessagesWithSync((prev) =>
@@ -611,7 +403,7 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
               logger.error('[CHAT-ERROR] Streaming error', err);
             },
           },
-          conversationIdForSend,
+          currentConversationId,
           sendOptions.fileIds || []
         );
       } catch (err) {
@@ -629,14 +421,13 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
     [
       captureConversationHistory,
       currentConversationId,
+      messages.length,
       onError,
       onMessageSent,
       onResponseComplete,
       onFinish,
-      onConversationCreated,
       sendStreamingMessage,
       updateMessagesWithSync,
-      moveBackupMessages,
     ]
   );
 
@@ -676,14 +467,6 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
   const stopGeneration = useCallback(() => {
     abortStream();
     setIsLoading(false);
-    
-    // FIX: Clear streaming throttle state on stop
-    if (streamingFlushTimeoutRef.current) {
-      clearTimeout(streamingFlushTimeoutRef.current);
-      streamingFlushTimeoutRef.current = null;
-    }
-    pendingStreamingContentRef.current = '';
-    
     updateMessagesWithSync((prev) =>
       prev.map((msg) => (msg.isStreaming ? { ...msg, isStreaming: false } : msg))
     );
@@ -709,35 +492,17 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
   // EFFECTS
   // ---------------------------------------------------------------------------
 
+  // Store loadMessages in a ref to avoid dependency issues
   const loadMessagesRef = useRef(loadMessages);
   loadMessagesRef.current = loadMessages;
 
+  // Load messages when conversation changes
   useEffect(() => {
     const conversationId = initialConversationId;
     
+    // Skip if no conversation ID
     if (!conversationId) {
-      const lastConversationId = safeSessionStorageGet(LAST_CONVERSATION_KEY);
-      
-      // Don't restore temp_ IDs - they're client-side only and will 403
-      if (lastConversationId && lastConversationId.startsWith('temp_')) {
-        safeSessionStorageRemove(LAST_CONVERSATION_KEY);
-        // Don't restore, start fresh
-      } else if (lastConversationId) {
-        const backup = loadBackupMessages(lastConversationId);
-        if (backup && backup.length > 0) {
-          logger.info('[CHAT-LOAD] Restoring messages from session backup (no URL param)', {
-            conversationId: lastConversationId,
-            count: backup.length,
-          });
-          updateMessagesWithSync(() => backup);
-          loadedConversationRef.current = lastConversationId;
-          setCurrentConversationId(lastConversationId);
-          // DON'T call onConversationCreated here - it triggers fetches before auth is ready
-          // The URL will update naturally when user sends next message
-          return;
-        }
-      }
-
+      // Only clear if we have messages (avoid unnecessary state updates)
       if (messagesRef.current.length > 0) {
         setMessages([]);
         messagesRef.current = [];
@@ -748,59 +513,29 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
       return;
     }
     
-    // Also guard against temp_ IDs in the URL (shouldn't happen but defensive)
-    if (conversationId.startsWith('temp_')) {
-      setConversationNotFound(true);
-      return;
-    }
-    
+    // Skip if already loaded this conversation
     if (loadedConversationRef.current === conversationId) {
       return;
     }
-    
-    // Loading lock - prevents re-render loops during async fetch
-    if (loadingConversationRef.current === conversationId) {
-      return;
-    }
-    loadingConversationRef.current = conversationId;
 
-    if (previousConversationIdRef.current !== conversationId) {
-      failedConversationsRef.current.clear();
-      previousConversationIdRef.current = conversationId;
-    }
-
+    // Update current conversation ID
     setCurrentConversationId(conversationId);
+    
+    // Load messages using ref to avoid dependency loop
     loadMessagesRef.current(conversationId);
     
+    // Cleanup: abort loading on unmount or conversation change
     return () => {
       if (loadingAbortRef.current) {
         loadingAbortRef.current.abort();
       }
     };
-  }, [initialConversationId, loadBackupMessages, onConversationCreated, updateMessagesWithSync, safeSessionStorageGet, safeSessionStorageRemove]);
+  }, [initialConversationId]); // Only depend on conversationId - use refs for functions
 
-  useEffect(() => {
-    currentConversationIdRef.current = currentConversationId;
-  }, [currentConversationId]);
-
-  useEffect(() => {
-    if (currentConversationId) {
-      persistBackupMessages(currentConversationId, messages);
-    }
-  }, [currentConversationId, messages, persistBackupMessages]);
-
+  // Keep ref in sync with state
   useEffect(() => {
     messagesRef.current = messages;
   }, [messages]);
-
-  // FIX: Cleanup streaming timeout on unmount
-  useEffect(() => {
-    return () => {
-      if (streamingFlushTimeoutRef.current) {
-        clearTimeout(streamingFlushTimeoutRef.current);
-      }
-    };
-  }, []);
 
   // ---------------------------------------------------------------------------
   // RETURN
