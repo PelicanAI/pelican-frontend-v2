@@ -323,6 +323,7 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
 
     if (failedConversationsRef.current.has(conversationId)) {
       setConversationNotFound(true);
+      loadedConversationRef.current = conversationId;
       return false;
     }
 
@@ -371,6 +372,7 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
       if (!response.ok) {
         failedConversationsRef.current.add(conversationId);
         setConversationNotFound(true);
+        loadedConversationRef.current = conversationId;
         return false;
       }
       
