@@ -1,5 +1,24 @@
 import type { Metadata } from 'next';
+import { Bebas_Neue, IBM_Plex_Sans, JetBrains_Mono } from 'next/font/google';
 import './styles/marketing.css';
+
+const bebasNeue = Bebas_Neue({ 
+  weight: '400',
+  subsets: ['latin'],
+  variable: '--font-bebas-neue',
+});
+
+const ibmPlexSans = IBM_Plex_Sans({ 
+  weight: ['400', '500', '600'],
+  subsets: ['latin'],
+  variable: '--font-ibm-plex',
+});
+
+const jetbrainsMono = JetBrains_Mono({ 
+  weight: ['400', '500'],
+  subsets: ['latin'],
+  variable: '--font-jetbrains',
+});
 
 export const metadata: Metadata = {
   title: 'Pelican Trading | AI Market Intelligence for Traders',
@@ -15,19 +34,8 @@ export default function MarketingLayout({
   children: React.ReactNode;
 }) {
   return (
-    <>
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
-          rel="stylesheet"
-        />
-      </head>
-      <div className="marketing-page">
-        {children}
-      </div>
-    </>
+    <div className={`marketing-page ${bebasNeue.variable} ${ibmPlexSans.variable} ${jetbrainsMono.variable}`}>
+      {children}
+    </div>
   );
 }
-
