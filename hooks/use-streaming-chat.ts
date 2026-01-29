@@ -29,6 +29,7 @@ import { createClient } from '@/lib/supabase/client';
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://pelican-backend.fly.dev';
 const STREAM_TIMEOUT_MS = 2700000; // 45 minutes
 const CHUNK_TIMEOUT_MS = 2700000; // 45 minutes between chunks
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 // =============================================================================
 // TYPES
@@ -310,7 +311,8 @@ export function useStreamingChat(): UseStreamingChatReturn {
 
             if (parsed.done) {
               // Capture conversation ID from done event
-              const backendConversationId = parsed.conversationId || parsed.sessionId;
+              const rawId = parsed.conversationId || parsed.sessionId;
+              const backendConversationId = rawId && UUID_REGEX.test(rawId) ? rawId : null;
               if (backendConversationId) {
                 capturedConversationId = backendConversationId;
                 logger.info('[STREAM-COMPLETE] Received done signal with conversation ID', {

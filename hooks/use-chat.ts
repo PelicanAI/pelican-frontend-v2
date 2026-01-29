@@ -17,6 +17,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useStreamingChat } from './use-streaming-chat';
 import { logger } from '@/lib/logger';
 import type { Message, Attachment } from '@/lib/chat-utils';
+import { createClient } from '@/lib/supabase/client';
 
 // =============================================================================
 // CONSTANTS
@@ -368,13 +369,29 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
               );
             },
             onComplete: async (fullResponse: string, newConversationId?: string) => {
-              // Capture conversation ID from backend for new conversations
-              if (!currentConversationId && newConversationId) {
+              let conversationId = newConversationId;
+              
+              // If backend didn't return valid UUID, create conversation ourselves
+              if (!conversationId && fullResponse) {
+                const supabase = createClient();
+                const { data: { user } } = await supabase.auth.getUser();
+                if (user) {
+                  const { data } = await supabase
+                    .from('conversations')
+                    .insert({ user_id: user.id, title: 'New conversation' })
+                    .select('id')
+                    .single();
+                  conversationId = data?.id;
+                }
+              }
+
+              // Capture conversation ID for new conversations
+              if (!currentConversationId && conversationId) {
                 logger.info('[CHAT-COMPLETE] Capturing conversation ID from backend', {
-                  conversationId: newConversationId,
+                  conversationId,
                 });
-                setCurrentConversationId(newConversationId);
-                onConversationCreated?.(newConversationId);
+                setCurrentConversationId(conversationId);
+                onConversationCreated?.(conversationId);
               }
 
               const finalMessage: Message = {

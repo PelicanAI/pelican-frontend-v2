@@ -8,6 +8,11 @@ export async function GET(
   try {
     const supabase = await createClient()
     const { id: conversationId } = await params
+
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+    if (!uuidRegex.test(conversationId)) {
+      return NextResponse.json({ error: 'Invalid conversation id' }, { status: 400 })
+    }
     
     const { data: { user }, error: authError } = await supabase.auth.getUser()
     
