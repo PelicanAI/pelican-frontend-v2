@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState } from "react"
+import DOMPurify from "dompurify"
 import { Download, Share2, Check, ExternalLink, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/hooks/use-toast"
@@ -91,11 +92,13 @@ export function TableImageDisplay({ attachment }: TableImageDisplayProps) {
   const handleOpenInNewTab = () => {
     const newWindow = window.open()
     if (newWindow) {
+      const safeName = DOMPurify.sanitize(attachment.name || 'Table')
+      const safeUrl = DOMPurify.sanitize(attachment.url)
       newWindow.document.write(`
         <html>
-          <head><title>${attachment.name}</title></head>
+          <head><title>${safeName}</title></head>
           <body style="margin:0;display:flex;justify-content:center;align-items:center;min-height:100vh;background:#f3f4f6;">
-            <img src="${attachment.url}" style="max-width:100%;height:auto;" alt="Pelican Analysis" />
+            <img src="${safeUrl}" style="max-width:100%;height:auto;" alt="Pelican Analysis" />
           </body>
         </html>
       `)

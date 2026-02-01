@@ -32,3 +32,8 @@ yarn.lock
 next-env.d.ts
 # Sentry Config File
 .env.sentry-build-plugin
+
+# Dev assets
+demos/
+video-capture/
+how-to-use-package.zip
