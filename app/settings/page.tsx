@@ -902,13 +902,13 @@ export default function SettingsPage() {
                       <h4 className="font-medium">Legal</h4>
                       <div className="space-y-1">
                         <Button variant="link" asChild className="h-auto p-0 text-purple-600">
-                          <Link href="/privacy-policy" target="_blank">
+                          <Link href="/privacy" target="_blank">
                             Privacy Policy
                           </Link>
                         </Button>
                         <br />
                         <Button variant="link" asChild className="h-auto p-0 text-purple-600">
-                          <Link href="/terms-of-service" target="_blank">
+                          <Link href="/terms" target="_blank">
                             Terms of Service
                           </Link>
                         </Button>

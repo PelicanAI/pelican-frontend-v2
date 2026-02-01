@@ -51,13 +51,13 @@
     },
     "hero": {
 
-      "betaTag": "Beta",
+      "betaTag": "Early Access",
       "title1": "THE AI PLATFORM",
       "title2": "THAT",
       "titleHighlight": "THINKS",
       "title3": "LIKE YOU TRADE",
       "subtitle": "Institutional-grade market intelligence through natural conversation. Backtest strategies, analyze patterns, and execute with precision—all in one interface.",
-      "startTrading": "Start Trading →",
+      "startTrading": "Start Trading Smarter →",
       "seeFeatures": "See Features"
     },
     "stats": {

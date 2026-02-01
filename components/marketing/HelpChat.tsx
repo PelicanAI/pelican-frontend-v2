@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect, FormEvent } from 'react';
+import DOMPurify from 'dompurify';
 
 interface Message {
   type: 'user' | 'bot';
@@ -244,8 +245,8 @@ export default function HelpChat({ logoUrl = '/pelican-logo-transparent.png' }: 
                     lineHeight: '1.5',
                     border: msg.type === 'user' ? 'none' : '1px solid rgba(148, 163, 184, 0.1)',
                   }}
-                  dangerouslySetInnerHTML={{ 
-                    __html: msg.type === 'bot' ? formatMessage(msg.content) : msg.content 
+                  dangerouslySetInnerHTML={{
+                    __html: DOMPurify.sanitize(msg.type === 'bot' ? formatMessage(msg.content) : msg.content)
                   }}
                 />
               </div>

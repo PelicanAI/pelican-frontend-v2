@@ -30,7 +30,6 @@
   color: var(--text-primary);
   line-height: 1.6;
   overflow-x: hidden;
-  scroll-behavior: smooth;
   min-height: 100vh;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -261,6 +260,7 @@
   position: relative;
   z-index: 1;
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   align-items: center;
   padding: clamp(6rem, 12vw, 8rem) var(--page-gutter) var(--section-padding-y-tight);
@@ -1284,5 +1284,17 @@
 @media (max-width: 480px) {
   .credit-types-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+/* Accessibility: respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .animate-on-scroll,
+  .feature-card,
+  .hero-content {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+    animation: none !important;
   }
 }

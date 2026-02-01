@@ -51,13 +51,13 @@
     },
     "hero": {
 
-      "betaTag": "Beta",
+      "betaTag": "Early Access",
       "title1": "",
       "title2": "CONVERSATIONAL",
       "titleHighlight": "AI",
       "title3": "FOR TRADERS & INVESTORS",
       "subtitle": "Pelican replaces scanners, spreadsheets, and half-answers with real market intelligence.\nAsk questions in plain English to scan thousands of stocks, analyze price and macro context, and backtest strategies — all from a single interface.",
-      "startTrading": "Start Trading →",
+      "startTrading": "Start Trading Smarter →",
       "seeFeatures": "See Features"
     },
     "stats": {

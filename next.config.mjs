@@ -10,13 +10,13 @@ const nextConfig = {
     ignoreBuildErrors: false,
   },
   images: {
-    unoptimized: true,
+    unoptimized: false,
   },
   // Security headers to protect against common attacks
   async headers() {
     return [
       {
-        source: '/:path*',
+        source: '/((?!demos/).*)',
         headers: [
           {
             key: 'X-DNS-Prefetch-Control',
@@ -28,7 +28,7 @@ const nextConfig = {
           },
           {
             key: 'X-Frame-Options',
-            value: 'SAMEORIGIN'
+            value: 'DENY'
           },
           {
             key: 'X-Content-Type-Options',

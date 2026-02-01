@@ -291,7 +291,7 @@ export default function PricingPage() {
           </p>
           <p className="text-gray-500 text-sm">
             Questions?{' '}
-            <a href="mailto:support@pelicanai.com" className="text-blue-400 hover:underline">
+            <a href="mailto:support@pelicantrading.ai" className="text-blue-400 hover:underline">
               Contact us
             </a>
           </p>

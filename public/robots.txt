@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /chat/
+Disallow: /settings/
+Disallow: /profile/
+Disallow: /auth/
+
+Sitemap: https://pelicantrading.ai/sitemap.xml

@@ -4,11 +4,9 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
-  Brain,
   FlaskConical,
   MessageCircle,
   Search,
-  Share2,
   XSquare,
 } from 'lucide-react';
 import { useAuth } from '@/lib/providers/auth-provider';
@@ -459,7 +457,7 @@ export default function HomePage() {
       <footer>
         <div className="footer-inner">
           <div className="footer-logo">
-            <img src="/pelican-logo-transparent.png" alt="Pelican" />
+            <img src="/pelican-logo-transparent.png" alt="Pelican" loading="lazy" />
             <span>Pelican Trading</span>
           </div>
           <div className="footer-links">

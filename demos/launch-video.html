@@ -1,0 +1,1714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pelican AI - Launch Video</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg-primary: #0a0a0f;
+      --bg-sidebar: rgba(10, 10, 15, 0.95);
+      --bg-surface: rgba(16, 16, 22, 0.9);
+      --bg-surface-2: rgba(20, 20, 28, 0.8);
+      --bg-card: rgba(20, 20, 28, 0.95);
+      --text-primary: rgba(255, 255, 255, 0.95);
+      --text-secondary: rgba(255, 255, 255, 0.7);
+      --text-muted: rgba(255, 255, 255, 0.4);
+      --border-color: rgba(168, 85, 247, 0.15);
+      --border-focus: rgba(168, 85, 247, 0.4);
+      --purple-primary: rgb(168, 85, 247);
+      --purple-secondary: rgb(139, 92, 246);
+      --purple-glow: rgba(168, 85, 247, 0.25);
+      --purple-accent: rgb(192, 132, 252);
+      --green: rgb(34, 197, 94);
+      --red: rgb(239, 68, 68);
+      --radius-sm: 0.375rem;
+      --radius-md: 0.5rem;
+      --radius-lg: 0.75rem;
+      --radius-xl: 1rem;
+      --radius-2xl: 1.25rem;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      overflow: hidden;
+      height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .scene {
+      position: fixed;
+      inset: 0;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .scene.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* ========== SCENE 1: HOOK ========== */
+    #scene-hook {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(ellipse at center, rgba(168, 85, 247, 0.08) 0%, var(--bg-primary) 70%);
+    }
+
+    .hook-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      max-width: 1200px;
+      padding: 40px;
+    }
+
+    .hook-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 20px;
+      opacity: 0;
+      transform: scale(0.95);
+      transition: all 0.5s ease;
+    }
+
+    .hook-card.visible {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .hook-card-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .scanner-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+      opacity: 0;
+      transform: translateX(-10px);
+      transition: all 0.3s ease;
+    }
+
+    .scanner-row.visible {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .scanner-row:last-child {
+      border-bottom: none;
+    }
+
+    .scanner-ticker {
+      font-weight: 600;
+      font-size: 15px;
+      width: 60px;
+    }
+
+    .scanner-price {
+      color: var(--text-secondary);
+      font-size: 14px;
+      width: 70px;
+    }
+
+    .scanner-change {
+      font-size: 14px;
+      font-weight: 500;
+      width: 70px;
+    }
+
+    .scanner-change.negative { color: var(--red); }
+    .scanner-change.positive { color: var(--green); }
+
+    .scanner-volume {
+      font-size: 13px;
+      color: var(--text-muted);
+      width: 80px;
+    }
+
+    .volume-badge {
+      background: rgba(168, 85, 247, 0.2);
+      color: var(--purple-primary);
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .event-table {
+      width: 100%;
+      font-size: 13px;
+    }
+
+    .event-table th {
+      text-align: left;
+      color: var(--text-muted);
+      font-weight: 500;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .event-table td {
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    }
+
+    .event-table tr {
+      opacity: 0;
+      transform: translateY(5px);
+      transition: all 0.3s ease;
+    }
+
+    .event-table tr.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .order-flow-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+      opacity: 0;
+      transform: translateX(-10px);
+      transition: all 0.3s ease;
+    }
+
+    .order-flow-item.visible {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .order-flow-item:last-child {
+      border-bottom: none;
+    }
+
+    .order-flow-icon {
+      font-size: 18px;
+    }
+
+    .order-flow-text {
+      font-size: 14px;
+      color: var(--text-primary);
+    }
+
+    .coaching-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 10px 0;
+      opacity: 0;
+      transform: translateY(5px);
+      transition: all 0.3s ease;
+    }
+
+    .coaching-item.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .coaching-number {
+      background: var(--purple-primary);
+      color: white;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    .coaching-text {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    /* ========== CHAT UI (Scenes 2-5) ========== */
+    .chat-layout {
+      display: flex;
+      height: 100vh;
+    }
+
+    .sidebar {
+      width: 256px;
+      background: var(--bg-sidebar);
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      backdrop-filter: blur(12px);
+    }
+
+    .sidebar-header {
+      padding: 12px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .sidebar-header-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .logo-section {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-img {
+      width: 32px;
+      height: 32px;
+      object-fit: contain;
+      filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.3));
+    }
+
+    .logo-text {
+      font-weight: 700;
+      font-size: 18px;
+      background: linear-gradient(135deg, var(--purple-primary), var(--purple-secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .new-chat-btn {
+      width: 100%;
+      height: 40px;
+      background: transparent;
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      font-weight: 500;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 8px;
+      padding: 0 12px;
+    }
+
+    .conversation-list {
+      flex: 1;
+      padding: 8px;
+    }
+
+    .conversation-item {
+      padding: 12px;
+      border-radius: var(--radius-md);
+      margin-bottom: 4px;
+    }
+
+    .conversation-item.active {
+      background: rgba(168, 85, 247, 0.12);
+    }
+
+    .conversation-title {
+      font-weight: 500;
+      font-size: 14px;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .conversation-time {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      background: radial-gradient(600px 400px at 50% 10%, rgba(168, 85, 247, 0.06), transparent);
+    }
+
+    .chat-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 32px;
+      scroll-behavior: smooth;
+    }
+
+    .chat-inner {
+      max-width: 800px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .messages-container {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .message {
+      display: flex;
+      gap: 12px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.3s ease;
+    }
+
+    .message.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .message.user {
+      justify-content: flex-end;
+    }
+
+    .message-content {
+      max-width: 70%;
+    }
+
+    .message.assistant .message-content {
+      max-width: 100%;
+      flex: 1;
+    }
+
+    .message-bubble {
+      padding: 4px 8px;
+      line-height: 1.625;
+      font-size: 16px;
+    }
+
+    .avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+
+    .avatar.user {
+      background: rgba(168, 85, 247, 0.15);
+      color: var(--purple-primary);
+      border: 1px solid rgba(168, 85, 247, 0.25);
+    }
+
+    .avatar.assistant img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .message-text {
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .message-text strong {
+      color: var(--purple-accent);
+      font-weight: 600;
+    }
+
+    .chat-input-container {
+      background: rgba(10, 10, 15, 0.9);
+      border-top: 1px solid var(--border-color);
+      padding: 20px 32px;
+      backdrop-filter: blur(20px);
+    }
+
+    .chat-input-inner {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .input-wrapper {
+      display: flex;
+      align-items: flex-end;
+      gap: 12px;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-2xl);
+      padding: 8px 12px;
+      background: var(--bg-card);
+      min-height: 56px;
+      transition: all 0.2s ease;
+    }
+
+    .input-wrapper.focused {
+      border-color: var(--purple-primary);
+      box-shadow: 0 0 0 4px rgba(168, 85, 247, 0.12);
+    }
+
+    .chat-textarea {
+      flex: 1;
+      min-height: 40px;
+      max-height: 168px;
+      background: transparent;
+      border: none;
+      color: var(--text-primary);
+      resize: none;
+      font-family: inherit;
+      font-size: 15px;
+      padding: 10px 4px;
+      line-height: 1.5;
+    }
+
+    .chat-textarea:focus {
+      outline: none;
+    }
+
+    .chat-textarea::placeholder {
+      color: var(--text-muted);
+    }
+
+    .send-button {
+      width: 40px;
+      height: 40px;
+      background: var(--purple-primary);
+      border: none;
+      border-radius: 50%;
+      color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(168, 85, 247, 0.3);
+    }
+
+    .trading-panel {
+      width: 280px;
+      background: var(--bg-sidebar);
+      border-left: 1px solid var(--border-color);
+      backdrop-filter: blur(12px);
+    }
+
+    .trading-header {
+      padding: 16px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .trading-title {
+      font-weight: 600;
+      font-size: 15px;
+    }
+
+    .trading-content {
+      padding: 16px;
+    }
+
+    .trading-section-title {
+      font-weight: 600;
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+    }
+
+    .trading-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+      font-size: 13px;
+    }
+
+    .trading-value.positive { color: var(--green); }
+    .trading-value.negative { color: var(--red); }
+
+    /* Response cards/tables */
+    .response-table {
+      width: 100%;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-top: 12px;
+    }
+
+    .response-table-header {
+      display: grid;
+      grid-template-columns: 80px 90px 90px 100px auto;
+      padding: 12px 16px;
+      background: rgba(168, 85, 247, 0.08);
+      border-bottom: 1px solid var(--border-color);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .response-table-row {
+      display: grid;
+      grid-template-columns: 80px 90px 90px 100px auto;
+      padding: 12px 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+      font-size: 14px;
+      opacity: 0;
+      transform: translateY(5px);
+      transition: all 0.3s ease;
+    }
+
+    .response-table-row.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .response-table-row.highlight {
+      background: rgba(168, 85, 247, 0.08);
+    }
+
+    .response-table-row:last-child {
+      border-bottom: none;
+    }
+
+    .table-footer {
+      padding: 12px 16px;
+      font-size: 12px;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border-color);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .table-footer.visible {
+      opacity: 1;
+    }
+
+    /* Event study table */
+    .event-response-table {
+      width: 100%;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-top: 12px;
+    }
+
+    .event-response-table th,
+    .event-response-table td {
+      padding: 12px 16px;
+      text-align: left;
+      font-size: 14px;
+    }
+
+    .event-response-table th {
+      background: rgba(168, 85, 247, 0.08);
+      font-weight: 600;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-secondary);
+    }
+
+    .event-response-table tr {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+      opacity: 0;
+      transform: translateY(5px);
+      transition: all 0.3s ease;
+    }
+
+    .event-response-table tr.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .summary-text {
+      margin-top: 16px;
+      font-size: 14px;
+      color: var(--text-secondary);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .summary-text.visible {
+      opacity: 1;
+    }
+
+    .pattern-callout {
+      margin-top: 20px;
+      padding: 20px 24px;
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(139, 92, 246, 0.1));
+      border: 1px solid var(--purple-primary);
+      border-radius: 12px;
+      text-align: center;
+      opacity: 0;
+      transform: scale(0.9);
+      transition: all 0.5s ease;
+      box-shadow: 0 0 30px rgba(168, 85, 247, 0.2);
+    }
+
+    .pattern-callout.visible {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .pattern-callout-text {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--purple-accent);
+    }
+
+    /* Order flow callouts */
+    .order-callout {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px 20px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      margin-bottom: 12px;
+      opacity: 0;
+      transform: scale(0.95) translateX(-20px);
+      transition: all 0.4s ease;
+    }
+
+    .order-callout.visible {
+      opacity: 1;
+      transform: scale(1) translateX(0);
+    }
+
+    .order-callout-icon {
+      font-size: 24px;
+    }
+
+    .order-callout-text {
+      font-size: 15px;
+      font-weight: 500;
+    }
+
+    .context-line {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .context-line.visible {
+      opacity: 1;
+    }
+
+    .insights-block {
+      margin-top: 16px;
+      padding: 16px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--text-secondary);
+    }
+
+    .insights-block strong {
+      color: var(--purple-accent);
+    }
+
+    /* Typing indicator */
+    .typing-indicator {
+      display: flex;
+      gap: 5px;
+      padding: 8px 0;
+      align-items: center;
+    }
+
+    .typing-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--purple-primary);
+      animation: typingBounce 0.6s infinite ease-in-out;
+    }
+
+    .typing-dot:nth-child(1) { animation-delay: 0s; }
+    .typing-dot:nth-child(2) { animation-delay: 0.15s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.3s; }
+
+    @keyframes typingBounce {
+      0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+      30% { transform: translateY(-8px); opacity: 1; }
+    }
+
+    .typing-text {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-left: 8px;
+    }
+
+    /* ========== SCENE 6: CTA ========== */
+    #scene-cta {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(ellipse at center, rgba(168, 85, 247, 0.12) 0%, var(--bg-primary) 60%);
+    }
+
+    .cta-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .cta-logo {
+      width: 160px;
+      height: 160px;
+      object-fit: contain;
+      filter: drop-shadow(0 0 60px rgba(168, 85, 247, 0.5));
+      opacity: 0;
+      transform: scale(0.8);
+      transition: all 0.8s ease;
+    }
+
+    .cta-logo.visible {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    @keyframes logoGlow {
+      0%, 100% { filter: drop-shadow(0 0 50px rgba(168, 85, 247, 0.4)); }
+      50% { filter: drop-shadow(0 0 80px rgba(168, 85, 247, 0.7)); }
+    }
+
+    .cta-logo.pulsing {
+      animation: logoGlow 2s ease-in-out infinite;
+    }
+
+    .cta-tagline {
+      font-size: 28px;
+      color: var(--text-secondary);
+      text-align: center;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.6s ease;
+    }
+
+    .cta-tagline.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .cta-brand {
+      font-size: 56px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #fff 0%, var(--purple-primary) 50%, #fff 100%);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.6s ease;
+    }
+
+    .cta-brand.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .cta-live {
+      font-size: 20px;
+      color: var(--purple-primary);
+      font-weight: 500;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.6s ease;
+    }
+
+    .cta-live.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Cursor */
+    .demo-cursor {
+      position: fixed;
+      width: 24px;
+      height: 24px;
+      pointer-events: none;
+      z-index: 9999;
+      transition: transform 0.1s ease;
+      opacity: 0;
+    }
+
+    .demo-cursor.visible {
+      opacity: 1;
+    }
+
+    .demo-cursor.clicking {
+      transform: scale(0.85);
+    }
+
+    .cursor-svg {
+      width: 100%;
+      height: 100%;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.2); border-radius: 3px; }
+  </style>
+</head>
+<body>
+  <!-- Cursor -->
+  <div class="demo-cursor" id="demoCursor">
+    <svg class="cursor-svg" viewBox="0 0 24 24" fill="none">
+      <path d="M5.5 3.21V20.8c0 .45.54.67.85.35l4.86-5.12h8.29c.38 0 .57-.46.3-.74L6.35 2.94a.5.5 0 00-.85.27z" fill="white" stroke="black" stroke-width="1"/>
+    </svg>
+  </div>
+
+  <!-- SCENE 1: HOOK -->
+  <div class="scene" id="scene-hook">
+    <div class="hook-grid">
+      <!-- Scanner Card -->
+      <div class="hook-card" id="hookCard1">
+        <div class="hook-card-title">Stock Scanner</div>
+        <div class="scanner-row" data-row="0">
+          <span class="scanner-ticker">CMCL</span>
+          <span class="scanner-price">$27.02</span>
+          <span class="scanner-change negative">-16.6%</span>
+          <span class="scanner-volume">11.4x avg</span>
+          <span class="volume-badge">VOLUME SURGE</span>
+        </div>
+        <div class="scanner-row" data-row="1">
+          <span class="scanner-ticker">RDTL</span>
+          <span class="scanner-price">$47.53</span>
+          <span class="scanner-change negative">-20.5%</span>
+          <span class="scanner-volume">5.1x avg</span>
+          <span></span>
+        </div>
+        <div class="scanner-row" data-row="2">
+          <span class="scanner-ticker">RDDT</span>
+          <span class="scanner-price">$226.88</span>
+          <span class="scanner-change negative">-10.1%</span>
+          <span class="scanner-volume">1.9x avg</span>
+          <span></span>
+        </div>
+        <div class="scanner-row" data-row="3">
+          <span class="scanner-ticker">BSX</span>
+          <span class="scanner-price">$90.13</span>
+          <span class="scanner-change negative">-3.9%</span>
+          <span class="scanner-volume">2.9x avg</span>
+          <span></span>
+        </div>
+      </div>
+
+      <!-- Event Study Card -->
+      <div class="hook-card" id="hookCard2">
+        <div class="hook-card-title">AAPL Earnings History</div>
+        <table class="event-table">
+          <thead>
+            <tr class="visible">
+              <th>Date</th>
+              <th>1-Day</th>
+              <th>1-Week</th>
+              <th>1-Month</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr data-row="0"><td>Oct 30 '25</td><td style="color: var(--red)">-0.38%</td><td style="color: var(--red)">-0.60%</td><td style="color: var(--green)">+4.31%</td></tr>
+            <tr data-row="1"><td>Jul 31 '25</td><td style="color: var(--red)">-2.50%</td><td style="color: var(--green)">+6.00%</td><td style="color: var(--green)">+11.84%</td></tr>
+            <tr data-row="2"><td>May 1 '25</td><td style="color: var(--red)">-3.74%</td><td style="color: var(--red)">-7.42%</td><td style="color: var(--red)">-5.45%</td></tr>
+            <tr data-row="3"><td>Oct 31 '24</td><td style="color: var(--red)">-1.33%</td><td style="color: var(--green)">+0.69%</td><td style="color: var(--green)">+6.06%</td></tr>
+            <tr data-row="4"><td>May 2 '24</td><td style="color: var(--green)">+5.98%</td><td style="color: var(--green)">+6.67%</td><td style="color: var(--green)">+12.14%</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Order Flow Card -->
+      <div class="hook-card" id="hookCard3">
+        <div class="hook-card-title">Order Flow</div>
+        <div class="order-flow-item" data-row="0">
+          <span class="order-flow-icon">📊</span>
+          <span class="order-flow-text">32.6M shares traded</span>
+        </div>
+        <div class="order-flow-item" data-row="1">
+          <span class="order-flow-icon">🔷</span>
+          <span class="order-flow-text">6,064 block trades</span>
+        </div>
+        <div class="order-flow-item" data-row="2">
+          <span class="order-flow-icon">💰</span>
+          <span class="order-flow-text">573K largest block</span>
+        </div>
+        <div class="order-flow-item" data-row="3">
+          <span class="order-flow-icon">⏰</span>
+          <span class="order-flow-text">Clustering at 14:30</span>
+        </div>
+      </div>
+
+      <!-- Coaching Card -->
+      <div class="hook-card" id="hookCard4">
+        <div class="hook-card-title">Trading Tips</div>
+        <div class="coaching-item" data-row="0">
+          <span class="coaching-number">1</span>
+          <span class="coaching-text">Identify Market Trends</span>
+        </div>
+        <div class="coaching-item" data-row="1">
+          <span class="coaching-number">2</span>
+          <span class="coaching-text">Set Clear Entry/Exit Rules</span>
+        </div>
+        <div class="coaching-item" data-row="2">
+          <span class="coaching-number">3</span>
+          <span class="coaching-text">Avoid Chasing Prices</span>
+        </div>
+        <div class="coaching-item" data-row="3">
+          <span class="coaching-number">4</span>
+          <span class="coaching-text">Risk Management...</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCENE 2: SCANNER -->
+  <div class="scene" id="scene-scanner">
+    <div class="chat-layout">
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <div class="sidebar-header-top">
+            <div class="logo-section">
+              <img src="pelican-logo.png" alt="Pelican" class="logo-img">
+              <span class="logo-text">PelicanAI</span>
+            </div>
+          </div>
+          <button class="new-chat-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            New chat
+          </button>
+        </div>
+        <div class="conversation-list">
+          <div class="conversation-item active">
+            <div class="conversation-title" id="scannerConvoTitle">New Conversation</div>
+            <div class="conversation-time">Just now</div>
+          </div>
+        </div>
+      </aside>
+      <main class="main-content">
+        <div class="chat-container" id="scannerChatContainer">
+          <div class="chat-inner">
+            <div class="messages-container" id="scannerMessages"></div>
+          </div>
+        </div>
+        <div class="chat-input-container">
+          <div class="chat-input-inner">
+            <div class="input-wrapper" id="scannerInputWrapper">
+              <textarea class="chat-textarea" id="scannerInput" placeholder="Ask Pelican anything..."></textarea>
+              <button class="send-button">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </main>
+      <aside class="trading-panel">
+        <div class="trading-header"><h3 class="trading-title">Market Overview</h3></div>
+        <div class="trading-content">
+          <div class="trading-section-title">Indices</div>
+          <div class="trading-item"><span>S&P 500</span><span class="trading-value positive">6,051.25 +0.35%</span></div>
+          <div class="trading-item"><span>Nasdaq</span><span class="trading-value positive">19,926.72 +0.81%</span></div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <!-- SCENE 3: COACHING -->
+  <div class="scene" id="scene-coaching">
+    <div class="chat-layout">
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <div class="sidebar-header-top">
+            <div class="logo-section">
+              <img src="pelican-logo.png" alt="Pelican" class="logo-img">
+              <span class="logo-text">PelicanAI</span>
+            </div>
+          </div>
+          <button class="new-chat-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            New chat
+          </button>
+        </div>
+        <div class="conversation-list">
+          <div class="conversation-item active">
+            <div class="conversation-title" id="coachingConvoTitle">New Conversation</div>
+            <div class="conversation-time">Just now</div>
+          </div>
+        </div>
+      </aside>
+      <main class="main-content">
+        <div class="chat-container" id="coachingChatContainer">
+          <div class="chat-inner">
+            <div class="messages-container" id="coachingMessages"></div>
+          </div>
+        </div>
+        <div class="chat-input-container">
+          <div class="chat-input-inner">
+            <div class="input-wrapper" id="coachingInputWrapper">
+              <textarea class="chat-textarea" id="coachingInput" placeholder="Ask Pelican anything..."></textarea>
+              <button class="send-button">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </main>
+      <aside class="trading-panel">
+        <div class="trading-header"><h3 class="trading-title">Market Overview</h3></div>
+        <div class="trading-content">
+          <div class="trading-section-title">Indices</div>
+          <div class="trading-item"><span>S&P 500</span><span class="trading-value positive">6,051.25 +0.35%</span></div>
+          <div class="trading-item"><span>Nasdaq</span><span class="trading-value positive">19,926.72 +0.81%</span></div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <!-- SCENE 4: EVENT STUDY -->
+  <div class="scene" id="scene-event">
+    <div class="chat-layout">
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <div class="sidebar-header-top">
+            <div class="logo-section">
+              <img src="pelican-logo.png" alt="Pelican" class="logo-img">
+              <span class="logo-text">PelicanAI</span>
+            </div>
+          </div>
+          <button class="new-chat-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            New chat
+          </button>
+        </div>
+        <div class="conversation-list">
+          <div class="conversation-item active">
+            <div class="conversation-title" id="eventConvoTitle">New Conversation</div>
+            <div class="conversation-time">Just now</div>
+          </div>
+        </div>
+      </aside>
+      <main class="main-content">
+        <div class="chat-container" id="eventChatContainer">
+          <div class="chat-inner">
+            <div class="messages-container" id="eventMessages"></div>
+          </div>
+        </div>
+        <div class="chat-input-container">
+          <div class="chat-input-inner">
+            <div class="input-wrapper" id="eventInputWrapper">
+              <textarea class="chat-textarea" id="eventInput" placeholder="Ask Pelican anything..."></textarea>
+              <button class="send-button">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </main>
+      <aside class="trading-panel">
+        <div class="trading-header"><h3 class="trading-title">Market Overview</h3></div>
+        <div class="trading-content">
+          <div class="trading-section-title">Watchlist</div>
+          <div class="trading-item"><span>AAPL</span><span class="trading-value positive">$248.13 +1.04%</span></div>
+          <div class="trading-item"><span>MSFT</span><span class="trading-value positive">$418.76 +0.87%</span></div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <!-- SCENE 5: ORDER FLOW -->
+  <div class="scene" id="scene-orderflow">
+    <div class="chat-layout">
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <div class="sidebar-header-top">
+            <div class="logo-section">
+              <img src="pelican-logo.png" alt="Pelican" class="logo-img">
+              <span class="logo-text">PelicanAI</span>
+            </div>
+          </div>
+          <button class="new-chat-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            New chat
+          </button>
+        </div>
+        <div class="conversation-list">
+          <div class="conversation-item active">
+            <div class="conversation-title" id="orderflowConvoTitle">New Conversation</div>
+            <div class="conversation-time">Just now</div>
+          </div>
+        </div>
+      </aside>
+      <main class="main-content">
+        <div class="chat-container" id="orderflowChatContainer">
+          <div class="chat-inner">
+            <div class="messages-container" id="orderflowMessages"></div>
+          </div>
+        </div>
+        <div class="chat-input-container">
+          <div class="chat-input-inner">
+            <div class="input-wrapper" id="orderflowInputWrapper">
+              <textarea class="chat-textarea" id="orderflowInput" placeholder="Ask Pelican anything..."></textarea>
+              <button class="send-button">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </main>
+      <aside class="trading-panel">
+        <div class="trading-header"><h3 class="trading-title">Market Overview</h3></div>
+        <div class="trading-content">
+          <div class="trading-section-title">Watchlist</div>
+          <div class="trading-item"><span>AAPL</span><span class="trading-value positive">$247.97 +0.25%</span></div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <!-- SCENE 6: CTA -->
+  <div class="scene" id="scene-cta">
+    <div class="cta-content">
+      <img src="pelican-logo.png" alt="Pelican" class="cta-logo" id="ctaLogo">
+      <div class="cta-tagline" id="ctaTagline">Ask better questions. Get real answers.</div>
+      <div class="cta-brand" id="ctaBrand">Pelican.</div>
+      <div class="cta-live" id="ctaLive">Live now.</div>
+    </div>
+  </div>
+
+  <script>
+    // ==========================================
+    // CONFIGURATION
+    // ==========================================
+    const CONFIG = {
+      scenes: [
+        { id: 'hook', duration: 5000 },
+        { id: 'scanner', duration: 13000 },
+        { id: 'coaching', duration: 10000 },
+        { id: 'event', duration: 12000 },
+        { id: 'orderflow', duration: 12000 },
+        { id: 'cta', duration: 8000 }
+      ],
+      typingSpeed: 30,
+      streamingSpeed: 5,
+      cardStaggerDelay: 150,
+      logoPath: 'pelican-logo.png'
+    };
+
+    // ==========================================
+    // UTILITIES
+    // ==========================================
+    const cursor = document.getElementById('demoCursor');
+    let cursorX = window.innerWidth / 2;
+    let cursorY = window.innerHeight / 2;
+
+    function delay(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    function updateCursor() {
+      cursor.style.left = cursorX + 'px';
+      cursor.style.top = cursorY + 'px';
+    }
+
+    async function moveCursor(targetX, targetY, duration = 800) {
+      return new Promise(resolve => {
+        const startX = cursorX, startY = cursorY, startTime = performance.now();
+        function animate(currentTime) {
+          const elapsed = currentTime - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+          const easeProgress = 1 - Math.pow(1 - progress, 3);
+          cursorX = startX + (targetX - startX) * easeProgress;
+          cursorY = startY + (targetY - startY) * easeProgress;
+          updateCursor();
+          if (progress < 1) requestAnimationFrame(animate);
+          else resolve();
+        }
+        requestAnimationFrame(animate);
+      });
+    }
+
+    async function clickAnimation() {
+      cursor.classList.add('clicking');
+      await delay(100);
+      cursor.classList.remove('clicking');
+      await delay(100);
+    }
+
+    async function typeText(element, text, speed = 30) {
+      for (let i = 0; i < text.length; i++) {
+        element.value += text[i];
+        element.style.height = 'auto';
+        element.style.height = Math.min(element.scrollHeight, 168) + 'px';
+        await delay(speed);
+      }
+    }
+
+    async function streamText(element, text, speed = 5) {
+      for (let i = 0; i < text.length; i++) {
+        element.innerHTML = formatMessage(text.substring(0, i + 1));
+        const container = element.closest('.chat-container');
+        if (container) container.scrollTop = container.scrollHeight;
+        await delay(speed);
+      }
+    }
+
+    function formatMessage(text) {
+      let formatted = text.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+      return formatted.replace(/\n/g, '<br>');
+    }
+
+    function showScene(sceneId) {
+      document.querySelectorAll('.scene').forEach(s => s.classList.remove('active'));
+      document.getElementById(`scene-${sceneId}`).classList.add('active');
+    }
+
+    function addUserMessage(container, text) {
+      const div = document.createElement('div');
+      div.className = 'message user';
+      div.innerHTML = `
+        <div class="message-content">
+          <div class="message-bubble">
+            <div class="message-text">${text}</div>
+          </div>
+        </div>
+        <div class="avatar user">U</div>
+      `;
+      container.appendChild(div);
+      setTimeout(() => div.classList.add('visible'), 50);
+      return div;
+    }
+
+    function addTypingIndicator(container) {
+      const div = document.createElement('div');
+      div.className = 'message assistant visible';
+      div.id = 'typingIndicator';
+      div.innerHTML = `
+        <div class="avatar assistant"><img src="${CONFIG.logoPath}" alt="AI"></div>
+        <div class="message-content">
+          <div class="message-bubble">
+            <div class="typing-indicator">
+              <div class="typing-dot"></div>
+              <div class="typing-dot"></div>
+              <div class="typing-dot"></div>
+              <span class="typing-text">Pelican is thinking...</span>
+            </div>
+          </div>
+        </div>
+      `;
+      container.appendChild(div);
+      return div;
+    }
+
+    function removeTypingIndicator() {
+      const el = document.getElementById('typingIndicator');
+      if (el) el.remove();
+    }
+
+    function addAssistantMessage(container) {
+      const div = document.createElement('div');
+      div.className = 'message assistant';
+      div.innerHTML = `
+        <div class="avatar assistant"><img src="${CONFIG.logoPath}" alt="AI"></div>
+        <div class="message-content">
+          <div class="message-bubble">
+            <div class="message-text" id="streamingText"></div>
+          </div>
+        </div>
+      `;
+      container.appendChild(div);
+      setTimeout(() => div.classList.add('visible'), 50);
+      return div;
+    }
+
+    // ==========================================
+    // SCENE 1: HOOK
+    // ==========================================
+    async function runSceneHook() {
+      showScene('hook');
+
+      // Stagger card appearances
+      await delay(100);
+      document.getElementById('hookCard1').classList.add('visible');
+      await delay(150);
+      document.getElementById('hookCard2').classList.add('visible');
+      await delay(150);
+      document.getElementById('hookCard3').classList.add('visible');
+      await delay(150);
+      document.getElementById('hookCard4').classList.add('visible');
+
+      // Animate inner rows
+      await delay(300);
+
+      const animateRows = (selector) => {
+        const rows = document.querySelectorAll(selector);
+        rows.forEach((row, i) => {
+          setTimeout(() => row.classList.add('visible'), i * 100);
+        });
+      };
+
+      animateRows('#hookCard1 .scanner-row');
+      animateRows('#hookCard2 tbody tr');
+      animateRows('#hookCard3 .order-flow-item');
+      animateRows('#hookCard4 .coaching-item');
+
+      await delay(4000);
+    }
+
+    // ==========================================
+    // SCENE 2: SCANNER
+    // ==========================================
+    async function runSceneScanner() {
+      showScene('scanner');
+      cursor.classList.add('visible');
+
+      const input = document.getElementById('scannerInput');
+      const inputWrapper = document.getElementById('scannerInputWrapper');
+      const messages = document.getElementById('scannerMessages');
+      const prompt = "Show me US stocks down at least -3% today trading above $20 and trading at least 1.8x their normal volume";
+
+      await delay(500);
+
+      // Move cursor to input
+      const inputRect = input.getBoundingClientRect();
+      await moveCursor(inputRect.left + 100, inputRect.top + 20, 600);
+      await clickAnimation();
+      inputWrapper.classList.add('focused');
+
+      // Type query
+      await typeText(input, prompt, CONFIG.typingSpeed);
+      await delay(400);
+
+      // Send message
+      addUserMessage(messages, prompt);
+      input.value = '';
+      input.style.height = 'auto';
+      inputWrapper.classList.remove('focused');
+      document.getElementById('scannerConvoTitle').textContent = 'Stock Scanner';
+
+      await delay(500);
+      addTypingIndicator(messages);
+      await delay(800);
+      removeTypingIndicator();
+
+      // Add table response
+      const responseDiv = document.createElement('div');
+      responseDiv.className = 'message assistant visible';
+      responseDiv.innerHTML = `
+        <div class="avatar assistant"><img src="${CONFIG.logoPath}" alt="AI"></div>
+        <div class="message-content">
+          <div class="message-bubble">
+            <div class="message-text">Here are the stocks matching your criteria:</div>
+            <div class="response-table">
+              <div class="response-table-header">
+                <span>Ticker</span><span>Price</span><span>Change</span><span>Volume</span><span></span>
+              </div>
+              <div class="response-table-row highlight" data-row="0">
+                <span style="font-weight:600">CMCL</span><span>$27.02</span><span style="color:var(--red)">-16.6%</span><span>11.4x avg</span><span class="volume-badge">VOLUME SURGE</span>
+              </div>
+              <div class="response-table-row" data-row="1">
+                <span style="font-weight:600">RDTL</span><span>$47.53</span><span style="color:var(--red)">-20.5%</span><span>5.1x avg</span><span></span>
+              </div>
+              <div class="response-table-row" data-row="2">
+                <span style="font-weight:600">RDDT</span><span>$226.88</span><span style="color:var(--red)">-10.1%</span><span>1.9x avg</span><span></span>
+              </div>
+              <div class="response-table-row" data-row="3">
+                <span style="font-weight:600">BSX</span><span>$90.13</span><span style="color:var(--red)">-3.9%</span><span>2.9x avg</span><span></span>
+              </div>
+              <div class="response-table-row" data-row="4">
+                <span style="font-weight:600">ABVX</span><span>$116.50</span><span style="color:var(--red)">-6.8%</span><span>1.9x avg</span><span></span>
+              </div>
+              <div class="table-footer">Down 3%+ • Above $20 • 1.8x volume</div>
+            </div>
+          </div>
+        </div>
+      `;
+      messages.appendChild(responseDiv);
+
+      // Animate rows
+      const rows = responseDiv.querySelectorAll('.response-table-row');
+      for (let i = 0; i < rows.length; i++) {
+        await delay(150);
+        rows[i].classList.add('visible');
+      }
+      await delay(300);
+      responseDiv.querySelector('.table-footer').classList.add('visible');
+
+      cursor.classList.remove('visible');
+      await delay(3000);
+    }
+
+    // ==========================================
+    // SCENE 3: COACHING
+    // ==========================================
+    async function runSceneCoaching() {
+      showScene('coaching');
+      cursor.classList.add('visible');
+
+      const input = document.getElementById('coachingInput');
+      const inputWrapper = document.getElementById('coachingInputWrapper');
+      const messages = document.getElementById('coachingMessages');
+      const prompt = "I keep buying at the top and selling at the bottom. What am I doing wrong?";
+
+      const response = `It sounds like you might be getting caught up in emotional trading. Here are some tips:
+
+**1. Identify Market Trends:** Before making trades, identify the broader market trend. Are you in a bull market, bear market, or range-bound?
+
+**2. Set Clear Entry and Exit Rules:** Define criteria for entering and exiting. Use technical indicators like moving averages, RSI, or MACD.
+
+**3. Avoid Chasing Prices:** Don't buy just because a stock is going up. Look for pullback strategies where you buy the dip in an uptrend.
+
+**4. Risk Management:** Implement stop-loss orders to protect against large downside moves.
+
+**5. Stay Informed and Patient:** Sometimes the best trade is no trade at all. Don't give in to FOMO.
+
+**6. Reflect and Learn:** Review your trades to understand what works and what doesn't.`;
+
+      await delay(300);
+
+      const inputRect = input.getBoundingClientRect();
+      await moveCursor(inputRect.left + 100, inputRect.top + 20, 500);
+      await clickAnimation();
+      inputWrapper.classList.add('focused');
+
+      await typeText(input, prompt, CONFIG.typingSpeed);
+      await delay(300);
+
+      addUserMessage(messages, prompt);
+      input.value = '';
+      inputWrapper.classList.remove('focused');
+      document.getElementById('coachingConvoTitle').textContent = 'Trading Tips';
+
+      await delay(400);
+      addTypingIndicator(messages);
+      await delay(600);
+      removeTypingIndicator();
+
+      const msg = addAssistantMessage(messages);
+      const textEl = msg.querySelector('#streamingText');
+      await streamText(textEl, response, CONFIG.streamingSpeed);
+
+      cursor.classList.remove('visible');
+      await delay(1000);
+    }
+
+    // ==========================================
+    // SCENE 4: EVENT STUDY
+    // ==========================================
+    async function runSceneEvent() {
+      showScene('event');
+      cursor.classList.add('visible');
+
+      const input = document.getElementById('eventInput');
+      const inputWrapper = document.getElementById('eventInputWrapper');
+      const messages = document.getElementById('eventMessages');
+      const prompt = "Apple reports earnings this week. Show me the last 10 earnings events and the returns after each one.";
+
+      await delay(300);
+
+      const inputRect = input.getBoundingClientRect();
+      await moveCursor(inputRect.left + 100, inputRect.top + 20, 500);
+      await clickAnimation();
+      inputWrapper.classList.add('focused');
+
+      await typeText(input, prompt, CONFIG.typingSpeed);
+      await delay(300);
+
+      addUserMessage(messages, prompt);
+      input.value = '';
+      inputWrapper.classList.remove('focused');
+      document.getElementById('eventConvoTitle').textContent = 'AAPL Earnings';
+
+      await delay(400);
+      addTypingIndicator(messages);
+      await delay(600);
+      removeTypingIndicator();
+
+      const responseDiv = document.createElement('div');
+      responseDiv.className = 'message assistant visible';
+      responseDiv.innerHTML = `
+        <div class="avatar assistant"><img src="${CONFIG.logoPath}" alt="AI"></div>
+        <div class="message-content">
+          <div class="message-bubble">
+            <div class="message-text">Here's AAPL's earnings history:</div>
+            <table class="event-response-table">
+              <thead><tr class="visible"><th>Date</th><th>1-Day</th><th>1-Week</th><th>1-Month</th></tr></thead>
+              <tbody>
+                <tr data-row="0"><td>Oct 30 '25</td><td style="color:var(--red)">-0.38%</td><td style="color:var(--red)">-0.60%</td><td style="color:var(--green)">+4.31%</td></tr>
+                <tr data-row="1"><td>Jul 31 '25</td><td style="color:var(--red)">-2.50%</td><td style="color:var(--green)">+6.00%</td><td style="color:var(--green)">+11.84%</td></tr>
+                <tr data-row="2"><td>May 1 '25</td><td style="color:var(--red)">-3.74%</td><td style="color:var(--red)">-7.42%</td><td style="color:var(--red)">-5.45%</td></tr>
+                <tr data-row="3"><td>Oct 31 '24</td><td style="color:var(--red)">-1.33%</td><td style="color:var(--green)">+0.69%</td><td style="color:var(--green)">+6.06%</td></tr>
+                <tr data-row="4"><td>May 2 '24</td><td style="color:var(--green)">+5.98%</td><td style="color:var(--green)">+6.67%</td><td style="color:var(--green)">+12.14%</td></tr>
+              </tbody>
+            </table>
+            <div class="summary-text">7 of 10 earnings: negative 1-day reaction<br>6 of 10: positive 1-month return</div>
+            <div class="pattern-callout">
+              <div class="pattern-callout-text">Pattern: Sell the news → Buy the dip</div>
+            </div>
+          </div>
+        </div>
+      `;
+      messages.appendChild(responseDiv);
+
+      const rows = responseDiv.querySelectorAll('tbody tr');
+      for (let i = 0; i < rows.length; i++) {
+        await delay(200);
+        rows[i].classList.add('visible');
+      }
+
+      await delay(500);
+      responseDiv.querySelector('.summary-text').classList.add('visible');
+
+      await delay(800);
+      responseDiv.querySelector('.pattern-callout').classList.add('visible');
+
+      cursor.classList.remove('visible');
+      await delay(2500);
+    }
+
+    // ==========================================
+    // SCENE 5: ORDER FLOW
+    // ==========================================
+    async function runSceneOrderflow() {
+      showScene('orderflow');
+      cursor.classList.add('visible');
+
+      const input = document.getElementById('orderflowInput');
+      const inputWrapper = document.getElementById('orderflowInputWrapper');
+      const messages = document.getElementById('orderflowMessages');
+      const prompt = "What's really happening under the hood in AAPL today?";
+
+      await delay(300);
+
+      const inputRect = input.getBoundingClientRect();
+      await moveCursor(inputRect.left + 100, inputRect.top + 20, 500);
+      await clickAnimation();
+      inputWrapper.classList.add('focused');
+
+      await typeText(input, prompt, CONFIG.typingSpeed);
+      await delay(300);
+
+      addUserMessage(messages, prompt);
+      input.value = '';
+      inputWrapper.classList.remove('focused');
+      document.getElementById('orderflowConvoTitle').textContent = 'AAPL Analysis';
+
+      await delay(400);
+      addTypingIndicator(messages);
+      await delay(600);
+      removeTypingIndicator();
+
+      const responseDiv = document.createElement('div');
+      responseDiv.className = 'message assistant visible';
+      responseDiv.innerHTML = `
+        <div class="avatar assistant"><img src="${CONFIG.logoPath}" alt="AI"></div>
+        <div class="message-content">
+          <div class="message-bubble">
+            <div class="context-line">AAPL $247.36 → $247.97 (+0.25%) | Range: $244.67 – $274.61</div>
+            <div id="orderCallouts"></div>
+            <div class="insights-block" id="insightsBlock" style="opacity:0">
+              <strong>Insights:</strong> The clustering of significant price movements around 14:30 aligns with block trades, suggesting institutional involvement. The day was tumultuous, but the market settled close to its starting point—dynamic forces at play.
+            </div>
+          </div>
+        </div>
+      `;
+      messages.appendChild(responseDiv);
+
+      await delay(200);
+      responseDiv.querySelector('.context-line').classList.add('visible');
+
+      const callouts = [
+        { icon: '📊', text: '32.6M shares across 605,017 trades' },
+        { icon: '🔷', text: '6,064 large block trades' },
+        { icon: '💰', text: 'Largest block: 573,211 shares' },
+        { icon: '⏰', text: 'Heavy clustering around 14:30' }
+      ];
+
+      const calloutsContainer = document.getElementById('orderCallouts');
+      for (const callout of callouts) {
+        const div = document.createElement('div');
+        div.className = 'order-callout';
+        div.innerHTML = `<span class="order-callout-icon">${callout.icon}</span><span class="order-callout-text">${callout.text}</span>`;
+        calloutsContainer.appendChild(div);
+        await delay(100);
+        div.classList.add('visible');
+        await delay(900);
+      }
+
+      await delay(300);
+      document.getElementById('insightsBlock').style.opacity = '1';
+      document.getElementById('insightsBlock').style.transition = 'opacity 0.5s ease';
+
+      cursor.classList.remove('visible');
+      await delay(2000);
+    }
+
+    // ==========================================
+    // SCENE 6: CTA
+    // ==========================================
+    async function runSceneCta() {
+      showScene('cta');
+
+      await delay(500);
+
+      const logo = document.getElementById('ctaLogo');
+      logo.classList.add('visible');
+      await delay(800);
+      logo.classList.add('pulsing');
+
+      await delay(700);
+      document.getElementById('ctaTagline').classList.add('visible');
+
+      await delay(700);
+      document.getElementById('ctaBrand').classList.add('visible');
+
+      await delay(700);
+      document.getElementById('ctaLive').classList.add('visible');
+
+      await delay(5000);
+    }
+
+    // ==========================================
+    // MAIN
+    // ==========================================
+    async function runAllScenes() {
+      await runSceneHook();
+      await runSceneScanner();
+      await runSceneCoaching();
+      await runSceneEvent();
+      await runSceneOrderflow();
+      await runSceneCta();
+    }
+
+    window.addEventListener('load', () => {
+      document.querySelectorAll('img').forEach(img => {
+        img.onerror = function() { this.style.display = 'none'; };
+      });
+      runAllScenes();
+    });
+  </script>
+</body>
+</html>

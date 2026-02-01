@@ -241,6 +241,7 @@ export default function FAQ() {
           </Link>
           <div className="nav-links">
             <Link href="/#features">{t.marketing.nav.features}</Link>
+            <Link href="/how-to-use">How to Use</Link>
             <Link href="/#pricing">{t.marketing.nav.pricing}</Link>
             <Link href="/faq" className="active">{t.marketing.nav.faq}</Link>
             <LanguageSelector />
@@ -265,6 +266,7 @@ export default function FAQ() {
         >
           <div className="nav-mobile-inner">
             <Link href="/#features" onClick={() => setMobileNavOpen(false)}>{t.marketing.nav.features}</Link>
+            <Link href="/how-to-use" onClick={() => setMobileNavOpen(false)}>How to Use</Link>
             <Link href="/#pricing" onClick={() => setMobileNavOpen(false)}>{t.marketing.nav.pricing}</Link>
             <Link href="/faq" onClick={() => setMobileNavOpen(false)}>{t.marketing.nav.faq}</Link>
             <LanguageSelector />
