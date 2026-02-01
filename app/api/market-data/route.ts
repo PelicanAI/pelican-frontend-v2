@@ -74,10 +74,27 @@ export async function GET() {
     }
 
     if (!POLYGON_API_KEY) {
-      return NextResponse.json(
-        { error: "POLYGON_API_KEY not configured" },
-        { status: 500 }
-      )
+      return NextResponse.json({
+        indices: [
+          { symbol: "SPX", name: "S&P 500", price: null, change: null, changePercent: null },
+          { symbol: "IXIC", name: "Nasdaq", price: null, change: null, changePercent: null },
+          { symbol: "DJI", name: "Dow Jones", price: null, change: null, changePercent: null },
+        ],
+        vix: null,
+        vixChange: null,
+        sectors: [
+          { name: "Technology", changePercent: null },
+          { name: "Financials", changePercent: null },
+          { name: "Healthcare", changePercent: null },
+          { name: "Energy", changePercent: null },
+        ],
+        watchlist: [
+          { symbol: "AAPL", price: null, changePercent: null },
+          { symbol: "TSLA", price: null, changePercent: null },
+          { symbol: "NVDA", price: null, changePercent: null },
+          { symbol: "SPY", price: null, changePercent: null },
+        ],
+      })
     }
 
     // Fetch both endpoints in parallel
