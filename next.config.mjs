@@ -10,6 +10,7 @@ const nextConfig = {
     ignoreBuildErrors: false,
   },
   images: {
+    formats: ['image/avif', 'image/webp'],
     unoptimized: false,
   },
   // Security headers to protect against common attacks

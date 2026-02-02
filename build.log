@@ -1,0 +1,123 @@
+
+> pelican-trading@0.1.0 build
+> next build
+
+  ▲ Next.js 14.2.16
+  - Environments: .env.local
+  - Experiments (use with caution):
+    · instrumentationHook
+
+   Creating an optimized production build ...
+
+[2m[284.98ms][22m [@tailwindcss/postcss] app\globals.css
+[2m[  0.07ms][22m  [2m ↳ [22mQuick bail check
+[2m[ 42.30ms][22m  [2m ↳ [22mSetup compiler
+[2m[  0.85ms][22m    [2m ↳ [22mPostCSS AST -> Tailwind CSS AST
+[2m[ 41.42ms][22m    [2m ↳ [22mCreate compiler
+[2m[  0.19ms][22m  [2m ↳ [22mRegister full rebuild paths
+[2m[  1.53ms][22m  [2m ↳ [22mSetup scanner
+[2m[ 42.05ms][22m  [2m ↳ [22mScan for candidates
+[2m[ 61.26ms][22m  [2m ↳ [22mRegister dependency messages
+[2m[ 74.19ms][22m  [2m ↳ [22mBuild utilities
+[2m[ 51.74ms][22m  [2m ↳ [22mOptimization
+[2m[  1.64ms][22m    [2m ↳ [22mAST -> CSS
+[2m[ 26.63ms][22m    [2m ↳ [22mLightning CSS
+[2m[ 23.44ms][22m    [2m ↳ [22mCSS -> PostCSS AST
+[2m[ 11.13ms][22m  [2m ↳ [22mUpdate PostCSS AST
+
+ ✓ Compiled successfully
+   Linting and checking validity of types ...
+
+./app/(marketing)/faq/page.tsx
+239:13  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./app/(marketing)/how-to-use/page.tsx
+211:13  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+359:13  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./app/(marketing)/page.tsx
+20:11  Warning: 'user' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+82:13  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+158:13  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+460:13  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./app/api/health/route.ts
+24:9  Warning: 'startTime' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./app/api/stripe/billing-portal/route.ts
+9:28  Warning: 'request' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./app/chat/page.tsx
+12:10  Warning: 'useConversations' is defined but never used.  @typescript-eslint/no-unused-vars
+21:8  Warning: 'Link' is defined but never used.  @typescript-eslint/no-unused-vars
+44:9  Warning: 'pathname' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+54:10  Warning: 'isOnline' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+125:15  Warning: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+129:22  Warning: 'message' is defined but never used.  @typescript-eslint/no-unused-vars
+323:13  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+344:15  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./app/layout.tsx
+39:9  Warning: Custom fonts not added in `pages/_document.js` will only load for a single page. This is discouraged. See: https://nextjs.org/docs/messages/no-page-custom-font  @next/next/no-page-custom-font
+
+./components/chat/chat-container.tsx
+54:10  Warning: 'dragCounter' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+69:5  Warning: 'checkIfNearBottom' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+162:9  Warning: 'handleError' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+431:15  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./components/chat/chat-input.tsx
+5:10  Warning: 'Button' is defined but never used.  @typescript-eslint/no-unused-vars
+6:10  Warning: 'Card' is defined but never used.  @typescript-eslint/no-unused-vars
+7:35  Warning: 'Search' is defined but never used.  @typescript-eslint/no-unused-vars
+7:43  Warning: 'MapPin' is defined but never used.  @typescript-eslint/no-unused-vars
+7:51  Warning: 'Globe' is defined but never used.  @typescript-eslint/no-unused-vars
+7:58  Warning: 'Calendar' is defined but never used.  @typescript-eslint/no-unused-vars
+7:68  Warning: 'Mic' is defined but never used.  @typescript-eslint/no-unused-vars
+86:7  Warning: 'isDarkMode' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+89:7  Warning: 'onThemeChange' is defined but never used.  @typescript-eslint/no-unused-vars
+101:12  Warning: 'showThinkingNote' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+104:12  Warning: 'isHovered' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+104:23  Warning: 'setIsHovered' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+251:11  Warning: 'handleSuggestionClick' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+258:11  Warning: 'showCharCount' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./components/chat/conversation-sidebar.tsx
+34:10  Warning: 'LanguageSelector' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./components/chat/data-visualizations/data-table.tsx
+25:38  Warning: 'type' is defined but never used.  @typescript-eslint/no-unused-vars
+100:9  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+113:11  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./components/chat/file-upload-zone.tsx
+79:5  Warning: React Hook useCallback has a missing dependency: 'validateFile'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./components/chat/message-bubble.tsx
+160:3  Warning: 'isDarkMode' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+244:19  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+347:13  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./components/chat/table-image-display.tsx
+128:9  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./components/chat/welcome-screen.tsx
+23:11  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./components/marketing/HelpChat.tsx
+165:13  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./components/ui/use-toast.ts
+18:7  Warning: 'actionTypes' is assigned a value but only used as a type.  @typescript-eslint/no-unused-vars
+
+info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/basic-features/eslint#disabling-rules
+Failed to compile.
+
+./playwright.config.ts:1:30
+Type error: Cannot find module '@playwright/test' or its corresponding type declarations.
+
+[0m[31m[1m>[22m[39m[90m 1 |[39m [36mimport[39m { defineConfig } [36mfrom[39m [32m"@playwright/test"[39m[0m
+[0m [90m   |[39m                              [31m[1m^[22m[39m[0m
+[0m [90m 2 |[39m[0m
+[0m [90m 3 |[39m [36mexport[39m [36mdefault[39m defineConfig({[0m
+[0m [90m 4 |[39m   testDir[33m:[39m [32m"./tests"[39m[33m,[39m[0m
