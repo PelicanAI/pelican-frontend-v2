@@ -82,8 +82,6 @@ export default function HowToUsePage() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'traders' | 'investors'>('traders');
   const topRef = useRef<HTMLDivElement>(null);
-  const pendingScrollRestoreRef = useRef(false);
-  const lastScrollTopRef = useRef(0);
 
   const handleLaunchApp = () => {
     router.push('/auth/login');
@@ -125,23 +123,21 @@ export default function HowToUsePage() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Preserve scroll position when switching tabs (iframes can trigger jumps)
+  // Force scroll to top on tab change (iframes can trigger jumps)
   useLayoutEffect(() => {
-    if (!pendingScrollRestoreRef.current) return;
-
     const marketingPage = document.querySelector('.marketing-page') as HTMLElement | null;
-    const restore = () => {
-      window.scrollTo({ top: lastScrollTopRef.current, left: 0, behavior: 'instant' });
-      document.documentElement.scrollTop = lastScrollTopRef.current;
-      document.body.scrollTop = lastScrollTopRef.current;
+    const scrollTopNow = () => {
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
       if (marketingPage) {
-        marketingPage.scrollTop = lastScrollTopRef.current;
+        marketingPage.scrollTop = 0;
       }
+      topRef.current?.scrollIntoView({ behavior: 'instant', block: 'start' });
     };
 
-    restore();
-    const timers = [0, 50, 150].map((delay) => setTimeout(restore, delay));
-    pendingScrollRestoreRef.current = false;
+    scrollTopNow();
+    const timers = [0, 50, 150].map((delay) => setTimeout(scrollTopNow, delay));
     return () => timers.forEach(clearTimeout);
   }, [activeTab]);
 
@@ -195,8 +191,6 @@ export default function HowToUsePage() {
   const currentDemos = activeTab === 'traders' ? traderDemos : investorDemos;
   const handleTabChange = (tab: 'traders' | 'investors') => {
     if (tab === activeTab) return;
-    lastScrollTopRef.current = window.scrollY;
-    pendingScrollRestoreRef.current = true;
     setActiveTab(tab);
   };
 
