@@ -77,26 +77,29 @@ export async function GET(request: NextRequest) {
         hasUserCredits: !!userCredits
       })
 
-      // Valid plan types that grant access
+      // New user - no credits row yet, trigger will create it with 10 free questions
+      if (creditsError?.code === 'PGRST116' || !userCredits) {
+        console.log('[AUTH CALLBACK] New user, no credits row yet - redirecting to chat')
+        return NextResponse.redirect(new URL('/chat', request.url))
+      }
+
       const validPlans = ['base', 'pro', 'power', 'founder', 'starter']
-      const hasSubscription = userCredits?.plan_type && validPlans.includes(userCredits.plan_type)
-      const hasFreeQuestions = (userCredits?.free_questions_remaining ?? 0) > 0
+      const hasSubscription = userCredits.plan_type && validPlans.includes(userCredits.plan_type)
+      const hasFreeQuestions = (userCredits.free_questions_remaining ?? 0) > 0
       const hasAccess = hasSubscription || hasFreeQuestions
 
       console.log('[AUTH CALLBACK] Redirect decision', {
         hasSubscription,
         hasFreeQuestions,
         hasAccess,
-        planType: userCredits?.plan_type,
-        freeQuestionsRemaining: userCredits?.free_questions_remaining,
+        planType: userCredits.plan_type,
+        freeQuestionsRemaining: userCredits.free_questions_remaining,
         redirectTo: hasAccess ? '/chat' : '/pricing'
       })
 
-      // Redirect based on subscription status
       if (hasAccess) {
         return NextResponse.redirect(new URL('/chat', request.url))
       } else {
-        // New user or no subscription - redirect to pricing
         return NextResponse.redirect(new URL('/pricing', request.url))
       }
     }

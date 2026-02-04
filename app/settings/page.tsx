@@ -592,6 +592,48 @@ export default function SettingsPage() {
                                 </p>
                               </div>
                             </div>
+                          ) : credits?.plan === 'none' && (credits.freeQuestionsRemaining ?? 0) > 0 ? (
+                            <div className="space-y-3 p-4 bg-amber-500/10 border border-amber-500/20 rounded-lg">
+                              <div className="flex items-center gap-3">
+                                <Zap className="w-5 h-5 text-amber-500 flex-shrink-0" />
+                                <div className="flex-1">
+                                  <p className="font-semibold text-amber-500">
+                                    Free Trial
+                                  </p>
+                                  <p className="text-sm text-amber-600/80">
+                                    {credits.freeQuestionsRemaining} of 10 free questions remaining
+                                  </p>
+                                </div>
+                              </div>
+                              <div className="h-2 bg-amber-500/20 rounded-full overflow-hidden">
+                                <div
+                                  className="h-full bg-amber-500 rounded-full transition-all"
+                                  style={{
+                                    width: `${Math.min(
+                                      100,
+                                      ((10 - credits.freeQuestionsRemaining) / 10) * 100
+                                    )}%`,
+                                  }}
+                                />
+                              </div>
+                              <p className="text-xs text-amber-600/80">
+                                {Math.min(
+                                  100,
+                                  Math.round(((10 - credits.freeQuestionsRemaining) / 10) * 100)
+                                )}% used
+                              </p>
+                            </div>
+                          ) : credits?.plan === 'none' && (credits.freeQuestionsRemaining ?? 0) === 0 ? (
+                            <div className="flex items-center gap-3 p-4 bg-muted border border-border rounded-lg">
+                              <div className="flex-1">
+                                <p className="font-semibold text-foreground">
+                                  Trial Ended
+                                </p>
+                                <p className="text-sm text-muted-foreground">
+                                  Subscribe to continue using Pelican AI
+                                </p>
+                              </div>
+                            </div>
                           ) : (
                             <div className="flex items-center gap-3 p-4 bg-muted border border-border rounded-lg">
                               <div className="flex-1">
