@@ -41,11 +41,18 @@ export interface TrialExhaustedInfo {
   statusCode?: number;
 }
 
+export interface InsufficientCreditsInfo {
+  required?: number;
+  balance?: number;
+  message?: string;
+}
+
 interface StreamCallbacks {
   onChunk?: (chunk: string) => void;
   onComplete?: (fullResponse: string, conversationId?: string) => void | Promise<void>;
   onError?: (error: Error) => void;
   onTrialExhausted?: (info: TrialExhaustedInfo) => void;
+  onInsufficientCredits?: (info: InsufficientCreditsInfo) => void;
 }
 
 interface ConversationMessage {
@@ -89,6 +96,8 @@ function parseSSEChunk(chunk: string): {
   type?: string;
   statusCode?: number;
   freeQuestionsRemaining?: number;
+  required?: number;
+  balance?: number;
   message?: string;
   conversationId?: string;
   sessionId?: string;
@@ -112,6 +121,8 @@ function parseSSEChunk(chunk: string): {
       type: data.type,
       statusCode: data.status_code,
       freeQuestionsRemaining: data.free_questions_remaining,
+      required: data.required,
+      balance: data.balance,
       message: data.message,
       conversationId: data.conversation_id,
       sessionId: data.session_id,
@@ -245,6 +256,7 @@ export function useStreamingChat(): UseStreamingChatReturn {
       let lastChunkTime = Date.now();
       let capturedConversationId: string | undefined;
       let trialExhausted = false;
+      let insufficientCredits = false;
 
       try {
         // Get Supabase session token for authentication
@@ -331,6 +343,9 @@ export function useStreamingChat(): UseStreamingChatReturn {
               const isTrialExhausted =
                 parsed.error === 'trial_exhausted' ||
                 (parsed.type === 'error' && parsed.error === 'trial_exhausted');
+              const isInsufficientCredits =
+                parsed.error === 'insufficient_credits' ||
+                (parsed.type === 'error' && parsed.error === 'insufficient_credits');
 
               if (isTrialExhausted) {
                 trialExhausted = true;
@@ -338,6 +353,17 @@ export function useStreamingChat(): UseStreamingChatReturn {
                   message: parsed.message,
                   freeQuestionsRemaining: parsed.freeQuestionsRemaining,
                   statusCode: parsed.statusCode,
+                });
+                abortStream();
+                break;
+              }
+
+              if (isInsufficientCredits) {
+                insufficientCredits = true;
+                callbacks.onInsufficientCredits?.({
+                  required: parsed.required,
+                  balance: parsed.balance,
+                  message: parsed.message,
                 });
                 abortStream();
                 break;
@@ -367,7 +393,7 @@ export function useStreamingChat(): UseStreamingChatReturn {
             }
           }
 
-          if (trialExhausted) {
+          if (trialExhausted || insufficientCredits) {
             break;
           }
         }
@@ -381,7 +407,7 @@ export function useStreamingChat(): UseStreamingChatReturn {
           }
         }
 
-        if (trialExhausted) {
+        if (trialExhausted || insufficientCredits) {
           return;
         }
 

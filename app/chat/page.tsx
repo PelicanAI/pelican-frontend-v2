@@ -23,6 +23,7 @@ import { cn } from "@/lib/utils"
 import { SettingsModal } from "@/components/settings-modal"
 import { PaywallGate } from "@/components/paywall-gate"
 import { TrialExhaustedModal } from "@/components/trial-exhausted-modal"
+import { InsufficientCreditsModal } from "@/components/insufficient-credits-modal"
 import { useCreditsContext } from "@/providers/credits-provider"
 
 // Loading screen component for chat page
@@ -110,6 +111,10 @@ export default function ChatPage() {
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [trialExhaustedOpen, setTrialExhaustedOpen] = useState(false)
   const [trialExhaustedMessage, setTrialExhaustedMessage] = useState<string | null>(null)
+  const [insufficientCreditsOpen, setInsufficientCreditsOpen] = useState(false)
+  const [insufficientCreditsMessage, setInsufficientCreditsMessage] = useState<string | null>(null)
+  const [insufficientCreditsRequired, setInsufficientCreditsRequired] = useState<number | null>(null)
+  const [insufficientCreditsBalance, setInsufficientCreditsBalance] = useState<number | null>(null)
   const chatInputRef = useRef<ChatInputRef>(null)
 
   // Get conversation ID from URL
@@ -144,6 +149,15 @@ export default function ChatPage() {
         info.message || 'Your free trial has ended. Subscribe to continue using Pelican.'
       )
       setTrialExhaustedOpen(true)
+      refetch()
+    },
+    onInsufficientCredits: (info) => {
+      setInsufficientCreditsMessage(
+        info.message || 'Not enough credits to run this query.'
+      )
+      setInsufficientCreditsRequired(info.required ?? null)
+      setInsufficientCreditsBalance(info.balance ?? null)
+      setInsufficientCreditsOpen(true)
       refetch()
     },
   })
@@ -472,6 +486,13 @@ export default function ChatPage() {
         isOpen={trialExhaustedOpen}
         message={trialExhaustedMessage}
         onClose={() => setTrialExhaustedOpen(false)}
+      />
+      <InsufficientCreditsModal
+        isOpen={insufficientCreditsOpen}
+        message={insufficientCreditsMessage}
+        required={insufficientCreditsRequired}
+        balance={insufficientCreditsBalance}
+        onClose={() => setInsufficientCreditsOpen(false)}
       />
         </div>
       </ChatErrorBoundary>

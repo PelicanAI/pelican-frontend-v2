@@ -14,7 +14,7 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useStreamingChat, type TrialExhaustedInfo } from './use-streaming-chat';
+import { useStreamingChat, type TrialExhaustedInfo, type InsufficientCreditsInfo } from './use-streaming-chat';
 import { logger } from '@/lib/logger';
 import type { Message, Attachment } from '@/lib/chat-utils';
 import { createClient } from '@/lib/supabase/client';
@@ -42,6 +42,7 @@ interface UseChatOptions {
   onFinish?: (message: Message) => void;
   onConversationCreated?: (conversationId: string) => void;
   onTrialExhausted?: (info: TrialExhaustedInfo) => void;
+  onInsufficientCredits?: (info: InsufficientCreditsInfo) => void;
 }
 
 interface UseChatReturn {
@@ -126,6 +127,7 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
     onFinish,
     onConversationCreated,
     onTrialExhausted,
+    onInsufficientCredits,
   } = options;
 
   // ---------------------------------------------------------------------------
@@ -428,6 +430,14 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
               setIsLoading(false);
               onTrialExhausted?.(info);
               logger.warn('[CHAT-TRIAL] Trial exhausted during stream', { ...info });
+            },
+            onInsufficientCredits: (info: InsufficientCreditsInfo) => {
+              updateMessagesWithSync((prev) =>
+                prev.filter((msg) => msg.id !== assistantMessageId)
+              );
+              setIsLoading(false);
+              onInsufficientCredits?.(info);
+              logger.warn('[CHAT-CREDITS] Insufficient credits during stream', { ...info });
             },
           },
           currentConversationId,

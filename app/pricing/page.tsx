@@ -90,7 +90,7 @@ export default function PricingPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const preselectedPlan = searchParams.get('plan')
-  const { isSubscribed, isFounder, loading: creditsLoading } = useCreditsContext()
+  const { isSubscribed, isFounder, loading: creditsLoading, credits } = useCreditsContext()
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [user, setUser] = useState<User | null>(null)
@@ -188,7 +188,9 @@ export default function PricingPage() {
       <div className="page-container-wide">
         <div className="text-center mb-12">
           <Link href="/chat" className="text-gray-500 hover:text-gray-400 text-sm mb-4 inline-block">
-            ← Back to chat
+            {user && credits?.plan === 'none' && (credits.freeQuestionsRemaining ?? 0) >= 10
+              ? '← Start Free Trial'
+              : '← Back to chat'}
           </Link>
           <h1 className="text-3xl sm:text-4xl font-bold text-white mb-4">
             Simple, Credit-Based Pricing
@@ -205,6 +207,25 @@ export default function PricingPage() {
         {error && (
           <div className="max-w-md mx-auto mb-8 p-4 bg-red-900/20 border border-red-800 rounded-lg text-red-400 text-sm text-center">
             {error}
+          </div>
+        )}
+
+        {user && credits?.plan === 'none' && (credits.freeQuestionsRemaining ?? 0) > 0 && (
+          <div className="max-w-3xl mx-auto mb-10 p-6 bg-amber-500/10 border border-amber-500/20 rounded-xl text-center">
+            <p className="text-lg font-semibold text-amber-400">
+              🎉 You have {credits.freeQuestionsRemaining} free question{credits.freeQuestionsRemaining === 1 ? '' : 's'}
+            </p>
+            <p className="text-sm text-amber-200/80 mt-2">
+              Try Pelican&apos;s AI trading assistant - no card needed.
+            </p>
+            <div className="mt-5">
+              <Link
+                href="/chat"
+                className="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-amber-500 text-gray-900 font-medium hover:bg-amber-400 transition-colors"
+              >
+                Start Free Trial
+              </Link>
+            </div>
           </div>
         )}
 
