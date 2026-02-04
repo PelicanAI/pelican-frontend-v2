@@ -35,10 +35,17 @@ const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-
 // TYPES
 // =============================================================================
 
+export interface TrialExhaustedInfo {
+  message?: string;
+  freeQuestionsRemaining?: number;
+  statusCode?: number;
+}
+
 interface StreamCallbacks {
   onChunk?: (chunk: string) => void;
   onComplete?: (fullResponse: string, conversationId?: string) => void | Promise<void>;
   onError?: (error: Error) => void;
+  onTrialExhausted?: (info: TrialExhaustedInfo) => void;
 }
 
 interface ConversationMessage {
@@ -75,7 +82,17 @@ interface UseStreamingChatReturn {
 /**
  * Parse SSE data from a chunk
  */
-function parseSSEChunk(chunk: string): { content?: string; done?: boolean; error?: string; conversationId?: string; sessionId?: string } | null {
+function parseSSEChunk(chunk: string): {
+  content?: string;
+  done?: boolean;
+  error?: string;
+  type?: string;
+  statusCode?: number;
+  freeQuestionsRemaining?: number;
+  message?: string;
+  conversationId?: string;
+  sessionId?: string;
+} | null {
   if (!chunk.startsWith('data: ')) {
     return null;
   }
@@ -92,6 +109,10 @@ function parseSSEChunk(chunk: string): { content?: string; done?: boolean; error
       content: data.delta || data.content,  // Backend sends "delta", not "content"
       done: data.type === 'done' || data.done,  // Backend sends type: "done"
       error: data.error,
+      type: data.type,
+      statusCode: data.status_code,
+      freeQuestionsRemaining: data.free_questions_remaining,
+      message: data.message,
       conversationId: data.conversation_id,
       sessionId: data.session_id,
     };
@@ -223,6 +244,7 @@ export function useStreamingChat(): UseStreamingChatReturn {
       let fullResponse = '';
       let lastChunkTime = Date.now();
       let capturedConversationId: string | undefined;
+      let trialExhausted = false;
 
       try {
         // Get Supabase session token for authentication
@@ -306,6 +328,21 @@ export function useStreamingChat(): UseStreamingChatReturn {
             if (!parsed) continue;
 
             if (parsed.error) {
+              const isTrialExhausted =
+                parsed.error === 'trial_exhausted' ||
+                (parsed.type === 'error' && parsed.error === 'trial_exhausted');
+
+              if (isTrialExhausted) {
+                trialExhausted = true;
+                callbacks.onTrialExhausted?.({
+                  message: parsed.message,
+                  freeQuestionsRemaining: parsed.freeQuestionsRemaining,
+                  statusCode: parsed.statusCode,
+                });
+                abortStream();
+                break;
+              }
+
               throw new Error(parsed.error);
             }
 
@@ -329,6 +366,10 @@ export function useStreamingChat(): UseStreamingChatReturn {
               callbacks.onChunk?.(parsed.content);
             }
           }
+
+          if (trialExhausted) {
+            break;
+          }
         }
 
         // Process any remaining buffer
@@ -338,6 +379,10 @@ export function useStreamingChat(): UseStreamingChatReturn {
             fullResponse += parsed.content;
             callbacks.onChunk?.(parsed.content);
           }
+        }
+
+        if (trialExhausted) {
+          return;
         }
 
         // Call complete callback with conversation ID

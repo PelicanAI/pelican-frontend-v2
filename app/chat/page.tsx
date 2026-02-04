@@ -22,6 +22,8 @@ import Link from "next/link"
 import { cn } from "@/lib/utils"
 import { SettingsModal } from "@/components/settings-modal"
 import { PaywallGate } from "@/components/paywall-gate"
+import { TrialExhaustedModal } from "@/components/trial-exhausted-modal"
+import { useCreditsContext } from "@/providers/credits-provider"
 
 // Loading screen component for chat page
 function ChatLoadingScreen() {
@@ -40,6 +42,7 @@ function ChatLoadingScreen() {
 
 export default function ChatPage() {
   const { user, loading: authLoading } = useAuth()
+  const { refetch } = useCreditsContext()
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -105,6 +108,8 @@ export default function ChatPage() {
     }
   }, [])
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const [trialExhaustedOpen, setTrialExhaustedOpen] = useState(false)
+  const [trialExhaustedMessage, setTrialExhaustedMessage] = useState<string | null>(null)
   const chatInputRef = useRef<ChatInputRef>(null)
 
   // Get conversation ID from URL
@@ -133,6 +138,13 @@ export default function ChatPage() {
     },
     onConversationCreated: (conversationId: string) => {
       conversationRouter.setCurrentConversationId(conversationId)
+    },
+    onTrialExhausted: (info) => {
+      setTrialExhaustedMessage(
+        info.message || 'Your free trial has ended. Subscribe to continue using Pelican.'
+      )
+      setTrialExhaustedOpen(true)
+      refetch()
     },
   })
 
@@ -456,6 +468,11 @@ export default function ChatPage() {
       )}
 
       <SettingsModal open={settingsOpen} onOpenChange={setSettingsOpen} />
+      <TrialExhaustedModal
+        isOpen={trialExhaustedOpen}
+        message={trialExhaustedMessage}
+        onClose={() => setTrialExhaustedOpen(false)}
+      />
         </div>
       </ChatErrorBoundary>
     </PaywallGate>

@@ -65,7 +65,7 @@ export async function GET(request: NextRequest) {
       // Check if user has subscription
       const { data: userCredits, error: creditsError } = await supabase
         .from('user_credits')
-        .select('plan_type')
+        .select('plan_type, free_questions_remaining')
         .eq('user_id', user.id)
         .single()
 
@@ -73,21 +73,27 @@ export async function GET(request: NextRequest) {
         hasError: !!creditsError,
         error: creditsError?.message,
         planType: userCredits?.plan_type,
+        freeQuestionsRemaining: userCredits?.free_questions_remaining,
         hasUserCredits: !!userCredits
       })
 
       // Valid plan types that grant access
       const validPlans = ['base', 'pro', 'power', 'founder', 'starter']
       const hasSubscription = userCredits?.plan_type && validPlans.includes(userCredits.plan_type)
+      const hasFreeQuestions = (userCredits?.free_questions_remaining ?? 0) > 0
+      const hasAccess = hasSubscription || hasFreeQuestions
 
       console.log('[AUTH CALLBACK] Redirect decision', {
         hasSubscription,
+        hasFreeQuestions,
+        hasAccess,
         planType: userCredits?.plan_type,
-        redirectTo: hasSubscription ? '/chat' : '/pricing'
+        freeQuestionsRemaining: userCredits?.free_questions_remaining,
+        redirectTo: hasAccess ? '/chat' : '/pricing'
       })
 
       // Redirect based on subscription status
-      if (hasSubscription) {
+      if (hasAccess) {
         return NextResponse.redirect(new URL('/chat', request.url))
       } else {
         // New user or no subscription - redirect to pricing

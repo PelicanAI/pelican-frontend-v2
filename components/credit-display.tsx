@@ -20,6 +20,41 @@ export function CreditDisplay({ variant = 'default', className = '' }: CreditDis
     )
   }
 
+  const validPlans = ['base', 'pro', 'power', 'founder', 'starter']
+  const isSubscribed = credits && validPlans.includes(credits.plan)
+  const isTrial = credits && !isSubscribed && credits.freeQuestionsRemaining > 0
+
+  if (isTrial) {
+    const remaining = credits.freeQuestionsRemaining
+    const isLow = remaining <= 3
+
+    if (variant === 'compact') {
+      return (
+        <div className={`flex items-center gap-1.5 ${className}`}>
+          <Zap className={`w-3.5 h-3.5 ${isLow ? 'text-amber-400' : 'text-blue-400'}`} />
+          <span className={`text-xs font-medium ${isLow ? 'text-amber-400' : 'text-blue-400'}`}>
+            {remaining} free
+          </span>
+        </div>
+      )
+    }
+
+    return (
+      <div className={`flex items-center gap-2 ${className}`}>
+        <Zap className={`w-4 h-4 ${isLow ? 'text-amber-400' : 'text-blue-400'}`} />
+        <span className={`text-sm font-medium ${isLow ? 'text-amber-400' : 'text-blue-400'}`}>
+          {remaining} free question{remaining !== 1 ? 's' : ''} left
+        </span>
+        <Link
+          href="/pricing"
+          className="text-xs text-muted-foreground hover:text-white hover:underline"
+        >
+          Upgrade
+        </Link>
+      </div>
+    )
+  }
+
   if (!credits || credits.plan === 'none') {
     return (
       <Link 

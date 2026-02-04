@@ -9,6 +9,7 @@ interface CreditInfo {
   monthlyAllocation: number
   usedThisMonth: number
   billingCycleStart: string | null
+  freeQuestionsRemaining: number
 }
 
 interface UseCreditsReturn {
@@ -42,7 +43,7 @@ export function useCredits(): UseCreditsReturn {
       if (rpcError) {
         const { data: directData, error: directError } = await supabase
           .from('user_credits')
-          .select('credits_balance, plan_type, plan_credits_monthly, credits_used_this_month, billing_cycle_start')
+          .select('credits_balance, plan_type, plan_credits_monthly, credits_used_this_month, billing_cycle_start, free_questions_remaining')
           .eq('user_id', user.id)
           .single()
 
@@ -53,7 +54,8 @@ export function useCredits(): UseCreditsReturn {
               plan: 'none',
               monthlyAllocation: 0,
               usedThisMonth: 0,
-              billingCycleStart: null
+              billingCycleStart: null,
+              freeQuestionsRemaining: 10
             })
           } else {
             throw directError
@@ -64,7 +66,8 @@ export function useCredits(): UseCreditsReturn {
             plan: directData.plan_type,
             monthlyAllocation: directData.plan_credits_monthly,
             usedThisMonth: directData.credits_used_this_month,
-            billingCycleStart: directData.billing_cycle_start
+            billingCycleStart: directData.billing_cycle_start,
+            freeQuestionsRemaining: directData.free_questions_remaining ?? 0
           })
         }
       } else if (data) {
@@ -73,7 +76,8 @@ export function useCredits(): UseCreditsReturn {
           plan: data.plan,
           monthlyAllocation: data.monthly_allocation,
           usedThisMonth: data.used_this_month,
-          billingCycleStart: data.billing_cycle_start
+          billingCycleStart: data.billing_cycle_start,
+          freeQuestionsRemaining: data.free_questions_remaining ?? 0
         })
       }
 
@@ -148,7 +152,8 @@ export function useCredits(): UseCreditsReturn {
               plan: newData.plan_type,
               monthlyAllocation: newData.plan_credits_monthly,
               usedThisMonth: newData.credits_used_this_month,
-              billingCycleStart: newData.billing_cycle_start
+              billingCycleStart: newData.billing_cycle_start,
+              freeQuestionsRemaining: newData.free_questions_remaining ?? 0
             })
           }
         )

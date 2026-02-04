@@ -9,6 +9,7 @@ interface CreditInfo {
   monthlyAllocation: number
   usedThisMonth: number
   billingCycleStart: string | null
+  freeQuestionsRemaining: number
 }
 
 interface CreditsContextType {
@@ -20,6 +21,8 @@ interface CreditsContextType {
   canAfford: (cost: number) => boolean
   isSubscribed: boolean
   isFounder: boolean
+  isTrial: boolean
+  hasAccess: boolean
 }
 
 const CreditsContext = createContext<CreditsContextType | null>(null)
@@ -38,6 +41,10 @@ export function CreditsProvider({ children }: { children: ReactNode }) {
     credits.plan !== 'past_due'
   
   const isFounder = credits !== null && credits.plan === 'founder'
+  const isTrial = credits !== null &&
+    !isSubscribed &&
+    credits.freeQuestionsRemaining > 0
+  const hasAccess = isSubscribed || isFounder || isTrial
 
   return (
     <CreditsContext.Provider
@@ -49,7 +56,9 @@ export function CreditsProvider({ children }: { children: ReactNode }) {
         updateBalance,
         canAfford,
         isSubscribed,
-        isFounder
+        isFounder,
+        isTrial,
+        hasAccess
       }}
     >
       {children}

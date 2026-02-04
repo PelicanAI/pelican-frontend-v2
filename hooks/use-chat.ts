@@ -14,7 +14,7 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useStreamingChat } from './use-streaming-chat';
+import { useStreamingChat, type TrialExhaustedInfo } from './use-streaming-chat';
 import { logger } from '@/lib/logger';
 import type { Message, Attachment } from '@/lib/chat-utils';
 import { createClient } from '@/lib/supabase/client';
@@ -41,6 +41,7 @@ interface UseChatOptions {
   onResponseComplete?: (response: string) => void;
   onFinish?: (message: Message) => void;
   onConversationCreated?: (conversationId: string) => void;
+  onTrialExhausted?: (info: TrialExhaustedInfo) => void;
 }
 
 interface UseChatReturn {
@@ -124,6 +125,7 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
     onResponseComplete,
     onFinish,
     onConversationCreated,
+    onTrialExhausted,
   } = options;
 
   // ---------------------------------------------------------------------------
@@ -418,6 +420,14 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
                 prev.filter((msg) => msg.id !== assistantMessageId)
               );
               logger.error('[CHAT-ERROR] Streaming error', err);
+            },
+            onTrialExhausted: (info: TrialExhaustedInfo) => {
+              updateMessagesWithSync((prev) =>
+                prev.filter((msg) => msg.id !== assistantMessageId)
+              );
+              setIsLoading(false);
+              onTrialExhausted?.(info);
+              logger.warn('[CHAT-TRIAL] Trial exhausted during stream', { ...info });
             },
           },
           currentConversationId,
