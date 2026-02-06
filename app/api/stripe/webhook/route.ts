@@ -2,22 +2,49 @@ import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { createClient } from '@supabase/supabase-js'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-12-15.clover'
-})
-
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
-
 const PLAN_CREDITS: Record<string, number> = {
   base: 1000,
   pro: 3500,
   power: 10000
 }
 
+const getStripeClient = () => {
+  const secretKey = process.env.STRIPE_SECRET_KEY
+  if (!secretKey) {
+    throw new Error('Missing STRIPE_SECRET_KEY')
+  }
+  return new Stripe(secretKey, { apiVersion: '2025-12-15.clover' })
+}
+
+const getSupabaseAdmin = () => {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+  if (!supabaseUrl || !serviceRoleKey) {
+    throw new Error('Missing Supabase admin credentials')
+  }
+  return createClient(supabaseUrl, serviceRoleKey)
+}
+
 export async function POST(request: NextRequest) {
+  let stripe: Stripe
+  try {
+    stripe = getStripeClient()
+  } catch (error) {
+    console.error('Stripe webhook config error:', error)
+    return NextResponse.json(
+      { error: 'Stripe is not configured' },
+      { status: 500 }
+    )
+  }
+
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
+  if (!webhookSecret) {
+    return NextResponse.json(
+      { error: 'Stripe webhook is not configured' },
+      { status: 500 }
+    )
+  }
+
   const body = await request.text()
   const signature = request.headers.get('stripe-signature')
 
@@ -31,7 +58,7 @@ export async function POST(request: NextRequest) {
     event = stripe.webhooks.constructEvent(
       body,
       signature,
-      process.env.STRIPE_WEBHOOK_SECRET!
+      webhookSecret
     )
   } catch (err) {
     console.error('Webhook signature verification failed:', err)
@@ -42,6 +69,8 @@ export async function POST(request: NextRequest) {
   }
 
   try {
+    const supabaseAdmin = getSupabaseAdmin()
+
     switch (event.type) {
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session
