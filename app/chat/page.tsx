@@ -29,6 +29,8 @@ import { useCreditsContext } from "@/providers/credits-provider"
 import { ChartProvider, useChart } from "@/providers/chart-provider"
 import { TradingViewChart } from "@/components/chat/TradingViewChart"
 
+export const dynamic = 'force-dynamic';
+
 // Loading screen component for chat page
 function ChatLoadingScreen() {
   return (
