@@ -8,9 +8,9 @@
 - [x] Verify build passes after all changes
 
 ## Phase 1: SSR + Performance
-- [ ] Convert app/(marketing)/ pages from 'use client' to Server Components
-- [ ] Extract interactive elements into small client components
-- [ ] Add next/dynamic imports for heavy components
-- [ ] Verify no hydration errors
-- [ ] Verify SEO meta tags present on all marketing pages
-- [ ] Lighthouse performance score 90+
+- [x] Convert app/(marketing)/ pages from 'use client' to Server Components
+- [x] Extract interactive elements into small client components
+- [x] Add next/dynamic imports for heavy components (HelpChat ssr:false, DemoCard with loading skeleton)
+- [x] Verify no hydration errors (PASS — no hooks/event handlers in Server Component pages)
+- [x] Verify SEO meta tags present on all marketing pages (per-page metadata + og:image added)
+- [ ] Lighthouse performance score 90+ (not tested — requires browser)

@@ -1,7 +1,11 @@
-'use client';
-
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import '../legal-styles.css';
+
+export const metadata: Metadata = {
+  title: 'Terms of Service | Pelican Trading',
+  description: 'Terms and Conditions of Service for Pelican Trading, LLC — governing your access to and use of the Pelican platform and services.',
+};
 
 export default function TermsPage() {
   return (

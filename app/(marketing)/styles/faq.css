@@ -24,7 +24,7 @@
   padding: 0.5rem 1rem;
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-jetbrains), monospace;
   font-size: 0.75rem;
   color: var(--accent-cyan);
   text-transform: uppercase;
@@ -38,7 +38,7 @@
 }
 
 .faq-header h1 {
-  font-family: 'Bebas Neue', sans-serif;
+  font-family: var(--font-bebas-neue), sans-serif;
   font-size: clamp(2.5rem, 6vw, 4rem);
   line-height: 1;
   letter-spacing: 0.02em;
@@ -74,7 +74,7 @@
 }
 
 .faq-category-title {
-  font-family: 'Bebas Neue', sans-serif;
+  font-family: var(--font-bebas-neue), sans-serif;
   font-size: 1.75rem;
   letter-spacing: 0.05em;
   color: var(--text-primary);
@@ -101,7 +101,7 @@
   background: transparent;
   border: none;
   color: var(--text-primary);
-  font-family: 'IBM Plex Sans', sans-serif;
+  font-family: var(--font-ibm-plex), sans-serif;
   font-size: 1rem;
   font-weight: 500;
   text-align: left;
@@ -152,7 +152,7 @@
 }
 
 .faq-cta h3 {
-  font-family: 'Bebas Neue', sans-serif;
+  font-family: var(--font-bebas-neue), sans-serif;
   font-size: 1.75rem;
   letter-spacing: 0.05em;
   margin-bottom: 0.75rem;

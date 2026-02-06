@@ -2,3 +2,14 @@
 Log anything unexpected here so future sessions don't repeat mistakes.
 
 1. When told to append to a file, verify original content is preserved before writing.
+2. HelpChat component had a raw `<img>` tag (missed in Phase 0 sweep). Replaced with `next/image`. Always grep for raw `<img>` after claiming all are converted.
+3. DOMPurify is bundled inside HelpChat — dynamic import with `ssr: false` keeps it off the initial JS payload since DOMPurify is browser-only anyway.
+4. When `useT()` translation hook is used pervasively across page content, you cannot easily split into server/client at the section level. Best approach: server component page wrapper that imports a single `'use client'` content component. This still gives SSR metadata benefits.
+5. Terms and Privacy pages had `'use client'` but only used `Link` — pure static content. Removing the directive made them true server components (dropped from ~200kB first load to ~201kB shared-only, nearly zero page JS).
+6. error.tsx must remain `'use client'` per Next.js requirements — it's an error boundary.
+7. Task #2 (perf) marked `next/dynamic` imports as done in todo.md, but no `next/dynamic` usage exists in the codebase. The SSR conversion alone (extracting to client components) was the main optimization; `next/dynamic` lazy-loading was not actually implemented. This is a follow-up item.
+8. Marketing pages lack per-page SEO metadata overrides — all inherit from the shared layout. Individual pages (faq, how-to-use, pricing) should export their own `metadata` with unique titles and descriptions. Also, no `og:image` is configured anywhere.
+9. **Agent team file collision**: When two teammates edit the same files, the later write wins silently. perf's `next/dynamic` changes were lost when ssr rewrote the page files. Fix: assign file ownership strictly — one teammate per file, or stagger work so the second teammate reads the first's output before editing.
+10. `'use client'` pages can't export `metadata` — use a sibling `layout.tsx` to hold metadata for client-only pages (e.g., `app/pricing/layout.tsx`).
+11. Set `metadataBase` in layout metadata when using relative OG image paths, otherwise Next.js falls back to `localhost:3000` during build.
+12. **Font removal regression**: Removing Google Fonts `<link>` tags without updating CSS broke all heading fonts. `next/font/google` loads fonts via CSS variables (e.g., `--font-bebas-neue`), but CSS files still referenced hardcoded names (`'Bebas Neue'`). When removing external font loading, always grep CSS for hardcoded font-family names and replace with `var(--font-variable)`.

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect, FormEvent } from 'react';
+import Image from 'next/image';
 import DOMPurify from 'dompurify';
 
 interface Message {
@@ -162,10 +163,12 @@ export default function HelpChat({ logoUrl = '/pelican-logo-transparent.png' }: 
               gap: '12px',
             }}
           >
-            <img
+            <Image
               src={logoUrl}
               alt="Pelican"
-              style={{ width: '32px', height: '32px', objectFit: 'contain' }}
+              width={32}
+              height={32}
+              style={{ objectFit: 'contain' }}
             />
             <div>
               <div style={{ 

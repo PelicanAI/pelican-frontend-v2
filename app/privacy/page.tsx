@@ -1,7 +1,11 @@
-'use client';
-
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import '../legal-styles.css';
+
+export const metadata: Metadata = {
+  title: 'Privacy Policy | Pelican Trading',
+  description: 'Privacy Policy for Pelican Trading, LLC — how we collect, use, disclose, and safeguard your information.',
+};
 
 export default function PrivacyPage() {
   return (

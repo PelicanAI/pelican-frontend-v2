@@ -21,10 +21,24 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://pelicantrading.ai'),
   title: 'Pelican Trading | AI Market Intelligence for Traders',
-  description: 'The AI trading platform that thinks like you trade. Real-time market analysis, conversational backtesting, and institutional-grade intelligence—finally accessible to everyone.',
+  description: 'The AI trading platform that thinks like you trade. Real-time market analysis, conversational backtesting, and institutional-grade intelligence — finally accessible to everyone.',
   icons: {
-    icon: '/pelican-logo-transparent.png',
+    icon: '/pelican-logo-transparent.webp',
+  },
+  openGraph: {
+    title: 'Pelican Trading | AI Market Intelligence for Traders',
+    description: 'The AI trading platform that thinks like you trade. Real-time market analysis, conversational backtesting, and institutional-grade intelligence — finally accessible to everyone.',
+    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'Pelican Trading' }],
+    type: 'website',
+    siteName: 'Pelican Trading',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Pelican Trading | AI Market Intelligence for Traders',
+    description: 'The AI trading platform that thinks like you trade.',
+    images: ['/og-image.png'],
   },
 };
 

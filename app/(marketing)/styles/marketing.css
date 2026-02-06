@@ -25,7 +25,7 @@
 }
 
 .marketing-page {
-  font-family: 'IBM Plex Sans', sans-serif;
+  font-family: var(--font-ibm-plex), sans-serif;
   background-color: var(--bg-primary);
   color: var(--text-primary);
   line-height: 1.6;
@@ -121,7 +121,7 @@
 }
 
 .nav-logo span {
-  font-family: 'Bebas Neue', sans-serif;
+  font-family: var(--font-bebas-neue), sans-serif;
   font-size: 1.5rem;
   letter-spacing: 0.1em;
   color: var(--text-primary);
@@ -180,7 +180,7 @@
 }
 
 .nav-mobile-inner a {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-jetbrains), monospace;
   font-size: 0.85rem;
   color: var(--text-secondary);
   text-decoration: none;
@@ -193,7 +193,7 @@
 }
 
 .nav-links a {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-jetbrains), monospace;
   font-size: 0.85rem;
   color: var(--text-secondary);
   text-decoration: none;
@@ -215,7 +215,7 @@
   padding: 0.75rem 1.5rem;
   background: var(--accent-purple);
   color: var(--bg-primary);
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-jetbrains), monospace;
   font-size: 0.85rem;
   font-weight: 500;
   text-decoration: none;
@@ -239,7 +239,7 @@
   padding: 0.75rem 1.5rem;
   background: transparent;
   color: var(--text-primary);
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-jetbrains), monospace;
   font-size: 0.85rem;
   font-weight: 500;
   text-decoration: none;
@@ -289,7 +289,7 @@
   padding: 0.5rem 1rem;
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-jetbrains), monospace;
   font-size: 0.8rem;
   color: var(--accent-cyan);
   text-transform: uppercase;
@@ -303,7 +303,7 @@
 }
 
 .hero h1 {
-  font-family: 'Bebas Neue', sans-serif;
+  font-family: var(--font-bebas-neue), sans-serif;
   font-size: clamp(2.25rem, 6vw, 4rem);
   line-height: 0.95;
   letter-spacing: 0.02em;
@@ -359,14 +359,14 @@
 }
 
 .stat-value {
-  font-family: 'Bebas Neue', sans-serif;
+  font-family: var(--font-bebas-neue), sans-serif;
   font-size: 2.5rem;
   color: var(--accent-purple);
   line-height: 1;
 }
 
 .stat-label {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-jetbrains), monospace;
   font-size: 0.75rem;
   color: var(--text-muted);
   text-transform: uppercase;
@@ -392,7 +392,7 @@
 }
 
 .section-tag {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-jetbrains), monospace;
   font-size: 0.8rem;
   color: var(--accent-purple);
   text-transform: uppercase;
@@ -401,7 +401,7 @@
 }
 
 .section-title {
-  font-family: 'Bebas Neue', sans-serif;
+  font-family: var(--font-bebas-neue), sans-serif;
   font-size: clamp(2.5rem, 5vw, 4rem);
   letter-spacing: 0.02em;
   text-wrap: balance;
@@ -420,7 +420,7 @@
 }
 
 .what-text h2 {
-  font-family: 'Bebas Neue', sans-serif;
+  font-family: var(--font-bebas-neue), sans-serif;
   font-size: clamp(2rem, 4vw, 3rem);
   margin-bottom: 1.5rem;
 }
@@ -435,7 +435,7 @@
   background: var(--bg-primary);
   border: 1px solid var(--border-color);
   padding: 1.5rem;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-jetbrains), monospace;
   font-size: 0.85rem;
 }
 
@@ -552,7 +552,7 @@
 }
 
 .feature-card h3 {
-  font-family: 'Bebas Neue', sans-serif;
+  font-family: var(--font-bebas-neue), sans-serif;
   font-size: 1.5rem;
   letter-spacing: 0.05em;
   margin-bottom: 0.75rem;
@@ -591,14 +591,14 @@
 }
 
 .team-name {
-  font-family: 'Bebas Neue', sans-serif;
+  font-family: var(--font-bebas-neue), sans-serif;
   font-size: 2rem;
   letter-spacing: 0.05em;
   margin-bottom: 0.25rem;
 }
 
 .team-role {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-jetbrains), monospace;
   font-size: 0.75rem;
   color: var(--accent-purple);
   text-transform: uppercase;
@@ -625,7 +625,7 @@
 }
 
 .credits-explainer h3 {
-  font-family: 'Bebas Neue', sans-serif;
+  font-family: var(--font-bebas-neue), sans-serif;
   font-size: 2rem;
   margin-bottom: 1rem;
   color: var(--accent-cyan);
@@ -659,7 +659,7 @@
 }
 
 .credit-type-name {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-jetbrains), monospace;
   font-size: 0.75rem;
   color: var(--text-muted);
   text-transform: uppercase;
@@ -668,7 +668,7 @@
 }
 
 .credit-type-amount {
-  font-family: 'Bebas Neue', sans-serif;
+  font-family: var(--font-bebas-neue), sans-serif;
   font-size: 2rem;
   color: var(--accent-purple);
   line-height: 1;
@@ -725,7 +725,7 @@
   transform: translateX(-50%);
   background: var(--accent-purple);
   color: var(--bg-primary);
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-jetbrains), monospace;
   font-size: 0.7rem;
   font-weight: 600;
   text-transform: uppercase;
@@ -734,14 +734,14 @@
 }
 
 .pricing-tier-name {
-  font-family: 'Bebas Neue', sans-serif;
+  font-family: var(--font-bebas-neue), sans-serif;
   font-size: 1.75rem;
   letter-spacing: 0.05em;
   margin-bottom: 0.5rem;
 }
 
 .pricing-for {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-jetbrains), monospace;
   font-size: 0.8rem;
   color: var(--text-muted);
   text-transform: uppercase;
@@ -759,7 +759,7 @@
 }
 
 .pricing-amount {
-  font-family: 'Bebas Neue', sans-serif;
+  font-family: var(--font-bebas-neue), sans-serif;
   font-size: 4rem;
   line-height: 1;
   margin: 0.5rem 0;
@@ -771,7 +771,7 @@
 }
 
 .pricing-period {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-jetbrains), monospace;
   font-size: 0.8rem;
   color: var(--text-muted);
   margin-bottom: 1.5rem;
@@ -785,13 +785,13 @@
 }
 
 .pricing-credits-amount {
-  font-family: 'Bebas Neue', sans-serif;
+  font-family: var(--font-bebas-neue), sans-serif;
   font-size: 2rem;
   color: var(--accent-cyan);
 }
 
 .pricing-credits-label {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-jetbrains), monospace;
   font-size: 0.75rem;
   color: var(--text-muted);
   text-transform: uppercase;
@@ -799,7 +799,7 @@
 }
 
 .pricing-effective {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-jetbrains), monospace;
   font-size: 0.8rem;
   color: var(--text-secondary);
   margin-bottom: 1.5rem;
@@ -838,7 +838,7 @@
 }
 
 .market-comparison h3 {
-  font-family: 'Bebas Neue', sans-serif;
+  font-family: var(--font-bebas-neue), sans-serif;
   font-size: 2rem;
   margin-bottom: 0.5rem;
 }
@@ -867,7 +867,7 @@
 }
 
 .market-item-name {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-jetbrains), monospace;
   font-size: 0.8rem;
   color: var(--text-muted);
   text-transform: uppercase;
@@ -876,7 +876,7 @@
 }
 
 .market-item-price {
-  font-family: 'Bebas Neue', sans-serif;
+  font-family: var(--font-bebas-neue), sans-serif;
   font-size: 1.75rem;
   line-height: 1.2;
 }
@@ -888,14 +888,14 @@
 .market-item-annual {
   font-size: 0.75rem;
   color: var(--text-muted);
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-jetbrains), monospace;
 }
 
 .savings-badge {
   display: inline-block;
   background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-cyan) 100%);
   color: var(--bg-primary);
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-jetbrains), monospace;
   font-size: 0.8rem;
   font-weight: 600;
   padding: 0.75rem 1.5rem;
@@ -923,7 +923,7 @@
 }
 
 .trader-card-title {
-  font-family: 'IBM Plex Sans', sans-serif;
+  font-family: var(--font-ibm-plex), sans-serif;
   font-size: 1.25rem;
   font-weight: 500;
   color: var(--accent-purple);
@@ -1004,7 +1004,7 @@
 }
 
 .cta-section h2 {
-  font-family: 'Bebas Neue', sans-serif;
+  font-family: var(--font-bebas-neue), sans-serif;
   font-size: clamp(2.5rem, 6vw, 4.5rem);
   margin-bottom: 1.5rem;
 }
@@ -1046,7 +1046,7 @@
 }
 
 .footer-logo span {
-  font-family: 'Bebas Neue', sans-serif;
+  font-family: var(--font-bebas-neue), sans-serif;
   font-size: 1.25rem;
   letter-spacing: 0.1em;
 }
@@ -1058,7 +1058,7 @@
 
 
 .footer-links a {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-jetbrains), monospace;
   font-size: 0.85rem;
   color: var(--text-secondary);
   text-decoration: none;
@@ -1070,7 +1070,7 @@
 }
 
 .footer-copy {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-jetbrains), monospace;
   font-size: 0.8rem;
   color: var(--text-muted);
 }
