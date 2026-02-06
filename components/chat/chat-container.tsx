@@ -54,7 +54,15 @@ export function ChatContainer({
   const [dragCounter, setDragCounter] = useState(0)
   const [newMessageCount, setNewMessageCount] = useState(0)
   const [showNewMessagesPill, setShowNewMessagesPill] = useState(false)
-  
+
+  // Find the index of the last assistant message (for regenerate button)
+  const lastAssistantIndex = (() => {
+    for (let i = messages.length - 1; i >= 0; i--) {
+      if (messages[i]?.role === "assistant") return i
+    }
+    return -1
+  })()
+
   // Track previous messages to detect when user sends
   const prevMessagesLengthRef = useRef(messages.length)
   const prevLastMessageIdRef = useRef<string | undefined>(messages[messages.length - 1]?.id)
@@ -410,11 +418,11 @@ export function ChatContainer({
                     message={message}
                     onStop={message.isStreaming ? onStopGeneration : undefined}
                     onRegenerate={
-                      index === messages.length - 1 && message.role === "assistant" && !message.isStreaming
+                      index === lastAssistantIndex && message.role === "assistant" && !message.isStreaming
                         ? onRegenerateMessage
                         : undefined
                     }
-                    isRegenerating={index === messages.length - 1 && message.role === "assistant" && isLoading && !message.isStreaming}
+                    isRegenerating={index === lastAssistantIndex && message.role === "assistant" && isLoading && !message.isStreaming}
                     onReaction={handleReaction}
                     onEdit={onEditMessage}
                     onDelete={onDeleteMessage}

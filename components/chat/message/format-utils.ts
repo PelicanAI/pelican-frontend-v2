@@ -109,12 +109,7 @@ export function formatLine(line: string): string {
   // Step 4: Final sanitization with strict URI regexp
   return DOMPurify.sanitize(escaped, {
     ALLOWED_TAGS: ["strong", "em", "a", "span", "br"],
-    ALLOWED_ATTR: {
-      a: ["href", "target", "rel", "class"],
-      span: ["class"],
-      strong: ["class"],
-      em: ["class"],
-    } as unknown as string[],
+    ALLOWED_ATTR: ["class", "href", "target", "rel"],
     ALLOWED_URI_REGEXP: /^https?:\/\//i
   })
 }
@@ -148,12 +143,8 @@ export function applyTickerLinks(html: string, tickers: string[]): string {
   // Re-sanitize with data-ticker allowed
   return DOMPurify.sanitize(result, {
     ALLOWED_TAGS: ["strong", "em", "a", "span", "br"],
-    ALLOWED_ATTR: {
-      a: ["href", "target", "rel", "class"],
-      span: ["class", "data-ticker"],
-      strong: ["class"],
-      em: ["class"],
-    } as unknown as string[],
+    ALLOWED_ATTR: ["class", "href", "target", "rel"],
+    ADD_ATTR: ["data-ticker"],
     ALLOWED_URI_REGEXP: /^https?:\/\//i,
   })
 }
