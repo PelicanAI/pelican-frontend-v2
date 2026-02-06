@@ -5,6 +5,7 @@
 
 export interface TradingMetadata {
   tickers?: string[]
+  economicTerms?: string[]
   prices?: number[]
   action?: 'buy' | 'sell' | 'hold'
   quantities?: string[]
@@ -12,6 +13,11 @@ export interface TradingMetadata {
   hasStopLoss?: boolean
   hasTarget?: boolean
 }
+
+/** Economic event terms — blocked as tickers but highlighted separately */
+export const ECONOMIC_EVENT_TERMS = new Set([
+  'CPI', 'NFP', 'FOMC', 'PPI', 'GDP', 'PMI', 'ISM', 'JOLTS',
+])
 
 /** Common trading/finance acronyms that should NOT be highlighted as tickers */
 export const TRADING_ACRONYMS = new Set([
@@ -59,6 +65,14 @@ export function extractTradingMetadata(content: string): TradingMetadata {
 
   if (allTickers.length > 0) {
     metadata.tickers = [...new Set(allTickers)]
+  }
+
+  // Extract economic event terms from the uppercase matches we already have
+  if (tickerMatches) {
+    const econ = tickerMatches.filter(t => ECONOMIC_EVENT_TERMS.has(t))
+    if (econ.length > 0) {
+      metadata.economicTerms = [...new Set(econ)]
+    }
   }
 
   // Extract prices ($XXX.XX format or XXX.XX preceded by price/at/entry)

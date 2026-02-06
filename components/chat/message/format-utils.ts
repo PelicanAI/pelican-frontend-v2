@@ -122,13 +122,18 @@ function escapeRegExp(str: string): string {
   return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
 }
 
-export function applyTickerLinks(html: string, tickers: string[]): string {
-  if (!tickers || tickers.length === 0) return html
-
-  // Process longer tickers first so "EUR/USD" matches before "EUR" or "USD"
-  const sorted = [...tickers].sort((a, b) => b.length - a.length)
+export function applyTickerLinks(
+  html: string,
+  tickers: string[],
+  economicTerms?: string[],
+): string {
+  if ((!tickers || tickers.length === 0) && (!economicTerms || economicTerms.length === 0)) return html
 
   let result = html
+
+  // Process longer tickers first so "EUR/USD" matches before "EUR" or "USD"
+  const sorted = [...(tickers ?? [])].sort((a, b) => b.length - a.length)
+
   for (const ticker of sorted) {
     // Match the ticker as a standalone word, but only outside of HTML tags.
     // Split on HTML tags, process only text parts.
@@ -148,11 +153,30 @@ export function applyTickerLinks(html: string, tickers: string[]): string {
       .join("")
   }
 
-  // Re-sanitize with data-ticker allowed
+  // Apply economic term highlighting (different style + data attribute)
+  if (economicTerms && economicTerms.length > 0) {
+    const sortedEcon = [...economicTerms].sort((a, b) => b.length - a.length)
+    for (const term of sortedEcon) {
+      const parts = result.split(/(<[^>]*>)/g)
+      const escaped = escapeRegExp(term)
+      result = parts
+        .map((part) => {
+          if (part.startsWith("<")) return part
+          const re = new RegExp(`\\b(${escaped})\\b`, "g")
+          return part.replace(
+            re,
+            `<span class="ticker-link text-amber-400 hover:text-amber-300 underline decoration-amber-400/40 hover:decoration-amber-300 cursor-pointer font-medium" data-economic-term="${term}">$1</span>`
+          )
+        })
+        .join("")
+    }
+  }
+
+  // Re-sanitize with data-ticker and data-economic-term allowed
   return DOMPurify.sanitize(result, {
     ALLOWED_TAGS: ["strong", "em", "a", "span", "br"],
     ALLOWED_ATTR: ["class", "href", "target", "rel"],
-    ADD_ATTR: ["data-ticker"],
+    ADD_ATTR: ["data-ticker", "data-economic-term"],
     ALLOWED_URI_REGEXP: /^https?:\/\//i,
   })
 }

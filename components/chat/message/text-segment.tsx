@@ -4,14 +4,6 @@ import { useRef, useEffect, useCallback } from "react"
 import { motion } from "framer-motion"
 import { formatLine, applyTickerLinks } from "./format-utils"
 import { useChart } from "@/providers/chart-provider"
-import { TRADING_ACRONYMS } from "@/lib/trading-metadata"
-
-/** Economic event terms that should open the calendar instead of a chart */
-const ECONOMIC_TERMS = new Set(
-  ["CPI", "NFP", "FOMC", "PPI", "GDP", "PMI", "ISM", "JOLTS"].filter(
-    (t) => TRADING_ACRONYMS.has(t)
-  )
-)
 
 interface TextSegmentProps {
   content: string
@@ -19,36 +11,40 @@ interface TextSegmentProps {
   isStreaming: boolean
   isLargeContent: boolean
   tickers?: string[]
+  economicTerms?: string[]
 }
 
-export function TextSegment({ content, index, isStreaming, isLargeContent, tickers }: TextSegmentProps) {
+export function TextSegment({ content, index, isStreaming, isLargeContent, tickers, economicTerms }: TextSegmentProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const { showChart, showCalendar } = useChart()
 
   const handleClick = useCallback(
     (e: MouseEvent) => {
       const target = e.target as HTMLElement
-      if (target.classList.contains("ticker-link")) {
-        const ticker = target.getAttribute("data-ticker")
-        if (ticker) {
-          e.preventDefault()
-          if (ECONOMIC_TERMS.has(ticker.toUpperCase())) {
-            showCalendar()
-          } else {
-            showChart(ticker)
-          }
-        }
+      if (!target.classList.contains("ticker-link")) return
+
+      e.preventDefault()
+      const econTerm = target.getAttribute("data-economic-term")
+      if (econTerm) {
+        showCalendar()
+        return
+      }
+      const ticker = target.getAttribute("data-ticker")
+      if (ticker) {
+        showChart(ticker)
       }
     },
     [showChart, showCalendar]
   )
 
+  const hasLinks = (tickers && tickers.length > 0) || (economicTerms && economicTerms.length > 0)
+
   useEffect(() => {
     const el = containerRef.current
-    if (!el || !tickers?.length) return
+    if (!el || !hasLinks) return
     el.addEventListener("click", handleClick)
     return () => el.removeEventListener("click", handleClick)
-  }, [handleClick, tickers])
+  }, [handleClick, hasLinks])
 
   // Performance: skip expensive formatting during streaming for large content
   if (isStreaming && isLargeContent) {
@@ -69,9 +65,9 @@ export function TextSegment({ content, index, isStreaming, isLargeContent, ticke
     .map((line) => formatLine(line))
     .join("<br />")
 
-  // Apply ticker highlighting for non-streaming assistant messages
-  if (tickers && tickers.length > 0 && !isStreaming) {
-    safeLines = applyTickerLinks(safeLines, tickers)
+  // Apply ticker + economic term highlighting for non-streaming assistant messages
+  if (hasLinks && !isStreaming) {
+    safeLines = applyTickerLinks(safeLines, tickers ?? [], economicTerms)
   }
 
   return (

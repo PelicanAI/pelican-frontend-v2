@@ -4,7 +4,7 @@ import type React from "react"
 
 import { MessageActions } from "./message-actions"
 import { motion } from "framer-motion"
-import { useState, useCallback } from "react"
+import { useState, useCallback, useMemo } from "react"
 import { Copy, Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/hooks/use-toast"
@@ -44,6 +44,11 @@ export function MessageBubble({
   const [copied, setCopied] = useState(false)
   const { toast } = useToast()
   const isUser = message.role === "user"
+
+  const tradingMeta = useMemo(
+    () => (!isUser && !isStreaming ? extractTradingMetadata(message.content) : null),
+    [message.content, isUser, isStreaming]
+  )
 
   const triggerHapticFeedback = useCallback(() => {
     if ("vibrate" in navigator) {
@@ -143,7 +148,8 @@ export function MessageBubble({
                 content={message.content}
                 isStreaming={isStreaming}
                 showSkeleton={showSkeleton}
-                tickers={!isStreaming ? extractTradingMetadata(message.content).tickers : undefined}
+                tickers={tradingMeta?.tickers}
+                economicTerms={tradingMeta?.economicTerms}
               />
             </div>
 

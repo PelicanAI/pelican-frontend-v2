@@ -14,6 +14,7 @@ interface MessageContentProps {
   isStreaming: boolean
   showSkeleton?: boolean
   tickers?: string[]
+  economicTerms?: string[]
 }
 
 export function MessageContent({
@@ -21,6 +22,7 @@ export function MessageContent({
   isStreaming,
   showSkeleton,
   tickers,
+  economicTerms,
 }: MessageContentProps) {
   const [showRawText, setShowRawText] = useState(false)
 
@@ -106,6 +108,7 @@ export function MessageContent({
               isStreaming={isStreaming}
               isLargeContent={isLargeContent}
               tickers={tickers}
+              economicTerms={economicTerms}
             />
           )
         })}
