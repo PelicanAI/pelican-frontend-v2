@@ -1,6 +1,27 @@
 import { createClient } from '@/lib/supabase/server'
+import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { NextResponse } from 'next/server'
 import { redirect } from 'next/navigation'
+
+/**
+ * Service-role Supabase client for admin data queries (bypasses RLS).
+ * Validates env vars at runtime — throws with a clear message if missing.
+ */
+export function getServiceClient() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+  if (!url || !key) {
+    const missing = [
+      !url && 'NEXT_PUBLIC_SUPABASE_URL',
+      !key && 'SUPABASE_SERVICE_ROLE_KEY',
+    ].filter(Boolean).join(', ')
+    console.error(`[Admin] Missing env vars: ${missing}`)
+    throw new Error(`Missing Supabase env vars for admin: ${missing}`)
+  }
+
+  return createSupabaseClient(url, key)
+}
 
 /**
  * Verify the current user is an admin (for API routes).

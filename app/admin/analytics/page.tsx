@@ -1,15 +1,8 @@
 export const dynamic = 'force-dynamic'
 
-import { createClient } from '@supabase/supabase-js'
+import { getServiceClient } from '@/lib/admin'
 import { AnalyticsChart } from '@/components/admin/AnalyticsChart'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-
-function getServiceClient() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  )
-}
 
 function getLast30Days() {
   const days: string[] = []
@@ -31,7 +24,7 @@ export default async function AdminAnalyticsPage() {
   const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
   const days = getLast30Days()
 
-  const [{ data: recentConvos }, { data: authData }, { data: planData }] =
+  const [convosResult, authResult, planResult] =
     await Promise.all([
       admin
         .from('conversations')
@@ -41,10 +34,19 @@ export default async function AdminAnalyticsPage() {
       admin.from('user_credits').select('plan_type'),
     ])
 
+  // Log any query errors for Vercel runtime diagnostics
+  if (convosResult.error) console.error('[Admin Analytics] conversations query failed:', convosResult.error.message)
+  if (authResult.error) console.error('[Admin Analytics] listUsers failed:', authResult.error.message)
+  if (planResult.error) console.error('[Admin Analytics] plan_type query failed:', planResult.error.message)
+
+  const recentConvos = convosResult.data ?? []
+  const authUsers = authResult.data?.users ?? []
+  const planData = planResult.data ?? []
+
   // Bucket conversations by day
   const convoBuckets = new Map<string, number>()
   for (const day of days) convoBuckets.set(day, 0)
-  for (const c of recentConvos ?? []) {
+  for (const c of recentConvos) {
     const day = (c.created_at as string).split('T')[0]!
     convoBuckets.set(day, (convoBuckets.get(day) ?? 0) + 1)
   }
@@ -52,7 +54,7 @@ export default async function AdminAnalyticsPage() {
   // Bucket signups by day (from auth.users created_at)
   const signupBuckets = new Map<string, number>()
   for (const day of days) signupBuckets.set(day, 0)
-  for (const u of authData?.users ?? []) {
+  for (const u of authUsers) {
     const day = u.created_at.split('T')[0]!
     if (signupBuckets.has(day)) {
       signupBuckets.set(day, (signupBuckets.get(day) ?? 0) + 1)
@@ -71,7 +73,7 @@ export default async function AdminAnalyticsPage() {
 
   // Plan distribution
   const planCounts: Record<string, number> = {}
-  for (const row of planData ?? []) {
+  for (const row of planData) {
     const plan = (row.plan_type as string) ?? 'none'
     planCounts[plan] = (planCounts[plan] ?? 0) + 1
   }

@@ -1,13 +1,5 @@
 import { type NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
-import { requireAdmin } from '@/lib/admin'
-
-function getServiceClient() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  )
-}
+import { requireAdmin, getServiceClient } from '@/lib/admin'
 
 export async function GET(req: NextRequest) {
   const auth = await requireAdmin()
@@ -55,10 +47,11 @@ export async function GET(req: NextRequest) {
 
   // Fetch credit info for this page's users
   const userIds = pageUsers.map((u) => u.id)
-  const { data: credits } = await admin
+  const { data: credits, error: creditsError } = await admin
     .from('user_credits')
     .select('user_id, credits_balance, plan_type, credits_used_this_month, free_questions_remaining, is_admin')
     .in('user_id', userIds)
+  if (creditsError) console.error('[Admin Users API] credits query failed:', creditsError.message)
 
   const creditMap = new Map(
     (credits ?? []).map((c) => [c.user_id as string, c])
