@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -25,6 +25,7 @@ import {
   User,
   LogOut,
   PanelLeftClose,
+  Shield,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useConversations } from "@/hooks/use-conversations"
@@ -34,6 +35,7 @@ import { ThemeToggle } from "@/components/theme-toggle"
 import { LanguageSelector } from "@/components/language-selector"
 import { useT } from "@/lib/providers/translation-provider"
 import { useAuth } from "@/lib/providers/auth-provider"
+import { createClient } from "@/lib/supabase/client"
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip"
 
 interface Conversation {
@@ -90,6 +92,22 @@ export function ConversationSidebar({
   const [editTitle, setEditTitle] = useState("")
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [showSignOutDialog, setShowSignOutDialog] = useState(false)
+  const [isAdmin, setIsAdmin] = useState(false)
+
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) return
+      supabase
+        .from('user_credits')
+        .select('is_admin')
+        .eq('user_id', user.id)
+        .single()
+        .then(({ data }) => {
+          if (data?.is_admin) setIsAdmin(true)
+        })
+    })
+  }, [])
 
   const { list: conversations, loading, remove, rename } = useConversations()
 
@@ -392,7 +410,16 @@ export function ConversationSidebar({
       </ScrollArea>
 
       {/* Footer */}
-      <div className="px-3 py-3 border-t border-sidebar-border/30">
+      <div className="px-3 py-3 border-t border-sidebar-border/30 space-y-2">
+        {isAdmin && (
+          <Link
+            href="/admin/dashboard"
+            className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium text-purple-400 hover:bg-purple-500/10 transition-colors"
+          >
+            <Shield className="h-4 w-4" />
+            <span>Admin Panel</span>
+          </Link>
+        )}
         <div className="flex items-center gap-2">
           <Button
             variant="ghost"

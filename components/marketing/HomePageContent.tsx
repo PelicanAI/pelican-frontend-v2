@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
 import {
   FlaskConical,
   MessageCircle,
@@ -17,6 +16,13 @@ import dynamic from 'next/dynamic';
 
 const HelpChat = dynamic(() => import('@/components/marketing/HelpChat'), {
   ssr: false,
+});
+
+const HeroChatDemo = dynamic(() => import('@/components/marketing/HeroChatDemo'), {
+  ssr: false,
+  loading: () => (
+    <div style={{ width: '100%', maxWidth: 480, height: 468, margin: '0 auto', borderRadius: 16, background: '#12141a' }} />
+  ),
 });
 
 export default function HomePageContent() {
@@ -71,7 +77,7 @@ export default function HomePageContent() {
             </div>
           </div>
           <div className="hero-visual">
-            <Image src="/pelican-logo-transparent.webp" alt="Pelican Logo" width={400} height={400} className="hero-logo-large" priority />
+            <HeroChatDemo />
           </div>
         </div>
       </section>

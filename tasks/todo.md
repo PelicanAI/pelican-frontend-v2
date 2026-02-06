@@ -36,3 +36,14 @@
 - [x] Regenerate Response Button — already implemented; threaded `isRegenerating` prop through chat-container → streaming-message → message-bubble (was hardcoded `false`)
 - [x] Suggested Prompts — created SuggestedPrompts.tsx (6 stock-related prompts, 2/3 col grid, framer-motion stagger), integrated into welcome-screen.tsx, added 4 tests
 - [x] Mobile Chat UI Polish — fixed touch targets in message-actions.tsx (h-11/sm:h-7 + 44px min), added overflow-hidden to message-bubble containers
+
+## Phase 4: Admin Dashboard
+- [x] Add `is_admin` column to profiles table (backend — migration via Supabase)
+- [x] Create admin RLS policies (backend — service role bypass for admin aggregate queries)
+- [x] Create admin API routes — GET /api/admin/stats, GET /api/admin/users (backend)
+- [x] Add admin middleware/route protection — `requireAdmin()` for API, `requireAdminPage()` for layouts, `/admin` in middleware protected routes (backend)
+- [x] Build admin layout with sidebar nav — `app/admin/layout.tsx` Server Component with auth check, `AdminSidebar` client component with Dashboard/Users/Analytics nav
+- [x] Build admin dashboard page with stats cards — Total Users, Active Today, Total Conversations, Credits Used; Recent Signups and Recent Conversations lists
+- [x] Build admin users page with searchable table — paginated UsersTable with search, expandable UserDetail rows, plan/credits display
+- [x] Build admin analytics page with charts — CSS bar charts for conversations/signups per day (last 30 days), plan distribution progress bars
+- [x] Update tasks/todo.md and tasks/lessons.md, verify build + tests pass (73 tests passing, build passes except pre-existing Stripe env var issue)

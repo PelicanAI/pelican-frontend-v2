@@ -56,7 +56,7 @@ export async function GET(request: NextRequest) {
         return NextResponse.redirect(new URL('/chat', request.url))
       }
 
-      const validPlans = ['base', 'pro', 'power', 'founder', 'starter']
+      const validPlans = ['base', 'pro', 'power', 'founder', 'starter', 'trial']
       const hasSubscription = userCredits.plan_type && validPlans.includes(userCredits.plan_type)
       const hasFreeQuestions = (userCredits.free_questions_remaining ?? 0) > 0
       const hasAccess = hasSubscription || hasFreeQuestions
@@ -70,7 +70,7 @@ export async function GET(request: NextRequest) {
 
     // No code provided - this shouldn't happen for OAuth, but handle gracefully
     console.warn('[AUTH CALLBACK] No code parameter provided')
-    return NextResponse.redirect(new URL('/pricing', request.url))
+    return NextResponse.redirect(new URL('/chat', request.url))
   } catch (error) {
     console.error('[AUTH CALLBACK] Unhandled error:', error)
     return NextResponse.redirect(new URL('/auth/error', request.url))
