@@ -13,17 +13,40 @@ export interface TradingMetadata {
   hasTarget?: boolean
 }
 
+/** Common trading/finance acronyms that should NOT be highlighted as tickers */
+export const TRADING_ACRONYMS = new Set([
+  // Technical indicators
+  'MACD', 'RSI', 'EMA', 'SMA', 'VWAP', 'BOLL', 'ADX', 'ATR', 'OBV', 'CCI', 'DMI', 'SAR',
+  // Financial terms
+  'GDP', 'CPI', 'PPI', 'PE', 'EPS', 'IPO', 'ETF', 'SEC', 'FED', 'IMF', 'EBITDA', 'GAAP',
+  'ROI', 'ROE', 'ROA', 'ROIC', 'DCF', 'NAV', 'AUM', 'YTD', 'QOQ', 'MOM', 'YOY', 'APR', 'APY',
+  // Trading terms
+  'ATH', 'ATL', 'HODL', 'DCA', 'OTC', 'ITM', 'OTM', 'FOMO', 'FUD', 'IV', 'DTE', 'EOD', 'HOD', 'LOD',
+  // Market structure / FOMC
+  'FOMC', 'NFP', 'PMI', 'ISM', 'JOLTS',
+  // Exchanges and organizations
+  'NYSE', 'CBOE', 'CFTC', 'FDIC', 'FINRA', 'SIPC', 'DTCC', 'ISDA',
+  // Currencies
+  'USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'NZD', 'CHF', 'CNY', 'HKD', 'SGD', 'KRW',
+  // General acronyms
+  'USA', 'CEO', 'CFO', 'CTO', 'COO', 'CIO', 'FAQ', 'LLC', 'INC', 'LTD',
+  'AI', 'ML', 'API', 'URL', 'DNS', 'CSS', 'HTML',
+  // Common English words (uppercase in sentences)
+  'I', 'A', 'THE', 'AND', 'OR', 'BUT', 'FOR', 'TO', 'IN', 'ON', 'AT', 'BY', 'UP',
+  'IS', 'IT', 'OF', 'AS', 'BE', 'ARE', 'WAS', 'SO', 'IF', 'MY', 'ME', 'DO', 'GO',
+  'NO', 'US', 'AN', 'AM', 'PM', 'OK',
+])
+
 /**
  * Extract trading metadata from message content
  */
 export function extractTradingMetadata(content: string): TradingMetadata {
   const metadata: TradingMetadata = {}
 
-  // Extract tickers (1-5 letter uppercase words, excluding common words)
-  const commonWords = new Set(['I', 'A', 'THE', 'AND', 'OR', 'BUT', 'FOR', 'TO', 'IN', 'ON', 'AT', 'BY', 'UP', 'IS', 'IT', 'OF', 'AS', 'BE', 'ARE', 'WAS', 'SO', 'IF', 'MY', 'ME', 'DO', 'GO', 'NO', 'US', 'AN', 'AM', 'PM', 'AI', 'OK'])
-  const tickerMatches = content.match(/\b[A-Z]{1,5}\b/g)
+  // Extract tickers (2-5 letter uppercase words, excluding blocklist)
+  const tickerMatches = content.match(/\b[A-Z]{2,5}\b/g)
   if (tickerMatches) {
-    const validTickers = tickerMatches.filter(ticker => !commonWords.has(ticker))
+    const validTickers = tickerMatches.filter(ticker => !TRADING_ACRONYMS.has(ticker))
     if (validTickers.length > 0) {
       metadata.tickers = [...new Set(validTickers)]
     }
