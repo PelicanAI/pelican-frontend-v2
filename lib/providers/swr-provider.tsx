@@ -4,7 +4,7 @@ import type React from "react"
 
 import { SWRConfig } from "swr"
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json())
+const fetcher = (url: string) => fetch(url).then((res) => { if (!res.ok) throw new Error(res.statusText); return res.json(); })
 
 export function SWRProvider({ children }: { children: React.ReactNode }) {
   return (

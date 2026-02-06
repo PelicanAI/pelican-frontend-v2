@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState } from "react"
-import DOMPurify from "dompurify"
+import DOMPurify from "isomorphic-dompurify"
 import { Download, Share2, Check, ExternalLink, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/hooks/use-toast"

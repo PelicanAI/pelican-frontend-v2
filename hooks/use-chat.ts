@@ -338,17 +338,7 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
         isNewConversation: !currentConversationId,
       });
 
-      console.log('[CHAT-DEBUG] Payload construction:', {
-        stateLength: messages.length,
-        refLength: messagesRef.current.length,
-        historyLength: conversationHistory.length,
-        conversationId: currentConversationId,
-        isNewConversation: !currentConversationId,
-        firstMsgPreview: conversationHistory[0]?.content?.slice(0, 50),
-      });
-
       if (!sendOptions.skipUserMessage) {
-        console.log('Message being added:', userMessage);
         updateMessagesWithSync((prev) => [...prev, userMessage]);
         onMessageSent?.(userMessage);
       }

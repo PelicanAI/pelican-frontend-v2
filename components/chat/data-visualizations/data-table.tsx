@@ -3,6 +3,7 @@
 import { type DataPoint, type Column, calculateStats } from '@/lib/data-parsers'
 import { useMemo } from 'react'
 import { cn } from '@/lib/utils'
+import Image from 'next/image'
 
 interface DataTableProps {
   data: DataPoint[] | Record<string, unknown>[]
@@ -97,9 +98,11 @@ export function DataTable({ data, columns, title = "Market Data", query, summary
 
       {/* LARGE PROMINENT WATERMARK - 30% opacity, no blur */}
       <div className="absolute inset-0 flex items-center justify-center opacity-30 pointer-events-none overflow-hidden">
-        <img
-          src="/pelican-logo-transparent.png"
+        <Image
+          src="/pelican-logo-transparent.webp"
           alt=""
+          width={320}
+          height={320}
           className="w-[min(60vw,20rem)] h-auto object-contain"
           aria-hidden="true"
         />
@@ -110,7 +113,7 @@ export function DataTable({ data, columns, title = "Market Data", query, summary
 
         {/* Header with logo and branding */}
         <div className="mb-6 flex items-center gap-3">
-          <img src="/pelican-logo-transparent.png" alt="Pelican" className="h-10 w-10 sm:h-12 sm:w-12" />
+          <Image src="/pelican-logo-transparent.webp" alt="Pelican" width={48} height={48} className="h-10 w-10 sm:h-12 sm:w-12" />
           <span className="text-xl sm:text-2xl font-bold text-foreground">Pelican</span>
         </div>
 

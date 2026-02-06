@@ -264,7 +264,7 @@ export function ConversationSidebar({
             className="flex items-center gap-2 group transition-opacity hover:opacity-80"
           >
             <Image
-              src="/pelican-logo-transparent.png"
+              src="/pelican-logo-transparent.webp"
               alt="PelicanAI"
               width={28}
               height={28}

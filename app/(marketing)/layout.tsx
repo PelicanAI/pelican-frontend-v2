@@ -2,22 +2,25 @@ import type { Metadata } from 'next';
 import { Bebas_Neue, IBM_Plex_Sans, JetBrains_Mono } from 'next/font/google';
 import './styles/marketing.css';
 
-const bebasNeue = Bebas_Neue({ 
+const bebasNeue = Bebas_Neue({
   weight: '400',
   subsets: ['latin'],
   variable: '--font-bebas-neue',
+  display: 'swap',
 });
 
-const ibmPlexSans = IBM_Plex_Sans({ 
+const ibmPlexSans = IBM_Plex_Sans({
   weight: ['400', '500', '600'],
   subsets: ['latin'],
   variable: '--font-ibm-plex',
+  display: 'swap',
 });
 
-const jetbrainsMono = JetBrains_Mono({ 
+const jetbrainsMono = JetBrains_Mono({
   weight: ['400', '500'],
   subsets: ['latin'],
   variable: '--font-jetbrains',
+  display: 'swap',
 });
 
 export const metadata: Metadata = {

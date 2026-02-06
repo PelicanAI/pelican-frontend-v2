@@ -140,7 +140,7 @@ export default function SignUpPage() {
             <div className="relative z-10 mb-6 md:mb-12">
               <div className="w-40 h-40 md:w-72 md:h-72 relative">
                  <Image 
-                   src="/pelican-logo-transparent.png" 
+                   src="/pelican-logo-transparent.webp" 
                    alt="Pelican Logo" 
                    width={288} 
                    height={288} 

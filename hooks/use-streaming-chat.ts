@@ -228,26 +228,12 @@ export function useStreamingChat(): UseStreamingChatReturn {
         hasFiles: fileIds.length > 0,
       });
 
-      // Debug log for troubleshooting (remove in production)
-      console.log('[STREAM-DEBUG] Full payload:', {
-        message: message.substring(0, 100),
-        conversationHistoryCount: payload.conversationHistory.length,
-        conversation_historyCount: payload.conversation_history.length,
-        conversationId,
-        files: fileIds.length,
-        payloadPreview: JSON.stringify(payload, null, 2).substring(0, 500),
-      });
-
       // Warn if empty history for existing conversation
       if (payload.conversationHistory.length === 0 && conversationId) {
         logger.warn('[STREAM-SEND] WARNING: Sending empty history for existing conversation!', {
           conversationId,
           originalHistoryLength: history.length,
         });
-        console.warn(
-          '[STREAM-WARNING] Empty conversation history being sent for existing conversation!',
-          { conversationId }
-        );
       }
 
       setIsStreaming(true);
