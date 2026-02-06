@@ -152,10 +152,12 @@ export async function POST(
       )
     }
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       content: newContent,
       message_id: id,
       updated_at: updatedMessage?.updated_at
+    }, {
+      headers: { "Cache-Control": "private, no-cache" },
     })
 
   } catch (error) {

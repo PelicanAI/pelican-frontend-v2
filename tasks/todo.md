@@ -57,3 +57,30 @@
 - [x] Mobile chart sheet — `MobileChartSheet` component with bottom Sheet (70vh) for viewports below xl
 - [x] Auto-expand trading panel — `ChartPanelExpander` component expands collapsed panel when chart requested
 - [x] Verify: 73 tests passing, no new ESLint errors, build passes (pre-existing Stripe issue only)
+
+## Phase 6: Bugs, Performance, Polish
+
+### Group A: Data Layer Fixes
+- [ ] A1. Fix conversations pagination (limit 1000 → 20 + loadMore)
+- [ ] A2. Add Cache-Control headers to all API routes
+- [ ] A3. Fix market data over-fetching (revalidate 0 → 60s cache)
+- [ ] A4. Remove in-memory rate limiting (useless in serverless)
+- [ ] Group A: build + test verification + commit
+
+### Group B: Code Splitting & Performance
+- [ ] B1. Dynamic imports for modals + TradingView in chat page
+- [ ] B2. React.memo for ConversationItem + MessageContent
+- [ ] B3. Review 'use client' directives (all legitimate — no changes needed)
+- [ ] Group B: build + test verification + commit
+
+### Group C: Code Quality
+- [ ] C1. Console.log cleanup (already done in prior phases — verify only)
+- [ ] C2. Extract nested ConversationItem from sidebar
+- [ ] C3. Stripe env var guard (already handled — verify only)
+- [ ] Group C: build + test verification + commit
+
+### Group D: Infrastructure
+- [ ] D1. Remove external API call from middleware (ipapi.co fetch)
+- [ ] D2. Add error boundaries for admin + pricing
+- [ ] D3. Configure Vercel function timeouts for API routes
+- [ ] Group D: build + test verification + commit

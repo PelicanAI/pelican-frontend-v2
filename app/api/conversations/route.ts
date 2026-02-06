@@ -2,6 +2,8 @@ import { type NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import * as Sentry from "@sentry/nextjs"
 
+const PRIVATE_CACHE = { "Cache-Control": "private, no-cache" } as const
+
 export async function GET(req: NextRequest) {
   try {
     const supabase = await createClient()
@@ -78,7 +80,7 @@ export async function GET(req: NextRequest) {
       })),
       nextCursor,
       hasMore: conversations.length === limit,
-    })
+    }, { headers: PRIVATE_CACHE })
   } catch (error) {
     Sentry.captureException(error, {
       tags: { endpoint: '/api/conversations', method: 'GET' },

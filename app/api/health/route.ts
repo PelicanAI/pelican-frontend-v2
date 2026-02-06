@@ -64,5 +64,8 @@ export async function GET() {
 
   const statusCode = health.status === "healthy" ? 200 : health.status === "degraded" ? 200 : 503
 
-  return NextResponse.json(health, { status: statusCode })
+  return NextResponse.json(health, {
+    status: statusCode,
+    headers: { "Cache-Control": "no-cache" },
+  })
 }

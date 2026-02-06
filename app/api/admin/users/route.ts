@@ -80,5 +80,7 @@ export async function GET(req: NextRequest) {
     }
   })
 
-  return NextResponse.json({ users, total, page, limit, totalPages })
+  return NextResponse.json({ users, total, page, limit, totalPages }, {
+    headers: { "Cache-Control": "private, no-cache" },
+  })
 }

@@ -278,6 +278,8 @@ export async function POST(request: NextRequest) {
       size: file.size,
       checksum,
       public: false,
+    }, {
+      headers: { "Cache-Control": "private, no-cache" },
     })
 
   } catch (error) {

@@ -44,22 +44,27 @@ export interface UseConversationsReturn {
   user: User | null
   guestUserId: string | null
   effectiveUserId: string | null
-  
+
+  // Pagination
+  hasMore: boolean
+  loadingMore: boolean
+  loadMore: () => void
+
   // Filters
   filter: "all" | "archived" | "active"
   setFilter: (filter: "all" | "archived" | "active") => void
   search: string
   setSearch: (search: string) => void
-  
+
   // Filtered list
   list: Conversation[]
-  
+
   // Operations
   create: (title?: string) => Promise<Conversation | null>
   rename: (id: string, title: string) => Promise<boolean>
   archive: (id: string, archived?: boolean) => Promise<boolean>
   remove: (id: string) => Promise<boolean>
-  
+
   // Guest-specific
   updateGuestMessages: (id: string, count: number, preview: string, messages?: unknown[]) => void
   loadGuestMessages: (id: string) => unknown[]
@@ -117,9 +122,13 @@ function useDebounce<T>(value: T, delay: number): T {
 // Main Hook
 // ============================================================================
 
+const PAGE_SIZE = 20
+
 export function useConversations(): UseConversationsReturn {
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [loading, setLoading] = useState(true)
+  const [loadingMore, setLoadingMore] = useState(false)
+  const [hasMore, setHasMore] = useState(true)
   const [user, setUser] = useState<User | null>(null)
   const [guestUserId, setGuestUserId] = useState<string | null>(null)
   const [filter, setFilter] = useState<"all" | "archived" | "active">("active")
@@ -151,13 +160,16 @@ export function useConversations(): UseConversationsReturn {
         .eq("user_id", userId)
         .is("deleted_at", null)
         .order("updated_at", { ascending: false })
-        .limit(1000)
+        .limit(PAGE_SIZE)
 
       if (error) throw error
 
-      setConversations(data || [])
+      const rows = data || []
+      setConversations(rows)
+      setHasMore(rows.length === PAGE_SIZE)
     } catch (error) {
       setConversations([])
+      setHasMore(false)
     } finally {
       setLoading(false)
     }
@@ -248,6 +260,43 @@ export function useConversations(): UseConversationsReturn {
 
     return () => { channel.unsubscribe() }
   }, [user?.id, loadFromDatabase])
+
+  // --------------------------------------------------------------------------
+  // Load more (pagination)
+  // --------------------------------------------------------------------------
+  const loadMore = useCallback(async () => {
+    if (loadingMore || !hasMore) return
+
+    const userId = user?.id || guestUserId
+    if (!userId || !user?.id) return // Guest conversations are all in localStorage
+
+    const oldest = conversations[conversations.length - 1]
+    if (!oldest) return
+
+    setLoadingMore(true)
+    try {
+      const { data, error } = await supabase
+        .from("conversations")
+        .select("*")
+        .eq("user_id", userId)
+        .is("deleted_at", null)
+        .lt("updated_at", oldest.updated_at)
+        .order("updated_at", { ascending: false })
+        .limit(PAGE_SIZE)
+
+      if (error) throw error
+
+      const rows = data || []
+      if (rows.length > 0) {
+        setConversations(prev => [...prev, ...rows])
+      }
+      setHasMore(rows.length === PAGE_SIZE)
+    } catch (error) {
+      setHasMore(false)
+    } finally {
+      setLoadingMore(false)
+    }
+  }, [loadingMore, hasMore, user?.id, guestUserId, conversations, supabase])
 
   // --------------------------------------------------------------------------
   // Refetch on route change to /chat
@@ -555,6 +604,9 @@ export function useConversations(): UseConversationsReturn {
     user,
     guestUserId,
     effectiveUserId,
+    hasMore,
+    loadingMore,
+    loadMore,
     filter,
     setFilter,
     search,

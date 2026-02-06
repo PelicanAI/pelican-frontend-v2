@@ -94,7 +94,9 @@ export async function GET(
       )
     }
 
-    return NextResponse.json({ conversation })
+    return NextResponse.json({ conversation }, {
+      headers: { "Cache-Control": "private, no-cache" },
+    })
 
   } catch (error) {
     Sentry.captureException(error, {

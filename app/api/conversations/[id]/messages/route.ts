@@ -33,9 +33,11 @@ export async function GET(
       return NextResponse.json({ error: 'Failed to fetch messages' }, { status: 500 })
     }
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       messages: messages || [],
-      conversationId 
+      conversationId
+    }, {
+      headers: { "Cache-Control": "private, no-cache" },
     })
 
   } catch (error) {

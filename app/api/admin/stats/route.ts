@@ -54,5 +54,7 @@ export async function GET() {
     totalConversations: totalConversations ?? 0,
     totalCreditsUsed,
     planBreakdown,
+  }, {
+    headers: { "Cache-Control": "private, no-cache" },
   })
 }

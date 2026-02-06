@@ -53,7 +53,9 @@ export async function POST() {
       return_url: `${process.env.NEXT_PUBLIC_APP_URL}/settings`
     })
 
-    return NextResponse.json({ url: session.url })
+    return NextResponse.json({ url: session.url }, {
+      headers: { "Cache-Control": "no-store" },
+    })
   } catch (error) {
     console.error('Billing portal error:', error)
     

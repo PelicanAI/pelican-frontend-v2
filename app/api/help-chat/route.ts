@@ -95,26 +95,6 @@ Direct users to support@pelicantrading.ai when they have:
 
 Escalation phrasing: "For [issue type], please email our team at support@pelicantrading.ai and we'll help you directly."`;
 
-// Rate limiting (simple in-memory, use Redis in production)
-const rateLimits = new Map<string, { count: number; resetTime: number }>();
-const RATE_LIMIT_WINDOW = 60000; // 1 minute
-const RATE_LIMIT_MAX = 20; // 20 messages per minute
-
-function checkRateLimit(ip: string): boolean {
-  const now = Date.now();
-  const userLimit = rateLimits.get(ip) || { count: 0, resetTime: now + RATE_LIMIT_WINDOW };
-  
-  if (now > userLimit.resetTime) {
-    userLimit.count = 0;
-    userLimit.resetTime = now + RATE_LIMIT_WINDOW;
-  }
-  
-  userLimit.count++;
-  rateLimits.set(ip, userLimit);
-  
-  return userLimit.count <= RATE_LIMIT_MAX;
-}
-
 interface ChatMessage {
   type: 'user' | 'bot';
   content: string;
@@ -126,12 +106,6 @@ interface ChatRequest {
 }
 
 export async function POST(request: NextRequest) {
-  // Rate limiting
-  const ip = request.headers.get('x-forwarded-for') || 'unknown';
-  if (!checkRateLimit(ip)) {
-    return NextResponse.json({ error: 'Too many requests. Please slow down.' }, { status: 429 });
-  }
-
   try {
     const { message, history = [] }: ChatRequest = await request.json();
 
@@ -190,7 +164,9 @@ export async function POST(request: NextRequest) {
     const data = await openaiResponse.json();
     const reply = data.choices[0]?.message?.content || 'Sorry, I could not generate a response.';
 
-    return NextResponse.json({ reply });
+    return NextResponse.json({ reply }, {
+      headers: { "Cache-Control": "private, no-cache" },
+    });
 
   } catch (error) {
     console.error('Chat API error:', error);

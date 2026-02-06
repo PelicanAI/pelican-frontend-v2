@@ -85,7 +85,9 @@ export async function POST(request: NextRequest) {
       }
     })
 
-    return NextResponse.json({ url: session.url })
+    return NextResponse.json({ url: session.url }, {
+      headers: { "Cache-Control": "no-store" },
+    })
   } catch (error) {
     console.error('Stripe checkout error:', error)
     
