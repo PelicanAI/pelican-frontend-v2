@@ -1,0 +1,52 @@
+"use client"
+
+import { Card, CardContent } from "@/components/ui/card"
+import { User, TrendingUp, Shield } from "lucide-react"
+import type { LucideIcon } from "lucide-react"
+
+interface Section {
+  id: string
+  label: string
+  icon: LucideIcon
+}
+
+const sections: Section[] = [
+  { id: "account", label: "Account", icon: User },
+  { id: "trading", label: "Trading Preferences", icon: TrendingUp },
+  { id: "privacy", label: "Data & Privacy", icon: Shield },
+]
+
+interface SettingsSidebarProps {
+  activeSection: string
+  onSectionChange: (id: string) => void
+}
+
+export function SettingsSidebar({ activeSection, onSectionChange }: SettingsSidebarProps) {
+  return (
+    <div className="lg:col-span-1">
+      <Card className="lg:sticky lg:top-24">
+        <CardContent className="p-4">
+          <nav className="space-y-1">
+            {sections.map((section) => {
+              const Icon = section.icon
+              return (
+                <button
+                  key={section.id}
+                  onClick={() => onSectionChange(section.id)}
+                  className={`w-full flex items-center gap-3 px-3 py-2 min-h-[44px] rounded-lg text-sm font-medium transition-colors ${
+                    activeSection === section.id
+                      ? "bg-purple-500/15 text-purple-400 dark:bg-purple-500/20 dark:text-purple-300"
+                      : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                  }`}
+                >
+                  <Icon className="h-4 w-4" />
+                  {section.label}
+                </button>
+              )
+            })}
+          </nav>
+        </CardContent>
+      </Card>
+    </div>
+  )
+}

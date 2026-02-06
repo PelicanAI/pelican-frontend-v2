@@ -1,76 +1,25 @@
 "use client"
 
 import type React from "react"
-import { useState, useRef, type KeyboardEvent, forwardRef, useImperativeHandle, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
-import { Send, Paperclip, Square, Search, MapPin, Globe, Calendar, Mic } from "lucide-react"
+import { useState, useRef, forwardRef, useImperativeHandle } from "react"
 import { cn } from "@/lib/utils"
-import { AttachmentChip } from "./attachment-chip"
+import { AnimatePresence } from "framer-motion"
 import { useT } from "@/lib/providers/translation-provider"
-// import { InputSuggestions } from "./input-suggestions"
-// import { useInputSuggestions } from "@/hooks/use-input-suggestions"
-import { motion, AnimatePresence } from "framer-motion"
 import { LIMITS, UI } from "@/lib/constants"
+import {
+  AttachButton,
+  SendButton,
+  InputTextarea,
+  DragOverlay,
+  AttachmentsPreview,
+  DraftIndicator,
+} from "./input"
+import type { InputTextareaRef } from "./input"
 
-// Auto-suggestion feature - DISABLED FOR NOW, will re-enable later
-// const COMMON_SUGGESTIONS = [
-//   "Write a professional email about",
-//   "Create a marketing strategy for",
-//   "Explain the concept of",
-//   "Generate a bullish trading strategy for",
-//   "Analyze the market trends in",
-//   "Help me understand",
-//   "Create a business plan for",
-//   "Write code to",
-//   "Summarize the key points of",
-//   "Compare and contrast",
-// ]
+// Re-export types so external consumers are unaffected
+export type { ChatInputRef, ChatInputProps } from "./input/types"
 
-// const SUGGESTION_PILLS = [
-//   { icon: "📊", text: "Compare", color: "bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200" },
-//   { icon: "🔧", text: "Troubleshoot", color: "bg-green-50 hover:bg-green-100 text-green-700 border-green-200" },
-//   { icon: "📚", text: "Learn", color: "bg-purple-50 hover:bg-purple-100 text-purple-700 border-purple-200" },
-//   { icon: "💡", text: "Strategy", color: "bg-orange-50 hover:bg-orange-100 text-orange-700 border-orange-200" },
-//   { icon: "❤️", text: "Health", color: "bg-red-50 hover:bg-red-100 text-red-700 border-red-200" },
-// ]
-
-interface Attachment {
-  name: string
-  type: string
-  url: string
-}
-
-interface PendingAttachment {
-  file: File
-  isError?: boolean
-  id: string
-}
-
-interface ChatInputProps {
-  onSendMessage: (message: string) => void
-  onFileUpload?: (files: File[]) => void
-  disabled?: boolean
-  canSend?: boolean
-  disabledSend?: boolean
-  onQueueMessage?: (message: string) => void
-  queueEnabled?: boolean
-  placeholder?: string
-  isDarkMode?: boolean
-  onTypingDuringResponse?: () => void
-  isAIResponding?: boolean
-  onThemeChange?: (isDark: boolean) => void
-  attachments?: Attachment[]
-  onRemoveAttachment?: (index: number) => void
-  pendingAttachments?: PendingAttachment[]
-  onRetryAttachment?: (id: string) => void
-  pendingDraft?: string | null
-  onStopResponse?: () => void
-}
-
-export interface ChatInputRef {
-  focus: () => void
-}
+import type { ChatInputRef, ChatInputProps } from "./input/types"
 
 export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
   (
@@ -98,65 +47,21 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
   ) => {
     const t = useT()
     const actualPlaceholder = placeholder || t.chat.messagePlaceholder
-    const [showThinkingNote, setShowThinkingNote] = useState(false)
     const [isDragOver, setIsDragOver] = useState(false)
     const [isFocused, setIsFocused] = useState(false)
-    const [isHovered, setIsHovered] = useState(false)
-
-    const textareaRef = useRef<HTMLTextAreaElement>(null)
-    const fileInputRef = useRef<HTMLInputElement>(null)
-    const containerRef = useRef<HTMLDivElement>(null)
-
-    // Simple message state (auto-suggestions disabled for now)
     const [message, setMessage] = useState("")
 
-    // Input suggestions hook - DISABLED FOR NOW, will re-enable later
-    // const {
-    //   input: message,
-    //   updateInput,
-    //   suggestions,
-    //   visible: suggestionsVisible,
-    //   selectedIndex,
-    //   handleKeyDown: handleSuggestionsKeyDown,
-    //   acceptSuggestion,
-    //   saveRecentSearch,
-    //   clearSuggestions,
-    //   handleSuggestionHover,
-    // } = useInputSuggestions({
-    //   onAccept: (text) => {
-    //     setMessage(text)
-    //     textareaRef.current?.focus()
-    //   },
-    // })
+    const textareaRef = useRef<InputTextareaRef>(null)
+    const containerRef = useRef<HTMLDivElement>(null)
 
     useImperativeHandle(ref, () => ({
-      focus: () => {
-        textareaRef.current?.focus()
-      },
+      focus: () => textareaRef.current?.focus(),
     }))
 
-    const adjustTextareaHeight = () => {
-      const textarea = textareaRef.current
-      if (textarea) {
-        textarea.style.height = "auto"
-        const newHeight = Math.max(UI.TEXTAREA_MIN_HEIGHT, Math.min(textarea.scrollHeight, UI.TEXTAREA_MAX_HEIGHT))
-        textarea.style.height = `${newHeight}px`
-      }
-    }
-
-    useEffect(() => {
-      adjustTextareaHeight()
-    }, [message])
-
-
     const handleSubmit = () => {
-      // Check if message is empty (whitespace only)
       if (message.trim() && !disabled && !isAIResponding && canSend && !disabledSend) {
-        // Send message preserving newlines (don't trim here, let the handler decide)
         onSendMessage(message)
         setMessage("")
-        setShowThinkingNote(false)
-        // clearSuggestions() - DISABLED
       }
     }
 
@@ -164,48 +69,32 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
       if (message.trim() && onQueueMessage) {
         onQueueMessage(message.trim())
         setMessage("")
-        setShowThinkingNote(false)
-        // clearSuggestions() - DISABLED
       }
     }
 
-    const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
-      // Suggestions handling - DISABLED FOR NOW
-      // const handled = handleSuggestionsKeyDown(e)
-      // if (handled) {
-      //   return
-      // }
+    const handleFileSelect = (files: File[]) => {
+      if (onFileUpload) {
+        onFileUpload(files)
+      }
+    }
 
-      if (e.key === "Enter" && !e.shiftKey) {
-        e.preventDefault()
-        if (isAIResponding || disabledSend) {
-          setShowThinkingNote(true)
-          setTimeout(() => setShowThinkingNote(false), UI.THINKING_NOTE_DURATION_MS)
-          return
+    const handlePaste = (e: React.ClipboardEvent) => {
+      const items = e.clipboardData?.items
+      if (!items) return
+
+      const files: File[] = []
+      for (let i = 0; i < items.length; i++) {
+        const item = items[i]
+        if (item && item.type.startsWith("image/")) {
+          const file = item.getAsFile()
+          if (file) files.push(file)
         }
-        handleSubmit()
       }
 
-      if (e.key === "Enter" && (e.metaKey || e.ctrlKey) && queueEnabled && disabledSend) {
+      if (files.length > 0 && onFileUpload) {
         e.preventDefault()
-        handleQueueMessage()
+        onFileUpload(files)
       }
-    }
-
-    const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-      const newValue = e.target.value
-      if (isAIResponding && newValue.length > message.length && onTypingDuringResponse) {
-        onTypingDuringResponse()
-      }
-      setMessage(newValue)
-    }
-
-    const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const files = e.target.files
-      if (files && files.length > 0 && onFileUpload) {
-        onFileUpload(Array.from(files))
-      }
-      e.target.value = ""
     }
 
     const handleDragOver = (e: React.DragEvent) => {
@@ -229,38 +118,12 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
       }
     }
 
-    const handlePaste = (e: React.ClipboardEvent) => {
-      const items = e.clipboardData?.items
-      if (!items) return
-      
-      const files: File[] = []
-      for (let i = 0; i < items.length; i++) {
-        const item = items[i]
-        if (item && item.type.startsWith('image/')) {
-          const file = item.getAsFile()
-          if (file) files.push(file)
-        }
-      }
-      
-      if (files.length > 0 && onFileUpload) {
-        e.preventDefault()
-        onFileUpload(files)
-      }
-    }
-
-    const handleSuggestionClick = (suggestionText: string) => {
-      setMessage(suggestionText + " ")
-      textareaRef.current?.focus()
-    }
-
     const isSendDisabled = disabled || !message.trim() || !canSend || disabledSend || isAIResponding
     const characterCount = message.length
     const showCharCount = characterCount >= LIMITS.CHAT_MAX_TOKENS * UI.CHAR_COUNT_THRESHOLD
 
     return (
       <div className="w-full">
-        {/* Removed duplicate "Pelican is thinking..." indicator - shown in chat area instead */}
-
         <div
           ref={containerRef}
           className="relative w-full"
@@ -269,16 +132,7 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
           onDrop={handleDrop}
         >
           <AnimatePresence>
-            {isDragOver && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="absolute inset-0 z-50 bg-blue-500/10 border-2 border-dashed border-blue-500 rounded-2xl flex items-center justify-center backdrop-blur-sm"
-              >
-                <div className="text-blue-600 dark:text-blue-400 text-lg font-medium">Drop file to attach</div>
-              </motion.div>
-            )}
+            {isDragOver && <DragOverlay />}
           </AnimatePresence>
 
           <div
@@ -297,50 +151,25 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
               ],
             )}
           >
-            {/* Paperclip button */}
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => fileInputRef.current?.click()}
-              disabled={disabled}
-              className={cn(
-                "flex-shrink-0 w-11 h-11 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center",
-                "transition-all duration-200",
-                "hover:bg-muted",
-                disabled && "opacity-50 cursor-not-allowed",
-              )}
-              title={t.chat.attachFile}
-            >
-              <Paperclip className="h-5 w-5 text-muted-foreground" />
-            </motion.button>
+            <AttachButton disabled={disabled} onFileSelect={handleFileSelect} />
 
-            {/* Textarea */}
-            <textarea
+            <InputTextarea
               ref={textareaRef}
               value={message}
-              onChange={handleInputChange}
-              onKeyDown={handleKeyDown}
+              onChange={setMessage}
+              onSubmit={handleSubmit}
+              onQueueMessage={handleQueueMessage}
+              queueEnabled={queueEnabled}
+              disabled={disabled}
+              disabledSend={disabledSend}
+              isAIResponding={isAIResponding}
+              placeholder={actualPlaceholder}
+              onTypingDuringResponse={onTypingDuringResponse}
               onPaste={handlePaste}
               onFocus={() => setIsFocused(true)}
-              onBlur={() => {
-                setIsFocused(false)
-                // setTimeout(() => clearSuggestions(), 200) - DISABLED
-              }}
-              placeholder={actualPlaceholder}
-              disabled={disabled}
-              className={cn(
-                "flex-1 bg-transparent outline-none resize-none whitespace-pre-wrap",
-                "text-[15px] leading-relaxed font-[Inter,system-ui,sans-serif]",
-                "placeholder:text-muted-foreground",
-                "text-foreground",
-                "py-2 px-2",
-                "h-[40px] max-h-[168px] overflow-y-auto",
-                "scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent",
-              )}
-              rows={1}
+              onBlur={() => setIsFocused(false)}
             />
 
-            {/* Character count indicator (3500+) */}
             {characterCount >= 3500 && (
               <div
                 className="flex-shrink-0 w-2 h-2 rounded-full bg-amber-500"
@@ -348,106 +177,26 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
               />
             )}
 
-            {/* Send button */}
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={isAIResponding && onStopResponse ? onStopResponse : handleSubmit}
-              disabled={!isAIResponding && isSendDisabled}
-              className={cn(
-                "flex-shrink-0 w-11 h-11 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center",
-                "transition-all duration-200",
-                isAIResponding
-                  ? "bg-red-500 hover:bg-red-600 text-white"
-                  : isSendDisabled
-                    ? "bg-muted text-muted-foreground cursor-not-allowed"
-                    : "bg-primary hover:bg-primary/90 text-primary-foreground shadow-md shadow-primary/20",
-              )}
-            >
-              <AnimatePresence mode="wait" initial={false}>
-                <motion.div
-                  key={isAIResponding ? "stop" : "send"}
-                  initial={{ scale: 0.8, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  exit={{ scale: 0.8, opacity: 0 }}
-                  transition={{ duration: 0.1, ease: 'easeOut' }}
-                >
-                  {isAIResponding ? <Square className="h-5 w-5" /> : <Send className="h-5 w-5" />}
-                </motion.div>
-              </AnimatePresence>
-            </motion.button>
-
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*,.pdf,.txt,.csv,.xlsx,.xls"
-              onChange={handleFileSelect}
-              multiple
-              className="hidden"
+            <SendButton
+              isAIResponding={isAIResponding}
+              isSendDisabled={isSendDisabled}
+              onStop={onStopResponse}
+              onSend={handleSubmit}
             />
           </div>
 
-          {/* Attachments preview below input */}
           <AnimatePresence mode="wait">
             {(attachments.length > 0 || pendingAttachments.length > 0) && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                className="mt-2"
-              >
-                <div className="flex flex-wrap gap-2">
-                  {attachments.map((attachment, index) => (
-                    <AttachmentChip
-                      key={index}
-                      name={attachment.name}
-                      type={attachment.type}
-                      onRemove={onRemoveAttachment ? () => onRemoveAttachment(index) : undefined}
-                    />
-                  ))}
-                  {pendingAttachments.map((pendingAttachment) => (
-                    <AttachmentChip
-                      key={pendingAttachment.id}
-                      name={pendingAttachment.file.name}
-                      type={pendingAttachment.file.type}
-                      isError={pendingAttachment.isError}
-                      onRetry={onRetryAttachment ? () => onRetryAttachment(pendingAttachment.id) : undefined}
-                      onRemove={
-                        onRemoveAttachment
-                          ? () => onRemoveAttachment(pendingAttachments.indexOf(pendingAttachment))
-                          : undefined
-                      }
-                    />
-                  ))}
-                </div>
-              </motion.div>
+              <AttachmentsPreview
+                attachments={attachments}
+                pendingAttachments={pendingAttachments}
+                onRemoveAttachment={onRemoveAttachment}
+                onRetryAttachment={onRetryAttachment}
+              />
             )}
           </AnimatePresence>
 
-          {/* Draft indicator */}
-          {pendingDraft && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="mt-2"
-            >
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-full text-sm text-amber-700 dark:text-amber-300">
-                <div className="w-2 h-2 bg-amber-500 rounded-full animate-pulse" />
-                Queued: &quot;{pendingDraft.slice(0, 30)}
-                {pendingDraft.length > 30 ? "..." : ""}&quot;
-              </div>
-            </motion.div>
-          )}
-
-          {/* Input Suggestions - DISABLED FOR NOW, will re-enable later */}
-          {/* <InputSuggestions
-            suggestions={suggestions}
-            selectedIndex={selectedIndex}
-            onSelect={acceptSuggestion}
-            onHover={handleSuggestionHover}
-            visible={suggestionsVisible && isFocused}
-          /> */}
-
+          {pendingDraft && <DraftIndicator pendingDraft={pendingDraft} />}
         </div>
       </div>
     )
