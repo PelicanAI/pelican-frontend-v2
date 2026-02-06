@@ -43,6 +43,9 @@ export const metadata: Metadata = {
     description: 'The AI trading platform that thinks like you trade.',
     images: ['/og-image.png'],
   },
+  alternates: {
+    canonical: '/',
+  },
 };
 
 export default function MarketingLayout({

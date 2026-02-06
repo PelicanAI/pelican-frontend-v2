@@ -17,9 +17,25 @@ const inter = Inter({
 
 export function generateMetadata(): Metadata {
   return {
-    title: "Pelican AI - Elite Trading Assistant",
-    description: "AI-powered trading assistant for smarter trading decisions",
-    generator: "v0.app",
+    metadataBase: new URL('https://pelicantrading.ai'),
+    title: {
+      default: 'Pelican Trading | AI Market Intelligence for Traders',
+      template: '%s | Pelican Trading',
+    },
+    description: "AI-powered trading assistant for smarter trading decisions. Real-time market analysis, backtesting, and institutional-grade intelligence.",
+    openGraph: {
+      title: 'Pelican Trading | AI Market Intelligence for Traders',
+      description: 'AI-powered trading assistant for smarter trading decisions.',
+      images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'Pelican Trading' }],
+      type: 'website',
+      siteName: 'Pelican Trading',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: 'Pelican Trading | AI Market Intelligence for Traders',
+      description: 'AI-powered trading assistant for smarter trading decisions.',
+      images: ['/og-image.png'],
+    },
     other: {
       ...Sentry.getTraceData()
     }

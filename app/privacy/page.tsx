@@ -5,6 +5,9 @@ import '../legal-styles.css';
 export const metadata: Metadata = {
   title: 'Privacy Policy | Pelican Trading',
   description: 'Privacy Policy for Pelican Trading, LLC — how we collect, use, disclose, and safeguard your information.',
+  alternates: {
+    canonical: '/privacy',
+  },
 };
 
 export default function PrivacyPage() {
