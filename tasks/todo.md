@@ -61,26 +61,25 @@
 ## Phase 6: Bugs, Performance, Polish
 
 ### Group A: Data Layer Fixes
-- [ ] A1. Fix conversations pagination (limit 1000 → 20 + loadMore)
-- [ ] A2. Add Cache-Control headers to all API routes
-- [ ] A3. Fix market data over-fetching (revalidate 0 → 60s cache)
-- [ ] A4. Remove in-memory rate limiting (useless in serverless)
-- [ ] Group A: build + test verification + commit
+- [x] A1. Fix conversations pagination (limit 1000 → 20 + loadMore)
+- [x] A2. Add Cache-Control headers to all API routes
+- [x] A3. Fix market data over-fetching (revalidate 0 → 60s cache)
+- [x] A4. Remove in-memory rate limiting (useless in serverless)
+- [x] Group A: build + test verification + commit
 
 ### Group B: Code Splitting & Performance
-- [ ] B1. Dynamic imports for modals + TradingView in chat page
-- [ ] B2. React.memo for ConversationItem + MessageContent
-- [ ] B3. Review 'use client' directives (all legitimate — no changes needed)
-- [ ] Group B: build + test verification + commit
+- [x] B1. Dynamic imports for modals + TradingView in chat page
+- [x] B2. React.memo for ConversationItem
+- [x] B3. Review 'use client' directives (all legitimate — no changes needed)
+- [x] Group B+C: build + test verification + commit
 
 ### Group C: Code Quality
-- [ ] C1. Console.log cleanup (already done in prior phases — verify only)
-- [ ] C2. Extract nested ConversationItem from sidebar
-- [ ] C3. Stripe env var guard (already handled — verify only)
-- [ ] Group C: build + test verification + commit
+- [x] C1. Console.log cleanup (already done in prior phases — verified)
+- [x] C2. Extract nested ConversationItem from sidebar
+- [x] C3. Stripe env var guard (already handled — verified)
 
 ### Group D: Infrastructure
-- [ ] D1. Remove external API call from middleware (ipapi.co fetch)
-- [ ] D2. Add error boundaries for admin + pricing
-- [ ] D3. Configure Vercel function timeouts for API routes
-- [ ] Group D: build + test verification + commit
+- [x] D1. Remove external API call from middleware (combined with A4)
+- [x] D2. Add error boundaries for admin + pricing
+- [x] D3. Configure Vercel function timeouts for API routes
+- [x] Group D: build + test verification + commit
