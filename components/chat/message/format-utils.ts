@@ -118,3 +118,42 @@ export function formatLine(line: string): string {
     ALLOWED_URI_REGEXP: /^https?:\/\//i
   })
 }
+
+/**
+ * Wrap ticker symbols in clickable spans within already-formatted HTML.
+ * Skips matches inside HTML tags to avoid corrupting markup.
+ */
+export function applyTickerLinks(html: string, tickers: string[]): string {
+  if (!tickers || tickers.length === 0) return html
+
+  let result = html
+  for (const ticker of tickers) {
+    // Match the ticker as a standalone word, but only outside of HTML tags.
+    // Split on HTML tags, process only text parts.
+    const parts = result.split(/(<[^>]*>)/g)
+    result = parts
+      .map((part) => {
+        // If this part is an HTML tag, leave it alone
+        if (part.startsWith("<")) return part
+        // Replace standalone ticker matches in text content
+        const re = new RegExp(`\\b(${ticker})\\b`, "g")
+        return part.replace(
+          re,
+          `<span class="ticker-link text-purple-400 hover:text-purple-300 underline decoration-purple-400/40 hover:decoration-purple-300 cursor-pointer font-medium" data-ticker="${ticker}">$1</span>`
+        )
+      })
+      .join("")
+  }
+
+  // Re-sanitize with data-ticker allowed
+  return DOMPurify.sanitize(result, {
+    ALLOWED_TAGS: ["strong", "em", "a", "span", "br"],
+    ALLOWED_ATTR: {
+      a: ["href", "target", "rel", "class"],
+      span: ["class", "data-ticker"],
+      strong: ["class"],
+      em: ["class"],
+    } as unknown as string[],
+    ALLOWED_URI_REGEXP: /^https?:\/\//i,
+  })
+}

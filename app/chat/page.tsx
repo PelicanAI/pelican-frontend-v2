@@ -26,6 +26,8 @@ import { PaywallGate } from "@/components/paywall-gate"
 import { TrialExhaustedModal } from "@/components/trial-exhausted-modal"
 import { InsufficientCreditsModal } from "@/components/insufficient-credits-modal"
 import { useCreditsContext } from "@/providers/credits-provider"
+import { ChartProvider, useChart } from "@/providers/chart-provider"
+import { TradingViewChart } from "@/components/chat/TradingViewChart"
 
 // Loading screen component for chat page
 function ChatLoadingScreen() {
@@ -39,6 +41,41 @@ function ChatLoadingScreen() {
         <span className="text-gray-400 text-sm font-medium">Loading Pelican AI...</span>
       </div>
     </div>
+  )
+}
+
+// Auto-expand trading panel when a chart is requested
+function ChartPanelExpander({ onExpand }: { onExpand: () => void }) {
+  const { mode } = useChart()
+  useEffect(() => {
+    if (mode === "chart") onExpand()
+  }, [mode, onExpand])
+  return null
+}
+
+// Mobile chart sheet — opens on screens below xl when a chart is requested
+function MobileChartSheet() {
+  const { mode, selectedTicker, closeChart } = useChart()
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const mql = window.matchMedia("(max-width: 1279px)")
+    setIsMobile(mql.matches)
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches)
+    mql.addEventListener("change", handler)
+    return () => mql.removeEventListener("change", handler)
+  }, [])
+
+  if (!isMobile) return null
+
+  return (
+    <Sheet open={mode === "chart" && !!selectedTicker} onOpenChange={(open) => { if (!open) closeChart() }}>
+      <SheetContent side="bottom" className="h-[70vh] p-0 rounded-t-xl">
+        {selectedTicker && (
+          <TradingViewChart symbol={selectedTicker} onClose={closeChart} />
+        )}
+      </SheetContent>
+    </Sheet>
   )
 }
 
@@ -268,6 +305,11 @@ export default function ChatPage() {
   return (
     <PaywallGate>
       <ChatErrorBoundary onReset={() => clearMessages()}>
+        <ChartProvider>
+        <ChartPanelExpander onExpand={() => {
+          setTradingPanelCollapsed(false)
+          localStorage.setItem('pelican_trading_panel_collapsed', 'false')
+        }} />
         <div className="flex h-[100svh] min-h-[100svh] overflow-hidden relative chat-background-gradient">
       {/* Futuristic background effects - only in dark mode */}
       {/* <div className="absolute inset-0 dark:block hidden pointer-events-none">
@@ -495,7 +537,9 @@ export default function ChatPage() {
         balance={insufficientCreditsBalance}
         onClose={() => setInsufficientCreditsOpen(false)}
       />
+      <MobileChartSheet />
         </div>
+        </ChartProvider>
       </ChatErrorBoundary>
     </PaywallGate>
   )

@@ -47,3 +47,13 @@
 - [x] Build admin users page with searchable table — paginated UsersTable with search, expandable UserDetail rows, plan/credits display
 - [x] Build admin analytics page with charts — CSS bar charts for conversations/signups per day (last 30 days), plan distribution progress bars
 - [x] Update tasks/todo.md and tasks/lessons.md, verify build + tests pass (73 tests passing, build passes except pre-existing Stripe env var issue)
+
+## Phase 5: TradingView Charts
+- [x] ChartProvider context — `providers/chart-provider.tsx` with `showChart(ticker)` / `closeChart()` + safe `useChart()` hook (no-op outside provider)
+- [x] TradingView chart component — `components/chat/TradingViewChart.tsx` with Advanced Chart widget embed, dark theme, candle style, back button header
+- [x] Right panel mode switching — `trading-context-panel.tsx` renders chart when `mode === 'chart'`, market overview when `mode === 'overview'`
+- [x] Clickable tickers in messages — `extractTradingMetadata()` extracts tickers at render time, `applyTickerLinks()` wraps them in purple clickable spans, click delegation via `useChart().showChart()`
+- [x] Watchlist clickable tickers — `onClick={() => showChart(ticker.symbol)}` on watchlist items
+- [x] Mobile chart sheet — `MobileChartSheet` component with bottom Sheet (70vh) for viewports below xl
+- [x] Auto-expand trading panel — `ChartPanelExpander` component expands collapsed panel when chart requested
+- [x] Verify: 73 tests passing, no new ESLint errors, build passes (pre-existing Stripe issue only)

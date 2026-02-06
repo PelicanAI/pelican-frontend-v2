@@ -13,12 +13,14 @@ interface MessageContentProps {
   content: string
   isStreaming: boolean
   showSkeleton?: boolean
+  tickers?: string[]
 }
 
 export function MessageContent({
   content,
   isStreaming,
   showSkeleton,
+  tickers,
 }: MessageContentProps) {
   const [showRawText, setShowRawText] = useState(false)
 
@@ -103,6 +105,7 @@ export function MessageContent({
               index={index}
               isStreaming={isStreaming}
               isLargeContent={isLargeContent}
+              tickers={tickers}
             />
           )
         })}

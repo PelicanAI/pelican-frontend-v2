@@ -12,6 +12,7 @@ import { getMessageAnimationVariant } from "@/lib/animation-config"
 import type { Message } from "@/lib/chat-utils"
 import { MessageContent } from "./message/message-content"
 import { AttachmentDisplay } from "./message/attachment-display"
+import { extractTradingMetadata } from "@/lib/trading-metadata"
 
 interface MessageBubbleProps {
   message: Message
@@ -142,6 +143,7 @@ export function MessageBubble({
                 content={message.content}
                 isStreaming={isStreaming}
                 showSkeleton={showSkeleton}
+                tickers={!isStreaming ? extractTradingMetadata(message.content).tickers : undefined}
               />
             </div>
 

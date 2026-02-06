@@ -5,6 +5,8 @@ import { TrendingUp, TrendingDown, Activity, Star, ChevronDown, ChevronUp } from
 import { cn } from "@/lib/utils"
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
+import { useChart } from "@/providers/chart-provider"
+import { TradingViewChart } from "./TradingViewChart"
 
 interface MarketIndex {
   symbol: string
@@ -48,6 +50,7 @@ export function TradingContextPanel({
   collapsed = false,
   onToggleCollapse,
 }: TradingContextPanelProps) {
+  const { mode, selectedTicker, showChart, closeChart } = useChart()
   const [isCollapsed, setIsCollapsed] = useState(collapsed)
 
   // Placeholder data - will be replaced with real data from props
@@ -93,6 +96,15 @@ export function TradingContextPanel({
   const getChangeBg = (value: number | null) => {
     if (value === null) return "bg-muted/30"
     return value >= 0 ? "bg-green-500/10" : "bg-red-500/10"
+  }
+
+  // Chart mode — show TradingView chart instead of market overview
+  if (mode === "chart" && selectedTicker) {
+    return (
+      <Card className="border-l-0 rounded-l-none bg-[var(--surface-1)]/40 backdrop-blur border-white/5 overflow-hidden h-full">
+        <TradingViewChart symbol={selectedTicker} onClose={closeChart} />
+      </Card>
+    )
   }
 
   return (
@@ -231,6 +243,7 @@ export function TradingContextPanel({
                   {defaultWatchlist.map((ticker) => (
                     <div
                       key={ticker.symbol}
+                      onClick={() => showChart(ticker.symbol)}
                       className="flex items-center justify-between p-2 rounded-lg bg-[var(--surface-2)] border border-white/5 hover:bg-muted/50 transition-colors cursor-pointer"
                     >
                       <span className="text-xs font-semibold text-foreground">{ticker.symbol}</span>

@@ -56,17 +56,11 @@ export async function requireAdminPage() {
     redirect('/auth/login?redirect=/admin/dashboard')
   }
 
-  const { data: credits, error: creditsError } = await supabase
+  const { data: credits } = await supabase
     .from('user_credits')
     .select('is_admin')
     .eq('user_id', user.id)
     .single()
-
-  // DEBUG — remove after fixing admin redirect
-  console.log('[ADMIN DEBUG] user.id:', user.id)
-  console.log('[ADMIN DEBUG] credits query result:', { data: credits, error: creditsError })
-  console.log('[ADMIN DEBUG] is_admin value:', credits?.is_admin)
-  console.log('[ADMIN DEBUG] will redirect?', !credits?.is_admin)
 
   if (!credits?.is_admin) {
     redirect('/chat')
