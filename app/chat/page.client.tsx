@@ -103,6 +103,22 @@ export default function ChatPage() {
     return false
   })
 
+  // Resizable trading panel width
+  const PANEL_MIN = 280
+  const PANEL_MAX = 700
+  const PANEL_DEFAULT = 320
+  const [panelWidth, setPanelWidth] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('pelican_trading_panel_width')
+      if (saved) {
+        const n = parseInt(saved, 10)
+        if (!isNaN(n) && n >= PANEL_MIN && n <= PANEL_MAX) return n
+      }
+    }
+    return PANEL_DEFAULT
+  })
+  const isResizing = useRef(false)
+
   // Handle sidebar toggle with persistence
   const handleSidebarToggle = () => {
     const newCollapsed = !sidebarCollapsed
@@ -116,6 +132,44 @@ export default function ChatPage() {
     setTradingPanelCollapsed(newCollapsed)
     localStorage.setItem('pelican_trading_panel_collapsed', newCollapsed.toString())
   }
+
+  // Panel resize handlers
+  const handleResizeStart = useCallback((e: React.MouseEvent) => {
+    e.preventDefault()
+    isResizing.current = true
+    const startX = e.clientX
+    const startWidth = panelWidth
+
+    document.body.style.userSelect = 'none'
+    document.body.style.cursor = 'col-resize'
+    // Disable pointer events on iframes during drag (they eat mouse events)
+    document.querySelectorAll('iframe').forEach(f => { (f as HTMLElement).style.pointerEvents = 'none' })
+
+    const onMouseMove = (ev: MouseEvent) => {
+      if (!isResizing.current) return
+      // Dragging left increases width (panel is on the right)
+      const delta = startX - ev.clientX
+      const newWidth = Math.min(PANEL_MAX, Math.max(PANEL_MIN, startWidth + delta))
+      setPanelWidth(newWidth)
+    }
+
+    const onMouseUp = () => {
+      isResizing.current = false
+      document.body.style.userSelect = ''
+      document.body.style.cursor = ''
+      document.querySelectorAll('iframe').forEach(f => { (f as HTMLElement).style.pointerEvents = '' })
+      document.removeEventListener('mousemove', onMouseMove)
+      document.removeEventListener('mouseup', onMouseUp)
+      // Persist final width
+      setPanelWidth(w => {
+        localStorage.setItem('pelican_trading_panel_width', String(w))
+        return w
+      })
+    }
+
+    document.addEventListener('mousemove', onMouseMove)
+    document.addEventListener('mouseup', onMouseUp)
+  }, [panelWidth])
 
   // Fetch real-time market data
   const { indices, vix, vixChange, sectors, watchlist, isLoading: isLoadingMarketData, refresh: refreshMarketData } = useMarketData({
@@ -491,19 +545,31 @@ export default function ChatPage() {
 
       {/* Trading Context Panel - Desktop only */}
       {!tradingPanelCollapsed && (
-        <div className="hidden xl:block w-80 h-full overflow-y-auto transition-all duration-300">
-          <TradingContextPanel
-            collapsed={tradingPanelCollapsed}
-            onToggleCollapse={handleTradingPanelToggle}
-            indices={indices}
-            vix={vix}
-            vixChange={vixChange}
-            sectors={sectors}
-            watchlist={watchlist}
-            isLoading={isLoadingMarketData}
-            onRefresh={refreshMarketData}
-          />
-        </div>
+        <>
+          {/* Resize handle */}
+          <div
+            className="hidden xl:flex items-center justify-center w-1.5 cursor-col-resize group hover:bg-purple-500/10 active:bg-purple-500/20 transition-colors flex-shrink-0"
+            onMouseDown={handleResizeStart}
+          >
+            <div className="w-0.5 h-8 rounded-full bg-border group-hover:bg-purple-400/50 group-active:bg-purple-400 transition-colors" />
+          </div>
+          <div
+            className="hidden xl:block h-full overflow-y-auto flex-shrink-0"
+            style={{ width: panelWidth }}
+          >
+            <TradingContextPanel
+              collapsed={tradingPanelCollapsed}
+              onToggleCollapse={handleTradingPanelToggle}
+              indices={indices}
+              vix={vix}
+              vixChange={vixChange}
+              sectors={sectors}
+              watchlist={watchlist}
+              isLoading={isLoadingMarketData}
+              onRefresh={refreshMarketData}
+            />
+          </div>
+        </>
       )}
 
       {/* Show expand button when trading panel is collapsed */}
