@@ -67,23 +67,19 @@ export function captureMessage(
   context: ErrorContext,
   level: Sentry.SeverityLevel = 'info'
 ): void {
-  if (process.env.NODE_ENV === 'development') {
-    console.log(`[${level.toUpperCase()}]`, message, context);
-  }
-  
   Sentry.withScope((scope) => {
     if (context.userId) {
       scope.setUser({ id: context.userId });
     }
-    
+
     // Set tags
     if (context.action) scope.setTag('action', context.action);
     if (context.component) scope.setTag('component', context.component);
     if (context.conversationId) scope.setTag('conversation_id', context.conversationId);
-    
+
     scope.setContext('additional', context);
     scope.setLevel(level);
-    
+
     Sentry.captureMessage(message, level);
   });
 }
@@ -94,10 +90,6 @@ export function captureMessage(
  * @param data - Additional data
  */
 export function addBreadcrumb(message: string, data?: Record<string, unknown>): void {
-  if (process.env.NODE_ENV === 'development') {
-    console.log('[Breadcrumb]', message, data);
-  }
-  
   Sentry.addBreadcrumb({
     message,
     data,

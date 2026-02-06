@@ -1,5 +1,6 @@
 "use client"
 
+import Image from "next/image"
 import { useT } from "@/lib/providers/translation-provider"
 
 interface WelcomeScreenProps {
@@ -20,12 +21,13 @@ export function WelcomeScreen({}: WelcomeScreenProps) {
 
       <div className="max-w-2xl mx-auto text-center space-y-6 sm:space-y-8 px-2">
         <div className="flex justify-center h-24 sm:h-32">
-          <img 
-            src="/pelican-logo-transparent.png" 
-            alt={t.common.appName} 
-            className="w-24 h-24 sm:w-32 sm:h-32 object-contain" 
-            width="128"
-            height="128"
+          <Image
+            src="/pelican-logo-transparent.webp"
+            alt={t.common.appName}
+            className="w-24 h-24 sm:w-32 sm:h-32 object-contain"
+            width={128}
+            height={128}
+            priority
           />
         </div>
 

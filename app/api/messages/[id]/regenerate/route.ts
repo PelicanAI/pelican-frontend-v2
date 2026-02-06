@@ -152,8 +152,6 @@ export async function POST(
       )
     }
 
-    console.log("[regenerate] Message updated successfully:", id)
-
     return NextResponse.json({ 
       content: newContent,
       message_id: id,

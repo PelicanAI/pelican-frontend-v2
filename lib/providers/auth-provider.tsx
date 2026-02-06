@@ -60,8 +60,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const guestConversations = JSON.parse(guestConversationsRaw)
       if (!Array.isArray(guestConversations) || guestConversations.length === 0) return
 
-      console.log(`[Auth] Migrating ${guestConversations.length} guest conversations to user ${userId}`)
-
       let migratedCount = 0
       let failedCount = 0
 
@@ -118,8 +116,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
               if (!success || msgError) {
                 console.error("[Auth] Failed to migrate messages:", msgError)
-              } else {
-                console.log(`[Auth] Migrated ${count} messages for conversation ${newConv.id}`)
               }
             }
           }
@@ -138,8 +134,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       localStorage.removeItem(GUEST_CONVERSATIONS_KEY)
       localStorage.removeItem(GUEST_MODE_KEY)
       localStorage.removeItem(GUEST_USER_ID_KEY)
-
-      console.log(`[Auth] Guest migration completed: ${migratedCount} succeeded, ${failedCount} failed`)
 
     } catch (error) {
       console.error("[Auth] Guest migration failed:", error)

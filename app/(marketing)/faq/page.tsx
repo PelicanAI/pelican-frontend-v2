@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/providers/auth-provider';
@@ -236,7 +237,7 @@ export default function FAQ() {
       <nav>
         <div className="nav-inner">
           <Link href="/" className="nav-logo">
-            <img src="/pelican-logo-transparent.png" alt="Pelican" />
+            <Image src="/pelican-logo-transparent.webp" alt="Pelican" width={32} height={32} />
             <span>Pelican</span>
           </Link>
           <div className="nav-links">
@@ -330,7 +331,7 @@ export default function FAQ() {
         </p>
       </footer>
 
-      <HelpChat logoUrl="/pelican-logo-transparent.png" />
+      <HelpChat logoUrl="/pelican-logo-transparent.webp" />
     </>
   );
 }

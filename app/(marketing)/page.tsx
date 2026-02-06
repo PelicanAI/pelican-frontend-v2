@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import {
   FlaskConical,
@@ -79,7 +80,7 @@ export default function HomePage() {
       <nav>
         <div className="nav-inner">
           <Link href="/" className="nav-logo">
-            <img src="/pelican-logo-transparent.png" alt="Pelican" />
+            <Image src="/pelican-logo-transparent.webp" alt="Pelican" width={32} height={32} />
             <span>Pelican</span>
           </Link>
           <div className="nav-links">
@@ -155,7 +156,7 @@ export default function HomePage() {
             </div>
           </div>
           <div className="hero-visual">
-            <img src="/pelican-logo-transparent.png" alt="Pelican Logo" className="hero-logo-large" />
+            <Image src="/pelican-logo-transparent.webp" alt="Pelican Logo" width={400} height={400} className="hero-logo-large" priority />
           </div>
         </div>
       </section>
@@ -457,7 +458,7 @@ export default function HomePage() {
       <footer>
         <div className="footer-inner">
           <div className="footer-logo">
-            <img src="/pelican-logo-transparent.png" alt="Pelican" loading="lazy" />
+            <Image src="/pelican-logo-transparent.webp" alt="Pelican" width={32} height={32} />
             <span>Pelican Trading</span>
           </div>
           <div className="footer-links">
@@ -472,7 +473,7 @@ export default function HomePage() {
       </footer>
 
       {/* Help Chat Widget */}
-      <HelpChat logoUrl="/pelican-logo-transparent.png" />
+      <HelpChat logoUrl="/pelican-logo-transparent.webp" />
     </>
   );
 }

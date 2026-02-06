@@ -197,8 +197,6 @@ export async function PATCH(
       )
     }
 
-    console.log("[conversations] Updated successfully:", id)
-
     return NextResponse.json({ 
       success: true,
       conversation: data
@@ -282,8 +280,6 @@ export async function DELETE(
         { status: 500 }
       )
     }
-
-    console.log("[conversations] Soft deleted successfully:", id)
 
     return NextResponse.json({ 
       success: true,

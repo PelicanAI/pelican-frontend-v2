@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef, useLayoutEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/providers/auth-provider';
 import { useT } from '@/lib/providers/translation-provider';
@@ -202,7 +203,7 @@ export default function HowToUsePage() {
       <nav>
         <div className="nav-inner">
           <Link href="/" className="nav-logo">
-            <img src="/pelican-logo-transparent.png" alt="Pelican" />
+            <Image src="/pelican-logo-transparent.webp" alt="Pelican" width={32} height={32} />
             <span>Pelican</span>
           </Link>
           <div className="nav-links">
@@ -350,7 +351,7 @@ export default function HowToUsePage() {
       <footer>
         <div className="footer-inner">
           <div className="footer-logo">
-            <img src="/pelican-logo-transparent.png" alt="Pelican" />
+            <Image src="/pelican-logo-transparent.webp" alt="Pelican" width={32} height={32} />
             <span>Pelican Trading</span>
           </div>
           <div className="footer-links">
@@ -363,7 +364,7 @@ export default function HowToUsePage() {
       </footer>
 
       {/* Help Chat Widget */}
-      <HelpChat logoUrl="/pelican-logo-transparent.png" />
+      <HelpChat logoUrl="/pelican-logo-transparent.webp" />
     </div>
   );
 }

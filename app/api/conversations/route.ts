@@ -128,10 +128,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Failed to create conversation" }, { status: 500 })
     }
 
-    // Success - optionally log to console in development
-    if (process.env.NODE_ENV === 'development') {
-      console.log("[v0] Created new conversation:", conversation.id)
-    }
     return NextResponse.json({ conversation })
   } catch (error) {
     Sentry.captureException(error, {

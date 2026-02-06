@@ -33,11 +33,6 @@ export async function GET(
       return NextResponse.json({ error: 'Failed to fetch messages' }, { status: 500 })
     }
 
-    console.log('[MESSAGES] Fetched messages:', { 
-      conversationId, 
-      count: messages?.length || 0 
-    })
-
     return NextResponse.json({ 
       messages: messages || [],
       conversationId 

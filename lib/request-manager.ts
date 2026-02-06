@@ -42,7 +42,6 @@ class RequestManager {
 
   // Cancel all active requests (e.g., when user sends new message)
   cancelAllRequests(): void {
-    console.log("[v0] RequestManager: Cancelling all active requests")
     this.activeRequests.forEach((controller, id) => {
       controller.abort()
       this.updateRequestState(id, { status: "cancelled" })
@@ -54,7 +53,6 @@ class RequestManager {
   cancelRequest(requestId: string): void {
     const controller = this.activeRequests.get(requestId)
     if (controller) {
-      console.log(`[v0] RequestManager: Cancelling request ${requestId}`)
       controller.abort()
       this.activeRequests.delete(requestId)
       this.updateRequestState(requestId, { status: "cancelled" })
@@ -132,8 +130,6 @@ class RequestManager {
     }
 
     try {
-      console.log(`[v0] RequestManager: Executing request ${requestId} (attempt ${retryCount + 1})`)
-
       const response = await fetch(config.url, requestOptions)
 
       // Check for rate limiting
@@ -183,8 +179,6 @@ class RequestManager {
           nextRetryAt,
         })
 
-        console.log(`[v0] RequestManager: Retrying request ${requestId} in ${delay}ms`)
-
         // Schedule retry
         setTimeout(() => {
           const retryConfig = { ...config, retryCount: retryCount + 1 }
@@ -207,7 +201,6 @@ class RequestManager {
   async request(config: RequestConfig): Promise<Response> {
     // Check for rate limiting
     if (this.isRateLimited()) {
-      console.log("[v0] RequestManager: Rate limited, adding to queue")
       this.requestQueue.push(config)
       this.processQueue()
       throw new Error("Rate limited - request queued")

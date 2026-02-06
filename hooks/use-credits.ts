@@ -107,18 +107,13 @@ export function useCredits(): UseCreditsReturn {
       if (event === 'SIGNED_IN' && session?.user) {
         // Skip refetch on tab focus - only fetch on actual sign-in
         if (hasInitialized) {
-          console.log('[CREDITS] Ignoring SIGNED_IN (tab focus/token refresh)')
           return
         }
         hasInitialized = true
         
-        // User just signed in - refetch credits with their ID
-        console.log('[CREDITS] Auth state changed to SIGNED_IN, refetching credits')
         setLoading(true)
         fetchCredits()
       } else if (event === 'SIGNED_OUT') {
-        // User signed out - clear credits
-        console.log('[CREDITS] Auth state changed to SIGNED_OUT, clearing credits')
         hasInitialized = false
         setCredits(null)
         setLoading(false)

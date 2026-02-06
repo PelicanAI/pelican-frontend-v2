@@ -136,7 +136,6 @@ function inferMimeType(filename: string, declaredType: string): string {
   }
   const ext = "." + filename.split(".").pop()?.toLowerCase()
   if (ext && EXTENSION_TO_MIME[ext]) {
-    console.log(`[UPLOAD] MIME inferred from extension: ${declaredType} -> ${EXTENSION_TO_MIME[ext]}`)
     return EXTENSION_TO_MIME[ext]
   }
   return normalized
@@ -172,7 +171,6 @@ export async function POST(request: NextRequest) {
 
   try {
     addBreadcrumb("Upload request started", { requestId })
-    console.log(`[${requestId}] Upload request started`)
 
     const supabase = await createClient()
     const { data: { user }, error: authError } = await supabase.auth.getUser()
@@ -186,7 +184,6 @@ export async function POST(request: NextRequest) {
     const file = formData.get("file") as File
 
     if (!file) {
-      console.log(`[${requestId}] No file provided`)
       return NextResponse.json({ error: "No file provided" }, { status: 400 })
     }
 
@@ -195,11 +192,9 @@ export async function POST(request: NextRequest) {
     const category = getFileCategory(mimeType)
 
     fileMeta = { name: sanitizedFilename, type: mimeType, size: file.size, category }
-    console.log(`[${requestId}] File: ${sanitizedFilename} (${mimeType}, ${category}, ${file.size} bytes)`)
     addBreadcrumb("File received", { requestId, fileMeta })
 
     if (!ALL_ALLOWED_MIME_TYPES.includes(mimeType)) {
-      console.log(`[${requestId}] Unsupported MIME type: ${mimeType}`)
       return NextResponse.json(
         { error: `Unsupported file type: ${mimeType}`, code: "unsupported_type" },
         { status: 400 }
@@ -207,7 +202,6 @@ export async function POST(request: NextRequest) {
     }
 
     if (file.size > MAX_FILE_SIZE) {
-      console.log(`[${requestId}] File too large: ${file.size} bytes`)
       return NextResponse.json(
         { error: `File exceeds ${MAX_FILE_SIZE / 1024 / 1024}MB limit`, code: "file_too_large" },
         { status: 413 }
@@ -221,7 +215,6 @@ export async function POST(request: NextRequest) {
     const fileBuffer = await file.arrayBuffer()
 
     if (!validateMagicBytes(fileBuffer, mimeType)) {
-      console.log(`[${requestId}] Magic bytes validation failed`)
       return NextResponse.json(
         { error: "File content doesn't match declared type", code: "mime_mismatch" },
         { status: 400 }
@@ -230,12 +223,9 @@ export async function POST(request: NextRequest) {
 
     const checksum = computeChecksum(fileBuffer)
     fileMeta.checksum = checksum
-    console.log(`[${requestId}] Checksum: ${checksum.substring(0, 16)}...`)
 
     const now = new Date()
     const storageKey = `${now.getFullYear()}/${String(now.getMonth() + 1).padStart(2, "0")}/${uuidv4()}.${sanitizedFilename.split(".").pop()?.toLowerCase() || "bin"}`
-
-    console.log(`[${requestId}] Uploading -> ${storageKey}`)
 
     const { error: uploadError } = await supabase.storage
       .from("pelican")
@@ -278,8 +268,6 @@ export async function POST(request: NextRequest) {
       console.error(`[${requestId}] Signed URL error:`, signedUrlError)
       return NextResponse.json({ error: "Failed to generate access URL", code: "signed_url_error" }, { status: 500 })
     }
-
-    console.log(`[${requestId}] ✅ Upload complete: ${sanitizedFilename} -> ${fileRecord.id}`)
 
     return NextResponse.json({
       id: fileRecord.id,

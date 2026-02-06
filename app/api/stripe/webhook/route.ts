@@ -41,8 +41,6 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  console.log(`Processing Stripe event: ${event.type}`)
-
   try {
     switch (event.type) {
       case 'checkout.session.completed': {
@@ -77,7 +75,6 @@ export async function POST(request: NextRequest) {
             throw error
           }
 
-          console.log(`✅ User ${userId} subscribed to ${planName} with ${credits} credits`)
         }
         break
       }
@@ -107,7 +104,6 @@ export async function POST(request: NextRequest) {
             throw error
           }
 
-          console.log(`✅ Monthly credits reset for user ${userId}`)
         }
         break
       }
@@ -132,7 +128,6 @@ export async function POST(request: NextRequest) {
               })
               .eq('user_id', userId)
 
-            console.log(`⚠️ Payment failed for user ${userId}`)
           }
         }
         break
@@ -152,7 +147,6 @@ export async function POST(request: NextRequest) {
             throw error
           }
 
-          console.log(`✅ Subscription canceled for user ${userId}`)
         }
         break
       }
@@ -178,14 +172,13 @@ export async function POST(request: NextRequest) {
               })
               .eq('user_id', userId)
 
-            console.log(`✅ User ${userId} upgraded to ${planName}`)
           }
         }
         break
       }
 
       default:
-        console.log(`Unhandled event type: ${event.type}`)
+        break
     }
 
     return NextResponse.json({ received: true })

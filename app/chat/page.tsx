@@ -19,6 +19,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Menu } from "lucide-react"
 import { ThemeToggle } from "@/components/theme-toggle"
 import Link from "next/link"
+import Image from "next/image"
 import { cn } from "@/lib/utils"
 import { SettingsModal } from "@/components/settings-modal"
 import { PaywallGate } from "@/components/paywall-gate"
@@ -346,7 +347,7 @@ export default function ChatPage() {
             </SheetTrigger>
           </Sheet>
           <div className="flex items-center gap-2">
-            <img src="/pelican-logo-transparent.png" alt="PelicanAI" className="w-6 h-6 object-contain" />
+            <Image src="/pelican-logo-transparent.webp" alt="PelicanAI" width={24} height={24} className="w-6 h-6 object-contain" />
             <span className="font-semibold text-foreground">Pelican AI</span>
           </div>
           <div className="hidden sm:flex items-center gap-2">
@@ -367,7 +368,7 @@ export default function ChatPage() {
               <span className="text-sm font-medium">Show Sidebar</span>
             </Button>
             <div className="flex items-center gap-2">
-              <img src="/pelican-logo-transparent.png" alt="PelicanAI" className="w-6 h-6 object-contain" />
+              <Image src="/pelican-logo-transparent.webp" alt="PelicanAI" width={24} height={24} className="w-6 h-6 object-contain" />
               <span className="font-semibold text-foreground">Pelican AI</span>
             </div>
             <div className="flex items-center gap-2">
