@@ -1,0 +1,23 @@
+'use client'
+
+import { Button } from '@/components/ui/button'
+
+export default function AdminError({
+  error,
+  reset
+}: {
+  error: Error & { digest?: string }
+  reset: () => void
+}) {
+  console.error('Admin error:', error)
+
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-4 bg-background">
+      <h2 className="text-xl font-semibold">Something went wrong</h2>
+      <p className="text-muted-foreground text-center max-w-md">
+        We encountered an error loading the admin panel. Please try again.
+      </p>
+      <Button onClick={reset}>Try again</Button>
+    </div>
+  )
+}

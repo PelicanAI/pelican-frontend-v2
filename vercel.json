@@ -6,6 +6,22 @@
   "framework": "nextjs",
   "regions": ["iad1"],
   "functions": {
+    "app/api/help-chat/route.ts": {
+      "memory": 1024,
+      "maxDuration": 30
+    },
+    "app/api/messages/[id]/regenerate/route.ts": {
+      "memory": 1024,
+      "maxDuration": 30
+    },
+    "app/api/upload/route.ts": {
+      "memory": 1024,
+      "maxDuration": 30
+    },
+    "app/api/stripe/webhook/route.ts": {
+      "memory": 1024,
+      "maxDuration": 30
+    },
     "app/api/**/*.ts": {
       "memory": 1024,
       "maxDuration": 10
