@@ -72,10 +72,33 @@ function MessageBubble({ msg }: { msg: ConvoMessage }) {
   )
 }
 
-export function RecentConversations({ conversations }: { conversations: ConversationRow[] }) {
+export function RecentConversations({ conversations: initial }: { conversations: ConversationRow[] }) {
+  const [conversations, setConversations] = useState<ConversationRow[]>(initial)
+  const [hasMore, setHasMore] = useState(initial.length >= 10)
+  const [loadingMore, setLoadingMore] = useState(false)
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [messagesCache, setMessagesCache] = useState<Record<string, ConvoMessage[]>>({})
   const [loadingId, setLoadingId] = useState<string | null>(null)
+
+  const loadMore = useCallback(async () => {
+    if (loadingMore || !hasMore || conversations.length === 0) return
+    setLoadingMore(true)
+    try {
+      const last = conversations[conversations.length - 1]!
+      const params = new URLSearchParams({ limit: '10', cursor: last.createdAt })
+      const res = await fetch(`/api/admin/conversations?${params}`)
+      if (res.ok) {
+        const data = await res.json()
+        const newConvos: ConversationRow[] = data.conversations ?? []
+        setConversations((prev) => [...prev, ...newConvos])
+        setHasMore(data.hasMore === true)
+      }
+    } catch (e) {
+      console.error('[RecentConversations] Failed to load more:', e)
+    } finally {
+      setLoadingMore(false)
+    }
+  }, [loadingMore, hasMore, conversations])
 
   const handleToggle = useCallback(async (id: string) => {
     if (expandedId === id) {
@@ -162,6 +185,23 @@ export function RecentConversations({ conversations }: { conversations: Conversa
                 </div>
               )
             })}
+
+            {hasMore && (
+              <button
+                onClick={loadMore}
+                disabled={loadingMore}
+                className="w-full flex items-center justify-center gap-2 text-sm p-2 rounded-md hover:bg-muted/50 transition-colors text-muted-foreground"
+              >
+                {loadingMore ? (
+                  <>
+                    <Loader2 className="size-3 animate-spin" />
+                    Loading...
+                  </>
+                ) : (
+                  'Show more'
+                )}
+              </button>
+            )}
           </div>
         )}
       </CardContent>
