@@ -19,6 +19,7 @@ interface MessageBubbleProps {
   showSkeleton?: boolean
   isDarkMode?: boolean
   onRegenerate?: () => void
+  isRegenerating?: boolean
   onStop?: () => void
   onReaction?: (messageId: string, reaction: "like" | "dislike") => void
   onEdit?: (id: string, content: string) => void
@@ -32,6 +33,7 @@ export function MessageBubble({
   showSkeleton = false,
   isDarkMode = false,
   onRegenerate,
+  isRegenerating = false,
   onStop,
   onReaction,
   onEdit,
@@ -89,7 +91,7 @@ export function MessageBubble({
       >
         <div className="max-w-3xl mx-auto px-4 sm:px-8">
           <div className="flex gap-4 sm:gap-6 items-start justify-end">
-            <div className="max-w-[90%] sm:max-w-[80%] md:max-w-[70%] lg:max-w-[600px]">
+            <div className="max-w-[90%] sm:max-w-[80%] md:max-w-[70%] lg:max-w-[600px] overflow-hidden">
               <div className="text-[15px] sm:text-base leading-relaxed break-words text-foreground">
                 <AttachmentDisplay attachments={message.attachments} />
                 {message.content}
@@ -133,7 +135,7 @@ export function MessageBubble({
             />
           </div>
 
-          <div className="flex-1 min-w-0 max-w-[90%] sm:max-w-[80%] md:max-w-[75%] lg:max-w-[700px]">
+          <div className="flex-1 min-w-0 max-w-[90%] sm:max-w-[80%] md:max-w-[75%] lg:max-w-[700px] overflow-hidden">
             <AttachmentDisplay attachments={message.attachments} />
             <div className="text-[16px] sm:text-base leading-relaxed text-foreground">
               <MessageContent
@@ -164,7 +166,7 @@ export function MessageBubble({
                   onEdit={onEdit}
                   onDelete={onDelete}
                   onPin={onPin}
-                  isRegenerating={false}
+                  isRegenerating={isRegenerating}
                   canDelete={true}
                   variant="minimal"
                 />

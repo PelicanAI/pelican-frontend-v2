@@ -414,6 +414,7 @@ export function ChatContainer({
                         ? onRegenerateMessage
                         : undefined
                     }
+                    isRegenerating={index === messages.length - 1 && message.role === "assistant" && isLoading && !message.isStreaming}
                     onReaction={handleReaction}
                     onEdit={onEditMessage}
                     onDelete={onDeleteMessage}

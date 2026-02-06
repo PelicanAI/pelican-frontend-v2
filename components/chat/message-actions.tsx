@@ -232,8 +232,8 @@ export function MessageActions({
           {message.isStreaming && onStop && (
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="ghost" size="sm" onClick={onStop} className="h-7 w-7 p-0">
-                  <Square className="w-3 h-3" />
+                <Button variant="ghost" size="sm" onClick={onStop} className="h-11 w-11 sm:h-7 sm:w-7 p-0 min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0">
+                  <Square className="w-4 h-4 sm:w-3 sm:h-3" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>Stop generation</TooltipContent>
@@ -248,9 +248,9 @@ export function MessageActions({
                   size="sm"
                   onClick={onRegenerate}
                   disabled={isRegenerating || message.isStreaming}
-                  className="h-7 w-7 p-0"
+                  className="h-11 w-11 sm:h-7 sm:w-7 p-0 min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0"
                 >
-                  {isRegenerating ? <Loader2 className="w-3 h-3 animate-spin" /> : <RotateCcw className="w-3 h-3" />}
+                  {isRegenerating ? <Loader2 className="w-4 h-4 sm:w-3 sm:h-3 animate-spin" /> : <RotateCcw className="w-4 h-4 sm:w-3 sm:h-3" />}
                 </Button>
               </TooltipTrigger>
               <TooltipContent>{isRegenerating ? "Regenerating..." : "Regenerate response"}</TooltipContent>
@@ -267,8 +267,8 @@ export function MessageActions({
         {message.isStreaming && onStop && (
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="sm" onClick={onStop} className="h-7 w-7 p-0">
-                <Square className="w-3 h-3" />
+              <Button variant="ghost" size="sm" onClick={onStop} className="h-11 w-11 sm:h-7 sm:w-7 p-0 min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0">
+                <Square className="w-4 h-4 sm:w-3 sm:h-3" />
               </Button>
             </TooltipTrigger>
             <TooltipContent>Stop generation</TooltipContent>
@@ -282,10 +282,10 @@ export function MessageActions({
               variant="ghost"
               size="sm"
               onClick={handleCopy}
-              className="h-7 w-7 p-0"
+              className="h-11 w-11 sm:h-7 sm:w-7 p-0 min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0"
               disabled={message.isStreaming}
             >
-              {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+              {copied ? <Check className="w-4 h-4 sm:w-3 sm:h-3" /> : <Copy className="w-4 h-4 sm:w-3 sm:h-3" />}
             </Button>
           </TooltipTrigger>
           <TooltipContent>Copy message</TooltipContent>
@@ -298,10 +298,10 @@ export function MessageActions({
                     variant="ghost"
                     size="sm"
                     onClick={handlePin}
-                    className="h-7 w-7 p-0"
+                    className="h-11 w-11 sm:h-7 sm:w-7 p-0 min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0"
                     disabled={message.isStreaming}
                   >
-                    <Star className={cn("w-3 h-3", message.isPinned && "fill-current text-yellow-500")} />
+                    <Star className={cn("w-4 h-4 sm:w-3 sm:h-3", message.isPinned && "fill-current text-yellow-500")} />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>{message.isPinned ? "Unpin message" : "Pin message"}</TooltipContent>
@@ -315,10 +315,10 @@ export function MessageActions({
                     variant="ghost"
                     size="sm"
                     onClick={handleEdit}
-                    className="h-7 w-7 p-0"
+                    className="h-11 w-11 sm:h-7 sm:w-7 p-0 min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0"
                     disabled={message.isStreaming}
                   >
-                    <Edit3 className="w-3 h-3" />
+                    <Edit3 className="w-4 h-4 sm:w-3 sm:h-3" />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>Edit message</TooltipContent>
@@ -333,9 +333,9 @@ export function MessageActions({
                     size="sm"
                     onClick={onRegenerate}
                     disabled={isRegenerating || message.isStreaming}
-                    className="h-7 w-7 p-0"
+                    className="h-11 w-11 sm:h-7 sm:w-7 p-0 min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0"
                   >
-                    {isRegenerating ? <Loader2 className="w-3 h-3 animate-spin" /> : <RotateCcw className="w-3 h-3" />}
+                    {isRegenerating ? <Loader2 className="w-4 h-4 sm:w-3 sm:h-3 animate-spin" /> : <RotateCcw className="w-4 h-4 sm:w-3 sm:h-3" />}
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>{isRegenerating ? "Regenerating..." : "Regenerate response"}</TooltipContent>
@@ -347,10 +347,10 @@ export function MessageActions({
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-7 w-7 p-0"
+                  className="h-11 w-11 sm:h-7 sm:w-7 p-0 min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0"
                   disabled={message.isStreaming}
                 >
-                  <MoreHorizontal className="w-3 h-3" />
+                  <MoreHorizontal className="w-4 h-4 sm:w-3 sm:h-3" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">

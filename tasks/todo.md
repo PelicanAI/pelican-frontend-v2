@@ -31,3 +31,8 @@
 - [x] Add loading.tsx skeletons for settings, pricing, profile
 - [x] Convert pricing page to Server Component (extracted PricingPageContent client component)
 - [x] Remove 'use client' from stateless UI components (no-op — all already server-compatible)
+
+## Phase 3: Chat Features
+- [x] Regenerate Response Button — already implemented; threaded `isRegenerating` prop through chat-container → streaming-message → message-bubble (was hardcoded `false`)
+- [x] Suggested Prompts — created SuggestedPrompts.tsx (6 stock-related prompts, 2/3 col grid, framer-motion stagger), integrated into welcome-screen.tsx, added 4 tests
+- [x] Mobile Chat UI Polish — fixed touch targets in message-actions.tsx (h-11/sm:h-7 + 44px min), added overflow-hidden to message-bubble containers

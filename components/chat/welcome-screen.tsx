@@ -2,13 +2,14 @@
 
 import Image from "next/image"
 import { useT } from "@/lib/providers/translation-provider"
+import { SuggestedPrompts } from "./SuggestedPrompts"
 
 interface WelcomeScreenProps {
   onQuickStart: (message: string) => void
   onSettingsClick?: () => void
 }
 
-export function WelcomeScreen({}: WelcomeScreenProps) {
+export function WelcomeScreen({ onQuickStart }: WelcomeScreenProps) {
   const t = useT()
 
   return (
@@ -37,6 +38,8 @@ export function WelcomeScreen({}: WelcomeScreenProps) {
         <p className="text-base sm:text-lg text-muted-foreground">
           {t.chat.welcomeSubtitle}
         </p>
+
+        <SuggestedPrompts onSelect={onQuickStart} />
       </div>
     </div>
   )

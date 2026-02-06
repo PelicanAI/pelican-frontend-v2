@@ -9,6 +9,7 @@ interface StreamingMessageProps {
   message: Message
   onStop?: () => void
   onRegenerate?: () => void
+  isRegenerating?: boolean
   onReaction?: (messageId: string, reaction: "like" | "dislike") => void
   onEdit?: (id: string, content: string) => void
   onDelete?: (id: string) => void
@@ -21,6 +22,7 @@ export function StreamingMessage({
   message,
   onStop,
   onRegenerate,
+  isRegenerating,
   onReaction,
   onEdit,
   onDelete,
@@ -92,6 +94,7 @@ export function StreamingMessage({
         isDarkMode={isDarkMode}
         onStop={message.isStreaming ? onStop : undefined}
         onRegenerate={!message.isStreaming && !isRevealing && message.role === "assistant" ? onRegenerate : undefined}
+        isRegenerating={isRegenerating}
         onReaction={onReaction}
         onEdit={onEdit}
         onDelete={onDelete}
