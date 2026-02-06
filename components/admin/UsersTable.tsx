@@ -176,7 +176,7 @@ export function UsersTable({ initialData }: { initialData: UsersResponse }) {
 
         {/* Expanded detail — rendered outside the table for valid HTML */}
         {expandedId && (
-          <div className="border-t border-border bg-muted/30">
+          <div className="border-t border-border bg-muted/30" onClick={(e) => e.stopPropagation()}>
             {data.users
               .filter((u) => u.id === expandedId)
               .map((user) => (

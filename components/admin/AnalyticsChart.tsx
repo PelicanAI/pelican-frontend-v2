@@ -34,7 +34,7 @@ export function AnalyticsChart({ title, data }: AnalyticsChartProps) {
               return (
                 <div
                   key={i}
-                  className="group relative flex-1 flex flex-col justify-end"
+                  className="group relative flex-1 h-full flex flex-col justify-end"
                 >
                   <div
                     className="w-full rounded-t bg-primary/70 hover:bg-primary transition-colors min-h-[2px]"

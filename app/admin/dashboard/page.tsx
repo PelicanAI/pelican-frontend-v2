@@ -1,6 +1,6 @@
 export const dynamic = 'force-dynamic'
 
-import { Users, Activity, MessageSquare, Coins } from 'lucide-react'
+import { Users, Activity, MessageSquare, Coins, Mail, CalendarDays, AlertTriangle } from 'lucide-react'
 import { getServiceClient } from '@/lib/admin'
 import { StatsCard } from '@/components/admin/StatsCard'
 import { RecentSignups } from '@/components/admin/RecentSignups'
@@ -10,22 +10,29 @@ export default async function AdminDashboardPage() {
   const admin = getServiceClient()
   const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
 
+  const todayStart = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()).toISOString()
+  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
+
   const [
     usersResult,
     convosResult,
     activeResult,
     creditsResult,
     recentConvosResult,
+    messagesTodayResult,
+    messagesWeekResult,
   ] = await Promise.all([
     admin.from('user_credits').select('*', { count: 'exact', head: true }),
     admin.from('conversations').select('*', { count: 'exact', head: true }),
     admin.from('conversations').select('user_id').gte('created_at', oneDayAgo),
-    admin.from('user_credits').select('credits_used_this_month, plan_type, user_id'),
+    admin.from('user_credits').select('credits_used_this_month, credits_balance, plan_type, user_id'),
     admin
       .from('conversations')
       .select('id, title, user_id, created_at')
       .order('created_at', { ascending: false })
       .limit(10),
+    admin.from('messages').select('*', { count: 'exact', head: true }).gte('created_at', todayStart),
+    admin.from('messages').select('*', { count: 'exact', head: true }).gte('created_at', sevenDaysAgo),
   ])
 
   // Log any query errors for Vercel runtime diagnostics
@@ -34,6 +41,8 @@ export default async function AdminDashboardPage() {
   if (activeResult.error) console.error('[Admin Dashboard] active conversations query failed:', activeResult.error.message)
   if (creditsResult.error) console.error('[Admin Dashboard] credits stats query failed:', creditsResult.error.message)
   if (recentConvosResult.error) console.error('[Admin Dashboard] recent conversations query failed:', recentConvosResult.error.message)
+  if (messagesTodayResult.error) console.error('[Admin Dashboard] messages today query failed:', messagesTodayResult.error.message)
+  if (messagesWeekResult.error) console.error('[Admin Dashboard] messages week query failed:', messagesWeekResult.error.message)
 
   const totalUsers = usersResult.count ?? 0
   const totalConversations = convosResult.count ?? 0
@@ -44,6 +53,17 @@ export default async function AdminDashboardPage() {
     (sum, r) => sum + (r.credits_used_this_month ?? 0),
     0
   )
+  const messagesToday = messagesTodayResult.count ?? 0
+  const messagesThisWeek = messagesWeekResult.count ?? 0
+
+  // Low credits: paid users with balance < 50
+  let usersLowCredits = 0
+  for (const row of creditStats) {
+    const plan = row.plan_type ?? 'none'
+    if (plan !== 'none' && plan !== 'trial' && (row.credits_balance ?? 0) < 50) {
+      usersLowCredits++
+    }
+  }
 
   // Build credit plan lookup for recent signups
   const creditPlanMap = new Map(
@@ -105,6 +125,12 @@ export default async function AdminDashboardPage() {
         <StatsCard title="Active Today" value={activeUsersToday} icon={Activity} />
         <StatsCard title="Total Conversations" value={totalConversations} icon={MessageSquare} />
         <StatsCard title="Credits Used (Month)" value={totalCreditsUsed} icon={Coins} />
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-3">
+        <StatsCard title="Messages Today" value={messagesToday} icon={Mail} />
+        <StatsCard title="Messages This Week" value={messagesThisWeek} icon={CalendarDays} />
+        <StatsCard title="Low Credit Users" value={usersLowCredits} icon={AlertTriangle} description="Paid users with < 50 credits" />
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
