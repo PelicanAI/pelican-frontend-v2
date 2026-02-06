@@ -30,6 +30,7 @@ const SettingsModal = dynamic(() => import("@/components/settings-modal").then(m
 const TrialExhaustedModal = dynamic(() => import("@/components/trial-exhausted-modal").then(m => ({ default: m.TrialExhaustedModal })))
 const InsufficientCreditsModal = dynamic(() => import("@/components/insufficient-credits-modal").then(m => ({ default: m.InsufficientCreditsModal })))
 const TradingViewChart = dynamic(() => import("@/components/chat/TradingViewChart").then(m => ({ default: m.TradingViewChart })), { ssr: false })
+const EconomicCalendar = dynamic(() => import("@/components/chat/EconomicCalendar").then(m => ({ default: m.EconomicCalendar })), { ssr: false })
 
 // Loading screen component for chat page
 function ChatLoadingScreen() {
@@ -46,16 +47,16 @@ function ChatLoadingScreen() {
   )
 }
 
-// Auto-expand trading panel when a chart is requested
+// Auto-expand trading panel when a chart or calendar is requested
 function ChartPanelExpander({ onExpand }: { onExpand: () => void }) {
   const { mode } = useChart()
   useEffect(() => {
-    if (mode === "chart") onExpand()
+    if (mode === "chart" || mode === "calendar") onExpand()
   }, [mode, onExpand])
   return null
 }
 
-// Mobile chart sheet — opens on screens below xl when a chart is requested
+// Mobile sheet — opens on screens below xl when a chart or calendar is requested
 function MobileChartSheet() {
   const { mode, selectedTicker, closeChart } = useChart()
   const [isMobile, setIsMobile] = useState(false)
@@ -70,10 +71,15 @@ function MobileChartSheet() {
 
   if (!isMobile) return null
 
+  const isOpen = (mode === "chart" && !!selectedTicker) || mode === "calendar"
+
   return (
-    <Sheet open={mode === "chart" && !!selectedTicker} onOpenChange={(open) => { if (!open) closeChart() }}>
+    <Sheet open={isOpen} onOpenChange={(open) => { if (!open) closeChart() }}>
       <SheetContent side="bottom" className="h-[70vh] p-0 rounded-t-xl">
-        {selectedTicker && (
+        {mode === "calendar" && (
+          <EconomicCalendar onClose={closeChart} />
+        )}
+        {mode === "chart" && selectedTicker && (
           <TradingViewChart symbol={selectedTicker} onClose={closeChart} />
         )}
       </SheetContent>

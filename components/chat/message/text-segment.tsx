@@ -4,6 +4,14 @@ import { useRef, useEffect, useCallback } from "react"
 import { motion } from "framer-motion"
 import { formatLine, applyTickerLinks } from "./format-utils"
 import { useChart } from "@/providers/chart-provider"
+import { TRADING_ACRONYMS } from "@/lib/trading-metadata"
+
+/** Economic event terms that should open the calendar instead of a chart */
+const ECONOMIC_TERMS = new Set(
+  ["CPI", "NFP", "FOMC", "PPI", "GDP", "PMI", "ISM", "JOLTS"].filter(
+    (t) => TRADING_ACRONYMS.has(t)
+  )
+)
 
 interface TextSegmentProps {
   content: string
@@ -15,7 +23,7 @@ interface TextSegmentProps {
 
 export function TextSegment({ content, index, isStreaming, isLargeContent, tickers }: TextSegmentProps) {
   const containerRef = useRef<HTMLDivElement>(null)
-  const { showChart } = useChart()
+  const { showChart, showCalendar } = useChart()
 
   const handleClick = useCallback(
     (e: MouseEvent) => {
@@ -24,11 +32,15 @@ export function TextSegment({ content, index, isStreaming, isLargeContent, ticke
         const ticker = target.getAttribute("data-ticker")
         if (ticker) {
           e.preventDefault()
-          showChart(ticker)
+          if (ECONOMIC_TERMS.has(ticker.toUpperCase())) {
+            showCalendar()
+          } else {
+            showChart(ticker)
+          }
         }
       }
     },
-    [showChart]
+    [showChart, showCalendar]
   )
 
   useEffect(() => {

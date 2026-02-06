@@ -3,22 +3,29 @@
 import { createContext, useContext, useState, useCallback } from "react"
 import type { ReactNode } from "react"
 
+type PanelMode = "overview" | "chart" | "calendar"
+
 interface ChartContextValue {
-  mode: "overview" | "chart"
+  mode: PanelMode
   selectedTicker: string | null
   showChart: (ticker: string) => void
+  showCalendar: () => void
   closeChart: () => void
 }
 
 const ChartContext = createContext<ChartContextValue | null>(null)
 
 export function ChartProvider({ children }: { children: ReactNode }) {
-  const [mode, setMode] = useState<"overview" | "chart">("overview")
+  const [mode, setMode] = useState<PanelMode>("overview")
   const [selectedTicker, setSelectedTicker] = useState<string | null>(null)
 
   const showChart = useCallback((ticker: string) => {
     setSelectedTicker(ticker.toUpperCase())
     setMode("chart")
+  }, [])
+
+  const showCalendar = useCallback(() => {
+    setMode("calendar")
   }, [])
 
   const closeChart = useCallback(() => {
@@ -27,7 +34,7 @@ export function ChartProvider({ children }: { children: ReactNode }) {
   }, [])
 
   return (
-    <ChartContext.Provider value={{ mode, selectedTicker, showChart, closeChart }}>
+    <ChartContext.Provider value={{ mode, selectedTicker, showChart, showCalendar, closeChart }}>
       {children}
     </ChartContext.Provider>
   )
@@ -38,6 +45,7 @@ const DEFAULT_CHART_CONTEXT: ChartContextValue = {
   mode: "overview",
   selectedTicker: null,
   showChart: NOOP,
+  showCalendar: NOOP,
   closeChart: NOOP,
 }
 

@@ -7,6 +7,7 @@ import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useChart } from "@/providers/chart-provider"
 import { TradingViewChart } from "./TradingViewChart"
+import { EconomicCalendar } from "./EconomicCalendar"
 
 interface MarketIndex {
   symbol: string
@@ -50,7 +51,7 @@ export function TradingContextPanel({
   collapsed = false,
   onToggleCollapse,
 }: TradingContextPanelProps) {
-  const { mode, selectedTicker, showChart, closeChart } = useChart()
+  const { mode, selectedTicker, showChart, showCalendar, closeChart } = useChart()
   const [isCollapsed, setIsCollapsed] = useState(collapsed)
 
   // Placeholder data - will be replaced with real data from props
@@ -107,14 +108,48 @@ export function TradingContextPanel({
     )
   }
 
+  // Calendar mode — show TradingView economic calendar
+  if (mode === "calendar") {
+    return (
+      <Card className="border-l-0 rounded-l-none bg-[var(--surface-1)]/40 backdrop-blur border-white/5 overflow-hidden h-full">
+        <EconomicCalendar onClose={closeChart} />
+      </Card>
+    )
+  }
+
+  const tabs = [
+    { key: "market" as const, label: "Market" },
+    { key: "chart" as const, label: "Chart" },
+    { key: "calendar" as const, label: "Calendar" },
+  ]
+
   return (
     <Card className="border-l-0 rounded-l-none bg-[var(--surface-1)]/40 backdrop-blur border-white/5 overflow-hidden">
-      <div className="p-4 border-b border-white/5 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Activity className="h-4 w-4 text-teal-500" />
-          <h3 className="font-semibold text-sm text-foreground">Market Overview</h3>
+      {/* Tab bar */}
+      <div className="flex items-center border-b border-white/5">
+        <div className="flex flex-1">
+          {tabs.map((tab) => (
+            <button
+              key={tab.key}
+              onClick={() => {
+                if (tab.key === "calendar") showCalendar()
+                else if (tab.key === "market") closeChart()
+                // "chart" tab has no default ticker — stays on market until user picks one
+              }}
+              className={cn(
+                "flex-1 py-2.5 text-xs font-medium transition-colors border-b-2",
+                mode === "overview" && tab.key === "market"
+                  ? "text-teal-500 border-teal-500"
+                  : mode === tab.key
+                    ? "text-teal-500 border-teal-500"
+                    : "text-muted-foreground border-transparent hover:text-foreground hover:border-white/10"
+              )}
+            >
+              {tab.label}
+            </button>
+          ))}
         </div>
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 px-2">
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}
             className="text-muted-foreground hover:text-foreground transition-colors p-1 hover:bg-muted/50 rounded"
