@@ -20,14 +20,16 @@ import { Menu } from "lucide-react"
 import { ThemeToggle } from "@/components/theme-toggle"
 import Link from "next/link"
 import Image from "next/image"
+import dynamic from "next/dynamic"
 import { cn } from "@/lib/utils"
-import { SettingsModal } from "@/components/settings-modal"
 import { PaywallGate } from "@/components/paywall-gate"
-import { TrialExhaustedModal } from "@/components/trial-exhausted-modal"
-import { InsufficientCreditsModal } from "@/components/insufficient-credits-modal"
 import { useCreditsContext } from "@/providers/credits-provider"
 import { ChartProvider, useChart } from "@/providers/chart-provider"
-import { TradingViewChart } from "@/components/chat/TradingViewChart"
+
+const SettingsModal = dynamic(() => import("@/components/settings-modal").then(m => ({ default: m.SettingsModal })))
+const TrialExhaustedModal = dynamic(() => import("@/components/trial-exhausted-modal").then(m => ({ default: m.TrialExhaustedModal })))
+const InsufficientCreditsModal = dynamic(() => import("@/components/insufficient-credits-modal").then(m => ({ default: m.InsufficientCreditsModal })))
+const TradingViewChart = dynamic(() => import("@/components/chat/TradingViewChart").then(m => ({ default: m.TradingViewChart })), { ssr: false })
 
 // Loading screen component for chat page
 function ChatLoadingScreen() {

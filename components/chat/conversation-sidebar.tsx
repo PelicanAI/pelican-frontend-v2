@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo, useEffect } from "react"
+import React, { useState, useMemo, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -58,6 +58,119 @@ interface ConversationSidebarProps {
   navigatingToId?: string
 }
 
+interface ConversationItemProps {
+  conversation: Conversation
+  isActive: boolean
+  isEditing: boolean
+  isNavigatingToThis: boolean
+  editTitle: string
+  onSelect: (id: string) => void
+  onStartEdit: (id: string, currentTitle: string) => void
+  onCancelEdit: () => void
+  onConfirmEdit: (id: string, newTitle: string) => void
+  onEditTitleChange: (title: string) => void
+  onDelete: (id: string) => void
+  newChatLabel: string
+}
+
+const ConversationItem = React.memo(function ConversationItem({
+  conversation,
+  isActive,
+  isEditing,
+  isNavigatingToThis,
+  editTitle,
+  onSelect,
+  onStartEdit,
+  onCancelEdit,
+  onConfirmEdit,
+  onEditTitleChange,
+  onDelete,
+  newChatLabel,
+}: ConversationItemProps) {
+  if (isEditing) {
+    return (
+      <div className="px-3 py-2 mx-2">
+        <Input
+          value={editTitle}
+          onChange={(e) => onEditTitleChange(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              onConfirmEdit(conversation.id, editTitle)
+            } else if (e.key === 'Escape') {
+              onCancelEdit()
+            }
+          }}
+          onBlur={() => {
+            if (editTitle.trim()) {
+              onConfirmEdit(conversation.id, editTitle)
+            } else {
+              onCancelEdit()
+            }
+          }}
+          autoFocus
+          className="h-8 text-sm"
+        />
+      </div>
+    )
+  }
+
+  return (
+    <div
+      role="button"
+      tabIndex={0}
+      data-conversation-id={conversation.id}
+      className={cn(
+        "conversation-item group relative cursor-pointer transition-all rounded-lg mx-2",
+        "min-h-[48px] px-3 py-2 flex items-center gap-2",
+        isActive && "bg-primary/10 border border-primary/20",
+        !isActive && "hover:bg-sidebar-accent/50 border border-transparent",
+        isNavigatingToThis && "opacity-50 cursor-wait",
+      )}
+      onClick={() => {
+        if (isNavigatingToThis) return
+        onSelect(conversation.id)
+      }}
+    >
+      <div className="flex-1 min-w-0 max-w-[180px]">
+        <h3 className="font-medium text-sm truncate text-sidebar-foreground">
+          {(conversation.title || newChatLabel).length > 25
+            ? `${(conversation.title || newChatLabel).slice(0, 25)}...`
+            : conversation.title || newChatLabel}
+        </h3>
+        <span className="text-[10px] text-muted-foreground/60 leading-none">
+          {getRelativeTime(conversation.updated_at)}
+        </span>
+      </div>
+
+      <div className="flex items-center gap-1 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+        <button
+          onClick={(e) => {
+            e.stopPropagation()
+            onStartEdit(conversation.id, conversation.title || newChatLabel)
+          }}
+          className="p-1.5 rounded hover:bg-sidebar-accent transition-colors opacity-70 hover:opacity-100 text-muted-foreground hover:text-sidebar-foreground"
+          title="Rename conversation"
+          aria-label="Rename conversation"
+        >
+          <Edit3 className="h-4 w-4" />
+        </button>
+
+        <button
+          onClick={(e) => {
+            e.stopPropagation()
+            onDelete(conversation.id)
+          }}
+          className="p-1.5 rounded hover:bg-red-500/20 transition-colors opacity-70 hover:opacity-100"
+          title="Delete conversation"
+          aria-label="Delete conversation"
+        >
+          <Trash2 className="h-4 w-4 text-red-500 dark:text-red-400" />
+        </button>
+      </div>
+    </div>
+  )
+})
+
 const getRelativeTime = (date: string): string => {
   const now = new Date()
   const then = new Date(date)
@@ -109,7 +222,7 @@ export function ConversationSidebar({
     })
   }, [])
 
-  const { list: conversations, loading, remove, rename } = useConversations()
+  const { list: conversations, loading, remove, rename, hasMore, loadingMore, loadMore } = useConversations()
 
   const filteredConversations = useMemo(() => {
     return conversations.filter((conv) => {
@@ -158,108 +271,35 @@ export function ConversationSidebar({
     setDeletingId(null)
   }
 
-  const handleRenameConversation = async (conversationId: string, newTitle: string) => {
+  const handleRenameConversation = useCallback(async (conversationId: string, newTitle: string) => {
     if (newTitle && newTitle.trim()) {
       await rename(conversationId, newTitle.trim())
       setEditingId(null)
       setEditTitle("")
     }
-  }
+  }, [rename])
 
-  const ConversationItem = ({ conversation }: { conversation: Conversation }) => {
-    const isNavigatingToThis = isNavigating && navigatingToId === conversation.id
-    const isActive = currentConversationId === conversation.id
-    const isEditing = editingId === conversation.id
+  const handleStartEdit = useCallback((id: string, currentTitle: string) => {
+    setEditingId(id)
+    setEditTitle(currentTitle)
+  }, [])
 
-    if (isEditing) {
-      return (
-        <div className="px-3 py-2 mx-2">
-          <Input
-            value={editTitle}
-            onChange={(e) => setEditTitle(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                handleRenameConversation(conversation.id, editTitle)
-              } else if (e.key === 'Escape') {
-                setEditingId(null)
-                setEditTitle("")
-              }
-            }}
-            onBlur={() => {
-              if (editTitle.trim()) {
-                handleRenameConversation(conversation.id, editTitle)
-              } else {
-                setEditingId(null)
-              }
-            }}
-            autoFocus
-            className="h-8 text-sm"
-          />
-        </div>
-      )
-    }
+  const handleCancelEdit = useCallback(() => {
+    setEditingId(null)
+    setEditTitle("")
+  }, [])
 
-    return (
-      <div
-        role="button"
-        tabIndex={0}
-        data-conversation-id={conversation.id}
-        className={cn(
-          "conversation-item group relative cursor-pointer transition-all rounded-lg mx-2",
-          "min-h-[48px] px-3 py-2 flex items-center gap-2",
-          isActive && "bg-primary/10 border border-primary/20",
-          !isActive && "hover:bg-sidebar-accent/50 border border-transparent",
-          isNavigatingToThis && "opacity-50 cursor-wait",
-        )}
-        onClick={() => {
-          if (isNavigatingToThis) return
-          onConversationSelect?.(conversation.id)
-        }}
-      >
-        {/* Main content */}
-        <div className="flex-1 min-w-0 max-w-[180px]">
-          <h3 className="font-medium text-sm truncate text-sidebar-foreground">
-            {(conversation.title || t.common.newChat).length > 25
-              ? `${(conversation.title || t.common.newChat).slice(0, 25)}...`
-              : conversation.title || t.common.newChat}
-          </h3>
-          <span className="text-[10px] text-muted-foreground/60 leading-none">
-            {getRelativeTime(conversation.updated_at)}
-          </span>
-        </div>
+  const handleEditTitleChange = useCallback((title: string) => {
+    setEditTitle(title)
+  }, [])
 
-        {/* Action buttons - Hidden until hover */}
-        <div className="flex items-center gap-1 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
-          {/* Rename button */}
-          <button
-            onClick={(e) => {
-              e.stopPropagation()
-              setEditingId(conversation.id)
-              setEditTitle(conversation.title || t.common.newChat)
-            }}
-            className="p-1.5 rounded hover:bg-sidebar-accent transition-colors opacity-70 hover:opacity-100 text-muted-foreground hover:text-sidebar-foreground"
-            title="Rename conversation"
-            aria-label="Rename conversation"
-          >
-            <Edit3 className="h-4 w-4" />
-          </button>
+  const handleDelete = useCallback((id: string) => {
+    setDeletingId(id)
+  }, [])
 
-          {/* Delete button */}
-          <button
-            onClick={(e) => {
-              e.stopPropagation()
-              setDeletingId(conversation.id)
-            }}
-            className="p-1.5 rounded hover:bg-red-500/20 transition-colors opacity-70 hover:opacity-100"
-            title="Delete conversation"
-            aria-label="Delete conversation"
-          >
-            <Trash2 className="h-4 w-4 text-red-500 dark:text-red-400" />
-          </button>
-        </div>
-      </div>
-    )
-  }
+  const handleSelect = useCallback((id: string) => {
+    onConversationSelect?.(id)
+  }, [onConversationSelect])
 
   if (isCollapsed && !isMobileSheet) {
     return null
@@ -357,7 +397,21 @@ export function ConversationSidebar({
                   </h4>
                   <div className="space-y-1">
                     {groupedConversations.today.map((conv) => (
-                      <ConversationItem key={conv.id} conversation={conv} />
+                      <ConversationItem
+                        key={conv.id}
+                        conversation={conv}
+                        isActive={currentConversationId === conv.id}
+                        isEditing={editingId === conv.id}
+                        isNavigatingToThis={isNavigating && navigatingToId === conv.id}
+                        editTitle={editTitle}
+                        onSelect={handleSelect}
+                        onStartEdit={handleStartEdit}
+                        onCancelEdit={handleCancelEdit}
+                        onConfirmEdit={handleRenameConversation}
+                        onEditTitleChange={handleEditTitleChange}
+                        onDelete={handleDelete}
+                        newChatLabel={t.common.newChat}
+                      />
                     ))}
                   </div>
                 </div>
@@ -371,7 +425,21 @@ export function ConversationSidebar({
                   </h4>
                   <div className="space-y-1">
                     {groupedConversations.yesterday.map((conv) => (
-                      <ConversationItem key={conv.id} conversation={conv} />
+                      <ConversationItem
+                        key={conv.id}
+                        conversation={conv}
+                        isActive={currentConversationId === conv.id}
+                        isEditing={editingId === conv.id}
+                        isNavigatingToThis={isNavigating && navigatingToId === conv.id}
+                        editTitle={editTitle}
+                        onSelect={handleSelect}
+                        onStartEdit={handleStartEdit}
+                        onCancelEdit={handleCancelEdit}
+                        onConfirmEdit={handleRenameConversation}
+                        onEditTitleChange={handleEditTitleChange}
+                        onDelete={handleDelete}
+                        newChatLabel={t.common.newChat}
+                      />
                     ))}
                   </div>
                 </div>
@@ -385,7 +453,21 @@ export function ConversationSidebar({
                   </h4>
                   <div className="space-y-1">
                     {groupedConversations.previous7Days.map((conv) => (
-                      <ConversationItem key={conv.id} conversation={conv} />
+                      <ConversationItem
+                        key={conv.id}
+                        conversation={conv}
+                        isActive={currentConversationId === conv.id}
+                        isEditing={editingId === conv.id}
+                        isNavigatingToThis={isNavigating && navigatingToId === conv.id}
+                        editTitle={editTitle}
+                        onSelect={handleSelect}
+                        onStartEdit={handleStartEdit}
+                        onCancelEdit={handleCancelEdit}
+                        onConfirmEdit={handleRenameConversation}
+                        onEditTitleChange={handleEditTitleChange}
+                        onDelete={handleDelete}
+                        newChatLabel={t.common.newChat}
+                      />
                     ))}
                   </div>
                 </div>
@@ -399,9 +481,42 @@ export function ConversationSidebar({
                   </h4>
                   <div className="space-y-1">
                     {groupedConversations.earlier.map((conv) => (
-                      <ConversationItem key={conv.id} conversation={conv} />
+                      <ConversationItem
+                        key={conv.id}
+                        conversation={conv}
+                        isActive={currentConversationId === conv.id}
+                        isEditing={editingId === conv.id}
+                        isNavigatingToThis={isNavigating && navigatingToId === conv.id}
+                        editTitle={editTitle}
+                        onSelect={handleSelect}
+                        onStartEdit={handleStartEdit}
+                        onCancelEdit={handleCancelEdit}
+                        onConfirmEdit={handleRenameConversation}
+                        onEditTitleChange={handleEditTitleChange}
+                        onDelete={handleDelete}
+                        newChatLabel={t.common.newChat}
+                      />
                     ))}
                   </div>
+                </div>
+              )}
+
+              {/* Load More */}
+              {hasMore && (
+                <div className="px-4 py-3">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={loadMore}
+                    disabled={loadingMore}
+                    className="w-full text-xs text-muted-foreground hover:text-foreground"
+                  >
+                    {loadingMore ? (
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current" />
+                    ) : (
+                      "Load more conversations"
+                    )}
+                  </Button>
                 </div>
               )}
             </div>
