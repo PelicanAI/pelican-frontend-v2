@@ -9,6 +9,17 @@ interface TradingViewChartProps {
   onClose: () => void
 }
 
+const CRYPTO_BASES = new Set(["BTC", "ETH", "SOL", "XRP", "DOGE", "ADA", "DOT", "AVAX", "MATIC", "LINK"])
+
+/** Convert slash-format pairs to TradingView symbol format */
+function toTradingViewSymbol(symbol: string): string {
+  if (!symbol.includes("/")) return symbol
+  const [base] = symbol.split("/")
+  const cleaned = symbol.replace("/", "")
+  if (base && CRYPTO_BASES.has(base)) return cleaned
+  return `FX:${cleaned}`
+}
+
 function TradingViewChartInner({ symbol, onClose }: TradingViewChartProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -40,7 +51,7 @@ function TradingViewChartInner({ symbol, onClose }: TradingViewChartProps) {
     script.async = true
     script.innerHTML = JSON.stringify({
       autosize: true,
-      symbol: symbol,
+      symbol: toTradingViewSymbol(symbol),
       interval: "D",
       timezone: "Etc/UTC",
       theme: "dark",

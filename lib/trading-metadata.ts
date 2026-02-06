@@ -43,13 +43,22 @@ export const TRADING_ACRONYMS = new Set([
 export function extractTradingMetadata(content: string): TradingMetadata {
   const metadata: TradingMetadata = {}
 
-  // Extract tickers (2-5 letter uppercase words, excluding blocklist)
+  // Extract forex-style pairs first (e.g. EUR/USD, BTC/USD) — keep as one ticker
+  const forexMatches = content.match(/\b[A-Z]{2,5}\/[A-Z]{2,5}\b/g)
+  const allTickers: string[] = []
+  if (forexMatches) {
+    allTickers.push(...forexMatches)
+  }
+
+  // Extract standard tickers (2-5 letter uppercase words, excluding blocklist)
   const tickerMatches = content.match(/\b[A-Z]{2,5}\b/g)
   if (tickerMatches) {
     const validTickers = tickerMatches.filter(ticker => !TRADING_ACRONYMS.has(ticker))
-    if (validTickers.length > 0) {
-      metadata.tickers = [...new Set(validTickers)]
-    }
+    allTickers.push(...validTickers)
+  }
+
+  if (allTickers.length > 0) {
+    metadata.tickers = [...new Set(allTickers)]
   }
 
   // Extract prices ($XXX.XX format or XXX.XX preceded by price/at/entry)

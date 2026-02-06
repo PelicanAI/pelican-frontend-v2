@@ -118,20 +118,28 @@ export function formatLine(line: string): string {
  * Wrap ticker symbols in clickable spans within already-formatted HTML.
  * Skips matches inside HTML tags to avoid corrupting markup.
  */
+function escapeRegExp(str: string): string {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+}
+
 export function applyTickerLinks(html: string, tickers: string[]): string {
   if (!tickers || tickers.length === 0) return html
 
+  // Process longer tickers first so "EUR/USD" matches before "EUR" or "USD"
+  const sorted = [...tickers].sort((a, b) => b.length - a.length)
+
   let result = html
-  for (const ticker of tickers) {
+  for (const ticker of sorted) {
     // Match the ticker as a standalone word, but only outside of HTML tags.
     // Split on HTML tags, process only text parts.
     const parts = result.split(/(<[^>]*>)/g)
+    const escaped = escapeRegExp(ticker)
     result = parts
       .map((part) => {
         // If this part is an HTML tag, leave it alone
         if (part.startsWith("<")) return part
         // Replace standalone ticker matches in text content
-        const re = new RegExp(`\\b(${ticker})\\b`, "g")
+        const re = new RegExp(`\\b(${escaped})\\b`, "g")
         return part.replace(
           re,
           `<span class="ticker-link text-purple-400 hover:text-purple-300 underline decoration-purple-400/40 hover:decoration-purple-300 cursor-pointer font-medium" data-ticker="${ticker}">$1</span>`

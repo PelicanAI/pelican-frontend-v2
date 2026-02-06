@@ -478,10 +478,27 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
 
   const retryLastMessage = useCallback(async () => {
     if (lastSentMessageRef.current) {
+      // Delete old messages from DB so they don't reappear on reload
+      const current = messagesRef.current;
+      const lastUserIndex = current.findLastIndex((m) => m.role === 'user');
+      if (lastUserIndex >= 0) {
+        const removed = current.slice(lastUserIndex);
+        const uuidRe = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+        const dbIds = removed.filter((m) => uuidRe.test(m.id)).map((m) => m.id);
+        if (dbIds.length > 0) {
+          try {
+            const supabase = createClient();
+            await supabase.from('messages').delete().in('id', dbIds);
+          } catch (e) {
+            logger.warn('[CHAT-REGEN] Failed to delete old messages from DB');
+          }
+        }
+      }
+
       updateMessagesWithSync((prev) => {
-        const lastUserIndex = prev.findLastIndex((m) => m.role === 'user');
-        if (lastUserIndex >= 0) {
-          return prev.slice(0, lastUserIndex);
+        const idx = prev.findLastIndex((m) => m.role === 'user');
+        if (idx >= 0) {
+          return prev.slice(0, idx);
         }
         return prev;
       });
