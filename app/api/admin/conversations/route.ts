@@ -8,8 +8,28 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
   const limit = Math.min(Math.max(1, parseInt(searchParams.get('limit') || '10')), 50)
   const cursor = searchParams.get('cursor') || ''
+  const email = searchParams.get('email') || ''
 
   const admin = getServiceClient()
+
+  // If email filter, find matching user IDs first
+  let allUsers: Array<{ id: string; email?: string | null }> = []
+  let filterUserIds: string[] | null = null
+
+  if (email) {
+    const { data: authData } = await admin.auth.admin.listUsers({ page: 1, perPage: 1000 })
+    allUsers = authData?.users ?? []
+    filterUserIds = allUsers
+      .filter((u) => u.email?.toLowerCase().includes(email.toLowerCase()))
+      .map((u) => u.id)
+
+    if (filterUserIds.length === 0) {
+      return NextResponse.json(
+        { conversations: [], hasMore: false },
+        { headers: { 'Cache-Control': 'private, no-cache' } }
+      )
+    }
+  }
 
   let query = admin
     .from('conversations')
@@ -21,6 +41,10 @@ export async function GET(req: NextRequest) {
     query = query.lt('created_at', cursor)
   }
 
+  if (filterUserIds) {
+    query = query.in('user_id', filterUserIds)
+  }
+
   const { data, error } = await query
 
   if (error) {
@@ -30,15 +54,16 @@ export async function GET(req: NextRequest) {
 
   const rows = data ?? []
 
-  // Resolve user emails
-  const userIds = [...new Set(rows.map((c) => c.user_id as string))]
-  let userEmailMap = new Map<string, string | null>()
-  if (userIds.length > 0) {
-    const { data: authData } = await admin.auth.admin.listUsers({ page: 1, perPage: 1000 })
-    userEmailMap = new Map(
-      (authData?.users ?? []).map((u) => [u.id, u.email ?? null])
-    )
+  // Resolve user emails — reuse allUsers if already fetched for email filter
+  if (allUsers.length === 0) {
+    const userIds = [...new Set(rows.map((c) => c.user_id as string))]
+    if (userIds.length > 0) {
+      const { data: authData } = await admin.auth.admin.listUsers({ page: 1, perPage: 1000 })
+      allUsers = authData?.users ?? []
+    }
   }
+
+  const userEmailMap = new Map(allUsers.map((u) => [u.id, u.email ?? null]))
 
   const conversations = rows.map((c) => ({
     id: c.id as string,
