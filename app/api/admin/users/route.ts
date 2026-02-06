@@ -9,10 +9,12 @@ export async function GET(req: NextRequest) {
   const page = Math.max(1, parseInt(searchParams.get('page') || '1'))
   const limit = Math.min(Math.max(1, parseInt(searchParams.get('limit') || '50')), 100)
   const search = (searchParams.get('search') || '').toLowerCase().trim()
+  const planFilter = (searchParams.get('plan') || '').toLowerCase().trim()
+  const sortBy = (searchParams.get('sort') || 'newest').toLowerCase().trim()
 
   const admin = getServiceClient()
 
-  // Get all auth users (email, created_at, last_sign_in_at)
+  // Get all auth users
   const { data: authData, error: authError } = await admin.auth.admin.listUsers({
     page: 1,
     perPage: 1000,
@@ -22,43 +24,39 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Failed to fetch users' }, { status: 500 })
   }
 
-  let authUsers = authData.users ?? []
+  const authUsers = authData.users ?? []
+  const allUserIds = authUsers.map((u) => u.id)
 
-  // Filter by search (email)
-  if (search) {
-    authUsers = authUsers.filter((u) =>
-      (u.email ?? '').toLowerCase().includes(search)
-    )
+  // Fetch credit info for ALL users (needed for filtering/sorting)
+  let allCredits: Record<string, unknown>[] = []
+  if (allUserIds.length > 0) {
+    const { data, error } = await admin
+      .from('user_credits')
+      .select('user_id, credits_balance, plan_type, credits_used_this_month, free_questions_remaining, is_admin')
+      .in('user_id', allUserIds)
+    if (error) console.error('[Admin Users API] credits query failed:', error.message)
+    allCredits = data ?? []
   }
-
-  // Sort by created_at descending
-  authUsers.sort((a, b) =>
-    new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-  )
-
-  const total = authUsers.length
-  const totalPages = Math.ceil(total / limit)
-  const offset = (page - 1) * limit
-  const pageUsers = authUsers.slice(offset, offset + limit)
-
-  if (pageUsers.length === 0) {
-    return NextResponse.json({ users: [], total, page, limit, totalPages })
-  }
-
-  // Fetch credit info for this page's users
-  const userIds = pageUsers.map((u) => u.id)
-  const { data: credits, error: creditsError } = await admin
-    .from('user_credits')
-    .select('user_id, credits_balance, plan_type, credits_used_this_month, free_questions_remaining, is_admin')
-    .in('user_id', userIds)
-  if (creditsError) console.error('[Admin Users API] credits query failed:', creditsError.message)
 
   const creditMap = new Map(
-    (credits ?? []).map((c) => [c.user_id as string, c])
+    allCredits.map((c) => [c.user_id as string, c])
   )
 
-  const users = pageUsers.map((u) => {
-    const credit = creditMap.get(u.id)
+  // Fetch message counts per user for "most_active" sort
+  const userMsgCounts = new Map<string, number>()
+  if (sortBy === 'most_active') {
+    const { data: msgData } = await admin.from('messages').select('user_id')
+    if (msgData) {
+      for (const m of msgData) {
+        const uid = m.user_id as string
+        userMsgCounts.set(uid, (userMsgCounts.get(uid) ?? 0) + 1)
+      }
+    }
+  }
+
+  // Build merged user list
+  let merged = authUsers.map((u) => {
+    const credit = creditMap.get(u.id) as Record<string, unknown> | undefined
     return {
       id: u.id,
       displayName: u.email ?? null,
@@ -70,8 +68,49 @@ export async function GET(req: NextRequest) {
       creditsBalance: (credit?.credits_balance ?? 0) as number,
       creditsUsed: (credit?.credits_used_this_month ?? 0) as number,
       freeQuestionsRemaining: (credit?.free_questions_remaining ?? 0) as number,
+      messageCount: userMsgCounts.get(u.id) ?? 0,
     }
   })
+
+  // Filter by search
+  if (search) {
+    merged = merged.filter((u) =>
+      (u.email).toLowerCase().includes(search) ||
+      (u.displayName ?? '').toLowerCase().includes(search)
+    )
+  }
+
+  // Filter by plan
+  if (planFilter && planFilter !== 'all') {
+    merged = merged.filter((u) => u.plan === planFilter)
+  }
+
+  // Sort
+  switch (sortBy) {
+    case 'oldest':
+      merged.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
+      break
+    case 'most_credits':
+      merged.sort((a, b) => b.creditsBalance - a.creditsBalance)
+      break
+    case 'least_credits':
+      merged.sort((a, b) => a.creditsBalance - b.creditsBalance)
+      break
+    case 'most_active':
+      merged.sort((a, b) => b.messageCount - a.messageCount)
+      break
+    default: // newest
+      merged.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+  }
+
+  const total = merged.length
+  const totalPages = Math.ceil(total / limit)
+  const offset = (page - 1) * limit
+  const pageUsers = merged.slice(offset, offset + limit)
+
+  // Strip messageCount from response (internal sort field)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const users = pageUsers.map(({ messageCount: _mc, ...rest }) => rest)
 
   return NextResponse.json({ users, total, page, limit, totalPages }, {
     headers: { "Cache-Control": "private, no-cache" },

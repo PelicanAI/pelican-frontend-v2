@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useCallback } from 'react'
-import { Search, ChevronDown, ChevronUp, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Search, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Download } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -20,6 +20,7 @@ interface AdminUser {
   displayName: string | null
   email: string
   createdAt: string
+  lastSignIn?: string | null
   isAdmin: boolean
   plan: string
   creditsBalance: number
@@ -34,6 +35,15 @@ interface UsersResponse {
   limit: number
   totalPages: number
 }
+
+const PLAN_OPTIONS = ['all', 'none', 'trial', 'base', 'pro', 'power', 'founder'] as const
+const SORT_OPTIONS = [
+  { value: 'newest', label: 'Newest' },
+  { value: 'oldest', label: 'Oldest' },
+  { value: 'most_credits', label: 'Most Credits' },
+  { value: 'least_credits', label: 'Least Credits' },
+  { value: 'most_active', label: 'Most Active' },
+] as const
 
 function planVariant(plan: string) {
   switch (plan) {
@@ -55,20 +65,37 @@ function formatShortDate(dateStr: string) {
   })
 }
 
+function exportCSV(users: AdminUser[]) {
+  const header = 'email,plan_type,credits_balance,credits_used_this_month,signed_up'
+  const rows = users.map((u) => {
+    const email = u.email.includes(',') ? `"${u.email}"` : u.email
+    return `${email},${u.plan},${u.creditsBalance},${u.creditsUsed},${u.createdAt.split('T')[0]}`
+  })
+  const csv = [header, ...rows].join('\n')
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = `pelican-users-${new Date().toISOString().split('T')[0]}.csv`
+  a.click()
+  URL.revokeObjectURL(url)
+}
+
 export function UsersTable({ initialData }: { initialData: UsersResponse }) {
   const [data, setData] = useState<UsersResponse>(initialData)
   const [search, setSearch] = useState('')
+  const [planFilter, setPlanFilter] = useState('all')
+  const [sortBy, setSortBy] = useState('newest')
   const [loading, setLoading] = useState(false)
   const [expandedId, setExpandedId] = useState<string | null>(null)
 
-  const fetchUsers = useCallback(async (page: number, query: string) => {
+  const fetchUsers = useCallback(async (page: number, query: string, plan: string, sort: string) => {
     setLoading(true)
     try {
-      const params = new URLSearchParams({
-        page: String(page),
-        limit: '20',
-      })
+      const params = new URLSearchParams({ page: String(page), limit: '20' })
       if (query.trim()) params.set('search', query.trim())
+      if (plan && plan !== 'all') params.set('plan', plan)
+      if (sort) params.set('sort', sort)
 
       const res = await fetch(`/api/admin/users?${params}`)
       if (res.ok) {
@@ -83,30 +110,92 @@ export function UsersTable({ initialData }: { initialData: UsersResponse }) {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
     setExpandedId(null)
-    fetchUsers(1, search)
+    fetchUsers(1, search, planFilter, sortBy)
+  }
+
+  const handlePlanChange = (plan: string) => {
+    setPlanFilter(plan)
+    setExpandedId(null)
+    fetchUsers(1, search, plan, sortBy)
+  }
+
+  const handleSortChange = (sort: string) => {
+    setSortBy(sort)
+    setExpandedId(null)
+    fetchUsers(1, search, planFilter, sort)
   }
 
   const goToPage = (page: number) => {
     setExpandedId(null)
-    fetchUsers(page, search)
+    fetchUsers(page, search, planFilter, sortBy)
+  }
+
+  const handleExport = async () => {
+    // Fetch all users matching current filters (up to 1000)
+    const params = new URLSearchParams({ page: '1', limit: '100' })
+    if (search.trim()) params.set('search', search.trim())
+    if (planFilter && planFilter !== 'all') params.set('plan', planFilter)
+    if (sortBy) params.set('sort', sortBy)
+
+    try {
+      const res = await fetch(`/api/admin/users?${params}`)
+      if (res.ok) {
+        const json = await res.json()
+        exportCSV(json.users)
+      }
+    } catch {
+      // Silent fail — user can retry
+    }
   }
 
   return (
     <div className="space-y-4">
-      <form onSubmit={handleSearch} className="flex gap-2">
-        <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            placeholder="Search by name or email..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pl-9"
-          />
+      {/* Filters row */}
+      <div className="flex flex-wrap items-end gap-3">
+        <form onSubmit={handleSearch} className="flex gap-2 flex-1 min-w-[200px]">
+          <div className="relative flex-1 max-w-sm">
+            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder="Search by email..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pl-9"
+            />
+          </div>
+          <Button type="submit" variant="secondary" disabled={loading}>
+            Search
+          </Button>
+        </form>
+
+        <div className="flex items-center gap-2">
+          <select
+            value={planFilter}
+            onChange={(e) => handlePlanChange(e.target.value)}
+            className="h-9 rounded-md border border-input bg-background px-3 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+          >
+            {PLAN_OPTIONS.map((p) => (
+              <option key={p} value={p}>
+                {p === 'all' ? 'All Plans' : p.charAt(0).toUpperCase() + p.slice(1)}
+              </option>
+            ))}
+          </select>
+
+          <select
+            value={sortBy}
+            onChange={(e) => handleSortChange(e.target.value)}
+            className="h-9 rounded-md border border-input bg-background px-3 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+          >
+            {SORT_OPTIONS.map((s) => (
+              <option key={s.value} value={s.value}>{s.label}</option>
+            ))}
+          </select>
+
+          <Button variant="outline" size="sm" onClick={handleExport} title="Export CSV">
+            <Download className="size-4 mr-1" />
+            CSV
+          </Button>
         </div>
-        <Button type="submit" variant="secondary" disabled={loading}>
-          Search
-        </Button>
-      </form>
+      </div>
 
       <div className="rounded-lg border border-border">
         <Table>
@@ -174,7 +263,7 @@ export function UsersTable({ initialData }: { initialData: UsersResponse }) {
           </TableBody>
         </Table>
 
-        {/* Expanded detail — rendered outside the table for valid HTML */}
+        {/* Expanded detail */}
         {expandedId && (
           <div className="border-t border-border bg-muted/30" onClick={(e) => e.stopPropagation()}>
             {data.users
