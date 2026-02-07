@@ -498,13 +498,17 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
         }
       }
 
-      updateMessagesWithSync((prev) => {
-        const idx = prev.findLastIndex((m) => m.role === 'user');
-        if (idx >= 0) {
-          return prev.slice(0, idx);
-        }
-        return prev;
-      });
+      // Compute sliced messages (remove last user + assistant pair)
+      const sliced = lastUserIndex >= 0 ? current.slice(0, lastUserIndex) : current;
+
+      // CRITICAL: Update ref BEFORE sendMessage so captureConversationHistory()
+      // reads the correct (sliced) messages.  React 18 batches setMessages —
+      // the updater inside updateMessagesWithSync won't run until the next
+      // render, but sendMessage reads messagesRef.current synchronously.
+      // Without this, the backend receives the OLD response in conversation
+      // history and generates a differently-formatted regeneration.
+      messagesRef.current = sliced;
+      updateMessagesWithSync(() => sliced);
       await sendMessage(lastSentMessageRef.current);
     }
   }, [sendMessage, updateMessagesWithSync]);
