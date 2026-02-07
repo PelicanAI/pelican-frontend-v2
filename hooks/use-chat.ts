@@ -546,7 +546,7 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
   // Load messages when conversation changes
   useEffect(() => {
     const conversationId = initialConversationId;
-    
+
     // Skip if no conversation ID (e.g. "New Chat" with no messages to fetch)
     if (!conversationId) {
       // Only clear if we have messages (avoid unnecessary state updates)
@@ -560,18 +560,39 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
       setCurrentConversationId(null);
       return;
     }
-    
+
     // Skip if already loaded this conversation
     if (loadedConversationRef.current === conversationId) {
       return;
     }
 
+    // Skip if messages are already in state from streaming.
+    // When onComplete fires it sets currentConversationId (state) before the
+    // URL updates.  By the time this effect runs with the new URL-based
+    // conversationId, the state already matches — so we know messages came
+    // from the stream and there's nothing to fetch.
+    if (messagesRef.current.length > 0 && currentConversationId === conversationId) {
+      logger.info('[CHAT-LOAD] Skipping fetch — messages already in state from streaming', {
+        conversationId,
+        messageCount: messagesRef.current.length,
+      });
+      loadedConversationRef.current = conversationId;
+      return;
+    }
+
+    logger.info('[CHAT-LOAD] Loading messages for conversation', {
+      conversationId,
+      loadedRef: loadedConversationRef.current,
+      currentConvId: currentConversationId,
+      messagesInState: messagesRef.current.length,
+    });
+
     // Update current conversation ID
     setCurrentConversationId(conversationId);
-    
+
     // Load messages using ref to avoid dependency loop
     loadMessagesRef.current(conversationId);
-    
+
     // Cleanup: abort loading on unmount or conversation change
     return () => {
       if (loadingAbortRef.current) {
