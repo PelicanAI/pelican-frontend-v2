@@ -21,16 +21,8 @@ const HelpChat = dynamic(() => import('@/components/marketing/HelpChat'), {
   ssr: false,
 });
 
-const HeroChatDemo = dynamic(() => import('@/components/marketing/HeroChatDemo'), {
-  ssr: false,
-  loading: () => (
-    <div style={{ width: '100%', maxWidth: 560, height: 468, margin: '0 auto', borderRadius: 16, background: '#12141a' }} />
-  ),
-});
-
 export default function HomePageContent() {
   const t = useT();
-  const hasHeroTitle1 = t.marketing.hero.title1.trim().length > 0;
 
   const navLinks = [
     { href: '#features', label: t.marketing.nav.features, isAnchor: true },
@@ -48,47 +40,6 @@ export default function HomePageContent() {
       <MarketingNav links={navLinks} ctaAction="login" />
 
       <main id="main-content">
-      <section className="hero">
-        <div className="hero-inner">
-          <div className="hero-content">
-            <div className="hero-tag">{t.marketing.hero.betaTag}</div>
-            <h1>
-              {hasHeroTitle1 && (
-                <>
-                  {t.marketing.hero.title1}<br />
-                </>
-              )}
-              {t.marketing.hero.title2}{t.marketing.hero.titleHighlight && <>{' '}<span className="highlight">{t.marketing.hero.titleHighlight}</span></>}<br />
-              {t.marketing.hero.title3}
-            </h1>
-            <p className="hero-subtitle">
-              {t.marketing.hero.subtitle}
-            </p>
-            <div className="hero-cta">
-              <SignUpButton className="btn-primary">{t.marketing.hero.startTrading}</SignUpButton>
-              <a href="#features" className="btn-secondary">{t.marketing.hero.seeFeatures}</a>
-            </div>
-            <p className="hero-free-explainer">10 free questions. No credit card required.</p>
-            <div className="stats-bar">
-              <div className="stat">
-                <div className="stat-value">{t.marketing.stats.tickersCovered}</div>
-                <div className="stat-label">{t.marketing.stats.tickersCoveredLabel}</div>
-              </div>
-              <div className="stat">
-                <div className="stat-value">{t.marketing.stats.languagesSupported}</div>
-                <div className="stat-label">{t.marketing.stats.languagesSupportedLabel}</div>
-              </div>
-              <div className="stat">
-                <div className="stat-value">{t.marketing.stats.institutionalGrade}</div>
-                <div className="stat-label">{t.marketing.stats.institutionalGradeLabel}</div>
-              </div>
-            </div>
-          </div>
-          <div className="hero-visual">
-            <HeroChatDemo />
-          </div>
-        </div>
-      </section>
 
       <section className="how-it-works-section">
         <div className="section-inner">

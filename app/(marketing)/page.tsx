@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 import HomePageContent from '@/components/marketing/HomePageContent';
+import SignUpButton from '@/components/marketing/SignUpButton';
+import HeroChatDemoLoader from '@/components/marketing/HeroChatDemoLoader';
 
 export const metadata: Metadata = {
   title: { absolute: 'Pelican Trading | AI Market Intelligence for Traders' },
@@ -51,6 +53,42 @@ export default function HomePage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
       />
+      <section className="hero">
+        <div className="hero-inner">
+          <div className="hero-content">
+            <div className="hero-tag">Now in Beta</div>
+            <h1>
+              Stop Searching.<br />
+              Start Asking.
+            </h1>
+            <p className="hero-subtitle">
+              Pelican gives you institutional-grade market analysis in plain English. No scanners. No spreadsheets. No guesswork.
+            </p>
+            <div className="hero-cta">
+              <SignUpButton className="btn-primary">Try For Free →</SignUpButton>
+              <a href="#features" className="btn-secondary">See Features</a>
+            </div>
+            <p className="hero-free-explainer">10 free questions. No credit card required.</p>
+            <div className="stats-bar">
+              <div className="stat">
+                <div className="stat-value">99%</div>
+                <div className="stat-label">Cheaper Than Bloomberg</div>
+              </div>
+              <div className="stat">
+                <div className="stat-value">10K+</div>
+                <div className="stat-label">Tickers Covered</div>
+              </div>
+              <div className="stat">
+                <div className="stat-value">30+</div>
+                <div className="stat-label">Languages</div>
+              </div>
+            </div>
+          </div>
+          <div className="hero-visual">
+            <HeroChatDemoLoader />
+          </div>
+        </div>
+      </section>
       <HomePageContent />
     </>
   );
