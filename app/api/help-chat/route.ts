@@ -1,5 +1,50 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+// Simple in-memory rate limiter
+const RATE_LIMIT_WINDOW_MS = 60 * 1000 // 1 minute
+const RATE_LIMIT_MAX_REQUESTS = 10
+const MAX_CONTENT_LENGTH = 2000
+
+interface RateLimitEntry {
+  count: number
+  resetAt: number
+}
+
+const rateLimitMap = new Map<string, RateLimitEntry>()
+
+// Clean up expired entries periodically
+setInterval(() => {
+  const now = Date.now()
+  for (const [key, entry] of rateLimitMap) {
+    if (now > entry.resetAt) {
+      rateLimitMap.delete(key)
+    }
+  }
+}, 60 * 1000)
+
+function getClientIp(request: NextRequest): string {
+  return request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
+    || request.headers.get('x-real-ip')
+    || 'unknown'
+}
+
+function checkRateLimit(ip: string): boolean {
+  const now = Date.now()
+  const entry = rateLimitMap.get(ip)
+
+  if (!entry || now > entry.resetAt) {
+    rateLimitMap.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS })
+    return true
+  }
+
+  if (entry.count >= RATE_LIMIT_MAX_REQUESTS) {
+    return false
+  }
+
+  entry.count++
+  return true
+}
+
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
 const SYSTEM_PROMPT = `You are the Pelican Trading help assistant on the pelicantrading.ai website. Your job is to answer questions about Pelican Trading ONLY. You are friendly, concise, and helpful.
@@ -106,6 +151,15 @@ interface ChatRequest {
 }
 
 export async function POST(request: NextRequest) {
+  // Rate limit check
+  const clientIp = getClientIp(request)
+  if (!checkRateLimit(clientIp)) {
+    return NextResponse.json(
+      { error: 'Too many requests. Please try again in a minute.' },
+      { status: 429 }
+    )
+  }
+
   try {
     const { message, history = [] }: ChatRequest = await request.json();
 
@@ -113,7 +167,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Message is required' }, { status: 400 });
     }
 
-    if (message.length > 1000) {
+    if (message.length > MAX_CONTENT_LENGTH) {
       return NextResponse.json({ error: 'Message too long' }, { status: 400 });
     }
 

@@ -11,8 +11,6 @@ import {
   Copy,
   RotateCcw,
   Square,
-  ThumbsUp,
-  ThumbsDown,
   Share,
   MoreHorizontal,
   Check,
@@ -50,7 +48,6 @@ interface MessageActionsProps {
   message: Message
   onStop?: () => void
   onRegenerate?: () => void
-  onReaction?: (messageId: string, reaction: "like" | "dislike") => void
   onEdit?: (id: string, newContent: string) => void
   onDelete?: (id: string) => void
   onPin?: (id: string) => void
@@ -63,7 +60,6 @@ export function MessageActions({
   message,
   onStop,
   onRegenerate,
-  onReaction,
   onEdit,
   onDelete,
   onPin,
@@ -138,14 +134,6 @@ export function MessageActions({
     } else {
       handleCopy()
     }
-  }
-
-  const handleReaction = (reaction: "like" | "dislike") => {
-    onReaction?.(message.id, reaction)
-    toast({
-      title: reaction === "like" ? "Feedback sent" : "Feedback sent",
-      description: `Thank you for your ${reaction === "like" ? "positive" : "constructive"} feedback!`,
-    })
   }
 
   const handleBranchChat = async () => {
@@ -354,20 +342,6 @@ export function MessageActions({
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
-                {message.role === "assistant" && (
-                  <>
-                    <DropdownMenuItem onClick={() => handleReaction("like")}>
-                      <ThumbsUp className="w-4 h-4 mr-2" />
-                      Good response
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleReaction("dislike")}>
-                      <ThumbsDown className="w-4 h-4 mr-2" />
-                      Poor response
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                  </>
-                )}
-
                 {message.role === "assistant" && (
                   <DropdownMenuItem onClick={handleBranchChat}>
                     <GitBranch className="w-4 h-4 mr-2" />

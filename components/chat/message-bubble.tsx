@@ -22,7 +22,6 @@ interface MessageBubbleProps {
   onRegenerate?: () => void
   isRegenerating?: boolean
   onStop?: () => void
-  onReaction?: (messageId: string, reaction: "like" | "dislike") => void
   onEdit?: (id: string, content: string) => void
   onDelete?: (id: string) => void
   onPin?: (id: string) => void
@@ -36,7 +35,6 @@ export function MessageBubble({
   onRegenerate,
   isRegenerating = false,
   onStop,
-  onReaction,
   onEdit,
   onDelete,
   onPin,
@@ -172,7 +170,6 @@ export function MessageBubble({
                   message={message}
                   onStop={onStop}
                   onRegenerate={onRegenerate}
-                  onReaction={onReaction}
                   onEdit={onEdit}
                   onDelete={onDelete}
                   onPin={onPin}

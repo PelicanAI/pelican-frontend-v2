@@ -1,4 +1,13 @@
+import type { Metadata } from 'next'
 import PricingPageContent from '@/components/pricing/PricingPageContent'
+
+export const metadata: Metadata = {
+  title: 'Pricing | Pelican Trading — AI Market Analysis Plans',
+  description: 'Credit-based pricing starting at $29/mo. 99% cheaper than Bloomberg. All tiers include full access to Pelican\'s AI trading assistant.',
+  alternates: {
+    canonical: 'https://pelicantrading.ai/pricing',
+  },
+}
 
 const pricingJsonLd = {
   '@context': 'https://schema.org',

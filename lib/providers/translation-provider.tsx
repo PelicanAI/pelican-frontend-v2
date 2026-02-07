@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { Locale, translatedLocales } from '@/lib/languages';
 import { Translations } from '@/types/translations';
+import enTranslations from '@/messages/en.json';
 
 interface TranslationContextType {
   t: Translations;
@@ -14,7 +15,7 @@ const TranslationContext = createContext<TranslationContextType | null>(null);
 
 export function TranslationProvider({ children }: { children: ReactNode }) {
   const [locale, setLocale] = useState<Locale>('en');
-  const [translations, setTranslations] = useState<Translations | null>(null);
+  const [translations, setTranslations] = useState<Translations>(enTranslations as unknown as Translations);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -113,10 +114,6 @@ export function TranslationProvider({ children }: { children: ReactNode }) {
         })
       });
   }, [locale]);
-
-  if (!translations) {
-    return null; // Or a loading spinner
-  }
 
   return (
     <TranslationContext.Provider value={{ t: translations, locale, isLoading }}>

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -18,13 +18,15 @@ export function ImagePreview({ file, onRemove, className }: ImagePreviewProps) {
   const [isLoading, setIsLoading] = useState(true)
 
   // Create object URL for preview
-  useState(() => {
+  useEffect(() => {
     const url = URL.createObjectURL(file)
     setImageUrl(url)
     setIsLoading(false)
 
-    return () => URL.revokeObjectURL(url)
-  })
+    return () => {
+      URL.revokeObjectURL(url)
+    }
+  }, [file])
 
   const formatFileSize = (bytes: number) => {
     if (bytes === 0) return "0 Bytes"

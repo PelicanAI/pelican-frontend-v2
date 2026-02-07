@@ -1,7 +1,6 @@
 "use client"
 
 import React, { useState } from "react"
-import DOMPurify from "isomorphic-dompurify"
 import { Download, Share2, Check, ExternalLink, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/hooks/use-toast"
@@ -92,16 +91,23 @@ export function TableImageDisplay({ attachment }: TableImageDisplayProps) {
   const handleOpenInNewTab = () => {
     const newWindow = window.open()
     if (newWindow) {
-      const safeName = DOMPurify.sanitize(attachment.name || 'Table')
-      const safeUrl = DOMPurify.sanitize(attachment.url)
-      newWindow.document.write(`
-        <html>
-          <head><title>${safeName}</title></head>
-          <body style="margin:0;display:flex;justify-content:center;align-items:center;min-height:100vh;background:#f3f4f6;">
-            <img src="${safeUrl}" style="max-width:100%;height:auto;" alt="Pelican Analysis" />
-          </body>
-        </html>
-      `)
+      const doc = newWindow.document
+      doc.title = attachment.name || 'Table'
+
+      const body = doc.body
+      body.style.margin = '0'
+      body.style.display = 'flex'
+      body.style.justifyContent = 'center'
+      body.style.alignItems = 'center'
+      body.style.minHeight = '100vh'
+      body.style.background = '#f3f4f6'
+
+      const img = doc.createElement('img')
+      img.src = attachment.url
+      img.style.maxWidth = '100%'
+      img.style.height = 'auto'
+      img.alt = 'Pelican Analysis'
+      body.appendChild(img)
     }
   }
 

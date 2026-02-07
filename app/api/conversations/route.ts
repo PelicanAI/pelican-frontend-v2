@@ -4,6 +4,17 @@ import * as Sentry from "@sentry/nextjs"
 
 const PRIVATE_CACHE = { "Cache-Control": "private, no-cache" } as const
 
+function sanitizePostgrestSearch(input: string): string {
+  return input
+    .replace(/\\/g, '\\\\')
+    .replace(/%/g, '\\%')
+    .replace(/_/g, '\\_')
+    .replace(/\./g, '\\.')
+    .replace(/,/g, '\\,')
+    .replace(/\(/g, '\\(')
+    .replace(/\)/g, '\\)')
+}
+
 export async function GET(req: NextRequest) {
   try {
     const supabase = await createClient()
@@ -47,7 +58,8 @@ export async function GET(req: NextRequest) {
     // filter === "all" shows both active and archived
 
     if (search.trim()) {
-      query = query.or(`title.ilike.%${search}%,last_message_preview.ilike.%${search}%`)
+      const sanitized = sanitizePostgrestSearch(search.trim())
+      query = query.or(`title.ilike.%${sanitized}%,last_message_preview.ilike.%${sanitized}%`)
     }
 
     if (cursor) {

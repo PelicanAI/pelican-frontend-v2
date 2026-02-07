@@ -197,13 +197,6 @@ export function ChatContainer({
     [toast],
   )
 
-  const handleReaction = (messageId: string, reaction: "like" | "dislike") => {
-    toast({
-      title: "Feedback received",
-      description: `Thank you for your ${reaction === "like" ? "positive" : "constructive"} feedback!`,
-    })
-  }
-
   const handleJumpToBottom = useCallback(() => {
     scrollToBottom("smooth")
     resetScrollAwayState() // Reset scroll-away state when user manually scrolls to bottom
@@ -342,7 +335,7 @@ export function ChatContainer({
             message={networkError}
             variant="banner"
             onRetry={() => {
-              // Retry logic here
+              onRegenerateMessage?.()
             }}
           />
         )}
@@ -427,7 +420,6 @@ export function ChatContainer({
                         : undefined
                     }
                     isRegenerating={index === lastAssistantIndex && message.role === "assistant" && isLoading && !message.isStreaming}
-                    onReaction={handleReaction}
                     onEdit={onEditMessage}
                     onDelete={onDeleteMessage}
                     onPin={onPinMessage}

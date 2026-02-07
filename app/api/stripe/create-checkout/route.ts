@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
+import { createClient } from '@/lib/supabase/server'
 
 export const dynamic = 'force-dynamic'
 
@@ -13,6 +14,12 @@ const getStripeClient = () => {
 
 export async function POST(request: NextRequest) {
   try {
+    const supabase = await createClient()
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
+    }
+
     let stripe: Stripe
     try {
       stripe = getStripeClient()
@@ -24,14 +31,16 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const { priceId, userId, userEmail, planName, planCredits } = await request.json()
+    const { priceId, planName, planCredits } = await request.json()
 
-    if (!priceId || !userId || !planName) {
+    if (!priceId || !planName) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
       )
     }
+
+    const userEmail = user.email
 
     let customerId: string | undefined
     
@@ -59,15 +68,15 @@ export async function POST(request: NextRequest) {
       ],
       success_url: `${process.env.NEXT_PUBLIC_APP_URL}/chat?subscribed=true&plan=${planName}`,
       cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/pricing?canceled=true`,
-      client_reference_id: userId,
+      client_reference_id: user.id,
       metadata: {
-        user_id: userId,
+        user_id: user.id,
         plan: planName,
         credits: planCredits.toString()
       },
       subscription_data: {
         metadata: {
-          user_id: userId,
+          user_id: user.id,
           plan: planName,
           credits: planCredits.toString()
         }
