@@ -1,6 +1,7 @@
 "use client"
 
 import type React from "react"
+import Image from "next/image"
 import { motion, AnimatePresence } from "framer-motion"
 import { useEffect, useState, useCallback, useRef } from "react"
 import { StreamingMessage } from "./streaming-message"
@@ -435,9 +436,11 @@ export function ChatContainer({
           {/* Thinking indicator with timer - shows during initial processing */}
           {isLoading && messages.length > 0 && (messages[messages.length - 1]?.role === 'user' || (messages[messages.length - 1]?.role === 'assistant' && !messages[messages.length - 1]?.content)) && (
             <div className="flex items-center gap-3 py-4 px-4 sm:px-8 max-w-3xl mx-auto">
-              <img
-                src="/pelican-logo-transparent.png"
+              <Image
+                src="/pelican-logo-transparent.webp"
                 alt="Pelican AI"
+                width={32}
+                height={32}
                 className="w-7 h-7 sm:w-8 sm:h-8 object-contain opacity-80"
               />
               <div className="flex items-center gap-2.5 px-3.5 py-2 rounded-xl border border-white/5 backdrop-blur-sm bg-white/[0.03]">

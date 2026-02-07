@@ -27,6 +27,7 @@ export async function GET(
       .eq('conversation_id', conversationId)  // Use conversation UUID directly
       .eq('user_id', user.id)
       .order('created_at', { ascending: true })
+      .limit(100)
 
     if (error) {
       console.error('[MESSAGES] Error fetching messages:', error)

@@ -1,6 +1,7 @@
 "use client"
 
 import type React from "react"
+import Image from "next/image"
 
 import { MessageActions } from "./message-actions"
 import { motion } from "framer-motion"
@@ -134,9 +135,11 @@ export function MessageBubble({
       <div className="max-w-3xl mx-auto px-4 sm:px-8">
         <div className="flex gap-3 sm:gap-6 items-start">
           <div className="flex-shrink-0">
-            <img
-              src="/pelican-logo-transparent.png"
+            <Image
+              src="/pelican-logo-transparent.webp"
               alt="Pelican AI"
+              width={32}
+              height={32}
               className="w-7 h-7 sm:w-8 sm:h-8 object-contain"
             />
           </div>

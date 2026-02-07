@@ -13,7 +13,7 @@ interface HelpChatProps {
   logoUrl?: string;
 }
 
-export default function HelpChat({ logoUrl = '/pelican-logo-transparent.png' }: HelpChatProps) {
+export default function HelpChat({ logoUrl = '/pelican-logo-transparent.webp' }: HelpChatProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
@@ -110,14 +110,7 @@ export default function HelpChat({ logoUrl = '/pelican-logo-transparent.png' }: 
           visibility: 'visible',
           opacity: 1,
         }}
-        onMouseOver={(e) => {
-          e.currentTarget.style.transform = 'scale(1.05)';
-          e.currentTarget.style.boxShadow = '0 6px 30px rgba(168, 85, 247, 0.5)';
-        }}
-        onMouseOut={(e) => {
-          e.currentTarget.style.transform = 'scale(1)';
-          e.currentTarget.style.boxShadow = '0 4px 20px rgba(168, 85, 247, 0.4)';
-        }}
+        className="help-chat-btn"
       >
         {isOpen ? (
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0a0b0f" strokeWidth="2.5">
@@ -380,16 +373,7 @@ export default function HelpChat({ logoUrl = '/pelican-logo-transparent.png' }: 
                 textTransform: 'uppercase',
                 letterSpacing: '0.05em',
               }}
-              onMouseOver={(e) => {
-                e.currentTarget.style.background = 'rgba(168, 85, 247, 0.1)';
-                e.currentTarget.style.borderColor = '#a855f7';
-                e.currentTarget.style.color = '#f1f5f9';
-              }}
-              onMouseOut={(e) => {
-                e.currentTarget.style.background = 'transparent';
-                e.currentTarget.style.borderColor = 'rgba(168, 85, 247, 0.3)';
-                e.currentTarget.style.color = '#94a3b8';
-              }}
+              className="help-chat-support-btn"
             >
               Contact Support →
             </button>
@@ -397,11 +381,20 @@ export default function HelpChat({ logoUrl = '/pelican-logo-transparent.png' }: 
         </div>
       )}
 
-      {/* Animation styles */}
+      {/* Animation + hover styles */}
       <style jsx global>{`
         @keyframes bounce {
           0%, 80%, 100% { transform: scale(0); }
           40% { transform: scale(1); }
+        }
+        .help-chat-btn:hover {
+          transform: scale(1.05);
+          box-shadow: 0 6px 30px rgba(168, 85, 247, 0.5);
+        }
+        .help-chat-support-btn:hover {
+          background: rgba(168, 85, 247, 0.1);
+          border-color: #a855f7;
+          color: #f1f5f9;
         }
       `}</style>
     </>

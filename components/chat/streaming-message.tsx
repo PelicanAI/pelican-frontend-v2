@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import { motion } from "framer-motion"
 import { MessageBubble } from "./message-bubble"
 import type { Message } from "@/lib/chat-utils"
@@ -17,7 +17,7 @@ interface StreamingMessageProps {
   isDarkMode?: boolean
 }
 
-export function StreamingMessage({
+export const StreamingMessage = React.memo(function StreamingMessage({
   message,
   onStop,
   onRegenerate,
@@ -99,4 +99,4 @@ export function StreamingMessage({
       />
     </motion.div>
   )
-}
+})

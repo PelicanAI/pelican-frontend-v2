@@ -13,7 +13,7 @@ export function SWRProvider({ children }: { children: React.ReactNode }) {
         fetcher,
         revalidateOnFocus: false,
         revalidateOnReconnect: true,
-        dedupingInterval: 2000,
+        dedupingInterval: 30000,
       }}
     >
       {children}
