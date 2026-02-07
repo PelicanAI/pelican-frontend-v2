@@ -248,9 +248,9 @@ export function MessageActions({
                   size="sm"
                   onClick={onRegenerate}
                   disabled={isRegenerating || message.isStreaming}
-                  className="h-11 w-11 sm:h-7 sm:w-7 p-0 min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0"
+                  className="h-11 w-11 sm:h-7 sm:w-7 p-0 min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0 group/regen"
                 >
-                  {isRegenerating ? <Loader2 className="w-4 h-4 sm:w-3 sm:h-3 animate-spin" /> : <RotateCcw className="w-4 h-4 sm:w-3 sm:h-3" />}
+                  {isRegenerating ? <Loader2 className="w-4 h-4 sm:w-3 sm:h-3 animate-spin" /> : <RotateCcw className="w-4 h-4 sm:w-3 sm:h-3 transition-transform duration-200 group-hover/regen:-rotate-45" />}
                 </Button>
               </TooltipTrigger>
               <TooltipContent>{isRegenerating ? "Regenerating..." : "Regenerate response"}</TooltipContent>
@@ -333,9 +333,9 @@ export function MessageActions({
                     size="sm"
                     onClick={onRegenerate}
                     disabled={isRegenerating || message.isStreaming}
-                    className="h-11 w-11 sm:h-7 sm:w-7 p-0 min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0"
+                    className="h-11 w-11 sm:h-7 sm:w-7 p-0 min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0 group/regen"
                   >
-                    {isRegenerating ? <Loader2 className="w-4 h-4 sm:w-3 sm:h-3 animate-spin" /> : <RotateCcw className="w-4 h-4 sm:w-3 sm:h-3" />}
+                    {isRegenerating ? <Loader2 className="w-4 h-4 sm:w-3 sm:h-3 animate-spin" /> : <RotateCcw className="w-4 h-4 sm:w-3 sm:h-3 transition-transform duration-200 group-hover/regen:-rotate-45" />}
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>{isRegenerating ? "Regenerating..." : "Regenerate response"}</TooltipContent>

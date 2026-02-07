@@ -99,29 +99,37 @@ export function TradingContextPanel({
     return value >= 0 ? "bg-green-500/10" : "bg-red-500/10"
   }
 
-  // Chart mode — show TradingView chart instead of market overview
-  if (mode === "chart" && selectedTicker) {
-    return (
-      <Card className="border-l-0 rounded-l-none bg-[var(--surface-1)]/40 backdrop-blur border-white/5 overflow-hidden h-full">
-        <TradingViewChart symbol={selectedTicker} onClose={closeChart} />
-      </Card>
-    )
-  }
-
-  // Calendar mode — show TradingView economic calendar
-  if (mode === "calendar") {
-    return (
-      <Card className="border-l-0 rounded-l-none bg-[var(--surface-1)]/40 backdrop-blur border-white/5 overflow-hidden h-full">
-        <EconomicCalendar onClose={closeChart} />
-      </Card>
-    )
-  }
-
   const tabs = [
     { key: "market" as const, label: "Market" },
     { key: "chart" as const, label: "Chart" },
     { key: "calendar" as const, label: "Calendar" },
   ]
+
+  const activeMode = mode === "chart" && selectedTicker ? "chart" : mode === "calendar" ? "calendar" : "overview"
+
+  // Chart and calendar modes get a full-height card with no tabs
+  if (activeMode === "chart" || activeMode === "calendar") {
+    return (
+      <Card className="border-l-0 rounded-l-none bg-[var(--surface-1)]/40 backdrop-blur border-white/5 overflow-hidden h-full">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeMode}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+            className="h-full"
+          >
+            {activeMode === "chart" && selectedTicker ? (
+              <TradingViewChart symbol={selectedTicker} onClose={closeChart} />
+            ) : (
+              <EconomicCalendar onClose={closeChart} />
+            )}
+          </motion.div>
+        </AnimatePresence>
+      </Card>
+    )
+  }
 
   return (
     <Card className="border-l-0 rounded-l-none bg-[var(--surface-1)]/40 backdrop-blur border-white/5 overflow-hidden">

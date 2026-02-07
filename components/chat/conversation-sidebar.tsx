@@ -120,9 +120,10 @@ const ConversationItem = React.memo(function ConversationItem({
       tabIndex={0}
       data-conversation-id={conversation.id}
       className={cn(
-        "conversation-item group relative cursor-pointer transition-all rounded-lg mx-2",
+        "conversation-item group relative cursor-pointer rounded-lg mx-2",
         "min-h-[48px] px-3 py-2 flex items-center gap-2",
-        isActive && "bg-primary/10 border border-primary/20",
+        "transition-[background-color,border-color] duration-150 ease-in-out",
+        isActive && "bg-primary/10 border border-primary/20 border-l-2 border-l-primary",
         !isActive && "hover:bg-sidebar-accent/50 border border-transparent",
         isNavigatingToThis && "opacity-50 cursor-wait",
       )}
@@ -374,8 +375,15 @@ export function ConversationSidebar({
       <ScrollArea className="flex-1 min-h-0">
         <div className="py-2">
           {loading ? (
-            <div className="flex items-center justify-center py-12">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary" />
+            <div className="space-y-1 px-2 py-3">
+              {[...Array(5)].map((_, i) => (
+                <div key={i} className="flex items-center gap-2 px-3 py-2.5 rounded-lg">
+                  <div className="flex-1 space-y-1.5">
+                    <div className="h-3.5 rounded shimmer" style={{ width: `${65 + (i * 7) % 30}%` }} />
+                    <div className="h-2.5 rounded shimmer" style={{ width: `${40 + (i * 11) % 35}%`, animationDelay: `${i * 150}ms` }} />
+                  </div>
+                </div>
+              ))}
             </div>
           ) : filteredConversations.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-8 px-6 text-center">

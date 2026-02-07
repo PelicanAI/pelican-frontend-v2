@@ -26,7 +26,8 @@ export function SuggestedPrompts({ onSelect }: SuggestedPromptsProps) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: 0.1 + index * 0.05 }}
             onClick={() => onSelect(prompt.text)}
-            className="flex items-start gap-2.5 p-3 sm:p-4 rounded-xl border border-border bg-muted/30 hover:bg-muted hover:border-primary/30 transition-all duration-200 text-left cursor-pointer group"
+            whileHover={{ y: -2 }}
+            className="flex items-start gap-2.5 p-3 sm:p-4 rounded-xl border border-border bg-muted/30 hover:bg-muted hover:border-primary/30 hover:shadow-md transition-[background-color,border-color,box-shadow] duration-150 ease-out text-left cursor-pointer group"
           >
             <span className="text-lg flex-shrink-0 mt-0.5" aria-hidden="true">{prompt.icon}</span>
             <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors leading-snug">
