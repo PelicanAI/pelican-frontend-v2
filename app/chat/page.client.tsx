@@ -25,6 +25,7 @@ import { cn } from "@/lib/utils"
 import { PaywallGate } from "@/components/paywall-gate"
 import { useCreditsContext } from "@/providers/credits-provider"
 import { ChartProvider, useChart } from "@/providers/chart-provider"
+import { ChatCreditCounter } from "@/components/chat/credit-counter"
 
 const SettingsModal = dynamic(() => import("@/components/settings-modal").then(m => ({ default: m.SettingsModal })))
 const TrialExhaustedModal = dynamic(() => import("@/components/trial-exhausted-modal").then(m => ({ default: m.TrialExhaustedModal })))
@@ -454,7 +455,8 @@ export default function ChatPage() {
             <Image src="/pelican-logo-transparent.webp" alt="PelicanAI" width={24} height={24} className="w-6 h-6 object-contain" />
             <span className="font-semibold text-foreground">Pelican AI</span>
           </div>
-          <div className="hidden sm:flex items-center gap-2">
+          <div className="flex items-center gap-1 sm:gap-2">
+            <ChatCreditCounter />
             <ThemeToggle />
           </div>
         </div>
@@ -476,6 +478,7 @@ export default function ChatPage() {
               <span className="font-semibold text-foreground">Pelican AI</span>
             </div>
             <div className="flex items-center gap-2">
+              <ChatCreditCounter />
               <ThemeToggle />
             </div>
           </div>

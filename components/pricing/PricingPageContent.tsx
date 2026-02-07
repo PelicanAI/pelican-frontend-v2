@@ -3,10 +3,13 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { User } from '@supabase/supabase-js'
-import { Check, Zap, Loader2 } from 'lucide-react'
+import { Check, Zap, Loader2, ShieldCheck } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useCreditsContext } from '@/providers/credits-provider'
+import { useT } from '@/lib/providers/translation-provider'
+import MarketingNav from '@/components/marketing/MarketingNav'
+import MarketingFooter from '@/components/marketing/MarketingFooter'
 
 const QUERY_COSTS = {
   conversation: { label: 'Chat / Education', cost: 2 },
@@ -18,14 +21,14 @@ const QUERY_COSTS = {
 
 function CostBreakdownTable() {
   return (
-    <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-4">
-      <h3 className="text-sm font-medium text-gray-400 mb-3 text-center">What things cost</h3>
-      <div className="space-y-2.5">
+    <div className="cost-breakdown bracket-box">
+      <h3 className="cost-breakdown-title">What things cost</h3>
+      <div className="cost-breakdown-list">
         {Object.entries(QUERY_COSTS).map(([key, { label, cost }]) => (
-          <div key={key} className="flex justify-between items-center text-sm">
-            <span className="text-gray-300">{label}</span>
-            <span className="text-white font-medium flex items-center gap-1">
-              <Zap className="w-3 h-3 text-gray-500" />
+          <div key={key} className="cost-breakdown-row">
+            <span className="cost-breakdown-label">{label}</span>
+            <span className="cost-breakdown-value">
+              <Zap className="cost-breakdown-icon" />
               {cost}
             </span>
           </div>
@@ -44,6 +47,7 @@ const PLANS = [
     description: '~100 price checks or ~40 analyses',
     stripePriceId: process.env.NEXT_PUBLIC_STRIPE_STARTER_PRICE_ID || 'price_starter',
     popular: false,
+    cta: 'Get Started',
     features: [
       '1,000 credits/month',
       'All query types',
@@ -59,12 +63,12 @@ const PLANS = [
     description: '~350 price checks or ~140 analyses',
     stripePriceId: process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID || 'price_pro',
     popular: true,
+    cta: 'Start Trading',
     features: [
       '3,500 credits/month',
       'All query types',
       'Priority support',
       '20% rollover',
-      'API access (coming soon)'
     ]
   },
   {
@@ -75,12 +79,12 @@ const PLANS = [
     description: '~1,000 price checks or ~400 analyses',
     stripePriceId: process.env.NEXT_PUBLIC_STRIPE_POWER_PRICE_ID || 'price_power',
     popular: false,
+    cta: 'Go Power',
     features: [
       '10,000 credits/month',
       'All query types',
       'Priority support',
       '20% rollover',
-      'API access (coming soon)',
       'Custom integrations'
     ]
   }
@@ -89,11 +93,19 @@ const PLANS = [
 export default function PricingPageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const t = useT()
   const preselectedPlan = searchParams.get('plan')
   const { isSubscribed, isFounder, loading: creditsLoading, credits } = useCreditsContext()
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [user, setUser] = useState<User | null>(null)
+
+  const navLinks = [
+    { href: '/#features', label: t.marketing.nav.features },
+    { href: '/how-to-use', label: 'How to Use' },
+    { href: '/', label: t.marketing.nav.backToHome },
+    { href: '/faq', label: t.marketing.nav.faq },
+  ]
 
   // Get current user
   useEffect(() => {
@@ -117,12 +129,10 @@ export default function PricingPageContent() {
     if (preselectedPlan && user && !loadingPlan && !isSubscribed && !isFounder) {
       const plan = PLANS.find(p => p.id === preselectedPlan)
       if (plan) {
-        // Small delay to ensure component is fully mounted
         setTimeout(() => {
           handleSelectPlan(plan)
         }, 100)
       }
-      // Clear from sessionStorage after use
       sessionStorage.removeItem('intended_plan')
     }
   }, [preselectedPlan, user, loadingPlan, isSubscribed, isFounder])
@@ -172,108 +182,97 @@ export default function PricingPageContent() {
     }
   }
 
-  // Show loading while checking subscription status
   if (creditsLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-950">
-        <Loader2 className="h-8 w-8 animate-spin text-blue-400" />
+      <div className="pricing-loading">
+        <Loader2 className="pricing-loading-spinner" />
       </div>
     )
   }
 
-  // If user has subscription, they'll be redirected by useEffect
-  // Show pricing page for non-subscribed users
   return (
-    <div className="min-h-[100svh] bg-gray-950 py-12">
-      <div className="page-container-wide">
-        <div className="text-center mb-12">
-          <Link href="/chat" className="text-gray-500 hover:text-gray-400 text-sm mb-4 inline-block">
-            {user && credits?.plan === 'none' && (credits.freeQuestionsRemaining ?? 0) >= 10
-              ? '\u2190 Start Free Trial'
-              : '\u2190 Back to chat'}
-          </Link>
-          <h1 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-            Simple, Credit-Based Pricing
+    <>
+      <MarketingNav links={navLinks} ctaAction="signup" ctaLabel={t.marketing.nav.getStarted} />
+
+      <section className="pricing-hero">
+        <div className="pricing-hero-inner">
+          <div className="pricing-nav-links">
+            <Link href="/" className="pricing-back-link">
+              &larr; {t.marketing.nav.backToHome}
+            </Link>
+            {user && (
+              <Link href="/chat" className="pricing-back-link">
+                &larr; Back to chat
+              </Link>
+            )}
+          </div>
+
+          <div className="section-tag">{'// Pricing'}</div>
+          <h1 className="pricing-title">
+            Simple, <span className="text-glow">Credit-Based</span> Pricing
           </h1>
-          <p className="text-gray-400 text-lg max-w-xl mx-auto">
+          <p className="pricing-subtitle">
             Pay for what you use. No hidden fees. Cancel anytime.
           </p>
         </div>
+      </section>
 
-        <div className="max-w-sm mx-auto mb-12">
+      <section className="pricing-costs-section">
+        <div className="section-inner">
           <CostBreakdownTable />
         </div>
+      </section>
 
-        {error && (
-          <div className="max-w-md mx-auto mb-8 p-4 bg-red-900/20 border border-red-800 rounded-lg text-red-400 text-sm text-center">
-            {error}
-          </div>
-        )}
+      {error && (
+        <div className="pricing-error">
+          {error}
+        </div>
+      )}
 
-        {user && credits?.plan === 'none' && (credits.freeQuestionsRemaining ?? 0) > 0 && (
-          <div className="max-w-3xl mx-auto mb-10 p-6 bg-amber-500/10 border border-amber-500/20 rounded-xl text-center">
-            <p className="text-lg font-semibold text-amber-400">
-              You have {credits.freeQuestionsRemaining} free question{credits.freeQuestionsRemaining === 1 ? '' : 's'}
-            </p>
-            <p className="text-sm text-amber-200/80 mt-2">
-              Try Pelican&apos;s AI trading assistant - no card needed.
-            </p>
-            <div className="mt-5">
-              <Link
-                href="/chat"
-                className="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-amber-500 text-gray-900 font-medium hover:bg-amber-400 transition-colors"
-              >
-                Start Free Trial
-              </Link>
-            </div>
-          </div>
-        )}
+      {user && credits?.plan === 'none' && (credits.freeQuestionsRemaining ?? 0) > 0 && (
+        <div className="pricing-trial-banner">
+          <p className="pricing-trial-title">
+            You have {credits.freeQuestionsRemaining} free question{credits.freeQuestionsRemaining === 1 ? '' : 's'}
+          </p>
+          <p className="pricing-trial-subtitle">
+            Try Pelican&apos;s AI trading assistant &mdash; no card needed.
+          </p>
+          <Link href="/chat" className="btn-primary" style={{ marginTop: '1rem' }}>
+            Start Free Trial
+          </Link>
+        </div>
+      )}
 
-        <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+      <section className="pricing-cards-section">
+        <div className="pricing-cards-grid">
           {PLANS.map((plan) => (
             <div
               key={plan.id}
-              className={`relative rounded-xl p-6 transition-all ${
-                plan.popular
-                  ? 'bg-blue-600 ring-2 ring-blue-400 scale-105'
-                  : 'bg-gray-900 border border-gray-800 hover:border-gray-700'
-              }`}
+              className={`pricing-card bracket-box ${plan.popular ? 'pricing-card-popular' : ''}`}
             >
               {plan.popular && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                  <span className="bg-blue-400 text-blue-900 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">
-                    Most Popular
-                  </span>
-                </div>
+                <div className="pricing-popular-badge">Most Popular</div>
               )}
 
-              <h2 className="text-2xl font-bold text-white mt-2">{plan.name}</h2>
+              <h2 className="pricing-card-name">{plan.name}</h2>
 
-              <div className="mt-4">
-                <span className="text-4xl font-bold text-white">${plan.price}</span>
-                <span className={plan.popular ? 'text-blue-200' : 'text-gray-400'}>/month</span>
+              <div className="pricing-card-price">
+                <span className="pricing-card-amount">${plan.price}</span>
+                <span className="pricing-card-period">/month</span>
               </div>
 
-              <div className="mt-2 flex items-center gap-1.5">
-                <Zap className={`w-4 h-4 ${plan.popular ? 'text-blue-200' : 'text-gray-400'}`} />
-                <span className="text-lg text-white font-semibold">
-                  {plan.credits.toLocaleString()} credits
-                </span>
+              <div className="pricing-card-credits">
+                <Zap className="pricing-card-credits-icon" />
+                <span>{plan.credits.toLocaleString()} credits</span>
               </div>
 
-              <p className={`mt-2 text-sm ${plan.popular ? 'text-blue-200' : 'text-gray-400'}`}>
-                {plan.description}
-              </p>
+              <p className="pricing-card-description">{plan.description}</p>
 
-              <ul className="mt-6 space-y-3">
+              <ul className="pricing-card-features">
                 {plan.features.map((feature, i) => (
-                  <li key={i} className="flex items-start gap-2">
-                    <Check className={`w-4 h-4 mt-0.5 flex-shrink-0 ${
-                      plan.popular ? 'text-blue-200' : 'text-green-400'
-                    }`} />
-                    <span className={`text-sm ${plan.popular ? 'text-white' : 'text-gray-300'}`}>
-                      {feature}
-                    </span>
+                  <li key={i}>
+                    <Check className="pricing-card-check" />
+                    <span>{feature}</span>
                   </li>
                 ))}
               </ul>
@@ -281,43 +280,40 @@ export default function PricingPageContent() {
               <button
                 onClick={() => handleSelectPlan(plan)}
                 disabled={loadingPlan !== null}
-                className={`mt-6 w-full py-3 px-4 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 ${
-                  plan.popular
-                    ? 'bg-white text-blue-600 hover:bg-gray-100'
-                    : 'bg-blue-600 text-white hover:bg-blue-500'
-                }`}
+                className={`pricing-card-cta ${plan.popular ? 'pricing-card-cta-popular' : ''}`}
               >
                 {loadingPlan === plan.id ? (
                   <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <Loader2 className="pricing-card-cta-spinner" />
                     <span>Loading...</span>
                   </>
                 ) : (
-                  <span>Get Started</span>
+                  <span>{plan.cta}</span>
                 )}
               </button>
             </div>
           ))}
         </div>
+      </section>
 
-        <div className="text-center mt-12 space-y-2">
-          <p className="text-gray-500 text-sm">
-            Credits reset monthly. Unused credits roll over (up to 20%).
-          </p>
-          <p className="text-gray-500 text-sm">
-            By subscribing, you agree to our{' '}
-            <Link href="/terms" className="text-blue-400 hover:underline">
-              Terms of Service
-            </Link>
-          </p>
-          <p className="text-gray-500 text-sm">
-            Questions?{' '}
-            <a href="mailto:support@pelicantrading.ai" className="text-blue-400 hover:underline">
-              Contact us
-            </a>
-          </p>
-        </div>
+      <div className="pricing-guarantee">
+        <ShieldCheck className="pricing-guarantee-icon" />
+        <span>7-day money-back guarantee &mdash; no questions asked</span>
       </div>
-    </div>
+
+      <div className="pricing-footer-notes">
+        <p>Credits reset monthly. Unused credits roll over (up to 20%).</p>
+        <p>
+          By subscribing, you agree to our{' '}
+          <Link href="/terms">Terms of Service</Link>
+        </p>
+        <p>
+          Questions?{' '}
+          <a href="mailto:support@pelicantrading.ai">Contact us</a>
+        </p>
+      </div>
+
+      <MarketingFooter />
+    </>
   )
 }
