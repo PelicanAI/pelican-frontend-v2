@@ -19,7 +19,7 @@ export default function MobileStickyCtaBar() {
   return (
     <div className="mobile-sticky-cta">
       <a href="/auth/signup" className="mobile-sticky-cta-button">
-        Start Trading Smarter &rarr;
+        Try For Free &rarr;
       </a>
     </div>
   );
