@@ -49,7 +49,7 @@ const nextConfig = {
           },
           {
             key: 'Content-Security-Policy',
-            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://s3.tradingview.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://*.supabase.co https://*.tradingview.com; connect-src 'self' https://*.supabase.co https://*.supabase.in wss://*.supabase.co https://api.polygon.io https://s3.tradingview.com https://*.sentry.io https://*.stripe.com https://pelican-trading-api.fly.dev https://*.fly.dev; worker-src 'self' blob:; frame-src https://js.stripe.com https://s3.tradingview.com"
+            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://s3.tradingview.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://*.supabase.co https://*.tradingview.com; connect-src 'self' https://*.supabase.co https://*.supabase.in wss://*.supabase.co https://api.polygon.io https://s3.tradingview.com https://*.sentry.io https://*.stripe.com https://pelican-trading-api.fly.dev https://*.fly.dev; worker-src 'self' blob:; frame-src https://js.stripe.com https://*.tradingview.com https://*.tradingview-widget.com"
           },
         ],
       },
