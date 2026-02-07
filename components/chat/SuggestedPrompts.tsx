@@ -18,7 +18,7 @@ interface SuggestedPromptsProps {
 export function SuggestedPrompts({ onSelect }: SuggestedPromptsProps) {
   return (
     <div className="w-full max-w-2xl mx-auto px-2">
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3 pb-2">
         {SUGGESTED_PROMPTS.map((prompt, index) => (
           <motion.button
             key={index}

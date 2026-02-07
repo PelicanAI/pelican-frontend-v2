@@ -49,7 +49,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning className="dark:bg-[#0a0a0f]">
-      <head />
+      <head>
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="theme-color" content="#0a0a0f" />
+      </head>
       <body className={`font-sans antialiased bg-background dark:bg-[#0a0a0f] ${inter.variable} ${GeistMono.variable}`}>
         <SentryErrorBoundary>
           <Suspense fallback={null}>

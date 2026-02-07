@@ -13,7 +13,7 @@ export function WelcomeScreen({ onQuickStart }: WelcomeScreenProps) {
   const t = useT()
 
   return (
-    <div className="flex-1 flex items-center justify-center p-4 sm:p-8 bg-transparent min-h-[500px] sm:min-h-[600px]">
+    <div className="flex-1 flex items-center justify-center p-4 pb-8 sm:p-8 bg-transparent min-h-[500px] sm:min-h-[600px]">
       <div
         aria-hidden
         className="pointer-events-none fixed inset-0 -z-10 [background:radial-gradient(600px_400px_at_50%_10%,color-mix(in_oklch,var(--primary)_18%,transparent),transparent)] [@media(prefers-reduced-transparency:reduce)]:hidden"

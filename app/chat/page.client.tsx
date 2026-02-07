@@ -373,7 +373,7 @@ export default function ChatPage() {
           setTradingPanelCollapsed(false)
           localStorage.setItem('pelican_trading_panel_collapsed', 'false')
         }} />
-        <div className="flex h-[100svh] min-h-[100svh] overflow-hidden relative chat-background-gradient">
+        <div className="flex h-[100dvh] min-h-[100dvh] overflow-hidden relative chat-background-gradient chat-viewport-lock">
       {/* Futuristic background effects - only in dark mode */}
       {/* <div className="absolute inset-0 dark:block hidden pointer-events-none">
         <div className="absolute inset-0 bg-gradient-to-br from-purple-950/10 via-black to-violet-950/10" />
@@ -438,7 +438,7 @@ export default function ChatPage() {
       </Sheet>
 
       <div className="flex-1 flex flex-col h-full min-w-0">
-        <div className="xl:hidden border-b p-4 flex items-center justify-between bg-background border-border">
+        <div className="xl:hidden border-b p-4 flex items-center justify-between bg-background border-border touch-manipulation">
           <Sheet open={mobileSheetOpen} onOpenChange={setMobileSheetOpen}>
             <SheetTrigger asChild>
               <Button
@@ -485,7 +485,7 @@ export default function ChatPage() {
         )}
 
         <div className="flex-1 flex flex-col overflow-hidden">
-          <div className="flex-1 overflow-y-auto pb-[120px] md:pb-0">
+          <div className="flex-1 overflow-y-auto overscroll-none pb-[120px] md:pb-0 chat-scroll-area">
             <div className="max-w-5xl mx-auto w-full px-4 sm:px-6">
               <ChatContainer
                 messages={messages}
@@ -503,7 +503,7 @@ export default function ChatPage() {
           <div className={cn(
             "bg-background border-t border-border",
             "fixed bottom-0 left-0 right-0 md:relative md:bottom-auto",
-            "safe-bottom md:pb-4",
+            "chat-input-fixed md:pb-4",
             "z-40"
           )}>
             <div className="max-w-5xl mx-auto w-full px-4 sm:px-6 py-3">

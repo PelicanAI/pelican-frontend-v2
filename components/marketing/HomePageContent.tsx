@@ -13,6 +13,8 @@ import MarketingNav from '@/components/marketing/MarketingNav';
 import MarketingFooter from '@/components/marketing/MarketingFooter';
 import SignUpButton from '@/components/marketing/SignUpButton';
 import ScrollAnimationObserver from '@/components/marketing/ScrollAnimationObserver';
+import MobileStickyCtaBar from '@/components/marketing/MobileStickyCtaBar';
+import CollapsibleBio from '@/components/marketing/CollapsibleBio';
 import dynamic from 'next/dynamic';
 
 const HelpChat = dynamic(() => import('@/components/marketing/HelpChat'), {
@@ -404,16 +406,12 @@ export default function HomePageContent() {
             <div className="team-card bracket-box animate-on-scroll">
               <div className="team-name">{t.marketing.team.nickName}</div>
               <div className="team-role">{t.marketing.team.nickRole}</div>
-              <p className="team-bio">
-                {t.marketing.team.nickBio}
-              </p>
+              <CollapsibleBio text={t.marketing.team.nickBio} />
             </div>
             <div className="team-card bracket-box animate-on-scroll">
               <div className="team-name">{t.marketing.team.rayName}</div>
               <div className="team-role">{t.marketing.team.rayRole}</div>
-              <p className="team-bio">
-                {t.marketing.team.rayBio}
-              </p>
+              <CollapsibleBio text={t.marketing.team.rayBio} />
             </div>
           </div>
         </div>
@@ -429,6 +427,7 @@ export default function HomePageContent() {
 
       <MarketingFooter />
 
+      <MobileStickyCtaBar />
       <HelpChat logoUrl="/pelican-logo-transparent.webp" />
     </>
   );

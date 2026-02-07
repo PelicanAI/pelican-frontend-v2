@@ -1830,6 +1830,79 @@
   }
 }
 
+/* ========== Mobile Sticky CTA Bar ========== */
+.mobile-sticky-cta {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 90;
+  padding: 0.75rem var(--page-gutter) max(0.75rem, env(safe-area-inset-bottom));
+  background: linear-gradient(to top, var(--bg-primary) 60%, transparent 100%);
+}
+
+.mobile-sticky-cta-button {
+  display: block;
+  width: 100%;
+  text-align: center;
+  padding: 0.85rem 1.5rem;
+  background: var(--accent-purple);
+  color: var(--bg-primary);
+  font-family: var(--font-jetbrains), monospace;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.mobile-sticky-cta-button:hover {
+  background: #c084fc;
+}
+
+@media (max-width: 1024px) {
+  .mobile-sticky-cta {
+    display: block;
+  }
+}
+
+/* ========== Collapsible Bio (mobile only) ========== */
+/* Desktop: show full text, hide truncated */
+.collapsible-bio-full {
+  display: inline;
+}
+.collapsible-bio-truncated {
+  display: none;
+}
+
+@media (max-width: 1024px) {
+  .collapsible-bio-full {
+    display: none;
+  }
+  .collapsible-bio-truncated {
+    display: inline;
+  }
+}
+
+.collapsible-bio-toggle {
+  background: none;
+  border: none;
+  color: var(--accent-purple);
+  font-family: var(--font-jetbrains), monospace;
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: none;
+}
+
+.collapsible-bio-toggle:hover {
+  text-decoration: underline;
+}
+
 /* Accessibility: respect reduced motion preferences */
 @media (prefers-reduced-motion: reduce) {
   .animate-on-scroll,

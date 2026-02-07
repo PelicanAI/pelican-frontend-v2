@@ -1011,6 +1011,43 @@
     background: radial-gradient(ellipse at top, rgba(88, 28, 135, 0.3) 0%, transparent 70%);
   }
 
+  /* ========== Mobile App-Like Chat Experience ========== */
+
+  /* Lock viewport on chat page - prevent bounce/drag on mobile */
+  .chat-viewport-lock {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    overscroll-behavior: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* The message list is the ONLY scrollable area */
+  .chat-scroll-area {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+    scroll-behavior: smooth;
+  }
+
+  /* Fixed input area at bottom with safe area insets */
+  .chat-input-fixed {
+    padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+  }
+
+  /* Touch optimization: prevent double-tap zoom on interactive elements */
+  .touch-manipulation {
+    touch-action: manipulation;
+  }
+
+  /* Mobile-only: lock html/body when chat is active */
+  @media (max-width: 1279px) {
+    .chat-viewport-lock {
+      /* Ensure full dynamic viewport on mobile */
+      height: 100dvh;
+      min-height: 100dvh;
+    }
+  }
+
   /* Reduce motion for accessibility (FIX 35) */
   @media (prefers-reduced-motion: reduce) {
     *,
