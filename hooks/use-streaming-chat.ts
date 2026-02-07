@@ -27,8 +27,8 @@ import { createClient } from '@/lib/supabase/client';
 // =============================================================================
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://pelican-backend.fly.dev';
-const STREAM_TIMEOUT_MS = 2700000; // 45 minutes
-const CHUNK_TIMEOUT_MS = 2700000; // 45 minutes between chunks
+const STREAM_TIMEOUT_MS = 300000; // 5 minutes max total stream time
+const CHUNK_TIMEOUT_MS = 30000; // 30 seconds without new data = dead connection
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 // =============================================================================

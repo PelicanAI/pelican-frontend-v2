@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const { priceId, planName, planCredits } = await request.json()
+    const { priceId, planName } = await request.json()
 
     if (!priceId || !planName) {
       return NextResponse.json(
@@ -50,6 +50,20 @@ export async function POST(request: NextRequest) {
     if (!allowedPriceIds.includes(priceId)) {
       return NextResponse.json(
         { error: 'Invalid price ID' },
+        { status: 400 }
+      )
+    }
+
+    // Derive credits server-side from priceId — never trust client-supplied values
+    const PLAN_CREDITS: Record<string, number> = {
+      [process.env.NEXT_PUBLIC_STRIPE_STARTER_PRICE_ID!]: 1000,
+      [process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID!]: 3500,
+      [process.env.NEXT_PUBLIC_STRIPE_POWER_PRICE_ID!]: 10000,
+    }
+    const planCredits = PLAN_CREDITS[priceId]
+    if (!planCredits) {
+      return NextResponse.json(
+        { error: 'Invalid price configuration' },
         { status: 400 }
       )
     }
