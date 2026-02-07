@@ -60,7 +60,10 @@ export function TextSegment({ content, index, isStreaming, isLargeContent, ticke
     )
   }
 
-  let safeLines = content
+  // Normalize literal \n escape sequences and Windows line-endings to actual newlines
+  const normalized = content.replace(/\r\n/g, "\n").replace(/\\n/g, "\n")
+
+  let safeLines = normalized
     .split("\n")
     .map((line) => formatLine(line))
     .join("<br />")
