@@ -141,7 +141,7 @@
       "eventStudyCredits": "75",
       "eventStudyExample": "\"How does SPY react after CPI?\" / \"Compare AAPL vs MSFT\"",
       "deepAnalysis": "Deep Analysis",
-      "deepAnalysisCredits": "250",
+      "deepAnalysisCredits": "200",
       "deepAnalysisExample": "\"Backtest this strategy 1 year\" / \"Show institutional flow on SPY\"",
       "credits": "credits",
       "starter": "STARTER",
