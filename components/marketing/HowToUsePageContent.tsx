@@ -8,16 +8,11 @@ import MarketingNav from '@/components/marketing/MarketingNav';
 import MarketingFooter from '@/components/marketing/MarketingFooter';
 import ScrollAnimationObserver from '@/components/marketing/ScrollAnimationObserver';
 import SignUpButton from '@/components/marketing/SignUpButton';
+import DemoCard from '@/components/how-to-use/DemoCard';
 import dynamic from 'next/dynamic';
 
 const HelpChat = dynamic(() => import('@/components/marketing/HelpChat'), {
   ssr: false,
-});
-
-const DemoCard = dynamic(() => import('@/components/how-to-use/DemoCard'), {
-  loading: () => (
-    <div className="w-full h-64 bg-gray-800/50 rounded-xl animate-pulse" />
-  ),
 });
 
 const traderDemos = [
