@@ -24,6 +24,7 @@ import dynamic from "next/dynamic"
 import { cn } from "@/lib/utils"
 import { PaywallGate } from "@/components/paywall-gate"
 import { useCreditsContext } from "@/providers/credits-provider"
+import { useIsMobile } from "@/hooks/use-mobile"
 import { ChartProvider, useChart } from "@/providers/chart-provider"
 import { ChatCreditCounter } from "@/components/chat/credit-counter"
 
@@ -60,15 +61,7 @@ function ChartPanelExpander({ onExpand }: { onExpand: () => void }) {
 // Mobile sheet — opens on screens below xl when a chart or calendar is requested
 function MobileChartSheet() {
   const { mode, selectedTicker, closeChart } = useChart()
-  const [isMobile, setIsMobile] = useState(false)
-
-  useEffect(() => {
-    const mql = window.matchMedia("(max-width: 1279px)")
-    setIsMobile(mql.matches)
-    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches)
-    mql.addEventListener("change", handler)
-    return () => mql.removeEventListener("change", handler)
-  }, [])
+  const isMobile = useIsMobile()
 
   if (!isMobile) return null
 

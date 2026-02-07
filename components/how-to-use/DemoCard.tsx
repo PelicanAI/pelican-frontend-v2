@@ -1,5 +1,3 @@
-'use client';
-
 import SkillBadge from './SkillBadge';
 import DemoVideoPlaceholder from './DemoVideoPlaceholder';
 

@@ -1,5 +1,3 @@
-'use client';
-
 interface SignUpButtonProps {
   plan?: string;
   className?: string;

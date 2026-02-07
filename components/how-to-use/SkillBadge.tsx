@@ -1,5 +1,3 @@
-'use client';
-
 interface SkillBadgeProps {
   level: 'beginner' | 'intermediate' | 'advanced';
   audience?: 'trader' | 'investor';
