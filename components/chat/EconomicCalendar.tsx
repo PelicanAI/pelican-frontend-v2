@@ -36,7 +36,7 @@ function EconomicCalendarInner({ onClose }: EconomicCalendarProps) {
     script.async = true
     script.innerHTML = JSON.stringify({
       colorTheme: "dark",
-      isTransparent: true,
+      isTransparent: false,
       width: "100%",
       height: "100%",
       importanceFilter: "-1,0,1",
@@ -76,7 +76,7 @@ function EconomicCalendarInner({ onClose }: EconomicCalendarProps) {
             <div className="h-48 w-full mx-4 rounded-lg bg-muted/30 animate-pulse" />
           </div>
         )}
-        <div ref={containerRef} className="h-full w-full" />
+        <div ref={containerRef} className="h-full w-full bg-[#131722]" />
       </div>
     </div>
   )
