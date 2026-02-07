@@ -9,8 +9,8 @@ interface PaywallGateProps {
   fallback?: React.ReactNode
 }
 
-export function PaywallGate({ children, fallback }: PaywallGateProps) {
-  const { hasAccess, loading } = useCreditsContext()
+export function PaywallGate({ children }: PaywallGateProps) {
+  const { loading } = useCreditsContext()
 
   if (loading) {
     return (
@@ -20,14 +20,8 @@ export function PaywallGate({ children, fallback }: PaywallGateProps) {
     )
   }
 
-  if (!hasAccess) {
-    if (fallback) {
-      return <>{fallback}</>
-    }
-
-    return <DefaultPaywall />
-  }
-
+  // Always render children — the chat page handles soft-disabling the input
+  // when the user is out of credits instead of blocking the entire UI.
   return <>{children}</>
 }
 

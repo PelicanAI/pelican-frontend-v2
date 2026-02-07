@@ -7,9 +7,10 @@ import { SuggestedPrompts } from "./SuggestedPrompts"
 interface WelcomeScreenProps {
   onQuickStart: (message: string) => void
   onSettingsClick?: () => void
+  disabled?: boolean
 }
 
-export function WelcomeScreen({ onQuickStart }: WelcomeScreenProps) {
+export function WelcomeScreen({ onQuickStart, disabled }: WelcomeScreenProps) {
   const t = useT()
 
   return (
@@ -39,7 +40,7 @@ export function WelcomeScreen({ onQuickStart }: WelcomeScreenProps) {
           {t.chat.welcomeSubtitle}
         </p>
 
-        <SuggestedPrompts onSelect={onQuickStart} />
+        <SuggestedPrompts onSelect={onQuickStart} disabled={disabled} />
       </div>
     </div>
   )

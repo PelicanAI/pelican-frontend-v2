@@ -15,7 +15,7 @@ describe("SuggestedPrompts", () => {
   it("renders all 6 prompts", () => {
     render(<SuggestedPrompts onSelect={vi.fn()} />)
     for (const prompt of SUGGESTED_PROMPTS) {
-      expect(screen.getByText(prompt.text)).toBeInTheDocument()
+      expect(screen.getByText(prompt)).toBeInTheDocument()
     }
   })
 
@@ -23,11 +23,11 @@ describe("SuggestedPrompts", () => {
     const onSelect = vi.fn()
     render(<SuggestedPrompts onSelect={onSelect} />)
 
-    fireEvent.click(screen.getByText(SUGGESTED_PROMPTS[0].text))
-    expect(onSelect).toHaveBeenCalledWith(SUGGESTED_PROMPTS[0].text)
+    fireEvent.click(screen.getByText(SUGGESTED_PROMPTS[0]))
+    expect(onSelect).toHaveBeenCalledWith(SUGGESTED_PROMPTS[0])
 
-    fireEvent.click(screen.getByText(SUGGESTED_PROMPTS[3].text))
-    expect(onSelect).toHaveBeenCalledWith(SUGGESTED_PROMPTS[3].text)
+    fireEvent.click(screen.getByText(SUGGESTED_PROMPTS[3]))
+    expect(onSelect).toHaveBeenCalledWith(SUGGESTED_PROMPTS[3])
 
     expect(onSelect).toHaveBeenCalledTimes(2)
   })
@@ -40,10 +40,11 @@ describe("SuggestedPrompts", () => {
     expect(grid?.className).toContain("md:grid-cols-3")
   })
 
-  it("renders emoji icons", () => {
-    render(<SuggestedPrompts onSelect={vi.fn()} />)
-    for (const prompt of SUGGESTED_PROMPTS) {
-      expect(screen.getByText(prompt.icon)).toBeInTheDocument()
-    }
+  it("does not call onSelect when disabled", () => {
+    const onSelect = vi.fn()
+    render(<SuggestedPrompts onSelect={onSelect} disabled />)
+
+    fireEvent.click(screen.getByText(SUGGESTED_PROMPTS[0]))
+    expect(onSelect).not.toHaveBeenCalled()
   })
 })

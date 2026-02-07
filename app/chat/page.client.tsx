@@ -90,7 +90,8 @@ function MobileChartSheet() {
 
 export default function ChatPage() {
   const { user, loading: authLoading } = useAuth()
-  const { refetch } = useCreditsContext()
+  const { refetch, hasAccess, loading: creditsLoading } = useCreditsContext()
+  const outOfCredits = !creditsLoading && !hasAccess
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -493,9 +494,10 @@ export default function ChatPage() {
                 isLoadingHistory={isLoadingMessages}
                 onStopGeneration={handleStopGeneration}
                 onRegenerateMessage={regenerateLastMessage}
-                onQuickStart={handleQuickStart}
+                onQuickStart={outOfCredits ? undefined : handleQuickStart}
                 onFileUpload={fileUpload.handleMultipleFileUpload}
                 onSettingsClick={handleSettingsClick}
+                outOfCredits={outOfCredits}
               />
             </div>
           </div>
@@ -506,16 +508,26 @@ export default function ChatPage() {
             "chat-input-fixed md:pb-4",
             "z-40"
           )}>
-            <div className="max-w-5xl mx-auto w-full px-4 sm:px-6 py-3">
+            <div className="max-w-5xl mx-auto w-full px-4 sm:px-6 py-3 relative">
+              {outOfCredits && (
+                <div className="absolute inset-0 z-10 flex items-center justify-center px-4 sm:px-6 py-3">
+                  <div className="w-full flex items-center justify-center gap-2 px-4 py-4 rounded-2xl border border-border bg-card text-sm text-muted-foreground min-h-[56px]">
+                    <span>You&apos;ve used all your free questions.</span>
+                    <Link href="/pricing" className="text-purple-400 hover:text-purple-300 font-medium underline underline-offset-2 whitespace-nowrap">
+                      Upgrade to keep trading &rarr;
+                    </Link>
+                  </div>
+                </div>
+              )}
               <ChatInput
                 ref={chatInputRef}
                 onSendMessage={handleSendMessageWithFiles}
                 onStopResponse={handleStopGeneration}
                 onFileUpload={fileUpload.handleMultipleFileUpload}
-                disabled={isLoadingMessages}
-                disabledSend={(chatLoading || isLoadingMessages) && !messageHandler.isQueueingMessage}
-                canSend={(!chatLoading && !isLoadingMessages) || messageHandler.isQueueingMessage}
-                placeholder="Ask Pelican anything..."
+                disabled={isLoadingMessages || outOfCredits}
+                disabledSend={outOfCredits || ((chatLoading || isLoadingMessages) && !messageHandler.isQueueingMessage)}
+                canSend={!outOfCredits && ((!chatLoading && !isLoadingMessages) || messageHandler.isQueueingMessage)}
+                placeholder={outOfCredits ? "Upgrade to continue..." : "Ask Pelican anything..."}
                 onTypingDuringResponse={messageHandler.handleTypingDuringResponse}
                 isAIResponding={chatLoading}
                 pendingDraft={messageHandler.pendingDraft}
@@ -533,7 +545,7 @@ export default function ChatPage() {
                 ]}
                 onRemoveAttachment={(index: number) => {
                   const pendingCount = fileUpload.pendingAttachments.length
-                  
+
                   if (index < pendingCount) {
                     // Remove from pending
                     const attachment = fileUpload.pendingAttachments[index]

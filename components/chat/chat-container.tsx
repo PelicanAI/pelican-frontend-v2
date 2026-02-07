@@ -32,6 +32,7 @@ interface ChatContainerProps {
   onFileUpload?: (files: File[]) => void
   onSettingsClick?: () => void
   networkError?: string | null
+  outOfCredits?: boolean
 }
 
 export function ChatContainer({
@@ -47,6 +48,7 @@ export function ChatContainer({
   onFileUpload,
   onSettingsClick,
   networkError,
+  outOfCredits,
 }: ChatContainerProps) {
   const { toast } = useToast()
   const elapsedSeconds = useResponseTimer(isLoading)
@@ -309,7 +311,7 @@ export function ChatContainer({
         role="main"
         aria-label="Chat conversation"
       >
-        <WelcomeScreen onQuickStart={onQuickStart || (() => {})} onSettingsClick={onSettingsClick} />
+        <WelcomeScreen onQuickStart={onQuickStart || (() => {})} onSettingsClick={onSettingsClick} disabled={outOfCredits} />
         {isDragOver && (
           <motion.div
             initial={{ opacity: 0 }}
