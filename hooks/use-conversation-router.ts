@@ -2,8 +2,7 @@
 
 import { useEffect, useRef, startTransition } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
-import { useConversations } from "./use-conversations"
-import { ROUTES, LIMITS } from "@/lib/constants"
+import { ROUTES } from "@/lib/constants"
 import { logger } from "@/lib/logger"
 
 interface UseConversationRouterOptions {
@@ -25,8 +24,6 @@ export function useConversationRouter({
 }: UseConversationRouterOptions) {
   const router = useRouter()
   const searchParams = useSearchParams()
-  // FIX: Also get loading state to prevent race condition
-  const { conversations, loading: conversationsLoading } = useConversations()
 
   // SINGLE SOURCE OF TRUTH: Derive conversation ID from URL
   const currentConversationId = searchParams.get("conversation")
@@ -42,7 +39,7 @@ export function useConversationRouter({
     }
   }, [user])
 
-  // Bootstrap: Mark as ready once user and conversations are loaded.
+  // Bootstrap: Mark as ready once user is present.
   // No conversation param in the URL = fresh new chat (welcome screen).
   // Users select previous conversations from the sidebar.
   useEffect(() => {
@@ -50,14 +47,11 @@ export function useConversationRouter({
     if (cid) return // Already has conversation in URL
     if (bootstrappedRef.current) return
     if (!user) return
-    if (conversationsLoading) return
 
     bootstrappedRef.current = true
 
-    logger.info("[ROUTER] Bootstrap: landing on new chat", {
-      conversationCount: conversations.length,
-    })
-  }, [searchParams, user, conversations, conversationsLoading])
+    logger.info("[ROUTER] Bootstrap: landing on new chat")
+  }, [searchParams, user])
 
   // Track conversation changes for cleanup (clear drafts for previous conversation)
   useEffect(() => {

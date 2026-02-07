@@ -150,9 +150,6 @@ export function useConversations(): UseConversationsReturn {
   // Load from database
   // --------------------------------------------------------------------------
   const loadFromDatabase = useCallback(async (userId: string) => {
-    // Get fresh auth state to compare
-    const { data: { user: freshUser } } = await supabase.auth.getUser()
-
     try {
       const { data, error } = await supabase
         .from("conversations")
@@ -173,7 +170,7 @@ export function useConversations(): UseConversationsReturn {
     } finally {
       setLoading(false)
     }
-  }, [user, guestUserId, effectiveUserId])
+  }, [supabase])
 
   // --------------------------------------------------------------------------
   // Initialize guest user ID
