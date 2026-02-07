@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { cn } from "@/lib/utils"
-import { ANIMATION_CONFIG, messageVariants } from "@/lib/animation-config"
+import { messageVariants } from "@/lib/animation-config"
 
 // ─── Category definitions ─────────────────────────────────────
 type Category = "backtest" | "technical" | "tick" | "scan" | "macro" | "default"
@@ -177,31 +177,18 @@ export function EnhancedTypingDots({
         ))}
       </div>
 
-      <motion.div
-        className="px-3 py-1 rounded-full bg-current/5"
-        animate={{
-          opacity: [0.3, 0.6, 0.3],
-          scale: [0.98, 1, 0.98],
-        }}
-        transition={{
-          duration: ANIMATION_CONFIG.typingIndicator.duration,
-          repeat: Infinity,
-          ease: ANIMATION_CONFIG.typingIndicator.ease,
-        }}
-      >
-        <AnimatePresence mode="wait">
-          <motion.span
-            key={text}
-            className="text-sm text-muted-foreground font-medium block"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-          >
-            {text}...
-          </motion.span>
-        </AnimatePresence>
-      </motion.div>
+      <AnimatePresence mode="wait">
+        <motion.span
+          key={text}
+          className="text-sm font-medium thinking-shimmer-text"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+        >
+          {text}...
+        </motion.span>
+      </AnimatePresence>
     </motion.div>
   )
 }

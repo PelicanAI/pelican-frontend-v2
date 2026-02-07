@@ -442,13 +442,13 @@ export function ChatContainer({
                 alt="Pelican AI"
                 className="w-7 h-7 sm:w-8 sm:h-8 object-contain opacity-80"
               />
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2.5 px-3.5 py-2 rounded-xl border border-white/5 backdrop-blur-sm bg-white/[0.03]">
                 <EnhancedTypingDots
                   variant="thinking"
                   userMessage={[...messages].reverse().find(m => m.role === 'user')?.content || ''}
                   elapsedSeconds={elapsedSeconds}
                 />
-                <span className="text-xs text-muted-foreground/70 font-mono tabular-nums min-w-[2.5rem]">
+                <span className="text-xs text-muted-foreground/50 font-mono tabular-nums min-w-[2.5rem]">
                   {elapsedSeconds}s
                 </span>
               </div>

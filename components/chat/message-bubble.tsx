@@ -97,10 +97,12 @@ export function MessageBubble({
       >
         <div className="max-w-3xl mx-auto px-4 sm:px-8">
           <div className="flex gap-4 sm:gap-6 items-start justify-end">
-            <div className="max-w-[90%] sm:max-w-[80%] md:max-w-[70%] lg:max-w-[600px] overflow-hidden">
-              <div className="text-[15px] sm:text-base leading-relaxed break-words text-foreground">
-                <AttachmentDisplay attachments={message.attachments} />
-                {message.content}
+            <div className="max-w-[85%] sm:max-w-[70%] md:max-w-[60%] overflow-hidden">
+              <div className="rounded-2xl bg-white/[0.06] px-4 py-3">
+                <div className="text-[15px] sm:text-base leading-relaxed break-words text-foreground">
+                  <AttachmentDisplay attachments={message.attachments} />
+                  {message.content}
+                </div>
               </div>
 
               <div className="flex items-center gap-2 mt-2 justify-end">
