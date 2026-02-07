@@ -40,6 +40,20 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Validate price ID against allowlist from env vars
+    const allowedPriceIds = [
+      process.env.NEXT_PUBLIC_STRIPE_STARTER_PRICE_ID,
+      process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID,
+      process.env.NEXT_PUBLIC_STRIPE_POWER_PRICE_ID,
+    ].filter(Boolean)
+
+    if (!allowedPriceIds.includes(priceId)) {
+      return NextResponse.json(
+        { error: 'Invalid price ID' },
+        { status: 400 }
+      )
+    }
+
     const userEmail = user.email
 
     let customerId: string | undefined

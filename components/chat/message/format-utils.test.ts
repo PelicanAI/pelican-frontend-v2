@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest"
-import { parseContentSegments, formatLine } from "./format-utils"
+import { parseContentSegments, formatLine, applyTickerLinks } from "./format-utils"
 
 describe("parseContentSegments", () => {
   it("parses plain text as a single text segment", () => {
@@ -64,10 +64,11 @@ describe("formatLine", () => {
     expect(result).toContain("hello")
   })
 
-  it("formats bold section headers", () => {
+  it("formats bold section headers without purple color", () => {
     const result = formatLine("**Support:**")
     expect(result).toContain("<strong")
     expect(result).toContain("Support:")
+    expect(result).not.toContain("text-purple")
   })
 
   it("formats italic text", () => {
@@ -89,9 +90,44 @@ describe("formatLine", () => {
     expect(result).not.toContain("<a ")
   })
 
-  it("formats non-bold section headers", () => {
+  it("formats non-bold section headers without purple color", () => {
     const result = formatLine("Support: we help you")
     expect(result).toContain("<strong")
     expect(result).toContain("Support:")
+    expect(result).not.toContain("text-purple")
+  })
+
+  it("renders markdown h3 headers", () => {
+    const result = formatLine("### Market Overview")
+    expect(result).toContain("<h3")
+    expect(result).toContain("Market Overview")
+  })
+
+  it("renders markdown h4 headers", () => {
+    const result = formatLine("#### Key Points")
+    expect(result).toContain("<h4")
+    expect(result).toContain("Key Points")
+  })
+
+  it("renders markdown h2 headers", () => {
+    const result = formatLine("## Summary")
+    expect(result).toContain("<h2")
+    expect(result).toContain("Summary")
+  })
+
+  it("does not render # without space as header", () => {
+    const result = formatLine("#notaheader")
+    expect(result).not.toContain("<h1")
+  })
+})
+
+describe("applyTickerLinks", () => {
+  it("applies purple color only to ticker links", () => {
+    const html = '<strong class="font-semibold">Summary:</strong> AAPL is up'
+    const result = applyTickerLinks(html, ["AAPL"])
+    expect(result).toContain("text-purple-400")
+    expect(result).toContain("ticker-link")
+    // The strong tag should NOT have purple
+    expect(result).toMatch(/<strong class="font-semibold">/)
   })
 })

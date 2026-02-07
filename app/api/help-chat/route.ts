@@ -89,7 +89,7 @@ Pelican uses a credit-based pricing system. Credits represent analytical workloa
 - One-click shareable reports
 - All new features as they ship
 
-No free tier. Paid from day one. System failures automatically refund credits.
+Every new account gets 10 free questions — no credit card required. After that, choose a subscription plan. System failures automatically refund credits.
 
 **Market Comparison:**
 Pelican is ~99% cheaper than institutional terminals:

@@ -109,7 +109,7 @@ const faqData: FAQCategory[] = [
       },
       {
         question: 'Is there a free tier or trial?',
-        answer: 'There is no free tier. Pelican operates on a paid-from-day-one model. We believe in providing full value from day one rather than a limited experience.',
+        answer: 'Every new account gets 10 free questions to try Pelican before subscribing. No credit card required. After that, choose a plan that fits your trading style.',
       },
       {
         question: 'What happens if a query fails?',

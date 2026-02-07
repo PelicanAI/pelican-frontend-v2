@@ -72,27 +72,46 @@ export function parseContentSegments(content: string): ContentSegment[] {
 }
 
 export function formatLine(line: string): string {
-  // Step 1: Escape HTML first
+  // Step 1: Check for markdown headers BEFORE escaping (need raw # characters)
+  const headerMatch = line.match(/^(#{1,6})\s+(.+)$/)
+  if (headerMatch) {
+    const level = headerMatch[1]!.length
+    const headerContent = escapeHtml(headerMatch[2]!)
+    // Apply inline formatting to header content (bold, italic)
+    const formatted = headerContent
+      .replace(/\*\*(.*?)\*\*/g, '<strong class="font-[600]">$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    const tag = `h${level}` as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
+    const sizeClass = level <= 2 ? 'text-lg font-semibold' : level === 3 ? 'text-base font-semibold' : 'text-sm font-semibold'
+    return DOMPurify.sanitize(
+      `<${tag} class="${sizeClass} mt-3 mb-1">${formatted}</${tag}>`,
+      {
+        ALLOWED_TAGS: ["h1", "h2", "h3", "h4", "h5", "h6", "strong", "em", "span"],
+        ALLOWED_ATTR: ["class"],
+      }
+    )
+  }
+
+  // Step 2: Escape HTML first
   let escaped = escapeHtml(line)
 
-  // Step 2: Apply markdown formatting on escaped content
-  // Handle bold text with colored section headers
+  // Step 3: Apply markdown formatting on escaped content
+  // Handle bold text
   escaped = escaped.replace(/\*\*(.*?)\*\*/g, (_, content) => {
-    // Section headers end with colon - apply purple accent color
     if (content.endsWith(':')) {
-      return `<strong class="font-semibold text-purple-400">${content}</strong>`
+      return `<strong class="font-semibold">${content}</strong>`
     }
     return `<strong class="font-[600]">${content}</strong>`
   })
 
   // Also handle non-bold section headers (word followed by colon at start of line)
   if (/^[A-Z][a-zA-Z\s]+:/.test(escaped) && !escaped.includes('<strong')) {
-    escaped = escaped.replace(/^([A-Z][a-zA-Z\s]+:)/, '<strong class="font-semibold text-purple-400">$1</strong>')
+    escaped = escaped.replace(/^([A-Z][a-zA-Z\s]+:)/, '<strong class="font-semibold">$1</strong>')
   }
 
   escaped = escaped.replace(/\*(.*?)\*/g, '<em>$1</em>')
 
-  // Step 3: Safe link handling with URL validation
+  // Step 4: Safe link handling with URL validation
   escaped = escaped.replace(LINK_REGEX, (match) => {
     try {
       const url = new URL(match)
@@ -106,7 +125,7 @@ export function formatLine(line: string): string {
     }
   })
 
-  // Step 4: Final sanitization with strict URI regexp
+  // Step 5: Final sanitization with strict URI regexp
   return DOMPurify.sanitize(escaped, {
     ALLOWED_TAGS: ["strong", "em", "a", "span", "br"],
     ALLOWED_ATTR: ["class", "href", "target", "rel"],
@@ -174,7 +193,7 @@ export function applyTickerLinks(
 
   // Re-sanitize with data-ticker and data-economic-term allowed
   return DOMPurify.sanitize(result, {
-    ALLOWED_TAGS: ["strong", "em", "a", "span", "br"],
+    ALLOWED_TAGS: ["strong", "em", "a", "span", "br", "h1", "h2", "h3", "h4", "h5", "h6"],
     ALLOWED_ATTR: ["class", "href", "target", "rel"],
     ADD_ATTR: ["data-ticker", "data-economic-term"],
     ALLOWED_URI_REGEXP: /^https?:\/\//i,

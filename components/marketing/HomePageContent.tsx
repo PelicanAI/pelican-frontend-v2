@@ -67,7 +67,7 @@ export default function HomePageContent() {
               <SignUpButton className="btn-primary">{t.marketing.hero.startTrading}</SignUpButton>
               <a href="#features" className="btn-secondary">{t.marketing.hero.seeFeatures}</a>
             </div>
-            <p className="hero-free-explainer">5 free questions. No credit card required.</p>
+            <p className="hero-free-explainer">10 free questions. No credit card required.</p>
             <div className="stats-bar">
               <div className="stat">
                 <div className="stat-value">{t.marketing.stats.tickersCovered}</div>
