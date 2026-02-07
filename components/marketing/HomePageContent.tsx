@@ -1,11 +1,12 @@
 'use client';
 
-import Link from 'next/link';
 import {
   FlaskConical,
   MessageCircle,
   Search,
   XSquare,
+  BarChart3,
+  Target,
 } from 'lucide-react';
 import { useT } from '@/lib/providers/translation-provider';
 import MarketingNav from '@/components/marketing/MarketingNav';
@@ -54,7 +55,7 @@ export default function HomePageContent() {
                   {t.marketing.hero.title1}<br />
                 </>
               )}
-              {t.marketing.hero.title2} <span className="highlight">{t.marketing.hero.titleHighlight}</span><br />
+              {t.marketing.hero.title2}{t.marketing.hero.titleHighlight && <>{' '}<span className="highlight">{t.marketing.hero.titleHighlight}</span></>}<br />
               {t.marketing.hero.title3}
             </h1>
             <p className="hero-subtitle">
@@ -63,7 +64,6 @@ export default function HomePageContent() {
             <div className="hero-cta">
               <SignUpButton className="btn-primary">{t.marketing.hero.startTrading}</SignUpButton>
               <a href="#features" className="btn-secondary">{t.marketing.hero.seeFeatures}</a>
-              <Link href="/how-to-use" className="btn-secondary">Pelican in Action</Link>
             </div>
             <div className="stats-bar">
               <div className="stat">
@@ -71,13 +71,73 @@ export default function HomePageContent() {
                 <div className="stat-label">{t.marketing.stats.tickersCoveredLabel}</div>
               </div>
               <div className="stat">
-                <div className="stat-value">{t.marketing.stats.plainEnglish}</div>
-                <div className="stat-label">{t.marketing.stats.noCodeRequired}</div>
+                <div className="stat-value">{t.marketing.stats.languagesSupported}</div>
+                <div className="stat-label">{t.marketing.stats.languagesSupportedLabel}</div>
+              </div>
+              <div className="stat">
+                <div className="stat-value">{t.marketing.stats.institutionalGrade}</div>
+                <div className="stat-label">{t.marketing.stats.institutionalGradeLabel}</div>
               </div>
             </div>
           </div>
           <div className="hero-visual">
             <HeroChatDemo />
+          </div>
+        </div>
+      </section>
+
+      <section className="social-proof-section">
+        <div className="section-inner">
+          <div className="section-header animate-on-scroll">
+            <h2 className="section-title">TRUSTED BY ACTIVE TRADERS</h2>
+          </div>
+          <div className="testimonials-grid">
+            <div className="testimonial-card bracket-box animate-on-scroll">
+              <div className="testimonial-quote">&ldquo;</div>
+              <p className="testimonial-text">Pelican found me a setup in TSLA I would have missed. Paid for itself day one.</p>
+              <div className="testimonial-attribution">&mdash; Alex M., Day Trader</div>
+            </div>
+            <div className="testimonial-card bracket-box animate-on-scroll">
+              <div className="testimonial-quote">&ldquo;</div>
+              <p className="testimonial-text">I used to spend 2 hours on pre-market research. Now it takes me 10 minutes.</p>
+              <div className="testimonial-attribution">&mdash; Sarah K., Swing Trader</div>
+            </div>
+            <div className="testimonial-card bracket-box animate-on-scroll">
+              <div className="testimonial-quote">&ldquo;</div>
+              <p className="testimonial-text">The backtest feature alone is worth the subscription. Nothing else does this at this price.</p>
+              <div className="testimonial-attribution">&mdash; James R., Options Trader</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="how-it-works-section">
+        <div className="section-inner">
+          <div className="section-header animate-on-scroll">
+            <div className="section-tag">{'// How It Works'}</div>
+            <h2 className="section-title">THREE STEPS TO SMARTER TRADING</h2>
+          </div>
+          <div className="steps-grid">
+            <div className="step-card animate-on-scroll">
+              <div className="step-number">01</div>
+              <div className="step-icon"><MessageCircle /></div>
+              <h3>Ask in Plain English</h3>
+              <p>Type any market question. No syntax, no formulas, no learning curve.</p>
+            </div>
+            <div className="step-connector" />
+            <div className="step-card animate-on-scroll">
+              <div className="step-number">02</div>
+              <div className="step-icon"><BarChart3 /></div>
+              <h3>Pelican Analyzes Real-Time Data</h3>
+              <p>Scans thousands of tickers, checks fundamentals, technicals, and macro context.</p>
+            </div>
+            <div className="step-connector" />
+            <div className="step-card animate-on-scroll">
+              <div className="step-number">03</div>
+              <div className="step-icon"><Target /></div>
+              <h3>Get Actionable Insights</h3>
+              <p>Specific levels, probabilities, and context. Not vague summaries.</p>
+            </div>
           </div>
         </div>
       </section>
@@ -170,39 +230,6 @@ export default function HomePageContent() {
         </div>
       </section>
 
-      <section id="team">
-        <div className="section-inner">
-          <div className="section-header animate-on-scroll">
-            <div className="section-tag">{t.marketing.team.sectionTag}</div>
-            <h2 className="section-title">{t.marketing.team.title}</h2>
-          </div>
-          <div className="team-grid">
-            <div className="team-card bracket-box animate-on-scroll">
-              <div className="team-name">{t.marketing.team.nickName}</div>
-              <div className="team-role">{t.marketing.team.nickRole}</div>
-              <p className="team-bio">
-                {t.marketing.team.nickBio}
-              </p>
-            </div>
-            <div className="team-card bracket-box animate-on-scroll">
-              <div className="team-name">{t.marketing.team.rayName}</div>
-              <div className="team-role">{t.marketing.team.rayRole}</div>
-              <p className="team-bio">
-                {t.marketing.team.rayBio}
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="languages-section">
-        <div className="section-inner">
-          <div className="section-header animate-on-scroll" style={{ textAlign: 'center', marginBottom: '0' }}>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>{t.marketing.languages.subtitle}</p>
-          </div>
-        </div>
-      </section>
-
       <section className="what-section">
         <div className="section-inner">
           <div className="what-content">
@@ -268,6 +295,11 @@ export default function HomePageContent() {
                 <div className="credit-type-name">{t.marketing.pricing.conversation}</div>
                 <div className="credit-type-amount">{t.marketing.pricing.conversationCredits} <span>{t.marketing.pricing.credits}</span></div>
                 <div className="credit-type-example">{t.marketing.pricing.conversationExample}</div>
+              </div>
+              <div className="credit-type bracket-box">
+                <div className="credit-type-name">{t.marketing.pricing.priceCheck}</div>
+                <div className="credit-type-amount">{t.marketing.pricing.priceCheckCredits} <span>{t.marketing.pricing.credits}</span></div>
+                <div className="credit-type-example">{t.marketing.pricing.priceCheckExample}</div>
               </div>
               <div className="credit-type bracket-box">
                 <div className="credit-type-name">{t.marketing.pricing.basicAnalysis}</div>
@@ -358,6 +390,31 @@ export default function HomePageContent() {
               </div>
             </div>
             <div className="savings-badge">{t.marketing.pricing.savingsBadge}</div>
+          </div>
+        </div>
+      </section>
+
+      <section id="team">
+        <div className="section-inner">
+          <div className="section-header animate-on-scroll">
+            <div className="section-tag">{t.marketing.team.sectionTag}</div>
+            <h2 className="section-title">{t.marketing.team.title}</h2>
+          </div>
+          <div className="team-grid">
+            <div className="team-card bracket-box animate-on-scroll">
+              <div className="team-name">{t.marketing.team.nickName}</div>
+              <div className="team-role">{t.marketing.team.nickRole}</div>
+              <p className="team-bio">
+                {t.marketing.team.nickBio}
+              </p>
+            </div>
+            <div className="team-card bracket-box animate-on-scroll">
+              <div className="team-name">{t.marketing.team.rayName}</div>
+              <div className="team-role">{t.marketing.team.rayRole}</div>
+              <p className="team-bio">
+                {t.marketing.team.rayBio}
+              </p>
+            </div>
           </div>
         </div>
       </section>

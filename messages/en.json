@@ -53,20 +53,20 @@
 
       "betaTag": "Now in Beta",
       "title1": "",
-      "title2": "CONVERSATIONAL",
-      "titleHighlight": "AI",
-      "title3": "FOR TRADERS & INVESTORS",
-      "subtitle": "Pelican replaces scanners, spreadsheets, and half-answers with real market intelligence.\nAsk questions in plain English to scan thousands of stocks, analyze price and macro context, and backtest strategies — all from a single interface.",
+      "title2": "Ask Any Market Question.",
+      "titleHighlight": "",
+      "title3": "Get Institutional-Grade Answers.",
+      "subtitle": "Pelican replaces scanners, spreadsheets, and half-answers with real market intelligence.",
       "startTrading": "Start Trading Smarter →",
       "seeFeatures": "See Features"
     },
     "stats": {
       "tickersCovered": "10K+",
       "tickersCoveredLabel": "Tickers Covered",
-      "plainEnglish": "Plain English",
-      "noCodeRequired": "No Code Required",
-      "oneClick": "1-Click",
-      "shareableReports": "Shareable Reports"
+      "languagesSupported": "30+",
+      "languagesSupportedLabel": "Languages Supported",
+      "institutionalGrade": "Institutional-Grade",
+      "institutionalGradeLabel": "Analysis"
     },
     "what": {
       "title": "CURSOR IS FOR DEVELOPERS. PELICAN IS FOR TRADERS.",
@@ -116,10 +116,10 @@
       "title": "BUILT BY TRADERS, FOR TRADERS",
       "nickName": "NICK GROVES",
       "nickRole": "Founder & CEO",
-      "nickBio": "Nick Groves is a systems-driven trader and market analyst with eight years of experience across futures, FX, equities, and digital assets.\n\nHe began his career in cryptocurrency arbitrage, building early crypto auto-spreading systems with support from Trading Technologies in Chicago. These systems connected seven major global exchanges and helped shape his core belief that markets reward structure, discipline, and context over prediction.\n\nSince 2020, Nick has focused on discretionary trading in equity index futures and currencies, using cross-market analysis and central bank policy to identify high-probability inflection points. His work blends macroeconomic insight with technical execution, emphasizing risk control, process, and emotional discipline.\n\nBeyond trading, Nick is an active market educator and builder. He co-hosts daily market calls, produces institutional-style analysis across platforms, and founded Pelican after years of watching traders overpay for shallow tools and false authority, with a mission to make institutional-grade insight accessible and honest.",
+      "nickBio": "Nick Groves is a systems-driven trader with eight years of experience across futures, FX, equities, and digital assets. He co-hosts daily market calls and founded Pelican after years of watching traders overpay for shallow tools — with a mission to make institutional-grade insight accessible and honest.",
       "rayName": "RAY CAMPBELL",
       "rayRole": "Co-Founder & CTO",
-      "rayBio": "Ray Campbell is a rare systems architect who has helped build the infrastructure behind multiple generations of global markets.\n\nAt LaBranche & Co. Inc., he played a critical role in the NYSE’s transition to electronic trading, designing ultra-low-latency systems that continuously quoted and executed trades across hundreds of stocks at once. This work powered institutional market-making during one of the most important structural shifts in modern market history.\n\nBeyond U.S. equities, Ray worked extensively in Asia, helping design and deploy trading systems for the Shanghai Futures Exchange and Korean derivatives markets. In partnership with CITIC Bank, he contributed to the launch of China’s first commodity ETF, operating at the intersection of regulation, exchange infrastructure, and high-performance execution.\n\nOver the last decade, Ray has applied that same rigor to modern markets, architecting exchange-grade platforms across equities, futures, options, and crypto. His work spans matching engines, market data pipelines, exchange connectivity, and high-performance C++ systems built for environments where speed, reliability, and precision are non-negotiable."
+      "rayBio": "Ray Campbell helped build the NYSE's transition to electronic trading at LaBranche & Co., designing ultra-low-latency systems across hundreds of stocks. He has since architected exchange-grade platforms across equities, futures, options, and crypto — spanning matching engines, market data pipelines, and high-performance systems."
     },
     "pricing": {
       "sectionTag": "// Pricing",
@@ -130,7 +130,10 @@
       "creditsExplainer": "Credits are like points you spend when you ask for help. Easy questions use a few points. Bigger questions use more. You can always see how many points you have left.",
       "conversation": "Conversation",
       "conversationCredits": "2",
-      "conversationExample": "\"What's AAPL at?\" / \"What's RSI?\"",
+      "conversationExample": "\"What's RSI?\" / \"Explain options basics\"",
+      "priceCheck": "Price Check",
+      "priceCheckCredits": "10",
+      "priceCheckExample": "\"What's AAPL at?\" / Quick price lookups",
       "basicAnalysis": "Basic Analysis",
       "basicAnalysisCredits": "25",
       "basicAnalysisExample": "\"Is NVDA overbought?\" / \"Show me AAPL's moving averages\"",
@@ -138,7 +141,7 @@
       "eventStudyCredits": "75",
       "eventStudyExample": "\"How does SPY react after CPI?\" / \"Compare AAPL vs MSFT\"",
       "deepAnalysis": "Deep Analysis",
-      "deepAnalysisCredits": "200",
+      "deepAnalysisCredits": "250",
       "deepAnalysisExample": "\"Backtest this strategy 1 year\" / \"Show institutional flow on SPY\"",
       "credits": "credits",
       "starter": "STARTER",

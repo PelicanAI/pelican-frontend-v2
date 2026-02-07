@@ -62,10 +62,10 @@ export interface Translations {
     stats: {
       tickersCovered: string;
       tickersCoveredLabel: string;
-      plainEnglish: string;
-      noCodeRequired: string;
-      oneClick: string;
-      shareableReports: string;
+      languagesSupported: string;
+      languagesSupportedLabel: string;
+      institutionalGrade: string;
+      institutionalGradeLabel: string;
     };
     what: {
       title: string;
@@ -130,6 +130,9 @@ export interface Translations {
       conversation: string;
       conversationCredits: string;
       conversationExample: string;
+      priceCheck: string;
+      priceCheckCredits: string;
+      priceCheckExample: string;
       basicAnalysis: string;
       basicAnalysisCredits: string;
       basicAnalysisExample: string;
