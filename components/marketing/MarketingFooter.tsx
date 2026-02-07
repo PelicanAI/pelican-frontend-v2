@@ -24,7 +24,7 @@ export default function MarketingFooter() {
         </div>
       </div>
       <div className="footer-trust">
-        Your data is encrypted with AES-256. Pelican is not a financial advisor. Not investment advice.
+        Data encrypted at rest (AES-256) and in transit (TLS). Pelican is not a financial advisor. Not investment advice.
       </div>
     </footer>
   );
