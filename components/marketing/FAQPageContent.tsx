@@ -165,10 +165,15 @@ const faqData: FAQCategory[] = [
   },
 ];
 
-function FAQAccordion({ item, isOpen, onToggle }: { item: FAQItem; isOpen: boolean; onToggle: () => void }) {
+function FAQAccordion({ item, isOpen, onToggle, id }: { item: FAQItem; isOpen: boolean; onToggle: () => void; id: string }) {
   return (
     <div className="faq-item">
-      <button className={`faq-question ${isOpen ? 'open' : ''}`} onClick={onToggle}>
+      <button
+        className={`faq-question ${isOpen ? 'open' : ''}`}
+        onClick={onToggle}
+        aria-expanded={isOpen}
+        aria-controls={`faq-answer-${id}`}
+      >
         <span>{item.question}</span>
         <svg
           className={`faq-chevron ${isOpen ? 'open' : ''}`}
@@ -180,11 +185,12 @@ function FAQAccordion({ item, isOpen, onToggle }: { item: FAQItem; isOpen: boole
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
+          aria-hidden="true"
         >
           <polyline points="6 9 12 15 18 9"></polyline>
         </svg>
       </button>
-      <div className={`faq-answer ${isOpen ? 'open' : ''}`}>
+      <div id={`faq-answer-${id}`} className={`faq-answer ${isOpen ? 'open' : ''}`} role="region">
         <p>{item.answer}</p>
       </div>
     </div>
@@ -261,6 +267,7 @@ export default function FAQPageContent() {
                     item={item}
                     isOpen={openItems.has(key)}
                     onToggle={() => toggleItem(key)}
+                    id={key}
                   />
                 );
               })}

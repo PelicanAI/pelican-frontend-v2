@@ -277,9 +277,7 @@
 }
 
 .hero-content {
-  opacity: 0;
-  transform: translateY(30px);
-  animation: fadeUp 0.8s ease forwards;
+  animation: fadeUp 0.8s ease both;
 }
 
 .hero-tag {

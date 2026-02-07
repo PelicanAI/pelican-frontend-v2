@@ -144,14 +144,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Auth State
   // --------------------------------------------------------------------------
   useEffect(() => {
-    // Get initial session
-    const getInitialSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      setUser(session?.user ?? null)
+    // Get initial user (cryptographically verified, unlike getSession)
+    const getInitialUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      setUser(user ?? null)
       setLoading(false)
     }
 
-    getInitialSession()
+    getInitialUser()
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {

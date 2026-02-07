@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import HomePageContent from '@/components/marketing/HomePageContent';
-import './styles/marketing.css';
 
 export const metadata: Metadata = {
   title: { absolute: 'Pelican Trading | AI Market Intelligence for Traders' },

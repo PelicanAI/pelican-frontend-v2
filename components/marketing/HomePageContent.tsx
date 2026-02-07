@@ -47,6 +47,7 @@ export default function HomePageContent() {
 
       <MarketingNav links={navLinks} ctaAction="login" />
 
+      <main id="main-content">
       <section className="hero">
         <div className="hero-inner">
           <div className="hero-content">
@@ -400,6 +401,8 @@ export default function HomePageContent() {
           <SignUpButton className="btn-primary">{t.marketing.cta.button}</SignUpButton>
         </div>
       </section>
+
+      </main>
 
       <MarketingFooter />
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -31,12 +31,19 @@ export default function MarketingNav({
   const router = useRouter();
   const t = useT();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const mobileNavRef = useRef<HTMLDivElement>(null);
+  const toggleButtonRef = useRef<HTMLButtonElement>(null);
 
   const resolvedCtaLabel = ctaLabel ?? t.marketing.nav.launchApp;
 
   const handleCta = () => {
     router.push(ctaAction === 'login' ? '/auth/login' : '/auth/signup');
   };
+
+  const closeMobileNav = useCallback(() => {
+    setMobileNavOpen(false);
+    toggleButtonRef.current?.focus();
+  }, []);
 
   useEffect(() => {
     const handleResize = () => {
@@ -47,6 +54,56 @@ export default function MarketingNav({
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  // Focus trap for mobile nav
+  useEffect(() => {
+    if (!mobileNavOpen || !mobileNavRef.current) return;
+
+    const panel = mobileNavRef.current;
+    const focusableSelector = 'a[href], button, input, [tabindex]:not([tabindex="-1"])';
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        closeMobileNav();
+        return;
+      }
+
+      if (e.key !== 'Tab') return;
+
+      const focusableElements = Array.from(
+        panel.querySelectorAll<HTMLElement>(focusableSelector)
+      ).filter((el) => !el.hasAttribute('disabled') && el.offsetParent !== null);
+
+      if (focusableElements.length === 0) return;
+
+      const firstElement = focusableElements[0];
+      const lastElement = focusableElements[focusableElements.length - 1];
+
+      if (!firstElement || !lastElement) return;
+
+      if (e.shiftKey) {
+        if (document.activeElement === firstElement) {
+          e.preventDefault();
+          lastElement.focus();
+        }
+      } else {
+        if (document.activeElement === lastElement) {
+          e.preventDefault();
+          firstElement.focus();
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+
+    // Focus first focusable element when menu opens
+    const focusableElements = panel.querySelectorAll<HTMLElement>(focusableSelector);
+    focusableElements[0]?.focus();
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [mobileNavOpen, closeMobileNav]);
 
   return (
     <nav>
@@ -77,9 +134,10 @@ export default function MarketingNav({
           </button>
         </div>
         <button
+          ref={toggleButtonRef}
           type="button"
           className="nav-toggle"
-          aria-label="Open menu"
+          aria-label={mobileNavOpen ? 'Close menu' : 'Open menu'}
           aria-expanded={mobileNavOpen}
           aria-controls={mobileNavId}
           onClick={() => setMobileNavOpen((open) => !open)}
@@ -90,6 +148,7 @@ export default function MarketingNav({
         </button>
       </div>
       <div
+        ref={mobileNavRef}
         id={mobileNavId}
         className={`nav-mobile ${mobileNavOpen ? 'open' : ''}`}
       >
@@ -100,7 +159,7 @@ export default function MarketingNav({
                 key={link.href}
                 href={link.href}
                 className={link.active ? 'active' : ''}
-                onClick={() => setMobileNavOpen(false)}
+                onClick={() => closeMobileNav()}
               >
                 {link.label}
               </a>
@@ -109,7 +168,7 @@ export default function MarketingNav({
                 key={link.href}
                 href={link.href}
                 className={link.active ? 'active' : ''}
-                onClick={() => setMobileNavOpen(false)}
+                onClick={() => closeMobileNav()}
               >
                 {link.label}
               </Link>
@@ -118,7 +177,7 @@ export default function MarketingNav({
           <LanguageSelector />
           <button
             onClick={() => {
-              setMobileNavOpen(false);
+              closeMobileNav();
               handleCta();
             }}
             className="btn-primary"

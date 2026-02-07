@@ -385,31 +385,33 @@ export function ChatContainer({
                 return null
               }
 
+              // Only animate the last 2 messages (new/streaming); skip entrance animation for history
+              const isRecentMessage = index >= messages.length - 2
+              const animationProps = isRecentMessage
+                ? {
+                    initial: { opacity: 0, y: 20 } as const,
+                    animate: { opacity: 1, y: 0 } as const,
+                    exit: { opacity: 0, y: -10 } as const,
+                    transition: { duration: 0.2, ease: "easeOut" as const },
+                  }
+                : {
+                    initial: false as const,
+                    animate: { opacity: 1, y: 0 } as const,
+                    exit: { opacity: 0, y: -10 } as const,
+                    transition: { duration: 0.15 },
+                  }
+
               return message.role === "system" ? (
                 <motion.div
                   key={message.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{
-                    duration: 0.3,
-                    delay: index * 0.05,
-                    ease: "easeOut",
-                  }}
+                  {...animationProps}
                 >
                   <SystemMessage message={message} />
                 </motion.div>
               ) : (
                 <motion.div
                   key={message.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{
-                    duration: 0.3,
-                    delay: index * 0.05,
-                    ease: "easeOut",
-                  }}
+                  {...animationProps}
                 >
                   <StreamingMessage
                     message={message}

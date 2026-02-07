@@ -89,37 +89,18 @@ export default function ChatPage() {
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('pelican_sidebar_collapsed') === 'true'
-    }
-    return false
-  })
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [mobileSheetOpen, setMobileSheetOpen] = useState(false)
   const [isOnline, setIsOnline] = useState(true)
   const [showOfflineBanner, setShowOfflineBanner] = useState(false)
   const [mounted, setMounted] = useState(false)
-  const [tradingPanelCollapsed, setTradingPanelCollapsed] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('pelican_trading_panel_collapsed') === 'true'
-    }
-    return false
-  })
+  const [tradingPanelCollapsed, setTradingPanelCollapsed] = useState(false)
 
   // Resizable trading panel width
   const PANEL_MIN = 280
   const PANEL_MAX = 700
   const PANEL_DEFAULT = 320
-  const [panelWidth, setPanelWidth] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('pelican_trading_panel_width')
-      if (saved) {
-        const n = parseInt(saved, 10)
-        if (!isNaN(n) && n >= PANEL_MIN && n <= PANEL_MAX) return n
-      }
-    }
-    return PANEL_DEFAULT
-  })
+  const [panelWidth, setPanelWidth] = useState(PANEL_DEFAULT)
   const isResizing = useRef(false)
 
   // Handle sidebar toggle with persistence
@@ -181,9 +162,22 @@ export default function ChatPage() {
     watchlistSymbols: ['AAPL', 'TSLA', 'NVDA', 'SPY'] // User's custom watchlist
   })
 
-  // Initialize after mount and monitor network status
+  // Hydrate localStorage values after mount and monitor network status
   useEffect(() => {
     setMounted(true)
+
+    // Restore persisted state from localStorage
+    const savedSidebar = localStorage.getItem('pelican_sidebar_collapsed')
+    if (savedSidebar === 'true') setSidebarCollapsed(true)
+
+    const savedPanel = localStorage.getItem('pelican_trading_panel_collapsed')
+    if (savedPanel === 'true') setTradingPanelCollapsed(true)
+
+    const savedWidth = localStorage.getItem('pelican_trading_panel_width')
+    if (savedWidth) {
+      const n = parseInt(savedWidth, 10)
+      if (!isNaN(n) && n >= PANEL_MIN && n <= PANEL_MAX) setPanelWidth(n)
+    }
 
     // Monitor online/offline status
     const handleOnline = () => {
@@ -367,7 +361,7 @@ export default function ChatPage() {
           setTradingPanelCollapsed(false)
           localStorage.setItem('pelican_trading_panel_collapsed', 'false')
         }} />
-        <div className="flex h-[100dvh] min-h-[100dvh] overflow-hidden relative chat-background-gradient chat-viewport-lock">
+        <div id="main-content" className="flex h-[100dvh] min-h-[100dvh] overflow-hidden relative chat-background-gradient chat-viewport-lock">
       {/* Futuristic background effects - only in dark mode */}
       {/* <div className="absolute inset-0 dark:block hidden pointer-events-none">
         <div className="absolute inset-0 bg-gradient-to-br from-purple-950/10 via-black to-violet-950/10" />

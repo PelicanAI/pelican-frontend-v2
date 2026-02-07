@@ -21,7 +21,6 @@ const ALLOWED_MIME_TYPES: Record<string, string[]> = {
     "image/webp",
     "image/bmp",
     "image/tiff",
-    "image/svg+xml",
     "image/heic",
     "image/heif",
   ],
@@ -67,7 +66,6 @@ const EXTENSION_TO_MIME: Record<string, string> = {
   ".bmp": "image/bmp",
   ".tiff": "image/tiff",
   ".tif": "image/tiff",
-  ".svg": "image/svg+xml",
   ".heic": "image/heic",
   ".heif": "image/heif",
   ".pdf": "application/pdf",
@@ -94,7 +92,6 @@ const MAGIC_BYTES: Record<string, number[]> = {
   "image/webp": [0x52, 0x49, 0x46, 0x46],
   "image/bmp": [0x42, 0x4d],
   "image/tiff": [],
-  "image/svg+xml": [],
   "image/heic": [],
   "image/heif": [],
   "application/pdf": [0x25, 0x50, 0x44, 0x46],
@@ -193,6 +190,14 @@ export async function POST(request: NextRequest) {
 
     fileMeta = { name: sanitizedFilename, type: mimeType, size: file.size, category }
     addBreadcrumb("File received", { requestId, fileMeta })
+
+    // Block SVG uploads entirely (XSS risk via embedded scripts)
+    if (mimeType === "image/svg+xml" || mimeType === "image/svg") {
+      return NextResponse.json(
+        { error: "SVG uploads are not allowed for security reasons", code: "svg_blocked" },
+        { status: 400 }
+      )
+    }
 
     if (!ALL_ALLOWED_MIME_TYPES.includes(mimeType)) {
       return NextResponse.json(

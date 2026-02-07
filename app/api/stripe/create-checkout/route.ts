@@ -116,7 +116,7 @@ export async function POST(request: NextRequest) {
     
     if (error instanceof Stripe.errors.StripeError) {
       return NextResponse.json(
-        { error: error.message },
+        { error: process.env.NODE_ENV === 'production' ? 'An internal error occurred' : error.message },
         { status: error.statusCode || 500 }
       )
     }

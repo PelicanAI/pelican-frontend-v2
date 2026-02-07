@@ -151,7 +151,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(
       {
         error: "Failed to create conversation",
-        details: error instanceof Error ? error.message : "Unknown error",
+        details: process.env.NODE_ENV === 'production' ? undefined : (error instanceof Error ? error.message : "Unknown error"),
       },
       { status: 500 },
     )

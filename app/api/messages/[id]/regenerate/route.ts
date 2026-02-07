@@ -94,7 +94,7 @@ export async function POST(
     if (!pelApiKey) {
       console.error("[regenerate] Pelican API key not configured")
       return NextResponse.json(
-        { error: "Pelican API key not configured" },
+        { error: process.env.NODE_ENV === 'production' ? 'An internal error occurred' : 'Pelican API key not configured' },
         { status: 500 }
       )
     }
@@ -169,7 +169,7 @@ export async function POST(
     return NextResponse.json(
       {
         error: "Failed to regenerate message",
-        details: error instanceof Error ? error.message : "Unknown error",
+        details: process.env.NODE_ENV === 'production' ? undefined : (error instanceof Error ? error.message : "Unknown error"),
       },
       { status: 500 }
     )
