@@ -288,7 +288,9 @@ export function ChatContainer({
     prevMessagesRef.current = messages
   }, [messages, resetScrollState])
 
-  if (isLoadingHistory) {
+  // Only show skeleton when actually loading a conversation's history
+  // and no messages are present yet (defensive guard against stale loading state)
+  if (isLoadingHistory && messages.length === 0) {
     return (
       <div className="flex-1 flex flex-col min-h-0 bg-background relative">
         <ConversationHistorySkeleton messageCount={4} />

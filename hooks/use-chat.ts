@@ -384,6 +384,9 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
                 logger.info('[CHAT-COMPLETE] Capturing conversation ID from backend', {
                   conversationId,
                 });
+                // Mark as already loaded so the URL-change effect doesn't re-fetch
+                // (messages are already in state from streaming)
+                loadedConversationRef.current = conversationId;
                 setCurrentConversationId(conversationId);
                 onConversationCreated?.(conversationId);
               }
@@ -544,13 +547,14 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
   useEffect(() => {
     const conversationId = initialConversationId;
     
-    // Skip if no conversation ID
+    // Skip if no conversation ID (e.g. "New Chat" with no messages to fetch)
     if (!conversationId) {
       // Only clear if we have messages (avoid unnecessary state updates)
       if (messagesRef.current.length > 0) {
         setMessages([]);
         messagesRef.current = [];
       }
+      setIsLoadingMessages(false);
       setConversationNotFound(false);
       loadedConversationRef.current = null;
       setCurrentConversationId(null);
