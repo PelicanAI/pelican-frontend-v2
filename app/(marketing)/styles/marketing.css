@@ -331,6 +331,14 @@
   flex-wrap: wrap;
 }
 
+.hero-free-explainer {
+  font-family: var(--font-jetbrains), monospace;
+  font-size: 0.8rem;
+  color: rgba(241, 245, 249, 0.5);
+  margin-top: 0.75rem;
+  letter-spacing: 0.02em;
+}
+
 .hero-visual {
   position: relative;
   opacity: 0;

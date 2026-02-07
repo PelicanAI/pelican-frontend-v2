@@ -45,28 +45,31 @@
       "team": "チーム",
       "pricing": "料金",
       "faq": "よくある質問",
-      "launchApp": "アプリを起動 →",
+      "launchApp": "Try Free →",
       "getStarted": "始める →",
       "backToHome": "ホームに戻る"
     },
     "hero": {
-
       "betaTag": "Now in Beta",
       "title1": "AIプラットフォーム",
-      "title2": "あなたの",
+      "title2": "Stop Searching.",
       "titleHighlight": "思考",
-      "title3": "取引のように",
-      "subtitle": "自然な会話を通じた機関投資家レベルの市場インテリジェンス。戦略をバックテストし、パターンを分析し、1つのインターフェースで正確に実行します。",
+      "title3": "Start Asking.",
+      "subtitle": "Pelican gives you institutional-grade market analysis in plain English. No scanners. No spreadsheets. No guesswork.",
       "startTrading": "取引を開始 →",
       "seeFeatures": "機能を見る"
     },
     "stats": {
-      "tickersCovered": "10K+",
-      "tickersCoveredLabel": "対応ティッカー",
+      "tickersCovered": "99%",
+      "tickersCoveredLabel": "Cheaper Than Bloomberg",
       "plainEnglish": "平易な英語",
       "noCodeRequired": "コード不要",
       "oneClick": "1クリック",
-      "shareableReports": "共有可能なレポート"
+      "shareableReports": "共有可能なレポート",
+      "languagesSupported": "10K+",
+      "languagesSupportedLabel": "Tickers Covered",
+      "institutionalGrade": "30+",
+      "institutionalGradeLabel": "Languages"
     },
     "what": {
       "title": "CURSORは開発者向け。PELICANはトレーダー向け。",
@@ -150,7 +153,7 @@
       "starterFeature2": "10,000以上のティッカーのライブデータ",
       "starterFeature3": "取引教育とコーチング",
       "starterFeature4": "基本的なテクニカル分析",
-      "starterButton": "始める →",
+      "starterButton": "Start Free Trial →",
       "pro": "プロ",
       "proFor": "アクティブトレーダー",
       "proPrice": "$99",
@@ -163,7 +166,7 @@
       "proFeature3": "イベント研究と相関",
       "proFeature4": "1クリック共有レポート",
       "proFeature5": "取引コンテキストを記憶",
-      "proButton": "取引を開始 →",
+      "proButton": "Start Free Trial →",
       "power": "パワー",
       "powerFor": "ヘビーユーザーとプロフェッショナル",
       "powerPrice": "$249",
@@ -176,7 +179,7 @@
       "powerFeature3": "機関投資家フロー検出",
       "powerFeature4": "拡張バックテスト期間",
       "powerFeature5": "優先サポート",
-      "powerButton": "パワーへ →",
+      "powerButton": "Start Free Trial →",
       "mostPopular": "最も人気",
       "cancelAnytime": "いつでもキャンセル",
       "marketComparison": "機関投資家インテリジェンス。小売価格。",
@@ -193,7 +196,7 @@
       "title2": "始めましょう",
       "titleHighlight": "質問。",
       "subtitle": "分散したツールから統一されたインテリジェンスにアップグレードしたトレーダーに参加してください。",
-      "button": "Pelicanを起動 →"
+      "button": "Try For Free →"
     },
     "footer": {
       "copyright": "© 2026 Pelican Trading, LLC。全著作権所有。"
@@ -217,4 +220,3 @@
     }
   }
 }
-

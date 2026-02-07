@@ -67,6 +67,7 @@ export default function HomePageContent() {
               <SignUpButton className="btn-primary">{t.marketing.hero.startTrading}</SignUpButton>
               <a href="#features" className="btn-secondary">{t.marketing.hero.seeFeatures}</a>
             </div>
+            <p className="hero-free-explainer">5 free questions. No credit card required.</p>
             <div className="stats-bar">
               <div className="stat">
                 <div className="stat-value">{t.marketing.stats.tickersCovered}</div>
@@ -84,31 +85,6 @@ export default function HomePageContent() {
           </div>
           <div className="hero-visual">
             <HeroChatDemo />
-          </div>
-        </div>
-      </section>
-
-      <section className="social-proof-section">
-        <div className="section-inner">
-          <div className="section-header animate-on-scroll">
-            <h2 className="section-title">TRUSTED BY ACTIVE TRADERS</h2>
-          </div>
-          <div className="testimonials-grid">
-            <div className="testimonial-card bracket-box animate-on-scroll">
-              <div className="testimonial-quote">&ldquo;</div>
-              <p className="testimonial-text">Pelican found me a setup in TSLA I would have missed. Paid for itself day one.</p>
-              <div className="testimonial-attribution">&mdash; Alex M., Day Trader</div>
-            </div>
-            <div className="testimonial-card bracket-box animate-on-scroll">
-              <div className="testimonial-quote">&ldquo;</div>
-              <p className="testimonial-text">I used to spend 2 hours on pre-market research. Now it takes me 10 minutes.</p>
-              <div className="testimonial-attribution">&mdash; Sarah K., Swing Trader</div>
-            </div>
-            <div className="testimonial-card bracket-box animate-on-scroll">
-              <div className="testimonial-quote">&ldquo;</div>
-              <p className="testimonial-text">The backtest feature alone is worth the subscription. Nothing else does this at this price.</p>
-              <div className="testimonial-attribution">&mdash; James R., Options Trader</div>
-            </div>
           </div>
         </div>
       </section>

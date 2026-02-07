@@ -45,28 +45,31 @@
       "team": "الفريق",
       "pricing": "الأسعار",
       "faq": "الأسئلة الشائعة",
-      "launchApp": "تشغيل التطبيق ←",
+      "launchApp": "Try Free →",
       "getStarted": "ابدأ الآن ←",
       "backToHome": "العودة للرئيسية"
     },
     "hero": {
-
       "betaTag": "Now in Beta",
       "title1": "منصة الذكاء الاصطناعي",
-      "title2": "التي",
+      "title2": "Stop Searching.",
       "titleHighlight": "تفكر",
-      "title3": "كما تتداول أنت",
-      "subtitle": "ذكاء سوق بمستوى مؤسسي من خلال محادثة طبيعية. اختبر الاستراتيجيات، حلل الأنماط، ونفذ بدقة—كل ذلك في واجهة واحدة.",
+      "title3": "Start Asking.",
+      "subtitle": "Pelican gives you institutional-grade market analysis in plain English. No scanners. No spreadsheets. No guesswork.",
       "startTrading": "ابدأ التداول ←",
       "seeFeatures": "شاهد المميزات"
     },
     "stats": {
-      "tickersCovered": "+10K",
-      "tickersCoveredLabel": "رمز مغطى",
+      "tickersCovered": "99%",
+      "tickersCoveredLabel": "Cheaper Than Bloomberg",
       "plainEnglish": "لغة بسيطة",
       "noCodeRequired": "لا حاجة للبرمجة",
       "oneClick": "نقرة واحدة",
-      "shareableReports": "تقارير قابلة للمشاركة"
+      "shareableReports": "تقارير قابلة للمشاركة",
+      "languagesSupported": "10K+",
+      "languagesSupportedLabel": "Tickers Covered",
+      "institutionalGrade": "30+",
+      "institutionalGradeLabel": "Languages"
     },
     "what": {
       "title": "CURSOR للمطورين. PELICAN للمتداولين.",
@@ -150,7 +153,7 @@
       "starterFeature2": "بيانات مباشرة على أكثر من 10,000 رمز",
       "starterFeature3": "تعليم وتدريب التداول",
       "starterFeature4": "التحليل الفني الأساسي",
-      "starterButton": "ابدأ الآن ←",
+      "starterButton": "Start Free Trial →",
       "pro": "المحترف",
       "proFor": "المتداولون النشطون",
       "proPrice": "$99",
@@ -163,7 +166,7 @@
       "proFeature3": "دراسات الأحداث والارتباط",
       "proFeature4": "تقارير قابلة للمشاركة بنقرة واحدة",
       "proFeature5": "يتذكر سياق التداول الخاص بك",
-      "proButton": "ابدأ التداول ←",
+      "proButton": "Start Free Trial →",
       "power": "القوة",
       "powerFor": "المستخدمون الكثيفون والمحترفون",
       "powerPrice": "$249",
@@ -176,7 +179,7 @@
       "powerFeature3": "كشف التدفق المؤسسي",
       "powerFeature4": "فترات اختبار رجعي ممتدة",
       "powerFeature5": "دعم ذو أولوية",
-      "powerButton": "اختر القوة ←",
+      "powerButton": "Start Free Trial →",
       "mostPopular": "الأكثر شعبية",
       "cancelAnytime": "إلغاء في أي وقت",
       "marketComparison": "ذكاء مؤسسي. تسعير للأفراد.",
@@ -193,7 +196,7 @@
       "title2": "ابدأ",
       "titleHighlight": "السؤال.",
       "subtitle": "انضم إلى المتداولين الذين ترقوا من الأدوات المتناثرة إلى الذكاء الموحد.",
-      "button": "شغّل Pelican ←"
+      "button": "Try For Free →"
     },
     "footer": {
       "copyright": "© 2026 Pelican Trading, LLC. جميع الحقوق محفوظة."

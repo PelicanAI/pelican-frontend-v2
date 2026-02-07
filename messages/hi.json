@@ -45,28 +45,31 @@
       "team": "टीम",
       "pricing": "मूल्य निर्धारण",
       "faq": "सामान्य प्रश्न",
-      "launchApp": "ऐप लॉन्च करें →",
+      "launchApp": "Try Free →",
       "getStarted": "शुरू करें →",
       "backToHome": "होम पर वापस जाएं"
     },
     "hero": {
-
       "betaTag": "Now in Beta",
       "title1": "AI प्लेटफॉर्म",
-      "title2": "जो",
+      "title2": "Stop Searching.",
       "titleHighlight": "सोचता",
-      "title3": "है जैसे आप ट्रेड करते हैं",
-      "subtitle": "प्राकृतिक बातचीत के माध्यम से संस्थागत-स्तर की मार्केट इंटेलिजेंस। रणनीतियों का बैकटेस्ट करें, पैटर्न का विश्लेषण करें, और सटीकता के साथ निष्पादित करें—सब एक इंटरफेस में।",
+      "title3": "Start Asking.",
+      "subtitle": "Pelican gives you institutional-grade market analysis in plain English. No scanners. No spreadsheets. No guesswork.",
       "startTrading": "ट्रेडिंग शुरू करें →",
       "seeFeatures": "फीचर्स देखें"
     },
     "stats": {
-      "tickersCovered": "10K+",
-      "tickersCoveredLabel": "टिकर कवर किए गए",
+      "tickersCovered": "99%",
+      "tickersCoveredLabel": "Cheaper Than Bloomberg",
       "plainEnglish": "सरल भाषा",
       "noCodeRequired": "कोई कोड की आवश्यकता नहीं",
       "oneClick": "1-क्लिक",
-      "shareableReports": "शेयर करने योग्य रिपोर्ट"
+      "shareableReports": "शेयर करने योग्य रिपोर्ट",
+      "languagesSupported": "10K+",
+      "languagesSupportedLabel": "Tickers Covered",
+      "institutionalGrade": "30+",
+      "institutionalGradeLabel": "Languages"
     },
     "what": {
       "title": "CURSOR डेवलपर्स के लिए है। PELICAN ट्रेडर्स के लिए है।",
@@ -150,7 +153,7 @@
       "starterFeature2": "10,000+ टिकर्स पर लाइव डेटा",
       "starterFeature3": "ट्रेडिंग शिक्षा और कोचिंग",
       "starterFeature4": "बेसिक टेक्निकल एनालिसिस",
-      "starterButton": "शुरू करें →",
+      "starterButton": "Start Free Trial →",
       "pro": "प्रो",
       "proFor": "सक्रिय ट्रेडर्स",
       "proPrice": "$99",
@@ -163,7 +166,7 @@
       "proFeature3": "इवेंट स्टडीज और सहसंबंध",
       "proFeature4": "वन-क्लिक शेयर करने योग्य रिपोर्ट",
       "proFeature5": "आपका ट्रेडिंग संदर्भ याद रखता है",
-      "proButton": "ट्रेडिंग शुरू करें →",
+      "proButton": "Start Free Trial →",
       "power": "पावर",
       "powerFor": "हेवी और प्रोफेशनल यूजर्स",
       "powerPrice": "$249",
@@ -176,7 +179,7 @@
       "powerFeature3": "संस्थागत फ्लो डिटेक्शन",
       "powerFeature4": "विस्तारित बैकटेस्ट अवधि",
       "powerFeature5": "प्राथमिकता समर्थन",
-      "powerButton": "पावर चुनें →",
+      "powerButton": "Start Free Trial →",
       "mostPopular": "सबसे लोकप्रिय",
       "cancelAnytime": "कभी भी रद्द करें",
       "marketComparison": "संस्थागत इंटेलिजेंस। खुदरा मूल्य निर्धारण।",
@@ -193,7 +196,7 @@
       "title2": "शुरू करें",
       "titleHighlight": "पूछना।",
       "subtitle": "उन ट्रेडर्स से जुड़ें जिन्होंने बिखरे हुए टूल्स से एकीकृत इंटेलिजेंस में अपग्रेड किया है।",
-      "button": "Pelican लॉन्च करें →"
+      "button": "Try For Free →"
     },
     "footer": {
       "copyright": "© 2026 Pelican Trading, LLC. सर्वाधिकार सुरक्षित।"

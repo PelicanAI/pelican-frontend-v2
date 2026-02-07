@@ -45,28 +45,31 @@
       "team": "Team",
       "pricing": "Pricing",
       "faq": "FAQ",
-      "launchApp": "Launch App →",
+      "launchApp": "Try Free →",
       "getStarted": "Get Started →",
       "backToHome": "Back to Home"
     },
     "hero": {
-
       "betaTag": "Now in Beta",
       "title1": "THE AI PLATFORM",
-      "title2": "THAT",
+      "title2": "Stop Searching.",
       "titleHighlight": "THINKS",
-      "title3": "LIKE YOU TRADE",
-      "subtitle": "Institutional-grade market intelligence through natural conversation. Backtest strategies, analyze patterns, and execute with precision—all in one interface.",
+      "title3": "Start Asking.",
+      "subtitle": "Pelican gives you institutional-grade market analysis in plain English. No scanners. No spreadsheets. No guesswork.",
       "startTrading": "Start Trading Smarter →",
       "seeFeatures": "See Features"
     },
     "stats": {
-      "tickersCovered": "10K+",
-      "tickersCoveredLabel": "Tickers Covered",
+      "tickersCovered": "99%",
+      "tickersCoveredLabel": "Cheaper Than Bloomberg",
       "plainEnglish": "Plain English",
       "noCodeRequired": "No Code Required",
       "oneClick": "1-Click",
-      "shareableReports": "Shareable Reports"
+      "shareableReports": "Shareable Reports",
+      "languagesSupported": "10K+",
+      "languagesSupportedLabel": "Tickers Covered",
+      "institutionalGrade": "30+",
+      "institutionalGradeLabel": "Languages"
     },
     "what": {
       "title": "CURSOR IS FOR DEVELOPERS. PELICAN IS FOR TRADERS.",
@@ -150,7 +153,7 @@
       "starterFeature2": "Live data on 10,000+ tickers",
       "starterFeature3": "Trading education & coaching",
       "starterFeature4": "Basic technical analysis",
-      "starterButton": "Get Started →",
+      "starterButton": "Start Free Trial →",
       "pro": "PRO",
       "proFor": "Active Traders",
       "proPrice": "$99",
@@ -163,7 +166,7 @@
       "proFeature3": "Event studies & correlation",
       "proFeature4": "One-click shareable reports",
       "proFeature5": "Remembers your trading context",
-      "proButton": "Start Trading →",
+      "proButton": "Start Free Trial →",
       "power": "POWER",
       "powerFor": "Heavy & Professional Users",
       "powerPrice": "$249",
@@ -176,7 +179,7 @@
       "powerFeature3": "Institutional flow detection",
       "powerFeature4": "Extended backtest periods",
       "powerFeature5": "Priority support",
-      "powerButton": "Go Power →",
+      "powerButton": "Start Free Trial →",
       "mostPopular": "Most Popular",
       "cancelAnytime": "Cancel anytime",
       "marketComparison": "INSTITUTIONAL INTELLIGENCE. RETAIL PRICING.",
@@ -193,7 +196,7 @@
       "title2": "START",
       "titleHighlight": "ASKING.",
       "subtitle": "Join traders who've upgraded from scattered tools to unified intelligence.",
-      "button": "Launch Pelican →"
+      "button": "Try For Free →"
     },
     "footer": {
       "copyright": "© 2026 Pelican Trading, LLC. All rights reserved."
@@ -217,4 +220,3 @@
     }
   }
 }
-
