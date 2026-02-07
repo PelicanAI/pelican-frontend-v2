@@ -263,7 +263,7 @@
   min-height: 100dvh;
   display: flex;
   align-items: center;
-  padding: clamp(6rem, 12vw, 8rem) var(--page-gutter) var(--section-padding-y-tight);
+  padding: clamp(5rem, 8vw, 7rem) var(--page-gutter) var(--section-padding-y-tight);
 }
 
 .hero-inner {
@@ -304,7 +304,7 @@
 
 .hero h1 {
   font-family: var(--font-bebas-neue), sans-serif;
-  font-size: clamp(2rem, 4.5vw, 3rem);
+  font-size: clamp(2rem, 4.5vw, 3.5rem);
   line-height: 0.95;
   letter-spacing: 0.02em;
   margin-bottom: 1.5rem;
@@ -1265,11 +1265,7 @@
 
 @media (min-width: 1400px) {
   .section-inner {
-    max-width: 1200px;
-  }
-
-  .hero-inner {
-    max-width: 1200px;
+    max-width: 1400px;
   }
 
   .features-grid {

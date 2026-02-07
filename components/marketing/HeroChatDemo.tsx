@@ -122,7 +122,7 @@ export default function HeroChatDemo() {
 
   return (
     <div style={{
-      position: 'relative', width: '100%', maxWidth: 480, margin: '0 auto',
+      position: 'relative', width: '100%', maxWidth: 560, margin: '0 auto',
       borderRadius: 16, overflow: 'hidden', background: '#0a0b0f',
       border: '1px solid rgba(168,85,247,0.25)',
       boxShadow: '0 0 80px rgba(168,85,247,0.12), 0 25px 50px rgba(0,0,0,0.5)',
