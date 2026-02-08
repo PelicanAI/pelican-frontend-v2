@@ -40,18 +40,50 @@ export default function AcceptTermsPage() {
         return
       }
 
-      const { error: updateError } = await supabase
-        .from("user_credits")
-        .update({
-          terms_accepted: true,
-          terms_accepted_at: new Date().toISOString(),
-        })
-        .eq("user_id", user.id)
+      const now = new Date().toISOString()
 
-      if (updateError) {
-        console.error("[ACCEPT-TERMS] Update error:", updateError)
-        setError("Something went wrong. Please try again.")
-        return
+      // Try updating the existing row first (preserves credits, plan, etc.)
+      const { data: updated } = await supabase
+        .from("user_credits")
+        .update({ terms_accepted: true, terms_accepted_at: now })
+        .eq("user_id", user.id)
+        .select("user_id")
+
+      // If no row was updated, the user_credits row doesn't exist yet
+      // (race condition: DB trigger may not have fired yet for new OAuth users)
+      if (!updated || updated.length === 0) {
+        const { error: insertError } = await supabase
+          .from("user_credits")
+          .insert({
+            user_id: user.id,
+            terms_accepted: true,
+            terms_accepted_at: now,
+            free_questions_remaining: 10,
+            plan_type: "none",
+            credits_balance: 0,
+            is_admin: false,
+          })
+
+        if (insertError) {
+          // If insert fails with conflict, the trigger just created the row —
+          // retry the update once
+          if (insertError.code === "23505") {
+            const { error: retryError } = await supabase
+              .from("user_credits")
+              .update({ terms_accepted: true, terms_accepted_at: now })
+              .eq("user_id", user.id)
+
+            if (retryError) {
+              console.error("[ACCEPT-TERMS] Retry update error:", retryError)
+              setError("Something went wrong. Please try again.")
+              return
+            }
+          } else {
+            console.error("[ACCEPT-TERMS] Insert error:", insertError)
+            setError("Something went wrong. Please try again.")
+            return
+          }
+        }
       }
 
       router.replace("/chat")
