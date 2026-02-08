@@ -101,7 +101,6 @@ export function TradingContextPanel({
 
   const tabs = [
     { key: "market" as const, label: "Market" },
-    { key: "chart" as const, label: "Chart" },
     { key: "calendar" as const, label: "Calendar" },
   ]
 
@@ -142,7 +141,6 @@ export function TradingContextPanel({
               onClick={() => {
                 if (tab.key === "calendar") showCalendar()
                 else if (tab.key === "market") closeChart()
-                // "chart" tab has no default ticker — stays on market until user picks one
               }}
               className={cn(
                 "flex-1 py-2.5 text-xs font-medium transition-colors border-b-2",

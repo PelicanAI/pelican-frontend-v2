@@ -6,9 +6,6 @@ const SUGGESTED_PROMPTS = [
   "What are the top gaining stocks today?",
   "Analyze AAPL's technical setup",
   "Why is the market down today?",
-  "Give me a swing trade for this week",
-  "Compare NVDA vs AMD for a long-term hold",
-  "What are the most volatile stocks right now?",
 ]
 
 interface SuggestedPromptsProps {
