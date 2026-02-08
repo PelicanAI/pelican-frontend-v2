@@ -207,6 +207,20 @@
   color: var(--accent-purple);
 }
 
+.nav-login-link {
+  font-family: var(--font-jetbrains), monospace;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: color 0.2s;
+}
+
+.nav-login-link:hover {
+  color: var(--text-primary);
+}
+
 /* Buttons */
 .btn-primary {
   display: inline-flex;

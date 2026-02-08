@@ -129,6 +129,7 @@ export default function MarketingNav({
             )
           )}
           <LanguageSelector />
+          <Link href="/auth/login" className="nav-login-link">Login</Link>
           <button onClick={handleCta} className="btn-primary">
             {resolvedCtaLabel}
           </button>
@@ -175,6 +176,7 @@ export default function MarketingNav({
             )
           )}
           <LanguageSelector />
+          <Link href="/auth/login" className="nav-login-link" onClick={() => closeMobileNav()}>Login</Link>
           <button
             onClick={() => {
               closeMobileNav();
