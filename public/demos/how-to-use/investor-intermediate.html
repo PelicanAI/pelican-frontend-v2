@@ -123,7 +123,7 @@
 
     <div class="chat-header">
       <div class="header-left">
-        <img src="/pelican-logo-transparent.png" alt="Pelican" class="header-logo" id="headerLogo">
+        <img src="/pelican-logo-transparent.webp" alt="Pelican" class="header-logo" id="headerLogo">
         <span class="header-title">Pelican AI</span>
       </div>
       <div class="header-status"><span class="status-dot"></span><span>Online</span></div>
@@ -171,7 +171,7 @@ Want me to show you the specific dates and closing prices for each ATH?`,
       typingSpeed: 50,
       streamingSpeed: 30,
       holdDuration: 2500,
-      logoPath: "/pelican-logo-transparent.png"
+      logoPath: "/pelican-logo-transparent.webp"
     };
 
     const cursor = document.getElementById('demoCursor');
@@ -246,7 +246,7 @@ Want me to show you the specific dates and closing prices for each ATH?`,
       cursor.classList.add('visible'); await delay(500);
       const inputRect = chatInput.getBoundingClientRect();
       await moveCursor(inputRect.left + 100, inputRect.top + 12, 750);
-      await clickAnimation(); inputWrapper.classList.add('focused'); chatInput.focus(); await delay(500);
+      await clickAnimation(); inputWrapper.classList.add('focused'); await delay(500);
       await typeText(chatInput, CONFIG.prompt, CONFIG.typingSpeed); await delay(400);
       const sendRect = sendBtn.getBoundingClientRect();
       await moveCursor(sendRect.left + 18, sendRect.top + 18, 450); await delay(200); await clickAnimation();

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useLayoutEffect } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useT } from '@/lib/providers/translation-provider';
@@ -81,7 +81,6 @@ const investorDemos = [
 export default function HowToUsePageContent() {
   const t = useT();
   const [activeTab, setActiveTab] = useState<'traders' | 'investors'>('traders');
-  const topRef = useRef<HTMLDivElement>(null);
 
   const navLinks = [
     { href: '/#features', label: t.marketing.nav.features },
@@ -91,64 +90,9 @@ export default function HowToUsePageContent() {
     { href: '/faq', label: t.marketing.nav.faq },
   ];
 
-  // Force scroll to top on tab change (iframes can trigger jumps)
-  useLayoutEffect(() => {
-    const marketingPage = document.querySelector('.marketing-page') as HTMLElement | null;
-    const scrollTopNow = () => {
-      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-      document.documentElement.scrollTop = 0;
-      document.body.scrollTop = 0;
-      if (marketingPage) {
-        marketingPage.scrollTop = 0;
-      }
-      topRef.current?.scrollIntoView({ behavior: 'instant', block: 'start' });
-    };
-
-    scrollTopNow();
-    const timers = [0, 50, 150].map((delay) => setTimeout(scrollTopNow, delay));
-    return () => timers.forEach(clearTimeout);
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
   }, [activeTab]);
-
-  // Force scroll to top on page load
-  useLayoutEffect(() => {
-    const marketingPage = document.querySelector('.marketing-page');
-    if (marketingPage) {
-      (marketingPage as HTMLElement).style.scrollBehavior = 'auto';
-      marketingPage.classList.add('no-smooth-scroll');
-      marketingPage.scrollTop = 0;
-    }
-
-    document.documentElement.style.scrollBehavior = 'auto';
-    document.body.style.scrollBehavior = 'auto';
-
-    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
-    if (marketingPage) {
-      marketingPage.scrollTop = 0;
-    }
-
-    topRef.current?.scrollIntoView({ behavior: 'instant', block: 'start' });
-
-    const timers = [50, 100, 200, 500, 1000].map((delay) =>
-      setTimeout(() => {
-        window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-        if (marketingPage) {
-          marketingPage.scrollTop = 0;
-        }
-      }, delay)
-    );
-
-    return () => {
-      timers.forEach(clearTimeout);
-      if (marketingPage) {
-        (marketingPage as HTMLElement).style.scrollBehavior = '';
-        marketingPage.classList.remove('no-smooth-scroll');
-      }
-      document.documentElement.style.scrollBehavior = '';
-      document.body.style.scrollBehavior = '';
-    };
-  }, []);
 
   const currentDemos = activeTab === 'traders' ? traderDemos : investorDemos;
   const handleTabChange = (tab: 'traders' | 'investors') => {
@@ -159,7 +103,7 @@ export default function HowToUsePageContent() {
   return (
     <div className="how-to-use-page">
       <ScrollAnimationObserver dep={activeTab} />
-      <div ref={topRef} className="grid-bg"></div>
+      <div className="grid-bg"></div>
 
       <MarketingNav links={navLinks} ctaAction="login" />
 
