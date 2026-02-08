@@ -210,15 +210,25 @@
 .nav-login-link {
   font-family: var(--font-jetbrains), monospace;
   font-size: 0.85rem;
-  color: var(--text-secondary);
+  color: var(--accent-purple);
   text-decoration: none;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  transition: color 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid rgba(168, 85, 247, 0.35);
+  background: rgba(168, 85, 247, 0.08);
+  transition: color 0.2s, background 0.2s, border-color 0.2s, box-shadow 0.2s;
 }
 
 .nav-login-link:hover {
-  color: var(--text-primary);
+  color: var(--bg-primary);
+  background: var(--accent-purple);
+  border-color: var(--accent-purple);
+  box-shadow: 0 0 16px rgba(168, 85, 247, 0.35);
 }
 
 /* Buttons */
@@ -1348,6 +1358,9 @@
   .hero-visual {
     order: 0;
     margin-top: 2rem;
+    opacity: 1;
+    transform: none;
+    animation: none;
   }
 
   .hero-logo-large {
@@ -1984,7 +1997,8 @@
 @media (prefers-reduced-motion: reduce) {
   .animate-on-scroll,
   .feature-card,
-  .hero-content {
+  .hero-content,
+  .hero-visual {
     opacity: 1 !important;
     transform: none !important;
     transition: none !important;
