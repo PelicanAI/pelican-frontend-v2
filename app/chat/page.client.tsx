@@ -14,6 +14,7 @@ import { useMessageHandler } from "@/hooks/use-message-handler"
 import { useFileUpload } from "@/hooks/use-file-upload"
 import { useConversationRouter } from "@/hooks/use-conversation-router"
 import { useAuth } from "@/lib/providers/auth-provider"
+import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Menu } from "lucide-react"
@@ -197,6 +198,24 @@ export default function ChatPage() {
       window.removeEventListener('offline', handleOffline)
     }
   }, [])
+  // One-time terms acceptance check
+  const [termsChecked, setTermsChecked] = useState(false)
+  useEffect(() => {
+    if (!user || termsChecked) return
+    const supabase = createClient()
+    supabase
+      .from("user_credits")
+      .select("terms_accepted")
+      .eq("user_id", user.id)
+      .single()
+      .then(({ data }) => {
+        if (data && !data.terms_accepted) {
+          router.replace("/accept-terms")
+        }
+        setTermsChecked(true)
+      })
+  }, [user, termsChecked, router])
+
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [trialExhaustedOpen, setTrialExhaustedOpen] = useState(false)
   const [trialExhaustedMessage, setTrialExhaustedMessage] = useState<string | null>(null)

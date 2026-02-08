@@ -46,16 +46,22 @@ export async function GET(request: NextRequest) {
         return NextResponse.redirect(`${origin}/auth/error`)
       }
 
-      // Check if user has subscription
+      // Check if user has subscription and terms acceptance
       const { data: userCredits, error: creditsError } = await supabase
         .from('user_credits')
-        .select('plan_type, free_questions_remaining')
+        .select('plan_type, free_questions_remaining, terms_accepted')
         .eq('user_id', user.id)
         .single()
 
       // New user - no credits row yet, trigger will create it with 10 free questions
+      // Send to accept-terms since they haven't accepted yet
       if (creditsError?.code === 'PGRST116' || !userCredits) {
-        return NextResponse.redirect(new URL('/chat', request.url))
+        return NextResponse.redirect(new URL('/accept-terms', request.url))
+      }
+
+      // Check terms acceptance before anything else
+      if (!userCredits.terms_accepted) {
+        return NextResponse.redirect(new URL('/accept-terms', request.url))
       }
 
       const validPlans = ['base', 'pro', 'power', 'founder', 'starter', 'trial']

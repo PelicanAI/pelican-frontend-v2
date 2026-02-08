@@ -53,13 +53,26 @@ export default function SignUpPage() {
         password,
         options: {
           emailRedirectTo: `${window.location.origin}/auth/callback`,
+          data: {
+            terms_accepted: true,
+            terms_accepted_at: new Date().toISOString(),
+          },
         },
       })
-      
+
       if (error) throw error
 
       // If email confirmation is disabled, user is immediately logged in with a session
-      if (data.session) {
+      if (data.session && data.user) {
+        // Persist terms acceptance to user_credits
+        await supabase
+          .from("user_credits")
+          .update({
+            terms_accepted: true,
+            terms_accepted_at: new Date().toISOString(),
+          })
+          .eq("user_id", data.user.id)
+
         // User is logged in, redirect to pricing (new users need to subscribe)
         // Check if there's a pre-selected plan from the marketing site
         const storedPlan = sessionStorage.getItem('intended_plan')
