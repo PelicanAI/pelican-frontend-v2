@@ -1356,8 +1356,9 @@
   }
 
   .hero-visual {
-    order: 0;
-    margin-top: 2rem;
+    order: -2;
+    margin-bottom: 1.5rem;
+    margin-top: 0;
     opacity: 1;
     transform: none;
     animation: none;
