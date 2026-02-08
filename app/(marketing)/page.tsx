@@ -66,6 +66,7 @@ export default function HomePage() {
             </p>
             <div className="hero-cta">
               <SignUpButton className="btn-primary">Try For Free →</SignUpButton>
+              <a href="/auth/login" className="btn-secondary">Login</a>
               <a href="#features" className="btn-secondary">See Features</a>
             </div>
             <p className="hero-free-explainer">10 free questions. No credit card required.</p>
