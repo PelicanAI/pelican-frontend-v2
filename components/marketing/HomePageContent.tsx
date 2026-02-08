@@ -23,6 +23,26 @@ const HelpChat = dynamic(() => import('@/components/marketing/HelpChat'), {
 
 export default function HomePageContent() {
   const t = useT();
+  const pricingBullets = {
+    starter: [
+      'Learning what RSI, support, resistance actually mean?',
+      "Tired of trading off YouTube clips and gut feelings?",
+      "Want to ask basic questions without paying for tools you don't need yet?",
+      'Perfect for building your foundation with real data',
+    ],
+    pro: [
+      'Using Pelican daily to validate trades before you make them',
+      'Running enough analyses and event studies to need room to breathe',
+      'Exploring multiple tickers, strategies, and setups each week',
+      'The sweet spot between casual and all-in',
+    ],
+    power: [
+      "Research isn't something you do sometimes, it's how you trade",
+      'Burning through analyses the way day traders burn through charts',
+      'Pressure-testing every idea before real money touches it',
+      'Maximum runway for traders who never stop asking questions',
+    ],
+  };
 
   const navLinks = [
     { href: '#features', label: t.marketing.nav.features, isAnchor: true },
@@ -252,13 +272,16 @@ export default function HomePageContent() {
           <div className="pricing-tiers">
             <div className="pricing-card bracket-box animate-on-scroll">
               <div className="pricing-tier-name">{t.marketing.pricing.starter}</div>
-              <div className="pricing-for">{t.marketing.pricing.starterFor}</div>
               <div className="pricing-amount">{t.marketing.pricing.starterPrice}<span>{t.marketing.pricing.starterPeriod}</span></div>
               <div className="pricing-credits">
                 <div className="pricing-credits-amount">{t.marketing.pricing.starterCredits}</div>
                 <div className="pricing-credits-label">{t.marketing.pricing.starterCreditsLabel}</div>
               </div>
-              <div className="pricing-effective">{t.marketing.pricing.starterEffective}</div>
+              <ul className="pricing-bullets">
+                {pricingBullets.starter.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
               <SignUpButton plan="starter" className="btn-secondary" style={{ width: '100%', justifyContent: 'center' }}>
                 {t.marketing.pricing.starterButton}
               </SignUpButton>
@@ -267,13 +290,16 @@ export default function HomePageContent() {
             <div className="pricing-card bracket-box featured animate-on-scroll">
               <div className="pricing-badge">{t.marketing.pricing.mostPopular}</div>
               <div className="pricing-tier-name">{t.marketing.pricing.pro}</div>
-              <div className="pricing-for">{t.marketing.pricing.proFor}</div>
               <div className="pricing-amount">{t.marketing.pricing.proPrice}<span>{t.marketing.pricing.proPeriod}</span></div>
               <div className="pricing-credits">
                 <div className="pricing-credits-amount">{t.marketing.pricing.proCredits}</div>
                 <div className="pricing-credits-label">{t.marketing.pricing.proCreditsLabel}</div>
               </div>
-              <div className="pricing-effective">{t.marketing.pricing.proEffective}</div>
+              <ul className="pricing-bullets">
+                {pricingBullets.pro.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
               <SignUpButton plan="pro" className="btn-primary" style={{ width: '100%', justifyContent: 'center' }}>
                 {t.marketing.pricing.proButton}
               </SignUpButton>
@@ -281,13 +307,16 @@ export default function HomePageContent() {
 
             <div className="pricing-card bracket-box animate-on-scroll">
               <div className="pricing-tier-name">{t.marketing.pricing.power}</div>
-              <div className="pricing-for">{t.marketing.pricing.powerFor}</div>
               <div className="pricing-amount">{t.marketing.pricing.powerPrice}<span>{t.marketing.pricing.powerPeriod}</span></div>
               <div className="pricing-credits">
                 <div className="pricing-credits-amount">{t.marketing.pricing.powerCredits}</div>
                 <div className="pricing-credits-label">{t.marketing.pricing.powerCreditsLabel}</div>
               </div>
-              <div className="pricing-effective">{t.marketing.pricing.powerEffective}</div>
+              <ul className="pricing-bullets">
+                {pricingBullets.power.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
               <SignUpButton plan="power" className="btn-secondary" style={{ width: '100%', justifyContent: 'center' }}>
                 {t.marketing.pricing.powerButton}
               </SignUpButton>

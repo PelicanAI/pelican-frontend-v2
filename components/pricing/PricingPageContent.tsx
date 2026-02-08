@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { User } from '@supabase/supabase-js'
-import { Check, Zap, Loader2, ShieldCheck } from 'lucide-react'
+import { Zap, Loader2, ShieldCheck } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useCreditsContext } from '@/providers/credits-provider'
@@ -44,49 +44,45 @@ const PLANS = [
     name: 'Base',
     price: 29,
     credits: 1000,
-    description: '~100 price checks or ~40 analyses',
     stripePriceId: process.env.NEXT_PUBLIC_STRIPE_STARTER_PRICE_ID || 'price_starter',
     popular: false,
     cta: 'Get Started',
-    features: [
-      '1,000 credits/month',
-      'All query types',
-      'Email support',
-      '20% rollover'
-    ]
+    bullets: [
+      'Learning what RSI, support, resistance actually mean?',
+      "Tired of trading off YouTube clips and gut feelings?",
+      "Want to ask basic questions without paying for tools you don't need yet?",
+      'Perfect for building your foundation with real data',
+    ],
   },
   {
     id: 'pro',
     name: 'Pro',
     price: 99,
     credits: 3500,
-    description: '~350 price checks or ~140 analyses',
     stripePriceId: process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID || 'price_pro',
     popular: true,
     cta: 'Start Trading',
-    features: [
-      '3,500 credits/month',
-      'All query types',
-      'Priority support',
-      '20% rollover',
-    ]
+    bullets: [
+      'Using Pelican daily to validate trades before you make them',
+      'Running enough analyses and event studies to need room to breathe',
+      'Exploring multiple tickers, strategies, and setups each week',
+      'The sweet spot between casual and all-in',
+    ],
   },
   {
     id: 'power',
     name: 'Power',
     price: 249,
     credits: 10000,
-    description: '~1,000 price checks or ~400 analyses',
     stripePriceId: process.env.NEXT_PUBLIC_STRIPE_POWER_PRICE_ID || 'price_power',
     popular: false,
     cta: 'Go Power',
-    features: [
-      '10,000 credits/month',
-      'All query types',
-      'Priority support',
-      '20% rollover',
-      'Custom integrations'
-    ]
+    bullets: [
+      "Research isn't something you do sometimes, it's how you trade",
+      'Burning through analyses the way day traders burn through charts',
+      'Pressure-testing every idea before real money touches it',
+      'Maximum runway for traders who never stop asking questions',
+    ],
   }
 ]
 
@@ -266,14 +262,9 @@ export default function PricingPageContent() {
                 <span>{plan.credits.toLocaleString()} credits</span>
               </div>
 
-              <p className="pricing-card-description">{plan.description}</p>
-
-              <ul className="pricing-card-features">
-                {plan.features.map((feature, i) => (
-                  <li key={i}>
-                    <Check className="pricing-card-check" />
-                    <span>{feature}</span>
-                  </li>
+              <ul className="pricing-card-bullets">
+                {plan.bullets.map((item) => (
+                  <li key={item}>{item}</li>
                 ))}
               </ul>
 

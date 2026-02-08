@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import HomePageContent from '@/components/marketing/HomePageContent';
 import SignUpButton from '@/components/marketing/SignUpButton';
 import HeroChatDemoLoader from '@/components/marketing/HeroChatDemoLoader';
@@ -85,8 +86,20 @@ export default function HomePage() {
             </div>
           </div>
           <div className="hero-visual">
-            <HeroChatDemoLoader />
+            <Image
+              src="/pelican-logo-transparent.webp"
+              alt="Pelican Trading"
+              width={520}
+              height={520}
+              className="hero-logo-large"
+              priority
+            />
           </div>
+        </div>
+      </section>
+      <section className="hero-demo-section">
+        <div className="hero-demo-inner">
+          <HeroChatDemoLoader />
         </div>
       </section>
       <HomePageContent />
